@@ -1,0 +1,31 @@
+name: NSE Daily 6:30 PM Update
+
+on:
+  schedule:
+    - cron: '0 13 * * 1-5'  # Mon-Fri at 18:30 IST (13:00 UTC)
+  workflow_dispatch:        # Manual Run button
+
+jobs:
+  update-nse-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install pandas numpy
+
+      - name: Download & Compute Delivery OBV
+        run: python update_all_stocks.py
+
+      - name: Commit and Push Updated Stock JSONs
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --staged --quiet || (git commit -m "Auto-update all NSE delivery OBV data" && git push)
