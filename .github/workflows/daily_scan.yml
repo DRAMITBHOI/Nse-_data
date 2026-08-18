@@ -3,7 +3,10 @@ name: NSE Daily 6:30 PM Update
 on:
   schedule:
     - cron: '0 13 * * 1-5'  # Mon-Fri at 18:30 IST (13:00 UTC)
-  workflow_dispatch:        # Manual Run button
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-nse-data:
@@ -18,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install pandas numpy
+        run: pip install pandas numpy requests
 
       - name: Download & Compute Delivery OBV
         run: python update_all_stocks.py
@@ -28,4 +31,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --staged --quiet || (git commit -m "Auto-update all NSE delivery OBV data" && git push)
+          git diff --staged --quiet || (git commit -m "Auto-update daily NSE delivery data" && git push)
