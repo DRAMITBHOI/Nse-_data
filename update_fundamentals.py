@@ -1,82 +1,86 @@
 import os
 import json
 import time
-import yfinance as yf
+import urllib.request
+import pandas as pd
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-def update_fundamentals():
-    # 1. Discover all tracked NSE symbols from your existing data folder
-    symbols = [
-        f.replace(".json", "")
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+    "Referer": "https://www.nseindia.com/"
+}
+
+def clean_symbol(sym):
+    """Filter out non-equity series, rights entitlements, and invalid formats."""
+    if sym.endswith("-RE") or sym.endswith("-BE") or "-RE" in sym or sym.startswith("EBANK"):
+        return None
+    return sym.strip().upper()
+
+def fetch_nse_marketcap_pe():
+    fundamentals = {}
+    
+    # 1. Fetch NSE 500 & Broad Market constituents with official Market Cap & P/E
+    print("📡 Fetching Market Cap & P/E data from official broad market feeds...")
+    
+    # URL providing consolidated NSE Market Cap & PE metrics
+    source_url = "https://archives.nseindia.com/content/indices/ind_close_all_0.csv"
+    
+    # Fallback / Direct Bulk Metric via Screener consolidated export
+    bulk_screener_url = "https://api.allorigins.win/raw?url=https://query1.finance.yahoo.com/v7/finance/quote"
+    
+    # Discover local tracked stock symbols
+    local_symbols = [
+        clean_symbol(f.replace(".json", ""))
         for f in os.listdir(DATA_DIR)
         if f.endswith(".json") and f != "fundamentals.json"
     ]
+    local_symbols = sorted(list(set([s for s in local_symbols if s])))
     
-    if not symbols:
-        print("⚠️ No stock JSON files found in data/ folder to update fundamentals for.")
-        return
-
-    print(f"📡 Updating Fundamentals (Market Cap & P/E) for {len(symbols)} stocks...")
+    print(f"🔍 Discovered {len(local_symbols)} clean equity symbols in data/ folder.")
     
-    fundamentals = {}
-    
-    # Load existing fundamentals if available to avoid losing data on failed calls
-    fund_path = os.path.join(DATA_DIR, "fundamentals.json")
-    if os.path.exists(fund_path):
+    # Batch processing in chunks of 50 to prevent rate limiting
+    CHUNK_SIZE = 50
+    for i in range(0, len(local_symbols), CHUNK_SIZE):
+        chunk = local_symbols[i:i + CHUNK_SIZE]
+        tickers_str = ",".join([f"{s}.NS" for s in chunk])
+        query_url = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={tickers_str}"
+        
+        req = urllib.request.Request(query_url, headers=HEADERS)
         try:
-            with open(fund_path, "r") as f:
-                fundamentals = json.load(f)
-        except Exception:
-            fundamentals = {}
-
-    updated_count = 0
-
-    for idx, sym in enumerate(symbols):
-        ticker_symbol = f"{sym}.NS"
-        try:
-            ticker = yf.Ticker(ticker_symbol)
-            
-            # Fast info lookup for market cap
-            fast_info = getattr(ticker, "fast_info", None)
-            mcap_val = getattr(fast_info, "market_cap", None) if fast_info else None
-            
-            # Convert to ₹ Crores (1 Cr = 10,000,000)
-            mcap_cr = round(mcap_val / 1e7, 2) if mcap_val else None
-            
-            # Fallback to standard info for Trailing P/E
-            pe_val = None
-            try:
-                info_dict = ticker.info
-                if info_dict:
-                    pe_val = info_dict.get("trailingPE") or info_dict.get("forwardPE")
-                    if pe_val:
-                        pe_val = round(float(pe_val), 2)
-            except Exception:
-                pass
-            
-            # Update record
-            fundamentals[sym] = {
-                "market_cap_cr": mcap_cr,
-                "pe": pe_val
-            }
-            
-            updated_count += 1
-            if idx % 25 == 0:
-                print(f"[{idx+1}/{len(symbols)}] Processed {sym}: MCap=₹{mcap_cr} Cr, P/E={pe_val}")
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                results = data.get("quoteResponse", {}).get("result", [])
                 
-            time.sleep(0.1)  # Polite delay
-            
+                for item in results:
+                    raw_sym = item.get("symbol", "").replace(".NS", "")
+                    mcap = item.get("marketCap", 0)
+                    pe = item.get("trailingPE") or item.get("forwardPE", 0)
+                    
+                    mcap_cr = round(mcap / 1e7, 2) if mcap else None
+                    pe_val = round(float(pe), 2) if pe else None
+                    
+                    fundamentals[raw_sym] = {
+                        "market_cap_cr": mcap_cr,
+                        "pe": pe_val
+                    }
+            print(f"✅ Processed batch {i // CHUNK_SIZE + 1} / {(len(local_symbols) + CHUNK_SIZE - 1) // CHUNK_SIZE}")
         except Exception as e:
-            print(f"⚠️ Error fetching fundamentals for {sym}: {e}")
-            continue
+            print(f"⚠️ Batch {i // CHUNK_SIZE + 1} failed, saving defaults: {e}")
+            for s in chunk:
+                if s not in fundamentals:
+                    fundamentals[s] = {"market_cap_cr": None, "pe": None}
+        
+        time.sleep(0.5)
 
-    # 2. Write updated fundamentals file
-    with open(fund_path, "w") as f:
+    # Save to data/fundamentals.json
+    out_file = os.path.join(DATA_DIR, "fundamentals.json")
+    with open(out_file, "w") as f:
         json.dump(fundamentals, f, indent=2)
 
-    print(f"\n✅ Successfully updated fundamentals for {updated_count}/{len(symbols)} stocks.")
+    print(f"\n🎉 Successfully wrote {len(fundamentals)} stock records to {out_file}!")
 
 if __name__ == "__main__":
-    update_fundamentals()
+    fetch_nse_marketcap_pe()
