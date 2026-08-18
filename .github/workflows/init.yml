@@ -16,20 +16,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install yfinance pandas requests
+        run: pip install pandas numpy requests
 
       - name: Run Initial History Script
-        run: |
-          python init_history.py
+        run: python init_history.py
 
       - name: Push Data to Repo
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "Add initialized historical stock data" || echo "No changes"
-          git push
+          git diff --staged --quiet || (git commit -m "Add initialized 5Y true NSE delivery data" && git push)
