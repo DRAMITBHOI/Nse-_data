@@ -1,0 +1,34 @@
+name: Weekly Fundamentals Update
+
+on:
+  schedule:
+    - cron: '0 2 * * 6'   # Runs every Saturday at 02:00 UTC (7:30 AM IST)
+  workflow_dispatch:      # Allows manual trigger anytime from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update-fundamentals:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install yfinance pandas requests
+
+      - name: Fetch Latest Market Cap & P/E
+        run: python update_fundamentals.py
+
+      - name: Commit and Push Updated Fundamentals
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fundamentals.json
+          git diff --staged --quiet || (git commit -m "Auto-update weekly stock fundamentals" && git push)
