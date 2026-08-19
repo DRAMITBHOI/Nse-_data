@@ -1,0 +1,79 @@
+{
+  "summary": [
+    {
+      "model_name": "Standard Base",
+      "params": {
+        "name": "Standard Base",
+        "lookback": 15,
+        "min_p_drop": -5.0,
+        "min_obv_gain": 5.0,
+        "trigger": "5D_HIGH"
+      },
+      "total_trades": 21,
+      "win_rate_pct": 14.3,
+      "profit_factor": 0.81,
+      "avg_gain_pct": 2.26,
+      "avg_holding_days": 23.0
+    },
+    {
+      "model_name": "Deep Accumulation Base",
+      "params": {
+        "name": "Deep Accumulation Base",
+        "lookback": 20,
+        "min_p_drop": -6.0,
+        "min_obv_gain": 7.5,
+        "trigger": "5D_HIGH"
+      },
+      "total_trades": 20,
+      "win_rate_pct": 20.0,
+      "profit_factor": 1.72,
+      "avg_gain_pct": 4.86,
+      "avg_holding_days": 27.2
+    },
+    {
+      "model_name": "Institutional Spring Base",
+      "params": {
+        "name": "Institutional Spring Base",
+        "lookback": 25,
+        "min_p_drop": -7.5,
+        "min_obv_gain": 10.0,
+        "trigger": "5D_HIGH"
+      },
+      "total_trades": 15,
+      "win_rate_pct": 13.3,
+      "profit_factor": 0.89,
+      "avg_gain_pct": 1.55,
+      "avg_holding_days": 22.5
+    },
+    {
+      "model_name": "Fast Momentum Reversal",
+      "params": {
+        "name": "Fast Momentum Reversal",
+        "lookback": 10,
+        "min_p_drop": -4.0,
+        "min_obv_gain": 4.0,
+        "trigger": "3D_HIGH"
+      },
+      "total_trades": 44,
+      "win_rate_pct": 6.8,
+      "profit_factor": 0.37,
+      "avg_gain_pct": -0.29,
+      "avg_holding_days": 19.0
+    }
+  ],
+  "winning_model": {
+    "model_name": "Deep Accumulation Base",
+    "params": {
+      "name": "Deep Accumulation Base",
+      "lookback": 20,
+      "min_p_drop": -6.0,
+      "min_obv_gain": 7.5,
+      "trigger": "5D_HIGH"
+    },
+    "total_trades": 20,
+    "win_rate_pct": 20.0,
+    "profit_factor": 1.72,
+    "avg_gain_pct": 4.86,
+    "avg_holding_days": 27.2
+  }
+}
