@@ -7,7 +7,7 @@ DATA_DIR = "data"
 MIN_DELIVERY_TURNOVER_CR = 1.5  # Min ₹1.5 Cr/day delivery turnover
 
 def run_choch_obv_backtest():
-    print("🚀 Starting True OBV Accumulation -> CHoCH Breakout -> OBV Distribution Exit Backtest...")
+    print("🚀 Running True OBV Base -> CHoCH Breakout -> Distribution Exit Backtest...")
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -24,11 +24,11 @@ def run_choch_obv_backtest():
     ]
 
     target_stocks = [f for f in stock_files if fundamentals and f.replace(".json", "") in fundamentals] or stock_files
-    print(f"📊 Loading history for {len(target_stocks)} Nifty 750 stocks...")
+    print(f"📊 Analyzing {len(target_stocks)} institutional stocks across historical data...")
 
     trades = []
     active_setups = []
-    lookback_windows = [5, 10, 15, 20]  # 1W, 2W, 3W, 4W trading days
+    lookback_windows = [5, 10, 15, 20]  # 1W, 2W, 3W, 4W
 
     for f_name in target_stocks:
         sym = f_name.replace(".json", "").strip().upper()
@@ -40,7 +40,7 @@ def run_choch_obv_backtest():
         except Exception:
             continue
 
-        if len(raw) < 50:
+        if len(raw) < 60:
             continue
 
         closes = np.array([float(x["close"]) for x in raw])
@@ -62,14 +62,16 @@ def run_choch_obv_backtest():
                 cur_obv = vols[idx]
             obvs[idx] = cur_obv
 
-        # --- PART 1: HISTORICAL BACKTEST SIMULATION ---
+        # -----------------------------------------------------------
+        # PART 1: 2-PHASE HISTORICAL BACKTEST ENGINE
+        # -----------------------------------------------------------
         i = 25
-        while i < len(closes) - 5:
+        while i < len(closes) - 15:
             if closes[i] < 30.0 or np.mean(turnovers[max(0, i - 8):i + 1]) < MIN_DELIVERY_TURNOVER_CR:
                 i += 1
                 continue
 
-            # Check 1W, 2W, 3W, 4W Bullish Divergence
+            # Stage 1: Detect True Delivery Accumulation Base
             matched_lb = None
             for lb in lookback_windows:
                 p_drop = ((closes[i] - closes[i - lb]) / closes[i - lb]) * 100
@@ -84,97 +86,114 @@ def run_choch_obv_backtest():
                 i += 1
                 continue
 
-            # Check CHoCH Entry Trigger (Close surges above the swing high of the accumulation window)
-            swing_high = np.max(highs[i - matched_lb:i])
-            if closes[i] > swing_high and vols[i] >= np.mean(vols[max(0, i - 9):i]):
-                entry_price = closes[i]
-                entry_idx = i
-                base_low = np.min(lows[i - matched_lb:i + 1])
-                stop_loss = round(base_low * 0.995, 2)
-                risk_pct = ((entry_price - stop_loss) / entry_price) * 100
+            # Base parameters
+            base_high = np.max(highs[i - matched_lb:i + 1])
+            base_low = np.min(lows[i - matched_lb:i + 1])
+            stop_loss = round(base_low * 0.995, 2)
 
-                exit_price = entry_price
-                exit_idx = i
-                exit_reason = "MAX_HOLD_TIME"
+            # Stage 2: Watch forward up to 15 trading days for a CHoCH Breakout
+            trade_entered = False
+            for k in range(i + 1, min(i + 16, len(closes))):
+                # If price drops severely below base low before breaking out, base is invalidated
+                if lows[k] < base_low * 0.97:
+                    break
 
-                # Simulate Forward for Exit Condition
-                for j in range(i + 1, min(i + 60, len(closes))):
-                    # 1. Hard Stop Loss Check
-                    if lows[j] <= stop_loss:
-                        exit_price = stop_loss
-                        exit_idx = j
-                        exit_reason = "STOP_LOSS"
-                        break
+                # CHoCH Breakout Trigger: Close > Base High + Volume Confirmation
+                avg_v_10 = np.mean(vols[max(0, k - 10):k])
+                if closes[k] > base_high and vols[k] >= avg_v_10:
+                    trade_entered = True
+                    entry_price = closes[k]
+                    entry_idx = k
+                    risk_pct = ((entry_price - stop_loss) / entry_price) * 100
 
-                    # 2. Check Bearish OBV Divergence Exit (Price stable/up, OBV drops >= 5%)
-                    # Evaluate over rolling 5 to 15 day window after entry
-                    post_entry_span = min(j - entry_idx, 15)
-                    if post_entry_span >= 5:
-                        p_chg_post = ((closes[j] - closes[j - post_entry_span]) / closes[j - post_entry_span]) * 100
-                        ref_obv = obvs[j - post_entry_span]
-                        obv_chg_post = ((obvs[j] - ref_obv) / abs(ref_obv)) * 100 if abs(ref_obv) > 0 else 0
+                    exit_price = entry_price
+                    exit_idx = entry_idx
+                    exit_reason = "MAX_TIME_EXIT"
 
-                        # Exit condition: Price stable (>= -2%) or rising (>= +5%) while OBV drops <= -5%
-                        if (p_chg_post >= -2.0 or closes[j] >= entry_price * 1.05) and obv_chg_post <= -5.0:
-                            exit_price = closes[j]
-                            exit_idx = j
-                            exit_reason = "OBV_DISTRIBUTION_EXIT"
+                    # Stage 3: Position Tracking & Distribution Exit
+                    for m in range(entry_idx + 1, min(entry_idx + 50, len(closes))):
+                        # Hard Stop Loss Check
+                        if lows[m] <= stop_loss:
+                            exit_price = stop_loss
+                            exit_idx = m
+                            exit_reason = "STOP_LOSS"
                             break
 
-                    exit_price = closes[j]
-                    exit_idx = j
+                        # Distribution Divergence Exit Check (rolling 5-10 day window)
+                        bars_in_trade = m - entry_idx
+                        if bars_in_trade >= 5:
+                            span = min(bars_in_trade, 10)
+                            p_chg_win = ((closes[m] - closes[m - span]) / closes[m - span]) * 100
+                            ref_o = obvs[m - span]
+                            obv_chg_win = ((obvs[m] - ref_o) / abs(ref_o)) * 100 if abs(ref_o) > 0 else 0
 
-                pnl_pct = ((exit_price - entry_price) / entry_price) * 100
-                trades.append({
-                    "symbol": sym,
-                    "entry_price": entry_price,
-                    "exit_price": exit_price,
-                    "pnl_pct": pnl_pct,
-                    "holding_days": exit_idx - entry_idx,
-                    "exit_reason": exit_reason,
-                    "risk_pct": risk_pct
-                })
-                i = exit_idx + 1
-                continue
-            i += 1
+                            # Exit when price is steady/rising while OBV drops >= 5%
+                            if (p_chg_win >= -1.5 or closes[m] >= entry_price * 1.05) and obv_chg_win <= -5.0:
+                                exit_price = closes[m]
+                                exit_idx = m
+                                exit_reason = "OBV_DISTRIBUTION_EXIT"
+                                break
 
-        # --- PART 2: SCAN TODAY'S ACTIVE SIGNALS ---
-        if len(closes) >= 25 and closes[-1] >= 30.0:
+                        exit_price = closes[m]
+                        exit_idx = m
+
+                    pnl_pct = ((exit_price - entry_price) / entry_price) * 100
+                    trades.append({
+                        "symbol": sym,
+                        "pnl_pct": pnl_pct,
+                        "holding_days": exit_idx - entry_idx,
+                        "exit_reason": exit_reason,
+                        "risk_pct": risk_pct
+                    })
+                    i = exit_idx + 1
+                    break
+
+            if not trade_entered:
+                i += 1
+
+        # -----------------------------------------------------------
+        # PART 2: SCAN TODAY'S ACTIVE SETUPS
+        # -----------------------------------------------------------
+        if len(closes) >= 30 and closes[-1] >= 30.0:
             sma_9_to = np.mean(turnovers[-9:])
             if sma_9_to >= MIN_DELIVERY_TURNOVER_CR:
+                # Check if stock formed an accumulation base in the last 15 days
                 for lb in lookback_windows:
-                    p_drop = ((closes[-1] - closes[-lb - 1]) / closes[-lb - 1]) * 100
-                    past_o = obvs[-lb - 1]
-                    o_gain = ((obvs[-1] - past_o) / abs(past_o)) * 100 if abs(past_o) > 0 else 0
+                    for offset in range(0, 10):
+                        idx = -1 - offset
+                        p_drop = ((closes[idx] - closes[idx - lb]) / closes[idx - lb]) * 100
+                        past_o = obvs[idx - lb]
+                        o_gain = ((obvs[idx] - past_o) / abs(past_o)) * 100 if abs(past_o) > 0 else 0
 
-                    if p_drop <= -5.0 and o_gain >= 5.0:
-                        swing_high = np.max(highs[-lb - 1:-1])
-                        base_low = np.min(lows[-lb - 1:])
-                        sl_price = round(base_low * 0.995, 2)
-                        risk_pct = round(((closes[-1] - sl_price) / closes[-1]) * 100, 2)
-                        is_choch_triggered = closes[-1] >= swing_high and vols[-1] >= np.mean(vols[-10:-1])
+                        if p_drop <= -5.0 and o_gain >= 5.0:
+                            base_h = np.max(highs[idx - lb:idx + 1])
+                            base_l = np.min(lows[idx - lb:idx + 1])
+                            sl = round(base_l * 0.995, 2)
+                            risk = round(((closes[-1] - sl) / closes[-1]) * 100, 2)
 
-                        meta = fundamentals.get(sym, {})
-                        active_setups.append({
-                            "Symbol": sym,
-                            "Signal": "🟢 CHoCH ENTRY TRIGGERED" if is_choch_triggered else "🟡 ACCUMULATING (Awaiting CHoCH)",
-                            "LTP (₹)": round(closes[-1], 2),
-                            "CHoCH Trigger Level": f"> ₹{round(swing_high, 2)}",
-                            "Stop Loss (₹)": sl_price,
-                            "Risk %": f"{risk_pct}%",
-                            "Lookback": f"{lb//5}W ({lb}D)",
-                            "Price Drop": f"{round(p_drop, 1)}%",
-                            "OBV Gain": f"+{round(o_gain, 1)}%",
-                            "9D Turnover": f"₹{sma_9_to:.1f} Cr/d"
-                        })
+                            is_triggered = closes[-1] >= base_h and vols[-1] >= np.mean(vols[-11:-1])
+
+                            active_setups.append({
+                                "Symbol": sym,
+                                "Signal": "🟢 CHoCH TRIGGERED (Buy)" if is_triggered else "🟡 ACCUMULATING (Awaiting CHoCH)",
+                                "LTP (₹)": round(closes[-1], 2),
+                                "CHoCH Level": f"> ₹{round(base_h, 2)}",
+                                "Stop Loss (₹)": sl,
+                                "Risk %": f"{risk}%",
+                                "Base Window": f"{lb//5}W Base",
+                                "9D Turnover": f"₹{sma_9_to:.1f} Cr/d"
+                            })
+                            break
+                    if len(active_setups) and active_setups[-1]["Symbol"] == sym:
                         break
 
-    # Calculate Statistics
+    # -----------------------------------------------------------
+    # STATISTICAL EVALUATION
+    # -----------------------------------------------------------
     df_t = pd.DataFrame(trades)
     if len(df_t) > 0:
         wins = df_t[df_t["pnl_pct"] > 0]
         losses = df_t[df_t["pnl_pct"] <= 0]
-        dist_exits = df_t[df_t["exit_reason"] == "OBV_DISTRIBUTION_EXIT"]
         win_rate = (len(wins) / len(df_t)) * 100
         pf = (wins["pnl_pct"].sum() / abs(losses["pnl_pct"].sum())) if len(losses) > 0 and losses["pnl_pct"].sum() != 0 else 999.0
 
@@ -182,13 +201,12 @@ def run_choch_obv_backtest():
             "total_trades": len(df_t),
             "win_rate_pct": round(win_rate, 1),
             "profit_factor": round(pf, 2),
-            "avg_gain_pct": round(wins["pnl_pct"].mean(), 2) if len(wins) > 0 else 0,
-            "avg_loss_pct": round(losses["pnl_pct"].mean(), 2) if len(losses) > 0 else 0,
-            "avg_holding_days": round(df_t["holding_days"].mean(), 1),
-            "dist_exit_count": len(dist_exits)
+            "avg_gain_pct": round(wins["pnl_pct"].mean(), 2) if len(wins) > 0 else 0.0,
+            "avg_loss_pct": round(losses["pnl_pct"].mean(), 2) if len(losses) > 0 else 0.0,
+            "avg_holding_days": round(df_t["holding_days"].mean(), 1)
         }
     else:
-        summary = {"total_trades": 0, "win_rate_pct": 0, "profit_factor": 0, "avg_gain_pct": 0, "avg_loss_pct": 0, "avg_holding_days": 0}
+        summary = {"total_trades": 0, "win_rate_pct": 0.0, "profit_factor": 0.0, "avg_gain_pct": 0.0, "avg_loss_pct": 0.0, "avg_holding_days": 0.0}
 
     active_setups.sort(key=lambda x: (x["Signal"].startswith("🟢"), -float(x["Risk %"].replace("%", ""))), reverse=True)
 
@@ -198,7 +216,7 @@ def run_choch_obv_backtest():
     with open(os.path.join(DATA_DIR, "active_trade_plan.json"), "w") as f:
         json.dump(active_setups, f, indent=2)
 
-    print(f"\n🎉 Backtest complete across {len(df_t)} trades! Win Rate: {summary['win_rate_pct']}%, Profit Factor: {summary['profit_factor']}")
+    print(f"\n🎉 Backtest Completed: {summary['total_trades']} Trades | Win Rate: {summary['win_rate_pct']}% | PF: {summary['profit_factor']}")
 
 if __name__ == "__main__":
     run_choch_obv_backtest()
