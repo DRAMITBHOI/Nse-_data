@@ -4,12 +4,11 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
-MIN_DELIVERY_TURNOVER_CR = 2.0  # Min ₹2 Cr/day delivery turnover (High liquidity)
-TARGET_PROFIT_PCT = 20.0        # Target: +20%
-MAX_HOLDING_DAYS = 50          # Max holding: ~10 weeks
+MIN_DELIVERY_TURNOVER_CR = 1.0  # Min ₹1.0 Cr/day delivery turnover
+MAX_HOLDING_DAYS = 40          # Max holding duration: 40 sessions (~8 weeks)
 
 def run_quant_engine():
-    print("🚀 Running Institutional True Delivery OBV + Wyckoff Phase Backtest...")
+    print("🚀 Running Nifty 750 True Delivery OBV Swing Backtest Engine...")
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -26,7 +25,7 @@ def run_quant_engine():
     ]
     
     target_stocks = [f for f in stock_files if fundamentals and f.replace(".json", "") in fundamentals] or stock_files
-    print(f"📊 Analyzing {len(target_stocks)} institutional stocks...")
+    print(f"📊 Loading history for {len(target_stocks)} institutional stocks...")
 
     loaded_data = {}
     for f_name in target_stocks:
@@ -34,7 +33,7 @@ def run_quant_engine():
         try:
             with open(os.path.join(DATA_DIR, f_name), "r") as f:
                 d = json.load(f)
-            if len(d) >= 80:
+            if len(d) >= 40:
                 closes = np.array([float(x["close"]) for x in d])
                 highs = np.array([float(x.get("high", x["close"])) for x in d])
                 lows = np.array([float(x.get("low", x["close"])) for x in d])
@@ -65,12 +64,12 @@ def run_quant_engine():
         except Exception:
             continue
 
-    # 4 Robust Institutional Breakout Models
+    # 4 Strategy Models (Testing different lookbacks & targets)
     models = [
-        {"name": "Wyckoff Accumulation + 20SMA Reclaim", "lb": 20, "p_drop": -6.0, "obv_gain": 8.0, "sma_reclaim": True, "vol_mult": 1.5},
-        {"name": "Base Absorption + 10D High Breakout", "lb": 25, "p_drop": -8.0, "obv_gain": 10.0, "sma_reclaim": True, "vol_mult": 1.2},
-        {"name": "Aggressive Spring Reversal", "lb": 15, "p_drop": -5.0, "obv_gain": 6.0, "sma_reclaim": False, "vol_mult": 1.8},
-        {"name": "Multi-Month Smart Money Base", "lb": 35, "p_drop": -10.0, "obv_gain": 12.0, "sma_reclaim": True, "vol_mult": 1.3}
+        {"name": "Swing Momentum (+15% Target)", "lb": 10, "p_drop": -3.0, "obv_gain": 3.0, "target_pct": 15.0, "vol_mult": 1.1},
+        {"name": "High-Conviction Base (+20% Target)", "lb": 15, "p_drop": -5.0, "obv_gain": 5.0, "target_pct": 20.0, "vol_mult": 1.2},
+        {"name": "Deep Accumulation (+25% Target)", "lb": 20, "p_drop": -7.0, "obv_gain": 7.0, "target_pct": 25.0, "vol_mult": 1.2},
+        {"name": "Quick Pulse (+10% Target)", "lb": 10, "p_drop": -3.0, "obv_gain": 4.0, "target_pct": 10.0, "vol_mult": 1.0}
     ]
 
     backtest_stats = []
@@ -79,7 +78,7 @@ def run_quant_engine():
         lb = m["lb"]
         p_drop = m["p_drop"]
         obv_gain = m["obv_gain"]
-        req_sma = m["sma_reclaim"]
+        tgt_pct = m["target_pct"]
         vol_mult = m["vol_mult"]
 
         trades = []
@@ -92,47 +91,38 @@ def run_quant_engine():
             obvs = s_data["obvs"]
             turnovers = s_data["turnovers"]
 
-            i = lb + 20
+            i = lb + 6
             while i < len(closes) - 5:
-                # Turnover gate & minimum price
-                if closes[i] < 40.0 or np.mean(turnovers[max(0, i-8):i+1]) < MIN_DELIVERY_TURNOVER_CR:
+                if closes[i] < 30.0 or np.mean(turnovers[max(0, i-8):i+1]) < MIN_DELIVERY_TURNOVER_CR:
                     i += 1
                     continue
 
-                # Divergence check
+                # 1. Divergence Condition over lookback window
                 p_chg = ((closes[i] - closes[i - lb]) / closes[i - lb]) * 100
                 obv_chg = ((obvs[i] - obvs[i - lb]) / abs(obvs[i - lb])) * 100 if abs(obvs[i - lb]) > 0 else 0
 
                 if p_chg <= p_drop and obv_chg >= obv_gain:
-                    # 1. 20-Day SMA Trend Reclaim Gate
-                    sma_20 = np.mean(closes[i-19:i+1])
-                    if req_sma and closes[i] < sma_20:
-                        i += 1
-                        continue
+                    # 2. Breakout Trigger: Close > 5-Day High + Delivery volume confirmation
+                    recent_5d_high = np.max(highs[i-5:i])
+                    avg_vol_10 = np.mean(vols[max(0, i-10):i])
 
-                    # 2. Institutional Volume Spike Confirmation
-                    avg_vol_20 = np.mean(vols[max(0, i-19):i])
-                    if vols[i] < avg_vol_20 * vol_mult:
-                        i += 1
-                        continue
-
-                    # 3. Breakout above 10-day consolidation high
-                    recent_10d_high = np.max(highs[i-10:i])
-                    if closes[i] >= recent_10d_high:
+                    if closes[i] >= recent_5d_high and vols[i] >= avg_vol_10 * vol_mult:
                         entry_price = closes[i]
-                        base_low = np.min(lows[i-lb:i+1])
-                        stop_loss = round(base_low * 0.99, 2)
-                        target_price = round(entry_price * (1 + TARGET_PROFIT_PCT / 100), 2)
+                        # Realistic Swing Stop Loss = Just below 5-day swing low
+                        swing_low = np.min(lows[i-5:i+1])
+                        stop_loss = round(swing_low * 0.99, 2)
+                        target_price = round(entry_price * (1 + tgt_pct / 100), 2)
                         risk_pct = ((entry_price - stop_loss) / entry_price) * 100
 
-                        if risk_pct <= 7.0:  # Max 7% risk allowance
+                        # Accept setups with risk between 2.0% and 6.5%
+                        if 2.0 <= risk_pct <= 6.5:
                             outcome = "TIME_EXIT"
                             exit_price = entry_price
                             exit_idx = i
 
                             for j in range(i + 1, min(i + MAX_HOLDING_DAYS + 1, len(closes))):
                                 if highs[j] >= target_price:
-                                    outcome = "WIN (+20%)"
+                                    outcome = f"WIN (+{int(tgt_pct)}%)"
                                     exit_price = target_price
                                     exit_idx = j
                                     break
@@ -156,7 +146,7 @@ def run_quant_engine():
 
         if trades:
             df_t = pd.DataFrame(trades)
-            wins = df_t[df_t["outcome"] == "WIN (+20%)"]
+            wins = df_t[df_t["outcome"].str.startswith("WIN")]
             losses = df_t[df_t["outcome"] == "STOP_LOSS"]
             win_rate = (len(wins) / len(df_t)) * 100
             pf = (wins["pnl"].sum() / abs(losses["pnl"].sum())) if len(losses) > 0 and losses["pnl"].sum() != 0 else 999.0
@@ -171,10 +161,14 @@ def run_quant_engine():
                 "avg_holding_days": round(df_t["holding"].mean(), 1)
             })
 
-    best_model = max(backtest_stats, key=lambda x: (x["win_rate_pct"], x["profit_factor"]))
-    print(f"\n🏆 Winning Model: {best_model['model_name']} -> {best_model['win_rate_pct']}% Win Rate (PF: {best_model['profit_factor']})")
+    if not backtest_stats:
+        print("⚠️ No models qualified.")
+        return
 
-    # Generate Active Trade Plan Using the Best Model
+    best_model = max(backtest_stats, key=lambda x: (x["profit_factor"], x["win_rate_pct"]))
+    print(f"\n🏆 Best Strategy: {best_model['model_name']} ({best_model['win_rate_pct']}% Win Rate, PF: {best_model['profit_factor']}, {best_model['total_trades']} trades)")
+
+    # Generate Today's Trade Plan Using the Best Model
     active_plan = []
     opt = best_model["params"]
 
@@ -183,10 +177,10 @@ def run_quant_engine():
         highs = s_data["highs"]
         lows = s_data["lows"]
         vols = s_data["vols"]
-        obvs = s_data["obvs"]
         turnovers = s_data["turnovers"]
+        obvs = s_data["obvs"]
 
-        if len(closes) < opt["lb"] + 20 or closes[-1] < 40.0:
+        if len(closes) < opt["lb"] + 10 or closes[-1] < 30.0:
             continue
 
         sma_9_to = np.mean(turnovers[-9:])
@@ -201,31 +195,27 @@ def run_quant_engine():
         p_chg = ((curr_c - past_c) / past_c) * 100
         obv_chg = ((curr_obv - past_obv) / abs(past_obv)) * 100 if abs(past_obv) > 0 else 0
 
-        # Divergence test
         if p_chg <= opt["p_drop"] and obv_chg >= opt["obv_gain"]:
-            sma_20 = np.mean(closes[-20:])
-            avg_vol_20 = np.mean(vols[-20:])
-            recent_10d_high = np.max(highs[-11:-1])
-
-            is_above_sma = curr_c >= sma_20
-            is_vol_spike = vols[-1] >= avg_vol_20 * opt["vol_mult"]
-            is_breakout = curr_c >= recent_10d_high
-
-            is_triggered = is_above_sma and is_vol_spike and is_breakout
-
-            base_low = np.min(lows[-opt["lb"]:])
-            sl_price = round(base_low * 0.99, 2)
+            recent_5d_high = np.max(highs[-6:-1])
+            avg_vol_10 = np.mean(vols[-11:-1])
+            
+            is_triggered = (curr_c >= recent_5d_high) and (vols[-1] >= avg_vol_10 * opt["vol_mult"])
+            
+            swing_low = np.min(lows[-6:])
+            sl_price = round(swing_low * 0.99, 2)
             risk_pct = round(((curr_c - sl_price) / curr_c) * 100, 2)
 
-            if risk_pct <= 7.0:
+            if 2.0 <= risk_pct <= 6.5:
                 meta = fundamentals.get(sym, {})
+                target_val = round(curr_c * (1 + opt["target_pct"] / 100), 2)
+                
                 active_plan.append({
                     "Symbol": sym,
                     "Signal": "🟢 BUY TRIGGERED" if is_triggered else "🟡 PENDING BREAKOUT",
-                    "Entry Trigger": f"₹{curr_c:.2f}" if is_triggered else f"Breakout > ₹{recent_10d_high:.2f}",
+                    "Entry (₹)": round(curr_c, 2) if is_triggered else f"> ₹{recent_5d_high:.2f}",
                     "Stop Loss (₹)": sl_price,
                     "Risk": f"{risk_pct}%",
-                    "Target (+20%)": round(curr_c * 1.20, 2),
+                    f"Target (+{int(opt['target_pct'])}%)": target_val,
                     "9D Turnover": f"₹{sma_9_to:.1f} Cr/d",
                     "Category": meta.get("category", "Nifty 750")
                 })
@@ -238,7 +228,7 @@ def run_quant_engine():
     with open(os.path.join(DATA_DIR, "active_trade_plan.json"), "w") as f:
         json.dump(active_plan, f, indent=2)
 
-    print(f"🎉 Generated {len(active_plan)} disciplined setups.")
+    print(f"🎉 Generated {len(active_plan)} actionable trade setups.")
 
 if __name__ == "__main__":
     run_quant_engine()
