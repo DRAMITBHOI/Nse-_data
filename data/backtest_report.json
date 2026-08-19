@@ -1,84 +1,79 @@
 {
   "summary": [
     {
-      "model_name": "Stage 2 Uptrend Absorption (+12% Tgt)",
+      "model_name": "VCP Supply Dry-Up + Pivot Breakout (+15% Tgt)",
       "params": {
-        "name": "Stage 2 Uptrend Absorption (+12% Tgt)",
-        "lb": 10,
-        "p_pullback": -3.5,
-        "obv_min_gain": 2.0,
-        "target_pct": 12.0,
-        "vol_mult": 1.2
+        "name": "VCP Supply Dry-Up + Pivot Breakout (+15% Tgt)",
+        "base_len": 15,
+        "dry_mult": 0.65,
+        "breakout_mult": 1.4,
+        "target_pct": 15.0
       },
-      "total_trades": 1976,
-      "win_rate_pct": 27.3,
-      "profit_factor": 1.17,
-      "avg_gain_pct": 0.71,
-      "avg_holding_days": 10.5
+      "total_trades": 1185,
+      "win_rate_pct": 17.2,
+      "profit_factor": 1.03,
+      "avg_gain_pct": 1.02,
+      "avg_holding_days": 19.9
     },
     {
-      "model_name": "50 EMA Institutional Spring (+15% Tgt)",
+      "model_name": "Stage 2 Delivery Climax (+18% Tgt)",
       "params": {
-        "name": "50 EMA Institutional Spring (+15% Tgt)",
-        "lb": 15,
-        "p_pullback": -5.0,
-        "obv_min_gain": 3.5,
-        "target_pct": 15.0,
-        "vol_mult": 1.3
+        "name": "Stage 2 Delivery Climax (+18% Tgt)",
+        "base_len": 20,
+        "dry_mult": 0.7,
+        "breakout_mult": 1.5,
+        "target_pct": 18.0
       },
-      "total_trades": 1107,
-      "win_rate_pct": 22.7,
-      "profit_factor": 1.17,
-      "avg_gain_pct": 0.87,
-      "avg_holding_days": 11.5
+      "total_trades": 937,
+      "win_rate_pct": 13.4,
+      "profit_factor": 0.99,
+      "avg_gain_pct": 1.29,
+      "avg_holding_days": 20.9
     },
     {
-      "model_name": "High-Momentum Delivery Breakout (+10% Tgt)",
+      "model_name": "Tight Coil Momentum (+12% Tgt)",
       "params": {
-        "name": "High-Momentum Delivery Breakout (+10% Tgt)",
-        "lb": 8,
-        "p_pullback": -2.5,
-        "obv_min_gain": 2.0,
-        "target_pct": 10.0,
-        "vol_mult": 1.4
+        "name": "Tight Coil Momentum (+12% Tgt)",
+        "base_len": 10,
+        "dry_mult": 0.6,
+        "breakout_mult": 1.3,
+        "target_pct": 12.0
       },
-      "total_trades": 2010,
-      "win_rate_pct": 31.6,
-      "profit_factor": 1.17,
-      "avg_gain_pct": 0.59,
-      "avg_holding_days": 10.2
+      "total_trades": 1475,
+      "win_rate_pct": 23.4,
+      "profit_factor": 1.1,
+      "avg_gain_pct": 0.77,
+      "avg_holding_days": 17.8
     },
     {
-      "model_name": "Deep Base Re-Accumulation (+18% Tgt)",
+      "model_name": "High-Conviction Wyckoff Breakout (+20% Tgt)",
       "params": {
-        "name": "Deep Base Re-Accumulation (+18% Tgt)",
-        "lb": 20,
-        "p_pullback": -6.5,
-        "obv_min_gain": 5.0,
-        "target_pct": 18.0,
-        "vol_mult": 1.2
+        "name": "High-Conviction Wyckoff Breakout (+20% Tgt)",
+        "base_len": 25,
+        "dry_mult": 0.65,
+        "breakout_mult": 1.6,
+        "target_pct": 20.0
       },
-      "total_trades": 785,
-      "win_rate_pct": 17.8,
-      "profit_factor": 1.08,
-      "avg_gain_pct": 0.91,
-      "avg_holding_days": 12.3
+      "total_trades": 721,
+      "win_rate_pct": 10.8,
+      "profit_factor": 0.88,
+      "avg_gain_pct": 1.53,
+      "avg_holding_days": 21.8
     }
   ],
   "winning_model": {
-    "model_name": "High-Momentum Delivery Breakout (+10% Tgt)",
+    "model_name": "Tight Coil Momentum (+12% Tgt)",
     "params": {
-      "name": "High-Momentum Delivery Breakout (+10% Tgt)",
-      "lb": 8,
-      "p_pullback": -2.5,
-      "obv_min_gain": 2.0,
-      "target_pct": 10.0,
-      "vol_mult": 1.4
+      "name": "Tight Coil Momentum (+12% Tgt)",
+      "base_len": 10,
+      "dry_mult": 0.6,
+      "breakout_mult": 1.3,
+      "target_pct": 12.0
     },
-    "total_trades": 2010,
-    "win_rate_pct": 31.6,
-    "profit_factor": 1.17,
-    "avg_gain_pct": 0.59,
-    "avg_holding_days": 10.2
+    "total_trades": 1475,
+    "win_rate_pct": 23.4,
+    "profit_factor": 1.1,
+    "avg_gain_pct": 0.77,
+    "avg_holding_days": 17.8
   }
 }
