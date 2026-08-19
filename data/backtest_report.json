@@ -1,36 +1,84 @@
 {
   "summary": [
     {
-      "model_name": "Wyckoff Accumulation + 20SMA Reclaim",
+      "model_name": "Swing Momentum (+15% Target)",
       "params": {
-        "name": "Wyckoff Accumulation + 20SMA Reclaim",
-        "lb": 20,
-        "p_drop": -6.0,
-        "obv_gain": 8.0,
-        "sma_reclaim": true,
-        "vol_mult": 1.5
+        "name": "Swing Momentum (+15% Target)",
+        "lb": 10,
+        "p_drop": -3.0,
+        "obv_gain": 3.0,
+        "target_pct": 15.0,
+        "vol_mult": 1.1
       },
-      "total_trades": 1,
-      "win_rate_pct": 0.0,
-      "profit_factor": 0.0,
-      "avg_gain_pct": -6.86,
-      "avg_holding_days": 13.0
+      "total_trades": 22,
+      "win_rate_pct": 4.5,
+      "profit_factor": 0.16,
+      "avg_gain_pct": -2.43,
+      "avg_holding_days": 15.4
+    },
+    {
+      "model_name": "High-Conviction Base (+20% Target)",
+      "params": {
+        "name": "High-Conviction Base (+20% Target)",
+        "lb": 15,
+        "p_drop": -5.0,
+        "obv_gain": 5.0,
+        "target_pct": 20.0,
+        "vol_mult": 1.2
+      },
+      "total_trades": 17,
+      "win_rate_pct": 23.5,
+      "profit_factor": 1.67,
+      "avg_gain_pct": 4.08,
+      "avg_holding_days": 18.9
+    },
+    {
+      "model_name": "Deep Accumulation (+25% Target)",
+      "params": {
+        "name": "Deep Accumulation (+25% Target)",
+        "lb": 20,
+        "p_drop": -7.0,
+        "obv_gain": 7.0,
+        "target_pct": 25.0,
+        "vol_mult": 1.2
+      },
+      "total_trades": 8,
+      "win_rate_pct": 25.0,
+      "profit_factor": 3.05,
+      "avg_gain_pct": 7.12,
+      "avg_holding_days": 26.9
+    },
+    {
+      "model_name": "Quick Pulse (+10% Target)",
+      "params": {
+        "name": "Quick Pulse (+10% Target)",
+        "lb": 10,
+        "p_drop": -3.0,
+        "obv_gain": 4.0,
+        "target_pct": 10.0,
+        "vol_mult": 1.0
+      },
+      "total_trades": 19,
+      "win_rate_pct": 21.1,
+      "profit_factor": 0.57,
+      "avg_gain_pct": -1.19,
+      "avg_holding_days": 13.6
     }
   ],
   "winning_model": {
-    "model_name": "Wyckoff Accumulation + 20SMA Reclaim",
+    "model_name": "Deep Accumulation (+25% Target)",
     "params": {
-      "name": "Wyckoff Accumulation + 20SMA Reclaim",
+      "name": "Deep Accumulation (+25% Target)",
       "lb": 20,
-      "p_drop": -6.0,
-      "obv_gain": 8.0,
-      "sma_reclaim": true,
-      "vol_mult": 1.5
+      "p_drop": -7.0,
+      "obv_gain": 7.0,
+      "target_pct": 25.0,
+      "vol_mult": 1.2
     },
-    "total_trades": 1,
-    "win_rate_pct": 0.0,
-    "profit_factor": 0.0,
-    "avg_gain_pct": -6.86,
-    "avg_holding_days": 13.0
+    "total_trades": 8,
+    "win_rate_pct": 25.0,
+    "profit_factor": 3.05,
+    "avg_gain_pct": 7.12,
+    "avg_holding_days": 26.9
   }
 }
