@@ -6,8 +6,13 @@ import pandas as pd
 DATA_DIR = "data"
 MIN_DELIVERY_TURNOVER_CR = 1.5  # Min ₹1.5 Cr/day delivery turnover
 
+# Optimal Parameters from Quantitative Grid Search
+ENTRY_PRICE_DROP_PCT = -7.5     # Pullback >= -7.5%
+ENTRY_OBV_GAIN_PCT = 8.0        # True OBV Accumulation >= +8.0%
+EXIT_OBV_DROP_PCT = -8.0        # True OBV Distribution Exit <= -8.0%
+
 def run_choch_obv_backtest():
-    print("🚀 Running True OBV Base -> CHoCH Breakout -> Distribution Exit Backtest...")
+    print("🚀 Running Optimized True OBV Base -> CHoCH Breakout -> Distribution Exit Backtest...")
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -79,7 +84,7 @@ def run_choch_obv_backtest():
                 past_o = obvs[i - lb]
                 o_gain = ((obvs[i] - past_o) / abs(past_o)) * 100 if abs(past_o) > 0 else 0
 
-                if p_drop <= -5.0 and o_gain >= 5.0:
+                if p_drop <= ENTRY_PRICE_DROP_PCT and o_gain >= ENTRY_OBV_GAIN_PCT:
                     matched_lb = lb
                     break
 
@@ -123,7 +128,8 @@ def run_choch_obv_backtest():
                             ref_o = obvs[m - span]
                             obv_chg_win = ((obvs[m] - ref_o) / abs(ref_o)) * 100 if abs(ref_o) > 0 else 0
 
-                            if (p_chg_win >= -1.5 or closes[m] >= entry_price * 1.05) and obv_chg_win <= -5.0:
+                            # Exit when price is stable/rising while OBV drops <= -8.0%
+                            if (p_chg_win >= -1.5 or closes[m] >= entry_price * 1.05) and obv_chg_win <= EXIT_OBV_DROP_PCT:
                                 exit_price = closes[m]
                                 exit_idx = m
                                 exit_reason = "OBV_DISTRIBUTION_EXIT"
@@ -157,7 +163,7 @@ def run_choch_obv_backtest():
                     for offset in range(0, 10):
                         curr_pos = (N - 1) - offset
                         base_start = curr_pos - lb
-                        
+
                         if base_start < 0:
                             continue
 
@@ -165,7 +171,7 @@ def run_choch_obv_backtest():
                         past_o = obvs[base_start]
                         o_gain = ((obvs[curr_pos] - past_o) / abs(past_o)) * 100 if abs(past_o) > 0 else 0
 
-                        if p_drop <= -5.0 and o_gain >= 5.0:
+                        if p_drop <= ENTRY_PRICE_DROP_PCT and o_gain >= ENTRY_OBV_GAIN_PCT:
                             base_h = np.max(highs[base_start : curr_pos + 1])
                             base_l = np.min(lows[base_start : curr_pos + 1])
                             sl = round(base_l * 0.995, 2)
