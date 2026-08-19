@@ -6,15 +6,14 @@ import pandas as pd
 DATA_DIR = "data"
 
 # ==========================================
-# ⚙️ STRICT SCREENER FILTERS
+# ⚙️ SCREENER FILTERS
 # ==========================================
-MIN_MARKET_CAP_CR = 1000.0     # Minimum Market Cap in ₹ Crores (Strict)
-MAX_PE_RATIO = 35.0            # Maximum P/E Ratio
-MIN_9D_AVG_VOLUME = 100_000    # Minimum 9-Day Moving Average Delivery Volume
+MIN_PRICE = 20.0               # Minimum Stock Price (₹20 to eliminate sub-penny stocks)
+MIN_9D_AVG_VOLUME = 75_000     # Minimum 9-Day Average Delivery Volume (Demat shares)
 MIN_PRICE_DROP_PCT = -3.0      # Price drop >= 3% (<= -3.0%)
-MIN_OBV_GAIN_PCT = 1.5         # True Delivery OBV gain >= 1.5%
+MIN_OBV_GAIN_PCT = 2.0         # True Demat OBV increased >= 2.0%
 
-# Dynamic Lookback Steps: 1W to 52W (evaluated in 1-week steps)
+# Dynamic Lookback Steps: 1W to 52W in weekly intervals
 LOOKBACK_STEPS = list(range(5, 255, 5))
 if 252 not in LOOKBACK_STEPS:
     LOOKBACK_STEPS.append(252)
@@ -26,49 +25,36 @@ def format_tf(days):
 def run_cloud_screener():
     print("🚀 Starting 1W–52W True Delivery OBV Cloud Screener...")
     
-    # 1. Load fundamentals (Market Cap & P/E)
+    # 1. Load fundamentals directory
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
     if os.path.exists(fund_path):
         try:
             with open(fund_path, "r") as f:
                 fundamentals = json.load(f)
-            print(f"📊 Loaded fundamentals database ({len(fundamentals)} records).")
+            print(f"📊 Loaded fundamentals index ({len(fundamentals)} equities).")
         except Exception as e:
             print(f"⚠️ Error reading fundamentals.json: {e}")
-    else:
-        print("⚠️ Warning: data/fundamentals.json not found! Please run update_fundamentals.py first.")
 
-    # 2. Get all tracked stock JSON files
+    # 2. Get local stock data files
     stock_files = [
         f for f in os.listdir(DATA_DIR)
         if f.endswith(".json") and f not in ["fundamentals.json", "screener_results.json"]
     ]
-    print(f"🔍 Analyzing {len(stock_files)} stocks locally on runner...")
+    print(f"🔍 Scanning {len(stock_files)} stocks...")
 
     results = []
-    skipped_mcap = 0
-    skipped_pe = 0
     skipped_vol = 0
+    skipped_penny = 0
 
     for f_name in stock_files:
         sym = f_name.replace(".json", "").strip().upper()
         fund = fundamentals.get(sym, {})
-        mcap = fund.get("market_cap_cr", None)
-        pe = fund.get("pe", None)
 
-        # -----------------------------------------------------------
-        # 🛑 STRICT FUNDAMENTAL GATES
-        # 1. Reject if Market Cap is missing OR < ₹1,000 Cr
-        if mcap is None or float(mcap) < MIN_MARKET_CAP_CR:
-            skipped_mcap += 1
+        # Basic verification check
+        if fund and not fund.get("is_qualified", True):
+            skipped_penny += 1
             continue
-
-        # 2. Reject if P/E is > 35 or <= 0 (if P/E exists)
-        if pe is not None and (float(pe) <= 0 or float(pe) > MAX_PE_RATIO):
-            skipped_pe += 1
-            continue
-        # -----------------------------------------------------------
 
         try:
             with open(os.path.join(DATA_DIR, f_name), "r") as f:
@@ -97,17 +83,21 @@ def run_cloud_screener():
                 obv = v
             obvs.append(obv)
 
-        # 4. 9-Day Moving Average Delivery Volume Filter (>= 100,000)
+        curr_c = closes[-1]
+        if curr_c < MIN_PRICE:
+            skipped_penny += 1
+            continue
+
+        # 4. 9-Day Moving Average Mean Delivery Volume Gate
         sma_9 = np.mean(vols[-9:]) if len(vols) >= 9 else np.mean(vols)
         if sma_9 < MIN_9D_AVG_VOLUME:
             skipped_vol += 1
             continue
 
-        curr_c = closes[-1]
         curr_obv = obvs[-1]
         matches = []
 
-        # 5. Multi-Timeframe Scan from 1W (5D) to 52W (252D)
+        # 5. Scan 1W to 52W Lookback Spans
         for days in LOOKBACK_STEPS:
             if len(closes) > days:
                 past_c = closes[-days - 1]
@@ -115,7 +105,7 @@ def run_cloud_screener():
                 p_chg = ((curr_c - past_c) / past_c) * 100
                 obv_chg = ((curr_obv - past_obv) / abs(past_obv)) * 100 if abs(past_obv) > 0 else 0.0
 
-                # Condition: Price dropped >= 3% AND True Delivery OBV gained >= 1.5%
+                # Price down >= 3% while True Delivery OBV up >= 2.0%
                 if p_chg <= MIN_PRICE_DROP_PCT and obv_chg >= MIN_OBV_GAIN_PCT:
                     matches.append({
                         "label": format_tf(days),
@@ -128,19 +118,19 @@ def run_cloud_screener():
             min_tf = matches[0]["label"]
             max_tf = matches[-1]["label"]
             span = f"{min_tf} to {max_tf}" if min_tf != max_tf else min_tf
+            industry = fund.get("industry", "NSE Listed")
 
             results.append({
                 "Symbol": sym,
                 "LTP (₹)": round(curr_c, 2),
                 "9D Avg Deliv Vol": f"{sma_9/1e3:.1f}K",
-                "Market Cap (Cr)": f"₹{float(mcap):,.0f}",
-                "P/E": round(float(pe), 1) if pe is not None else "N/A",
+                "Industry / Category": industry,
                 "Active Span": span,
                 "Strongest Timeframe": f"{best['label']} (P: {best['price_chg']}%, OBV: +{best['obv_chg']}%)",
                 "Triggered Windows": len(matches)
             })
 
-    # Sort results with multi-confluence accumulation setups at the top
+    # Sort results by multi-confluence accumulation setups
     results.sort(key=lambda x: x["Triggered Windows"], reverse=True)
     for r in results:
         del r["Triggered Windows"]
@@ -149,9 +139,9 @@ def run_cloud_screener():
     with open(out_path, "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n📊 Filter Summary: Skipped {skipped_mcap} on Market Cap, {skipped_pe} on P/E, {skipped_vol} on Volume.")
-    print(f"🎉 Screener complete! Found {len(results)} high-conviction accumulation candidates.")
-    print(f"📁 Saved output to {out_path}")
+    print(f"\n📊 Filter Summary: Skipped {skipped_penny} penny/sub-₹20 stocks, {skipped_vol} illiquid stocks.")
+    print(f"🎉 Screener complete! Found {len(results)} accumulation candidates.")
+    print(f"📁 Output written to {out_path}")
 
 if __name__ == "__main__":
     run_cloud_screener()
