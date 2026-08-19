@@ -5,9 +5,13 @@ import pandas as pd
 
 DATA_DIR = "data"
 MIN_DELIVERY_TURNOVER_CR = 1.5  # Min ₹1.5 Cr/day delivery turnover
+MAX_RISK_PCT = 5.5             # Max allowed stop-loss risk (5.5%)
+
+def ema(series, span):
+    return pd.Series(series).ewm(span=span, adjust=False).mean().values
 
 def run_choch_obv_backtest():
-    print("🚀 Running True OBV Base -> CHoCH Breakout -> Distribution Exit Backtest...")
+    print("🚀 Running Upgraded OBV Accumulation + CHoCH + Breakeven Engine...")
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -24,7 +28,7 @@ def run_choch_obv_backtest():
     ]
 
     target_stocks = [f for f in stock_files if fundamentals and f.replace(".json", "") in fundamentals] or stock_files
-    print(f"📊 Analyzing {len(target_stocks)} institutional stocks across historical data...")
+    print(f"📊 Analyzing {len(target_stocks)} institutional stocks...")
 
     trades = []
     active_setups = []
@@ -48,6 +52,7 @@ def run_choch_obv_backtest():
         lows = np.array([float(x.get("low", x["close"])) for x in raw])
         vols = np.array([float(x.get("delivery_vol", 0)) for x in raw])
         turnovers = (closes * vols) / 1e7
+        ema50 = ema(closes, 50)
         N = len(closes)
 
         # Compute True Demat Delivery OBV
@@ -64,15 +69,14 @@ def run_choch_obv_backtest():
             obvs[idx] = cur_obv
 
         # -----------------------------------------------------------
-        # PART 1: 2-PHASE HISTORICAL BACKTEST ENGINE
+        # PART 1: 2-PHASE BACKTEST ENGINE WITH DYNAMIC BREAKEVEN
         # -----------------------------------------------------------
-        i = 25
+        i = 52
         while i < N - 15:
-            if closes[i] < 30.0 or np.mean(turnovers[max(0, i - 8):i + 1]) < MIN_DELIVERY_TURNOVER_CR:
+            if closes[i] < 30.0 or closes[i] < ema50[i] or np.mean(turnovers[max(0, i - 8):i + 1]) < MIN_DELIVERY_TURNOVER_CR:
                 i += 1
                 continue
 
-            # Stage 1: Detect True Delivery Accumulation Base
             matched_lb = None
             for lb in lookback_windows:
                 p_drop = ((closes[i] - closes[i - lb]) / closes[i - lb]) * 100
@@ -89,33 +93,47 @@ def run_choch_obv_backtest():
 
             base_high = np.max(highs[i - matched_lb:i + 1])
             base_low = np.min(lows[i - matched_lb:i + 1])
-            stop_loss = round(base_low * 0.995, 2)
 
-            # Stage 2: Watch forward up to 15 trading days for a CHoCH Breakout
+            # Watch forward up to 15 trading days for CHoCH Breakout
             trade_entered = False
             for k in range(i + 1, min(i + 16, N)):
                 if lows[k] < base_low * 0.97:
                     break
 
                 avg_v_10 = np.mean(vols[max(0, k - 10):k])
-                if closes[k] > base_high and vols[k] >= avg_v_10:
-                    trade_entered = True
+                if closes[k] > base_high and vols[k] >= (avg_v_10 * 1.25):
                     entry_price = closes[k]
                     entry_idx = k
-                    risk_pct = ((entry_price - stop_loss) / entry_price) * 100
 
+                    # Tight Swing Stop Loss (5-day pivot low)
+                    recent_pivot_low = np.min(lows[max(0, k - 5):k + 1])
+                    initial_sl = round(recent_pivot_low * 0.995, 2)
+                    risk_pct = ((entry_price - initial_sl) / entry_price) * 100
+
+                    # Skip setup if risk is wider than 5.5%
+                    if risk_pct > MAX_RISK_PCT or risk_pct < 1.5:
+                        break
+
+                    trade_entered = True
                     exit_price = entry_price
                     exit_idx = entry_idx
                     exit_reason = "MAX_TIME_EXIT"
+                    current_sl = initial_sl
 
-                    # Stage 3: Position Tracking & Distribution Exit
-                    for m in range(entry_idx + 1, min(entry_idx + 50, N)):
-                        if lows[m] <= stop_loss:
-                            exit_price = stop_loss
+                    # Stage 3: Trade Execution & Management
+                    for m in range(entry_idx + 1, min(entry_idx + 45, N)):
+                        # 1. Breakeven rule: If +5% gained, move SL to breakeven
+                        if highs[m] >= entry_price * 1.05 and current_sl < entry_price:
+                            current_sl = entry_price * 1.003
+
+                        # 2. Stop loss hit
+                        if lows[m] <= current_sl:
+                            exit_price = current_sl
                             exit_idx = m
-                            exit_reason = "STOP_LOSS"
+                            exit_reason = "BREAKEVEN" if current_sl >= entry_price else "STOP_LOSS"
                             break
 
+                        # 3. Smart Money Distribution Exit
                         bars_in_trade = m - entry_idx
                         if bars_in_trade >= 5:
                             span = min(bars_in_trade, 10)
@@ -147,9 +165,9 @@ def run_choch_obv_backtest():
                 i += 1
 
         # -----------------------------------------------------------
-        # PART 2: SCAN TODAY'S ACTIVE SETUPS (Safe Absolute Indexing)
+        # PART 2: SCAN TODAY'S ACTIVE SETUPS
         # -----------------------------------------------------------
-        if N >= 30 and closes[-1] >= 30.0:
+        if N >= 35 and closes[-1] >= 30.0 and closes[-1] >= ema50[-1]:
             sma_9_to = np.mean(turnovers[-9:])
             if sma_9_to >= MIN_DELIVERY_TURNOVER_CR:
                 matched_for_sym = False
@@ -157,7 +175,7 @@ def run_choch_obv_backtest():
                     for offset in range(0, 10):
                         curr_pos = (N - 1) - offset
                         base_start = curr_pos - lb
-                        
+
                         if base_start < 0:
                             continue
 
@@ -167,30 +185,31 @@ def run_choch_obv_backtest():
 
                         if p_drop <= -5.0 and o_gain >= 5.0:
                             base_h = np.max(highs[base_start : curr_pos + 1])
-                            base_l = np.min(lows[base_start : curr_pos + 1])
-                            sl = round(base_l * 0.995, 2)
+                            recent_pivot_l = np.min(lows[max(0, N - 6):])
+                            sl = round(recent_pivot_l * 0.995, 2)
                             risk = round(((closes[-1] - sl) / closes[-1]) * 100, 2)
 
-                            avg_v = np.mean(vols[max(0, N - 11) : N - 1])
-                            is_triggered = (closes[-1] >= base_h) and (vols[-1] >= avg_v)
+                            if risk <= MAX_RISK_PCT:
+                                avg_v = np.mean(vols[max(0, N - 11) : N - 1])
+                                is_triggered = (closes[-1] >= base_h) and (vols[-1] >= avg_v * 1.25)
 
-                            active_setups.append({
-                                "Symbol": sym,
-                                "Signal": "🟢 CHoCH TRIGGERED (Buy)" if is_triggered else "🟡 ACCUMULATING (Awaiting CHoCH)",
-                                "LTP (₹)": round(closes[-1], 2),
-                                "CHoCH Level": f"> ₹{round(base_h, 2)}",
-                                "Stop Loss (₹)": sl,
-                                "Risk %": f"{risk}%",
-                                "Base Window": f"{lb//5}W Base",
-                                "9D Turnover": f"₹{sma_9_to:.1f} Cr/d"
-                            })
-                            matched_for_sym = True
-                            break
+                                active_setups.append({
+                                    "Symbol": sym,
+                                    "Signal": "🟢 CHoCH TRIGGERED (Buy)" if is_triggered else "🟡 ACCUMULATING (Awaiting CHoCH)",
+                                    "LTP (₹)": round(closes[-1], 2),
+                                    "CHoCH Trigger": f"> ₹{round(base_h, 2)}",
+                                    "Stop Loss (₹)": sl,
+                                    "Risk %": f"{risk}%",
+                                    "Base Window": f"{lb//5}W Base",
+                                    "9D Turnover": f"₹{sma_9_to:.1f} Cr/d"
+                                })
+                                matched_for_sym = True
+                                break
                     if matched_for_sym:
                         break
 
     # -----------------------------------------------------------
-    # STATISTICAL EVALUATION & METRICS EXPORT
+    # STATISTICAL EVALUATION
     # -----------------------------------------------------------
     df_t = pd.DataFrame(trades)
     if len(df_t) > 0:
@@ -218,7 +237,7 @@ def run_choch_obv_backtest():
     with open(os.path.join(DATA_DIR, "active_trade_plan.json"), "w") as f:
         json.dump(active_setups, f, indent=2)
 
-    print(f"\n🎉 Backtest Completed: {summary['total_trades']} Trades | Win Rate: {summary['win_rate_pct']}% | PF: {summary['profit_factor']}")
+    print(f"\n🎉 Optimized Engine: {summary['total_trades']} Trades | Win Rate: {summary['win_rate_pct']}% | PF: {summary['profit_factor']}")
 
 if __name__ == "__main__":
     run_choch_obv_backtest()
