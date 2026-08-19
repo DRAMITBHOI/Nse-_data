@@ -4,14 +4,13 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
-MIN_DELIVERY_TURNOVER_CR = 1.5  # Min ₹1.5 Cr/day delivery turnover
-TARGET_PROFIT_PCT = 20.0        # Primary Target: +20% Gain
-MAX_HOLDING_DAYS = 40          # Max holding period: 40 sessions (~8 weeks)
+MIN_DELIVERY_TURNOVER_CR = 2.0  # Min ₹2 Cr/day delivery turnover (High liquidity)
+TARGET_PROFIT_PCT = 20.0        # Target: +20%
+MAX_HOLDING_DAYS = 50          # Max holding: ~10 weeks
 
-def run_grid_backtest_and_plan():
-    print("🚀 Starting Nifty 750 Historical Backtest & Dynamic Strategy Engine...")
+def run_quant_engine():
+    print("🚀 Running Institutional True Delivery OBV + Wyckoff Phase Backtest...")
 
-    # 1. Load institutional universe
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
     if os.path.exists(fund_path):
@@ -27,22 +26,21 @@ def run_grid_backtest_and_plan():
     ]
     
     target_stocks = [f for f in stock_files if fundamentals and f.replace(".json", "") in fundamentals] or stock_files
-    print(f"📊 Backtesting across {len(target_stocks)} institutional stocks...")
+    print(f"📊 Analyzing {len(target_stocks)} institutional stocks...")
 
-    # Load all stock histories into memory
     loaded_data = {}
     for f_name in target_stocks:
         sym = f_name.replace(".json", "")
         try:
             with open(os.path.join(DATA_DIR, f_name), "r") as f:
                 d = json.load(f)
-            if len(d) >= 60:
+            if len(d) >= 80:
                 closes = np.array([float(x["close"]) for x in d])
                 highs = np.array([float(x.get("high", x["close"])) for x in d])
                 lows = np.array([float(x.get("low", x["close"])) for x in d])
                 vols = np.array([float(x.get("delivery_vol", 0)) for x in d])
                 
-                # Calculate True Demat OBV
+                # True Demat Delivery OBV
                 obv_arr = np.zeros(len(closes))
                 cur_obv = 0
                 for idx in range(len(closes)):
@@ -67,23 +65,22 @@ def run_grid_backtest_and_plan():
         except Exception:
             continue
 
-    # 2. Grid Search to Find the Highest-Probability Strategy Configuration
-    # We test combinations of Lookback Windows, Price Drops, OBV Gains, and Confirmation filters
-    param_grid = [
-        {"name": "Standard Base", "lookback": 15, "min_p_drop": -5.0, "min_obv_gain": 5.0, "trigger": "5D_HIGH"},
-        {"name": "Deep Accumulation Base", "lookback": 20, "min_p_drop": -6.0, "min_obv_gain": 7.5, "trigger": "5D_HIGH"},
-        {"name": "Institutional Spring Base", "lookback": 25, "min_p_drop": -7.5, "min_obv_gain": 10.0, "trigger": "5D_HIGH"},
-        {"name": "Fast Momentum Reversal", "lookback": 10, "min_p_drop": -4.0, "min_obv_gain": 4.0, "trigger": "3D_HIGH"}
+    # 4 Robust Institutional Breakout Models
+    models = [
+        {"name": "Wyckoff Accumulation + 20SMA Reclaim", "lb": 20, "p_drop": -6.0, "obv_gain": 8.0, "sma_reclaim": True, "vol_mult": 1.5},
+        {"name": "Base Absorption + 10D High Breakout", "lb": 25, "p_drop": -8.0, "obv_gain": 10.0, "sma_reclaim": True, "vol_mult": 1.2},
+        {"name": "Aggressive Spring Reversal", "lb": 15, "p_drop": -5.0, "obv_gain": 6.0, "sma_reclaim": False, "vol_mult": 1.8},
+        {"name": "Multi-Month Smart Money Base", "lb": 35, "p_drop": -10.0, "obv_gain": 12.0, "sma_reclaim": True, "vol_mult": 1.3}
     ]
 
     backtest_stats = []
 
-    for param in param_grid:
-        lb = param["lookback"]
-        p_drop = param["min_p_drop"]
-        obv_gain = param["min_obv_gain"]
-        trig_type = param["trigger"]
-        trig_window = 5 if trig_type == "5D_HIGH" else 3
+    for m in models:
+        lb = m["lb"]
+        p_drop = m["p_drop"]
+        obv_gain = m["obv_gain"]
+        req_sma = m["sma_reclaim"]
+        vol_mult = m["vol_mult"]
 
         trades = []
 
@@ -95,30 +92,40 @@ def run_grid_backtest_and_plan():
             obvs = s_data["obvs"]
             turnovers = s_data["turnovers"]
 
-            i = lb + trig_window
+            i = lb + 20
             while i < len(closes) - 5:
-                # Filter: Minimum turnover & non-penny price
-                if closes[i] < 30.0 or np.mean(turnovers[max(0, i-8):i+1]) < MIN_DELIVERY_TURNOVER_CR:
+                # Turnover gate & minimum price
+                if closes[i] < 40.0 or np.mean(turnovers[max(0, i-8):i+1]) < MIN_DELIVERY_TURNOVER_CR:
                     i += 1
                     continue
 
-                # Divergence condition
+                # Divergence check
                 p_chg = ((closes[i] - closes[i - lb]) / closes[i - lb]) * 100
                 obv_chg = ((obvs[i] - obvs[i - lb]) / abs(obvs[i - lb])) * 100 if abs(obvs[i - lb]) > 0 else 0
 
                 if p_chg <= p_drop and obv_chg >= obv_gain:
-                    # Breakout confirmation trigger
-                    ref_high = np.max(highs[i - trig_window:i])
-                    vol_surge = vols[i] >= np.mean(vols[max(0, i-8):i])
+                    # 1. 20-Day SMA Trend Reclaim Gate
+                    sma_20 = np.mean(closes[i-19:i+1])
+                    if req_sma and closes[i] < sma_20:
+                        i += 1
+                        continue
 
-                    if closes[i] >= ref_high and vol_surge:
+                    # 2. Institutional Volume Spike Confirmation
+                    avg_vol_20 = np.mean(vols[max(0, i-19):i])
+                    if vols[i] < avg_vol_20 * vol_mult:
+                        i += 1
+                        continue
+
+                    # 3. Breakout above 10-day consolidation high
+                    recent_10d_high = np.max(highs[i-10:i])
+                    if closes[i] >= recent_10d_high:
                         entry_price = closes[i]
-                        base_low = np.min(lows[i - lb:i+1])
-                        stop_loss = base_low * 0.99
-                        target_price = entry_price * (1 + TARGET_PROFIT_PCT / 100)
+                        base_low = np.min(lows[i-lb:i+1])
+                        stop_loss = round(base_low * 0.99, 2)
+                        target_price = round(entry_price * (1 + TARGET_PROFIT_PCT / 100), 2)
                         risk_pct = ((entry_price - stop_loss) / entry_price) * 100
 
-                        if risk_pct <= 7.5:  # Strict Risk Guard: Skip if risk > 7.5%
+                        if risk_pct <= 7.0:  # Max 7% risk allowance
                             outcome = "TIME_EXIT"
                             exit_price = entry_price
                             exit_idx = i
@@ -155,8 +162,8 @@ def run_grid_backtest_and_plan():
             pf = (wins["pnl"].sum() / abs(losses["pnl"].sum())) if len(losses) > 0 and losses["pnl"].sum() != 0 else 999.0
 
             backtest_stats.append({
-                "model_name": param["name"],
-                "params": param,
+                "model_name": m["name"],
+                "params": m,
                 "total_trades": len(df_t),
                 "win_rate_pct": round(win_rate, 1),
                 "profit_factor": round(pf, 2),
@@ -164,16 +171,12 @@ def run_grid_backtest_and_plan():
                 "avg_holding_days": round(df_t["holding"].mean(), 1)
             })
 
-    # Pick the model with the highest Win Rate & Profit Factor
     best_model = max(backtest_stats, key=lambda x: (x["win_rate_pct"], x["profit_factor"]))
-    print(f"\n🏆 Best Historical Model: {best_model['model_name']} ({best_model['win_rate_pct']}% Win Rate, PF: {best_model['profit_factor']})")
+    print(f"\n🏆 Winning Model: {best_model['model_name']} -> {best_model['win_rate_pct']}% Win Rate (PF: {best_model['profit_factor']})")
 
-    # 3. Generate Today's High-Probability Action Plan Using the Winning Model
+    # Generate Active Trade Plan Using the Best Model
     active_plan = []
-    opt_lb = best_model["params"]["lookback"]
-    opt_p_drop = best_model["params"]["min_p_drop"]
-    opt_obv_gain = best_model["params"]["min_obv_gain"]
-    opt_trig_window = 5 if best_model["params"]["trigger"] == "5D_HIGH" else 3
+    opt = best_model["params"]
 
     for sym, s_data in loaded_data.items():
         closes = s_data["closes"]
@@ -183,54 +186,59 @@ def run_grid_backtest_and_plan():
         obvs = s_data["obvs"]
         turnovers = s_data["turnovers"]
 
-        if len(closes) < opt_lb + 5 or closes[-1] < 30.0:
+        if len(closes) < opt["lb"] + 20 or closes[-1] < 40.0:
             continue
 
         sma_9_to = np.mean(turnovers[-9:])
         if sma_9_to < MIN_DELIVERY_TURNOVER_CR:
             continue
 
-        # Check Winning Model Divergence
         curr_c = closes[-1]
-        past_c = closes[-opt_lb - 1]
+        past_c = closes[-opt["lb"] - 1]
         curr_obv = obvs[-1]
-        past_obv = obvs[-opt_lb - 1]
+        past_obv = obvs[-opt["lb"] - 1]
 
         p_chg = ((curr_c - past_c) / past_c) * 100
         obv_chg = ((curr_obv - past_obv) / abs(past_obv)) * 100 if abs(past_obv) > 0 else 0
 
-        if p_chg <= opt_p_drop and obv_chg >= opt_obv_gain:
-            ref_high = np.max(highs[-opt_trig_window - 1:-1])
-            is_triggered = (curr_c >= ref_high) and (vols[-1] >= np.mean(vols[-9:]))
+        # Divergence test
+        if p_chg <= opt["p_drop"] and obv_chg >= opt["obv_gain"]:
+            sma_20 = np.mean(closes[-20:])
+            avg_vol_20 = np.mean(vols[-20:])
+            recent_10d_high = np.max(highs[-11:-1])
 
-            base_low = np.min(lows[-opt_lb:])
+            is_above_sma = curr_c >= sma_20
+            is_vol_spike = vols[-1] >= avg_vol_20 * opt["vol_mult"]
+            is_breakout = curr_c >= recent_10d_high
+
+            is_triggered = is_above_sma and is_vol_spike and is_breakout
+
+            base_low = np.min(lows[-opt["lb"]:])
             sl_price = round(base_low * 0.99, 2)
             risk_pct = round(((curr_c - sl_price) / curr_c) * 100, 2)
 
-            if risk_pct <= 7.5:
+            if risk_pct <= 7.0:
                 meta = fundamentals.get(sym, {})
                 active_plan.append({
                     "Symbol": sym,
                     "Signal": "🟢 BUY TRIGGERED" if is_triggered else "🟡 PENDING BREAKOUT",
-                    "Entry (₹)": round(curr_c, 2) if is_triggered else f"> ₹{round(ref_high, 2)}",
+                    "Entry Trigger": f"₹{curr_c:.2f}" if is_triggered else f"Breakout > ₹{recent_10d_high:.2f}",
                     "Stop Loss (₹)": sl_price,
                     "Risk": f"{risk_pct}%",
-                    "Target 1 (+10%)": round(curr_c * 1.10, 2),
-                    "Target 2 (+20%)": round(curr_c * 1.20, 2),
+                    "Target (+20%)": round(curr_c * 1.20, 2),
                     "9D Turnover": f"₹{sma_9_to:.1f} Cr/d",
-                    "Industry": meta.get("industry", "NSE Listed")
+                    "Category": meta.get("category", "Nifty 750")
                 })
 
     active_plan.sort(key=lambda x: (x["Signal"].startswith("🟢"), -float(x["Risk"].replace("%", ""))), reverse=True)
 
-    # 4. Save Outputs
     with open(os.path.join(DATA_DIR, "backtest_report.json"), "w") as f:
         json.dump({"summary": backtest_stats, "winning_model": best_model}, f, indent=2)
 
     with open(os.path.join(DATA_DIR, "active_trade_plan.json"), "w") as f:
         json.dump(active_plan, f, indent=2)
 
-    print(f"✅ Generated {len(active_plan)} trades under the winning backtested rule set.")
+    print(f"🎉 Generated {len(active_plan)} disciplined setups.")
 
 if __name__ == "__main__":
-    run_grid_backtest_and_plan()
+    run_quant_engine()
