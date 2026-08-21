@@ -16,16 +16,23 @@ def full_corporate_action_adjustment(raw_data):
         return raw_data
     clean = []
     for r in raw_data:
-        clean.append({
-            "time": r["time"],
-            "open": float(r["open"]),
-            "high": float(r.get("high", r["close"])),
-            "low": float(r.get("low", r["close"])),
-            "close": float(r["close"]),
-            "delivery_vol": float(r.get("delivery_vol", 0)),
-            "volume": float(r.get("volume", r.get("delivery_vol", 0))),
-            "deliv_pct": float(r.get("deliv_pct", 0))
-        })
+        try:
+            c = float(r.get("close", 0))
+            if c <= 0:
+                continue
+            clean.append({
+                "time": str(r.get("time", "")),
+                "open": float(r.get("open", c)),
+                "high": float(r.get("high", c)),
+                "low": float(r.get("low", c)),
+                "close": c,
+                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                "volume": float(r.get("volume", r.get("delivery_vol", 0)) or 0),
+                "deliv_pct": float(r.get("deliv_pct", 0) or 0)
+            })
+        except (ValueError, TypeError):
+            continue
+
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -66,14 +73,18 @@ def find_swing_lows(arr, left=3, right=3):
 def scan_wyckoff_stocks():
     print("🚀 Running Nifty 750 scanobv(7.5,8,8) Scanner...")
 
+    if not os.path.exists(DATA_DIR):
+        print(f"❌ Error: '{DATA_DIR}' directory does not exist.")
+        return
+
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
     if os.path.exists(fund_path):
         try:
             with open(fund_path, "r") as f:
                 fundamentals = json.load(f)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"⚠️ Warning loading fundamentals: {e}")
 
     stock_files = [
         f for f in os.listdir(DATA_DIR)
@@ -109,10 +120,13 @@ def scan_wyckoff_stocks():
         except Exception:
             continue
 
-        if len(raw) < 50:
+        if not isinstance(raw, list) or len(raw) < 50:
             continue
 
         clean_history = full_corporate_action_adjustment(raw)
+        if len(clean_history) < 50:
+            continue
+
         closes = np.array([float(x["close"]) for x in clean_history])
         highs = np.array([float(x["high"]) for x in clean_history])
         lows = np.array([float(x["low"]) for x in clean_history])
@@ -121,8 +135,10 @@ def scan_wyckoff_stocks():
         N = len(closes)
 
         # 2. 9-Day Average Volume Filter (> 100,000)
+        if len(traded_vols) < 9:
+            continue
         sma_9_vol = float(np.mean(traded_vols[-9:]))
-        if sma_9_vol < MIN_AVG_VOLUME_9D:
+        if np.isnan(sma_9_vol) or sma_9_vol < MIN_AVG_VOLUME_9D:
             continue
 
         # 3. Calculate True Demat Delivery OBV
@@ -142,10 +158,11 @@ def scan_wyckoff_stocks():
         # 4. Swing Low Pivot Detection
         obv_lows = find_swing_lows(obvs, 3, 3)
         recent_window_start = max(0, N - 10)
-        recent_min_idx = recent_window_start + int(np.argmin(obvs[recent_window_start:]))
-        if recent_min_idx not in obv_lows and recent_min_idx >= N - 10:
-            obv_lows.append(recent_min_idx)
-            obv_lows.sort()
+        if len(obvs[recent_window_start:]) > 0:
+            recent_min_idx = recent_window_start + int(np.argmin(obvs[recent_window_start:]))
+            if recent_min_idx not in obv_lows and recent_min_idx >= N - 10:
+                obv_lows.append(recent_min_idx)
+                obv_lows.sort()
 
         matched_setup = None
 
@@ -157,23 +174,30 @@ def scan_wyckoff_stocks():
             for idx_a in reversed(obv_lows):
                 span = idx_b - idx_a
                 if MIN_LOOKBACK_BARS <= span <= MAX_LOOKBACK_BARS:
+                    if closes[idx_a] <= 0:
+                        continue
                     p_drop = ((closes[idx_b] - closes[idx_a]) / closes[idx_a]) * 100
                     past_o = obvs[idx_a]
-                    o_gain = ((obvs[idx_b] - past_o) / abs(past_o)) * 100 if abs(past_o) > 0 else 0
+                    
+                    if abs(past_o) == 0:
+                        continue
+                    o_gain = ((obvs[idx_b] - past_o) / abs(past_o)) * 100
 
                     if p_drop <= MIN_PRICE_DROP_PCT and o_gain >= MIN_OBV_GAIN_PCT:
-                        swing_high = np.max(highs[idx_a : idx_b + 1])
-                        base_low = np.min(lows[idx_a : idx_b + 1])
+                        swing_high = float(np.max(highs[idx_a : idx_b + 1]))
+                        base_low = float(np.min(lows[idx_a : idx_b + 1]))
                         sl_price = round(base_low * 0.995, 2)
-                        risk_pct = round(((closes[-1] - sl_price) / closes[-1]) * 100, 2)
+                        
+                        curr_close = float(closes[-1])
+                        risk_pct = round(((curr_close - sl_price) / curr_close) * 100, 2) if curr_close > 0 else 0
 
-                        avg_10_vol = np.mean(traded_vols[max(0, N - 11):N - 1])
-                        is_triggered = (closes[-1] >= swing_high) and (traded_vols[-1] >= avg_10_vol)
+                        avg_10_vol = float(np.mean(traded_vols[max(0, N - 11):N - 1]))
+                        is_triggered = bool((curr_close >= swing_high) and (traded_vols[-1] >= avg_10_vol))
 
                         matched_setup = {
                             "Symbol": sym,
                             "Signal": "🟢 BUY BREAKOUT" if is_triggered else "🟡 ACCUMULATION BASE",
-                            "LTP (₹)": round(closes[-1], 2),
+                            "LTP (₹)": round(curr_close, 2),
                             "P/E": f"{pe_float:.1f}" if pe_float is not None else "N/A",
                             "Swing High (₹)": round(swing_high, 2),
                             "Stop Loss (₹)": sl_price,
