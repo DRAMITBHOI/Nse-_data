@@ -2,42 +2,22 @@ import os
 import io
 import json
 import time
+import zipfile
 import datetime
 import requests
 import pandas as pd
-import numpy as np
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Full authentic browser signature required by NSE servers
-BROWSER_HEADERS = {
+HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-User": "?1",
-    "Upgrade-Insecure-Requests": "1"
+    "Referer": "https://www.nseindia.com/"
 }
 
-def create_nse_session():
-    """Initializes a persistent requests session with active NSE cookies."""
-    session = requests.Session()
-    session.headers.update(BROWSER_HEADERS)
-    try:
-        # Initial handshake to collect cookies
-        session.get("https://www.nseindia.com", timeout=15)
-        time.sleep(1)
-    except Exception as e:
-        print(f"⚠️ Initial NSE handshake warning: {e}")
-    return session
-
 def get_latest_recorded_date():
-    """Finds the latest date present in data/*.json files."""
     files = [
         f for f in os.listdir(DATA_DIR) 
         if f.endswith(".json") and f not in [
@@ -50,7 +30,7 @@ def get_latest_recorded_date():
         return datetime.date.today() - datetime.timedelta(days=15)
     
     dates = []
-    for f in files[:40]:
+    for f in files[:35]:
         try:
             with open(os.path.join(DATA_DIR, f), "r") as fp:
                 raw = json.load(fp)
@@ -62,42 +42,63 @@ def get_latest_recorded_date():
         return datetime.datetime.strptime(max(dates), "%Y-%m-%d").date()
     return datetime.date.today() - datetime.timedelta(days=15)
 
-def fetch_nse_full_bhavdata(session, target_date):
-    """Downloads official daily consolidated Price & Delivery Bhavcopy from NSE."""
+def download_nse_session_data(session, target_date):
+    """Fetches daily bhavcopy using established NSE cookies across archive URLs."""
     d_str = target_date.strftime("%d%m%Y")
+    d_udiff = target_date.strftime("%Y%m%d")
     
-    # Official NSE Archive endpoints
     urls = [
+        f"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_{d_udiff}_F_0000.csv.zip",
         f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{d_str}.csv",
         f"https://archives.nseindia.com/products/content/sec_bhavdata_full_{d_str}.csv"
     ]
-    
+
     for url in urls:
         try:
             resp = session.get(url, timeout=20)
-            if resp.status_code == 200 and len(resp.content) > 1000:
-                df = pd.read_csv(io.StringIO(resp.text))
-                df.columns = df.columns.str.strip()
-                
-                # Filter regular equities
-                df = df[df["SERIES"].isin(["EQ", "BE", "SM"])]
-                
+            if resp.status_code == 200 and len(resp.content) > 1500:
+                if url.endswith(".zip"):
+                    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+                        csv_name = z.namelist()[0]
+                        with z.open(csv_name) as zf:
+                            df = pd.read_csv(zf)
+                else:
+                    df = pd.read_csv(io.StringIO(resp.text))
+
+                df.columns = df.columns.str.strip().str.upper()
+
+                sym_col = next((c for c in ["SYMBOL", "TRADINGSYMBOL", "TCKRSYMB"] if c in df.columns), None)
+                srs_col = next((c for c in ["SERIES", "SRIS", "SCTYSRS"] if c in df.columns), None)
+                cls_col = next((c for c in ["CLOSE_PRICE", "CLOSE", "CLSPRIC"] if c in df.columns), None)
+                opn_col = next((c for c in ["OPEN_PRICE", "OPEN", "OPNPRIC"] if c in df.columns), None)
+                hgh_col = next((c for c in ["HIGH_PRICE", "HIGH", "HGHPRIC"] if c in df.columns), None)
+                low_col = next((c for c in ["LOW_PRICE", "LOW", "LWPRIC"] if c in df.columns), None)
+                vol_col = next((c for c in ["TTL_TRD_QNTY", "VOLUME", "TTLTRADEDQTY"] if c in df.columns), None)
+                dlv_col = next((c for c in ["DELIV_QTY", "DELIVERY_QTY", "DLVRYQTY"] if c in df.columns), None)
+                pct_col = next((c for c in ["DELIV_PER", "DELIVERY_PCT", "DLVRYPER"] if c in df.columns), None)
+
+                if not (sym_col and cls_col):
+                    continue
+
+                if srs_col:
+                    df = df[df[srs_col].astype(str).str.strip().isin(["EQ", "BE", "SM"])]
+
                 day_records = {}
                 for _, row in df.iterrows():
-                    sym = str(row["SYMBOL"]).strip().upper()
+                    sym = str(row[sym_col]).strip().upper()
                     try:
-                        o = float(row["OPEN_PRICE"])
-                        h = float(row["HIGH_PRICE"])
-                        l = float(row["LOW_PRICE"])
-                        c = float(row["CLOSE_PRICE"])
-                        tot_vol = float(row["TTL_TRD_QNTY"])
-                        
-                        deliv_raw = str(row.get("DELIV_QTY", "")).strip().replace("-", "")
-                        deliv_vol = float(deliv_raw) if deliv_raw else tot_vol
-                        
-                        pct_raw = str(row.get("DELIV_PER", "")).strip().replace("-", "")
-                        deliv_pct = float(pct_raw) if pct_raw else (round((deliv_vol / tot_vol) * 100, 1) if tot_vol > 0 else 0.0)
-                        
+                        c = float(row[cls_col])
+                        o = float(row[opn_col]) if opn_col else c
+                        h = float(row[hgh_col]) if hgh_col else c
+                        l = float(row[low_col]) if low_col else c
+                        tot_vol = float(row[vol_col]) if vol_col else 0.0
+
+                        d_raw = str(row.get(dlv_col, "")).strip().replace("-", "") if dlv_col else ""
+                        d_vol = float(d_raw) if d_raw and d_raw.lower() != "nan" else tot_vol
+
+                        p_raw = str(row.get(pct_col, "")).strip().replace("-", "") if pct_col else ""
+                        d_pct = float(p_raw) if p_raw and p_raw.lower() != "nan" else (round((d_vol / tot_vol) * 100, 1) if tot_vol > 0 else 0.0)
+
                         day_records[sym] = {
                             "time": target_date.strftime("%Y-%m-%d"),
                             "open": o,
@@ -105,50 +106,61 @@ def fetch_nse_full_bhavdata(session, target_date):
                             "low": l,
                             "close": c,
                             "volume": tot_vol,
-                            "delivery_vol": deliv_vol,
-                            "deliv_pct": deliv_pct
+                            "delivery_vol": d_vol,
+                            "deliv_pct": d_pct
                         }
                     except Exception:
                         continue
-                return day_records
+
+                if len(day_records) > 0:
+                    return day_records
         except Exception:
             continue
-    
-    print(f"ℹ️ NSE data unavailable for {target_date} (Holiday / Weekend / Closed).")
     return None
 
 def update_all_stocks():
-    session = create_nse_session()
+    session = requests.Session()
+    session.headers.update(HEADERS)
+
+    # Establish initial handshake to get valid cookies
+    try:
+        session.get("https://www.nseindia.com", timeout=15)
+        time.sleep(1)
+        session.get("https://www.nseindia.com/all-reports", timeout=15)
+        time.sleep(1)
+    except Exception as e:
+        print(f"⚠️ Session initialization notice: {e}")
+
     last_date = get_latest_recorded_date()
     today = datetime.date.today()
-    
+
     print(f"📅 Last recorded date in repo: {last_date}")
-    print(f"📅 Scanning NSE for missing sessions up to {today}...")
+    print(f"📅 Scanning dates from {last_date + datetime.timedelta(days=1)} to {today}...")
 
     missing_dates = []
     curr = last_date + datetime.timedelta(days=1)
     while curr <= today:
-        if curr.weekday() < 5:  # Monday to Friday only
+        if curr.weekday() < 5:  # Monday through Friday
             missing_dates.append(curr)
         curr += datetime.timedelta(days=1)
 
     if not missing_dates:
         print("✅ Data is already up to date!")
-        update_fundamentals(session)
         return
 
     daily_updates = {}
     for d in missing_dates:
-        print(f"📥 Downloading Official NSE Bhavdata for {d}...")
-        day_data = fetch_nse_full_bhavdata(session, d)
-        if day_data:
-            daily_updates[d.strftime("%Y-%m-%d")] = day_data
-            print(f"   -> Successfully extracted {len(day_data)} stocks for {d}")
+        print(f"📥 Fetching NSE data for {d}...")
+        records = download_nse_session_data(session, d)
+        if records:
+            daily_updates[d.strftime("%Y-%m-%d")] = records
+            print(f"   -> ✅ SUCCESS: Saved {len(records)} stocks for {d}")
+        else:
+            print(f"   -> ⚠️ No session data returned for {d}")
         time.sleep(1)
 
     if not daily_updates:
-        print("ℹ️ No new trading days were available on NSE.")
-        update_fundamentals(session)
+        print("ℹ️ No new trading days were fetched.")
         return
 
     stock_files = [
@@ -164,7 +176,7 @@ def update_all_stocks():
     for f_name in stock_files:
         sym = f_name.replace(".json", "").strip().upper()
         json_path = os.path.join(DATA_DIR, f_name)
-        
+
         try:
             with open(json_path, "r") as fp:
                 stock_data = json.load(fp)
@@ -185,63 +197,7 @@ def update_all_stocks():
                 json.dump(stock_data, fp, indent=2)
             updated_count += 1
 
-    print(f"🎉 Successfully updated {updated_count} stock files with official NSE data!")
-    update_fundamentals(session)
-
-def update_fundamentals(session):
-    print("📡 Updating NSE broad-market index tracking...")
-    index_urls = [
-        "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv"
-    ]
-    verified_symbols = {}
-    for url in index_urls:
-        try:
-            resp = session.get(url, timeout=15)
-            if resp.status_code == 200:
-                df = pd.read_csv(io.StringIO(resp.text))
-                df.columns = df.columns.str.strip()
-                for _, row in df.iterrows():
-                    sym = str(row.get("Symbol", "")).strip().upper()
-                    industry = str(row.get("Industry", "General"))
-                    if sym and sym != "NAN":
-                        verified_symbols[sym] = {"industry": industry, "is_nse_tracked": True}
-        except Exception as e:
-            print(f"⚠️ Could not load index file {url}: {e}")
-
-    fundamentals = {}
-    stock_files = [
-        f for f in os.listdir(DATA_DIR) 
-        if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", 
-            "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
-        ]
-    ]
-    for f_name in stock_files:
-        sym = f_name.replace(".json", "").strip().upper()
-        json_path = os.path.join(DATA_DIR, f_name)
-        try:
-            with open(json_path, "r") as fp:
-                raw_data = json.load(fp)
-            if not raw_data:
-                continue
-            latest_close = float(raw_data[-1]["close"])
-        except Exception:
-            continue
-
-        fundamentals[sym] = {
-            "market_cap_status": "Verified Listed Equity" if sym in verified_symbols else "NSE Equity",
-            "industry": verified_symbols.get(sym, {}).get("industry", "NSE Listed"),
-            "price": latest_close,
-            "is_qualified": True if (sym in verified_symbols or latest_close >= 20.0) else False
-        }
-
-    out_file = os.path.join(DATA_DIR, "fundamentals.json")
-    with open(out_file, "w") as fp:
-        json.dump(fundamentals, fp, indent=2)
-    print(f"🎉 Saved {len(fundamentals)} records into {out_file}!")
+    print(f"🎉 Updated {updated_count} stock files with new records!")
 
 if __name__ == "__main__":
     update_all_stocks()
