@@ -1,1 +1,4427 @@
-[{"time": "2024-09-24", "open": 350.0, "high": 350.0, "low": 308.2, "close": 323.4, "delivery_vol": 15202054, "deliv_pct": 43.48}, {"time": "2024-09-25", "open": 328.0, "high": 330.4, "low": 307.05, "close": 313.8, "delivery_vol": 2053069, "deliv_pct": 31.22}, {"time": "2024-09-26", "open": 311.3, "high": 316.95, "low": 303.0, "close": 304.6, "delivery_vol": 1095022, "deliv_pct": 45.62}, {"time": "2024-09-27", "open": 304.55, "high": 316.7, "low": 304.55, "close": 309.0, "delivery_vol": 1123613, "deliv_pct": 42.31}, {"time": "2024-09-30", "open": 306.0, "high": 308.8, "low": 295.05, "close": 300.0, "delivery_vol": 876358, "deliv_pct": 40.25}, {"time": "2024-10-01", "open": 310.0, "high": 314.0, "low": 301.7, "close": 306.3, "delivery_vol": 948670, "deliv_pct": 36.43}, {"time": "2024-10-02", "open": 310.0, "high": 314.0, "low": 301.7, "close": 306.3, "delivery_vol": 948670, "deliv_pct": 36.43}, {"time": "2024-10-03", "open": 297.2, "high": 303.0, "low": 292.0, "close": 293.45, "delivery_vol": 554334, "deliv_pct": 51.37}, {"time": "2024-10-04", "open": 294.85, "high": 301.7, "low": 285.2, "close": 292.35, "delivery_vol": 518367, "deliv_pct": 31.94}, {"time": "2024-10-07", "open": 294.9, "high": 294.95, "low": 269.5, "close": 278.95, "delivery_vol": 814761, "deliv_pct": 52.34}, {"time": "2024-10-08", "open": 277.5, "high": 288.0, "low": 275.8, "close": 285.85, "delivery_vol": 401252, "deliv_pct": 44.95}, {"time": "2024-10-09", "open": 286.85, "high": 292.4, "low": 284.65, "close": 285.35, "delivery_vol": 286526, "deliv_pct": 48.38}, {"time": "2024-10-10", "open": 288.7, "high": 293.0, "low": 287.5, "close": 289.8, "delivery_vol": 277136, "deliv_pct": 54.58}, {"time": "2024-10-11", "open": 287.55, "high": 292.2, "low": 282.55, "close": 283.8, "delivery_vol": 177560, "deliv_pct": 52.81}, {"time": "2024-10-14", "open": 285.95, "high": 286.85, "low": 273.3, "close": 274.1, "delivery_vol": 307764, "deliv_pct": 61.25}, {"time": "2024-10-15", "open": 274.2, "high": 278.0, "low": 271.0, "close": 274.6, "delivery_vol": 193157, "deliv_pct": 48.62}, {"time": "2024-10-16", "open": 273.6, "high": 277.0, "low": 268.0, "close": 268.3, "delivery_vol": 396645, "deliv_pct": 64.72}, {"time": "2024-10-17", "open": 268.0, "high": 274.5, "low": 266.5, "close": 269.45, "delivery_vol": 245441, "deliv_pct": 45.24}, {"time": "2024-10-18", "open": 269.0, "high": 269.4, "low": 264.15, "close": 266.1, "delivery_vol": 177560, "deliv_pct": 52.6}, {"time": "2024-10-21", "open": 268.0, "high": 269.0, "low": 249.05, "close": 251.05, "delivery_vol": 514802, "deliv_pct": 57.76}, {"time": "2024-10-22", "open": 250.0, "high": 251.55, "low": 242.1, "close": 243.55, "delivery_vol": 229344, "deliv_pct": 44.94}, {"time": "2024-10-23", "open": 243.0, "high": 250.9, "low": 240.65, "close": 244.2, "delivery_vol": 283308, "deliv_pct": 42.51}, {"time": "2024-10-24", "open": 245.9, "high": 247.0, "low": 237.5, "close": 239.05, "delivery_vol": 164134, "deliv_pct": 52.26}, {"time": "2024-10-25", "open": 239.1, "high": 241.65, "low": 229.05, "close": 231.0, "delivery_vol": 279755, "deliv_pct": 48.13}, {"time": "2024-10-28", "open": 234.65, "high": 236.45, "low": 226.65, "close": 232.4, "delivery_vol": 216848, "deliv_pct": 38.86}, {"time": "2024-10-29", "open": 243.0, "high": 251.9, "low": 240.2, "close": 246.95, "delivery_vol": 438159, "deliv_pct": 28.61}, {"time": "2024-10-30", "open": 248.9, "high": 248.9, "low": 243.2, "close": 246.1, "delivery_vol": 175992, "deliv_pct": 47.09}, {"time": "2024-10-31", "open": 246.5, "high": 253.9, "low": 244.1, "close": 250.2, "delivery_vol": 163156, "deliv_pct": 37.7}, {"time": "2024-11-01", "open": 252.45, "high": 256.0, "low": 251.75, "close": 254.65, "delivery_vol": 137307, "deliv_pct": 65.7}, {"time": "2024-11-04", "open": 256.95, "high": 260.7, "low": 252.35, "close": 259.4, "delivery_vol": 243963, "deliv_pct": 46.65}, {"time": "2024-11-05", "open": 259.9, "high": 264.2, "low": 257.15, "close": 259.85, "delivery_vol": 209960, "deliv_pct": 48.54}, {"time": "2024-11-06", "open": 262.0, "high": 263.95, "low": 259.15, "close": 261.75, "delivery_vol": 145000, "deliv_pct": 42.8}, {"time": "2024-11-07", "open": 262.85, "high": 264.9, "low": 260.15, "close": 260.65, "delivery_vol": 71995, "deliv_pct": 41.28}, {"time": "2024-11-08", "open": 261.9, "high": 262.8, "low": 252.0, "close": 253.45, "delivery_vol": 112548, "deliv_pct": 47.76}, {"time": "2024-11-11", "open": 255.4, "high": 255.4, "low": 246.6, "close": 250.35, "delivery_vol": 117409, "deliv_pct": 43.97}, {"time": "2024-11-12", "open": 251.1, "high": 253.25, "low": 241.2, "close": 242.35, "delivery_vol": 106761, "deliv_pct": 47.78}, {"time": "2024-11-13", "open": 242.35, "high": 243.45, "low": 232.5, "close": 233.7, "delivery_vol": 124033, "deliv_pct": 48.06}, {"time": "2024-11-14", "open": 233.7, "high": 240.0, "low": 233.7, "close": 237.45, "delivery_vol": 83651, "deliv_pct": 47.62}, {"time": "2024-11-18", "open": 238.9, "high": 241.0, "low": 232.55, "close": 236.3, "delivery_vol": 96003, "deliv_pct": 43.68}, {"time": "2024-11-19", "open": 237.1, "high": 243.1, "low": 237.0, "close": 237.85, "delivery_vol": 74227, "deliv_pct": 49.03}, {"time": "2024-11-20", "open": 237.1, "high": 243.1, "low": 237.0, "close": 237.85, "delivery_vol": 74227, "deliv_pct": 49.03}, {"time": "2024-11-21", "open": 240.0, "high": 240.0, "low": 226.0, "close": 227.3, "delivery_vol": 261048, "deliv_pct": 54.39}, {"time": "2024-11-22", "open": 227.95, "high": 234.4, "low": 225.35, "close": 232.85, "delivery_vol": 121508, "deliv_pct": 43.27}, {"time": "2024-11-25", "open": 238.45, "high": 238.95, "low": 230.05, "close": 230.4, "delivery_vol": 127645, "deliv_pct": 55.44}, {"time": "2024-11-26", "open": 232.35, "high": 232.65, "low": 227.85, "close": 229.05, "delivery_vol": 118872, "deliv_pct": 53.31}, {"time": "2024-11-27", "open": 229.05, "high": 245.95, "low": 228.4, "close": 243.85, "delivery_vol": 223576, "deliv_pct": 40.4}, {"time": "2024-11-28", "open": 246.7, "high": 250.5, "low": 242.0, "close": 242.9, "delivery_vol": 163671, "deliv_pct": 39.1}, {"time": "2024-11-29", "open": 242.7, "high": 246.35, "low": 231.7, "close": 234.1, "delivery_vol": 322330, "deliv_pct": 55.35}, {"time": "2024-12-02", "open": 234.09, "high": 234.09, "low": 228.41, "close": 228.96, "delivery_vol": 456345, "deliv_pct": 64.77}, {"time": "2024-12-03", "open": 230.4, "high": 235.95, "low": 230.39, "close": 232.83, "delivery_vol": 430950, "deliv_pct": 62.06}, {"time": "2024-12-04", "open": 234.4, "high": 250.33, "low": 234.1, "close": 243.9, "delivery_vol": 496089, "deliv_pct": 35.68}, {"time": "2024-12-05", "open": 246.35, "high": 255.8, "low": 245.61, "close": 251.98, "delivery_vol": 397034, "deliv_pct": 36.91}, {"time": "2024-12-06", "open": 254.0, "high": 256.7, "low": 250.29, "close": 251.2, "delivery_vol": 206291, "deliv_pct": 33.55}, {"time": "2024-12-09", "open": 252.7, "high": 256.5, "low": 251.45, "close": 252.83, "delivery_vol": 178229, "deliv_pct": 42.94}, {"time": "2024-12-10", "open": 257.7, "high": 261.4, "low": 245.58, "close": 247.44, "delivery_vol": 259450, "deliv_pct": 34.53}, {"time": "2024-12-11", "open": 248.35, "high": 251.34, "low": 245.55, "close": 246.17, "delivery_vol": 149018, "deliv_pct": 53.57}, {"time": "2024-12-12", "open": 246.85, "high": 247.4, "low": 238.0, "close": 239.32, "delivery_vol": 189535, "deliv_pct": 50.19}, {"time": "2024-12-13", "open": 239.45, "high": 241.99, "low": 234.7, "close": 236.42, "delivery_vol": 112540, "deliv_pct": 43.18}, {"time": "2024-12-16", "open": 237.7, "high": 240.0, "low": 237.0, "close": 239.19, "delivery_vol": 114242, "deliv_pct": 46.77}, {"time": "2024-12-17", "open": 239.0, "high": 241.97, "low": 235.25, "close": 235.91, "delivery_vol": 137128, "deliv_pct": 50.33}, {"time": "2024-12-18", "open": 234.5, "high": 237.79, "low": 231.82, "close": 233.8, "delivery_vol": 92777, "deliv_pct": 32.2}, {"time": "2024-12-19", "open": 225.5, "high": 234.0, "low": 225.45, "close": 230.28, "delivery_vol": 281667, "deliv_pct": 48.52}, {"time": "2024-12-20", "open": 230.1, "high": 231.99, "low": 221.0, "close": 221.67, "delivery_vol": 298375, "deliv_pct": 56.93}, {"time": "2024-12-23", "open": 226.95, "high": 226.95, "low": 218.91, "close": 219.72, "delivery_vol": 158847, "deliv_pct": 55.14}, {"time": "2024-12-24", "open": 220.9, "high": 223.0, "low": 220.05, "close": 220.84, "delivery_vol": 88442, "deliv_pct": 51.62}, {"time": "2024-12-25", "open": 220.9, "high": 223.0, "low": 220.05, "close": 220.84, "delivery_vol": 88442, "deliv_pct": 51.62}, {"time": "2024-12-26", "open": 221.65, "high": 223.2, "low": 218.16, "close": 218.79, "delivery_vol": 169506, "deliv_pct": 63.14}, {"time": "2024-12-27", "open": 219.85, "high": 220.89, "low": 216.93, "close": 217.69, "delivery_vol": 184837, "deliv_pct": 57.99}, {"time": "2024-12-30", "open": 218.1, "high": 221.76, "low": 217.0, "close": 217.68, "delivery_vol": 107486, "deliv_pct": 52.48}, {"time": "2024-12-31", "open": 216.08, "high": 218.39, "low": 215.53, "close": 217.05, "delivery_vol": 115002, "deliv_pct": 59.61}, {"time": "2025-01-01", "open": 218.9, "high": 220.08, "low": 217.2, "close": 218.0, "delivery_vol": 122589, "deliv_pct": 54.03}, {"time": "2025-01-02", "open": 219.69, "high": 222.89, "low": 217.52, "close": 221.82, "delivery_vol": 239584, "deliv_pct": 48.14}, {"time": "2025-01-03", "open": 222.0, "high": 233.29, "low": 222.0, "close": 229.28, "delivery_vol": 194583, "deliv_pct": 31.04}, {"time": "2025-01-06", "open": 229.6, "high": 231.46, "low": 218.05, "close": 219.37, "delivery_vol": 215067, "deliv_pct": 49.55}, {"time": "2025-01-07", "open": 219.53, "high": 228.0, "low": 217.71, "close": 225.55, "delivery_vol": 150871, "deliv_pct": 49.04}, {"time": "2025-01-08", "open": 225.55, "high": 225.64, "low": 220.0, "close": 222.44, "delivery_vol": 100225, "deliv_pct": 44.02}, {"time": "2025-01-09", "open": 221.8, "high": 224.65, "low": 219.0, "close": 221.15, "delivery_vol": 81162, "deliv_pct": 52.37}, {"time": "2025-01-10", "open": 220.03, "high": 221.0, "low": 214.5, "close": 215.09, "delivery_vol": 169390, "deliv_pct": 59.3}, {"time": "2025-01-13", "open": 214.99, "high": 214.99, "low": 201.87, "close": 204.18, "delivery_vol": 262787, "deliv_pct": 60.41}, {"time": "2025-01-14", "open": 204.41, "high": 214.5, "low": 204.41, "close": 210.24, "delivery_vol": 81479, "deliv_pct": 51.42}, {"time": "2025-01-15", "open": 211.75, "high": 213.0, "low": 207.14, "close": 207.83, "delivery_vol": 57731, "deliv_pct": 44.27}, {"time": "2025-01-16", "open": 209.55, "high": 213.0, "low": 209.55, "close": 210.85, "delivery_vol": 99078, "deliv_pct": 61.22}, {"time": "2025-01-17", "open": 211.0, "high": 211.91, "low": 208.01, "close": 209.96, "delivery_vol": 70052, "deliv_pct": 53.0}, {"time": "2025-01-20", "open": 210.0, "high": 212.63, "low": 208.01, "close": 210.53, "delivery_vol": 75956, "deliv_pct": 51.18}, {"time": "2025-01-21", "open": 211.01, "high": 212.0, "low": 205.2, "close": 207.7, "delivery_vol": 82250, "deliv_pct": 49.83}, {"time": "2025-01-22", "open": 208.25, "high": 210.0, "low": 201.0, "close": 203.53, "delivery_vol": 141802, "deliv_pct": 63.68}, {"time": "2025-01-23", "open": 202.45, "high": 207.7, "low": 200.15, "close": 201.74, "delivery_vol": 149125, "deliv_pct": 51.97}, {"time": "2025-01-24", "open": 201.6, "high": 203.48, "low": 196.0, "close": 197.42, "delivery_vol": 166661, "deliv_pct": 60.69}, {"time": "2025-01-27", "open": 197.99, "high": 198.01, "low": 190.2, "close": 192.07, "delivery_vol": 165440, "deliv_pct": 52.42}, {"time": "2025-01-28", "open": 193.09, "high": 195.07, "low": 187.8, "close": 191.8, "delivery_vol": 127096, "deliv_pct": 46.98}, {"time": "2025-01-29", "open": 192.89, "high": 198.75, "low": 191.81, "close": 197.11, "delivery_vol": 89202, "deliv_pct": 47.87}, {"time": "2025-01-30", "open": 197.14, "high": 198.09, "low": 193.7, "close": 194.41, "delivery_vol": 65446, "deliv_pct": 51.38}, {"time": "2025-01-31", "open": 194.1, "high": 204.5, "low": 194.1, "close": 202.84, "delivery_vol": 118865, "deliv_pct": 51.65}, {"time": "2025-02-03", "open": 201.0, "high": 201.97, "low": 195.92, "close": 197.38, "delivery_vol": 68799, "deliv_pct": 56.94}, {"time": "2025-02-04", "open": 199.0, "high": 200.0, "low": 193.3, "close": 197.69, "delivery_vol": 132245, "deliv_pct": 49.96}, {"time": "2025-02-05", "open": 198.45, "high": 200.0, "low": 197.03, "close": 197.97, "delivery_vol": 130963, "deliv_pct": 57.91}, {"time": "2025-02-06", "open": 198.0, "high": 199.49, "low": 195.42, "close": 195.81, "delivery_vol": 76074, "deliv_pct": 57.92}, {"time": "2025-02-07", "open": 196.0, "high": 197.85, "low": 190.5, "close": 191.24, "delivery_vol": 120166, "deliv_pct": 55.32}, {"time": "2025-02-10", "open": 192.47, "high": 193.08, "low": 184.35, "close": 187.36, "delivery_vol": 146215, "deliv_pct": 56.87}, {"time": "2025-02-11", "open": 187.01, "high": 188.0, "low": 182.8, "close": 184.52, "delivery_vol": 180681, "deliv_pct": 52.64}, {"time": "2025-02-12", "open": 182.81, "high": 191.0, "low": 177.0, "close": 181.7, "delivery_vol": 274901, "deliv_pct": 49.58}, {"time": "2025-02-13", "open": 181.7, "high": 185.0, "low": 178.9, "close": 180.71, "delivery_vol": 334424, "deliv_pct": 73.67}, {"time": "2025-02-14", "open": 181.85, "high": 183.5, "low": 170.0, "close": 174.75, "delivery_vol": 195209, "deliv_pct": 52.33}, {"time": "2025-02-17", "open": 172.57, "high": 173.75, "low": 166.12, "close": 171.11, "delivery_vol": 267999, "deliv_pct": 37.56}, {"time": "2025-02-18", "open": 171.15, "high": 172.99, "low": 165.16, "close": 167.29, "delivery_vol": 161473, "deliv_pct": 49.46}, {"time": "2025-02-19", "open": 166.25, "high": 176.7, "low": 165.94, "close": 175.63, "delivery_vol": 219212, "deliv_pct": 49.87}, {"time": "2025-02-20", "open": 175.63, "high": 179.09, "low": 173.03, "close": 173.78, "delivery_vol": 127261, "deliv_pct": 55.46}, {"time": "2025-02-21", "open": 172.15, "high": 178.22, "low": 172.0, "close": 173.76, "delivery_vol": 128926, "deliv_pct": 48.03}, {"time": "2025-02-24", "open": 173.55, "high": 173.8, "low": 168.11, "close": 169.08, "delivery_vol": 171951, "deliv_pct": 55.37}, {"time": "2025-02-25", "open": 169.51, "high": 174.0, "low": 168.01, "close": 168.31, "delivery_vol": 117581, "deliv_pct": 57.02}, {"time": "2025-02-27", "open": 172.0, "high": 178.0, "low": 169.93, "close": 175.13, "delivery_vol": 292906, "deliv_pct": 45.27}, {"time": "2025-02-28", "open": 174.0, "high": 174.19, "low": 169.59, "close": 171.63, "delivery_vol": 272484, "deliv_pct": 66.23}, {"time": "2025-03-03", "open": 171.0, "high": 174.94, "low": 163.6, "close": 167.54, "delivery_vol": 326102, "deliv_pct": 61.39}, {"time": "2025-03-04", "open": 165.0, "high": 169.37, "low": 163.5, "close": 166.23, "delivery_vol": 94864, "deliv_pct": 46.56}, {"time": "2025-03-05", "open": 167.1, "high": 170.58, "low": 166.0, "close": 169.1, "delivery_vol": 137182, "deliv_pct": 49.15}, {"time": "2025-03-06", "open": 171.65, "high": 174.0, "low": 170.61, "close": 172.64, "delivery_vol": 680273, "deliv_pct": 78.41}, {"time": "2025-03-07", "open": 173.0, "high": 175.5, "low": 171.01, "close": 173.2, "delivery_vol": 247743, "deliv_pct": 61.07}, {"time": "2025-03-10", "open": 174.6, "high": 175.0, "low": 168.0, "close": 169.27, "delivery_vol": 254074, "deliv_pct": 61.46}, {"time": "2025-03-11", "open": 168.85, "high": 172.71, "low": 166.0, "close": 171.14, "delivery_vol": 206951, "deliv_pct": 52.27}, {"time": "2025-03-12", "open": 172.0, "high": 172.0, "low": 168.21, "close": 170.48, "delivery_vol": 370512, "deliv_pct": 65.69}, {"time": "2025-03-13", "open": 171.5, "high": 171.79, "low": 169.16, "close": 170.83, "delivery_vol": 148859, "deliv_pct": 59.13}, {"time": "2025-03-17", "open": 172.0, "high": 172.85, "low": 167.0, "close": 170.51, "delivery_vol": 238625, "deliv_pct": 68.39}, {"time": "2025-03-18", "open": 170.5, "high": 170.99, "low": 167.5, "close": 169.47, "delivery_vol": 286984, "deliv_pct": 58.24}, {"time": "2025-03-19", "open": 168.55, "high": 175.9, "low": 168.5, "close": 175.39, "delivery_vol": 175882, "deliv_pct": 45.09}, {"time": "2025-03-20", "open": 177.42, "high": 177.5, "low": 172.0, "close": 172.59, "delivery_vol": 172991, "deliv_pct": 57.07}, {"time": "2025-03-21", "open": 172.5, "high": 179.75, "low": 171.67, "close": 175.48, "delivery_vol": 333801, "deliv_pct": 51.56}, {"time": "2025-03-24", "open": 175.5, "high": 179.27, "low": 171.9, "close": 172.71, "delivery_vol": 353421, "deliv_pct": 55.66}, {"time": "2025-03-25", "open": 173.99, "high": 174.81, "low": 166.39, "close": 168.4, "delivery_vol": 365757, "deliv_pct": 53.82}, {"time": "2025-03-26", "open": 168.48, "high": 170.19, "low": 166.25, "close": 167.81, "delivery_vol": 954621, "deliv_pct": 74.6}, {"time": "2025-03-27", "open": 168.61, "high": 170.0, "low": 166.51, "close": 168.18, "delivery_vol": 834561, "deliv_pct": 71.83}, {"time": "2025-03-28", "open": 166.8, "high": 171.11, "low": 166.0, "close": 167.52, "delivery_vol": 459043, "deliv_pct": 61.16}, {"time": "2025-04-01", "open": 167.45, "high": 175.65, "low": 165.65, "close": 171.86, "delivery_vol": 157640, "deliv_pct": 37.02}, {"time": "2025-04-02", "open": 173.0, "high": 177.8, "low": 170.62, "close": 176.44, "delivery_vol": 144548, "deliv_pct": 46.36}, {"time": "2025-04-03", "open": 176.0, "high": 191.7, "low": 175.0, "close": 188.63, "delivery_vol": 273637, "deliv_pct": 35.25}, {"time": "2025-04-04", "open": 191.8, "high": 191.8, "low": 175.0, "close": 175.67, "delivery_vol": 278030, "deliv_pct": 44.99}, {"time": "2025-04-07", "open": 166.0, "high": 174.59, "low": 141.47, "close": 173.33, "delivery_vol": 209667, "deliv_pct": 34.28}, {"time": "2025-04-08", "open": 176.9, "high": 177.29, "low": 172.25, "close": 173.9, "delivery_vol": 71231, "deliv_pct": 35.86}, {"time": "2025-04-09", "open": 174.0, "high": 174.39, "low": 168.5, "close": 169.38, "delivery_vol": 125818, "deliv_pct": 46.67}, {"time": "2025-04-11", "open": 180.02, "high": 198.99, "low": 178.9, "close": 190.75, "delivery_vol": 596287, "deliv_pct": 19.43}, {"time": "2025-04-15", "open": 195.9, "high": 199.0, "low": 191.55, "close": 193.23, "delivery_vol": 421986, "deliv_pct": 43.26}, {"time": "2025-04-16", "open": 193.95, "high": 194.7, "low": 190.0, "close": 191.17, "delivery_vol": 223528, "deliv_pct": 58.31}, {"time": "2025-04-17", "open": 191.7, "high": 202.91, "low": 191.2, "close": 199.28, "delivery_vol": 516330, "deliv_pct": 40.32}, {"time": "2025-04-21", "open": 200.0, "high": 210.42, "low": 199.02, "close": 208.51, "delivery_vol": 430695, "deliv_pct": 45.05}, {"time": "2025-04-22", "open": 210.0, "high": 216.04, "low": 204.71, "close": 210.92, "delivery_vol": 253241, "deliv_pct": 34.21}, {"time": "2025-04-23", "open": 211.99, "high": 224.4, "low": 207.41, "close": 221.95, "delivery_vol": 346545, "deliv_pct": 33.63}, {"time": "2025-04-24", "open": 220.9, "high": 226.05, "low": 216.97, "close": 218.78, "delivery_vol": 221060, "deliv_pct": 41.34}, {"time": "2025-04-25", "open": 220.49, "high": 221.13, "low": 208.03, "close": 210.7, "delivery_vol": 190969, "deliv_pct": 39.4}, {"time": "2025-04-28", "open": 210.5, "high": 218.0, "low": 206.21, "close": 212.9, "delivery_vol": 190704, "deliv_pct": 40.64}, {"time": "2025-04-29", "open": 213.48, "high": 231.6, "low": 213.48, "close": 228.4, "delivery_vol": 657472, "deliv_pct": 21.68}, {"time": "2025-04-30", "open": 230.0, "high": 230.59, "low": 222.19, "close": 223.76, "delivery_vol": 299672, "deliv_pct": 30.38}, {"time": "2025-05-02", "open": 224.9, "high": 228.9, "low": 219.14, "close": 220.36, "delivery_vol": 137119, "deliv_pct": 28.86}, {"time": "2025-05-05", "open": 222.9, "high": 225.9, "low": 218.51, "close": 220.03, "delivery_vol": 126661, "deliv_pct": 25.42}, {"time": "2025-05-06", "open": 220.04, "high": 221.35, "low": 204.02, "close": 205.23, "delivery_vol": 244538, "deliv_pct": 38.64}, {"time": "2025-05-07", "open": 204.55, "high": 209.58, "low": 200.35, "close": 205.78, "delivery_vol": 174259, "deliv_pct": 26.93}, {"time": "2025-05-08", "open": 207.75, "high": 211.6, "low": 204.0, "close": 204.66, "delivery_vol": 132605, "deliv_pct": 41.3}, {"time": "2025-05-09", "open": 200.0, "high": 206.01, "low": 197.02, "close": 202.98, "delivery_vol": 122463, "deliv_pct": 47.04}, {"time": "2025-05-12", "open": 210.96, "high": 221.2, "low": 192.07, "close": 205.02, "delivery_vol": 3707370, "deliv_pct": 59.58}, {"time": "2025-05-13", "open": 208.1, "high": 213.55, "low": 206.0, "close": 212.88, "delivery_vol": 258321, "deliv_pct": 34.69}, {"time": "2025-05-14", "open": 214.0, "high": 220.0, "low": 211.26, "close": 217.21, "delivery_vol": 483308, "deliv_pct": 49.76}, {"time": "2025-05-15", "open": 217.81, "high": 218.8, "low": 213.45, "close": 215.73, "delivery_vol": 228223, "deliv_pct": 50.62}, {"time": "2025-05-16", "open": 216.98, "high": 217.95, "low": 214.01, "close": 215.24, "delivery_vol": 228412, "deliv_pct": 50.33}, {"time": "2025-05-19", "open": 216.1, "high": 220.0, "low": 212.25, "close": 217.38, "delivery_vol": 463892, "deliv_pct": 50.57}, {"time": "2025-05-20", "open": 206.18, "high": 215.08, "low": 202.0, "close": 209.15, "delivery_vol": 562892, "deliv_pct": 35.09}, {"time": "2025-05-21", "open": 209.15, "high": 211.63, "low": 202.39, "close": 205.26, "delivery_vol": 359539, "deliv_pct": 38.21}, {"time": "2025-05-22", "open": 205.27, "high": 219.0, "low": 205.27, "close": 218.63, "delivery_vol": 652021, "deliv_pct": 46.66}, {"time": "2025-05-23", "open": 216.0, "high": 219.44, "low": 214.1, "close": 218.33, "delivery_vol": 387913, "deliv_pct": 48.84}, {"time": "2025-05-26", "open": 216.5, "high": 219.5, "low": 212.26, "close": 213.43, "delivery_vol": 361853, "deliv_pct": 59.4}, {"time": "2025-05-27", "open": 214.35, "high": 217.9, "low": 211.0, "close": 213.73, "delivery_vol": 150497, "deliv_pct": 42.62}, {"time": "2025-05-28", "open": 215.0, "high": 216.51, "low": 209.76, "close": 212.17, "delivery_vol": 147175, "deliv_pct": 51.54}, {"time": "2025-05-29", "open": 213.0, "high": 219.95, "low": 211.28, "close": 218.75, "delivery_vol": 270164, "deliv_pct": 54.46}, {"time": "2025-05-30", "open": 219.88, "high": 221.0, "low": 213.0, "close": 214.63, "delivery_vol": 366945, "deliv_pct": 41.36}, {"time": "2025-06-02", "open": 214.95, "high": 220.1, "low": 213.2, "close": 219.55, "delivery_vol": 407190, "deliv_pct": 52.55}, {"time": "2025-06-03", "open": 221.0, "high": 223.92, "low": 212.51, "close": 214.15, "delivery_vol": 246191, "deliv_pct": 43.52}, {"time": "2025-06-04", "open": 215.79, "high": 215.79, "low": 204.21, "close": 207.74, "delivery_vol": 268122, "deliv_pct": 49.7}, {"time": "2025-06-05", "open": 209.0, "high": 213.02, "low": 205.9, "close": 206.38, "delivery_vol": 268050, "deliv_pct": 50.46}, {"time": "2025-06-06", "open": 208.03, "high": 219.51, "low": 206.6, "close": 217.17, "delivery_vol": 378385, "deliv_pct": 31.84}, {"time": "2025-06-09", "open": 221.0, "high": 227.8, "low": 221.0, "close": 223.71, "delivery_vol": 538266, "deliv_pct": 43.76}, {"time": "2025-06-10", "open": 226.0, "high": 245.08, "low": 226.0, "close": 235.62, "delivery_vol": 1042095, "deliv_pct": 32.37}, {"time": "2025-06-11", "open": 238.62, "high": 238.9, "low": 230.3, "close": 232.23, "delivery_vol": 368565, "deliv_pct": 43.95}, {"time": "2025-06-12", "open": 237.1, "high": 241.39, "low": 225.05, "close": 226.42, "delivery_vol": 318469, "deliv_pct": 21.43}, {"time": "2025-06-13", "open": 221.99, "high": 225.97, "low": 219.76, "close": 223.87, "delivery_vol": 389072, "deliv_pct": 55.42}, {"time": "2025-06-16", "open": 225.0, "high": 228.0, "low": 218.05, "close": 225.22, "delivery_vol": 237487, "deliv_pct": 41.6}, {"time": "2025-06-17", "open": 225.0, "high": 225.22, "low": 216.5, "close": 217.61, "delivery_vol": 292757, "deliv_pct": 50.14}, {"time": "2025-06-18", "open": 216.65, "high": 222.34, "low": 213.1, "close": 218.59, "delivery_vol": 318112, "deliv_pct": 27.02}, {"time": "2025-06-19", "open": 218.98, "high": 225.0, "low": 208.01, "close": 213.88, "delivery_vol": 407423, "deliv_pct": 38.37}, {"time": "2025-06-20", "open": 203.0, "high": 218.81, "low": 195.3, "close": 208.38, "delivery_vol": 20681680, "deliv_pct": 41.2}, {"time": "2025-06-23", "open": 211.0, "high": 234.88, "low": 211.0, "close": 225.56, "delivery_vol": 5573419, "deliv_pct": 21.16}, {"time": "2025-06-24", "open": 228.9, "high": 239.9, "low": 225.6, "close": 233.61, "delivery_vol": 2785714, "deliv_pct": 27.97}, {"time": "2025-06-25", "open": 235.0, "high": 246.5, "low": 232.66, "close": 243.1, "delivery_vol": 2119003, "deliv_pct": 37.16}, {"time": "2025-06-26", "open": 242.8, "high": 247.9, "low": 238.84, "close": 241.14, "delivery_vol": 1164017, "deliv_pct": 32.7}, {"time": "2025-06-27", "open": 242.44, "high": 247.9, "low": 238.0, "close": 240.16, "delivery_vol": 1187256, "deliv_pct": 38.24}, {"time": "2025-06-30", "open": 241.2, "high": 243.4, "low": 230.73, "close": 232.75, "delivery_vol": 1308042, "deliv_pct": 47.37}, {"time": "2025-07-01", "open": 234.0, "high": 240.33, "low": 224.3, "close": 238.38, "delivery_vol": 1565175, "deliv_pct": 39.18}, {"time": "2025-07-02", "open": 236.41, "high": 243.0, "low": 234.01, "close": 240.69, "delivery_vol": 784792, "deliv_pct": 39.37}, {"time": "2025-07-03", "open": 240.35, "high": 243.8, "low": 237.09, "close": 240.06, "delivery_vol": 408701, "deliv_pct": 33.29}, {"time": "2025-07-04", "open": 240.4, "high": 261.8, "low": 239.07, "close": 257.03, "delivery_vol": 2379706, "deliv_pct": 23.78}, {"time": "2025-07-07", "open": 258.49, "high": 258.49, "low": 245.2, "close": 248.05, "delivery_vol": 925032, "deliv_pct": 33.17}, {"time": "2025-07-08", "open": 248.0, "high": 256.0, "low": 245.46, "close": 255.38, "delivery_vol": 755159, "deliv_pct": 34.67}, {"time": "2025-07-09", "open": 257.0, "high": 261.8, "low": 253.73, "close": 255.68, "delivery_vol": 658828, "deliv_pct": 35.89}, {"time": "2025-07-10", "open": 257.5, "high": 265.0, "low": 252.24, "close": 256.59, "delivery_vol": 1416046, "deliv_pct": 27.08}, {"time": "2025-07-11", "open": 256.45, "high": 257.34, "low": 245.2, "close": 247.37, "delivery_vol": 707922, "deliv_pct": 44.85}, {"time": "2025-07-14", "open": 246.18, "high": 253.58, "low": 243.31, "close": 252.18, "delivery_vol": 768240, "deliv_pct": 39.96}, {"time": "2025-07-15", "open": 254.0, "high": 259.8, "low": 251.11, "close": 256.43, "delivery_vol": 1198984, "deliv_pct": 56.76}, {"time": "2025-07-16", "open": 258.17, "high": 262.7, "low": 254.26, "close": 258.87, "delivery_vol": 442114, "deliv_pct": 33.86}, {"time": "2025-07-17", "open": 262.0, "high": 269.0, "low": 260.55, "close": 267.15, "delivery_vol": 1209267, "deliv_pct": 40.63}, {"time": "2025-07-18", "open": 267.8, "high": 267.8, "low": 256.1, "close": 257.25, "delivery_vol": 702359, "deliv_pct": 47.09}, {"time": "2025-07-21", "open": 258.9, "high": 274.0, "low": 254.3, "close": 269.79, "delivery_vol": 1404889, "deliv_pct": 39.6}, {"time": "2025-07-22", "open": 270.0, "high": 272.8, "low": 265.0, "close": 267.59, "delivery_vol": 838415, "deliv_pct": 46.97}, {"time": "2025-07-23", "open": 269.5, "high": 269.89, "low": 263.34, "close": 266.02, "delivery_vol": 426462, "deliv_pct": 45.24}, {"time": "2025-07-24", "open": 265.9, "high": 266.62, "low": 258.25, "close": 259.52, "delivery_vol": 466405, "deliv_pct": 51.49}, {"time": "2025-07-25", "open": 258.5, "high": 259.22, "low": 249.0, "close": 252.19, "delivery_vol": 668122, "deliv_pct": 46.77}, {"time": "2025-07-28", "open": 250.0, "high": 250.99, "low": 231.11, "close": 232.83, "delivery_vol": 1010620, "deliv_pct": 44.95}, {"time": "2025-07-29", "open": 234.0, "high": 246.23, "low": 232.21, "close": 244.69, "delivery_vol": 594706, "deliv_pct": 37.05}, {"time": "2025-07-30", "open": 250.0, "high": 259.89, "low": 234.55, "close": 235.91, "delivery_vol": 1742671, "deliv_pct": 43.61}, {"time": "2025-07-31", "open": 235.91, "high": 240.36, "low": 229.23, "close": 234.84, "delivery_vol": 581026, "deliv_pct": 39.03}, {"time": "2025-08-01", "open": 234.77, "high": 235.99, "low": 224.17, "close": 227.82, "delivery_vol": 837836, "deliv_pct": 37.38}, {"time": "2025-08-04", "open": 230.0, "high": 232.37, "low": 223.2, "close": 226.84, "delivery_vol": 806998, "deliv_pct": 48.24}, {"time": "2025-08-05", "open": 228.0, "high": 230.41, "low": 223.5, "close": 225.29, "delivery_vol": 244773, "deliv_pct": 46.32}, {"time": "2025-08-06", "open": 225.29, "high": 226.6, "low": 217.5, "close": 221.99, "delivery_vol": 465645, "deliv_pct": 40.75}, {"time": "2025-08-07", "open": 220.6, "high": 228.45, "low": 217.02, "close": 227.6, "delivery_vol": 442263, "deliv_pct": 49.55}, {"time": "2025-08-08", "open": 226.55, "high": 231.99, "low": 223.33, "close": 224.48, "delivery_vol": 585452, "deliv_pct": 43.62}, {"time": "2025-08-11", "open": 225.0, "high": 232.0, "low": 222.75, "close": 230.66, "delivery_vol": 462606, "deliv_pct": 52.26}, {"time": "2025-08-12", "open": 230.94, "high": 234.1, "low": 226.88, "close": 230.91, "delivery_vol": 447122, "deliv_pct": 46.12}, {"time": "2025-08-13", "open": 229.4, "high": 239.4, "low": 229.4, "close": 236.37, "delivery_vol": 693924, "deliv_pct": 52.94}, {"time": "2025-08-14", "open": 238.0, "high": 238.74, "low": 230.98, "close": 232.0, "delivery_vol": 235464, "deliv_pct": 50.55}, {"time": "2025-08-18", "open": 236.9, "high": 242.39, "low": 234.0, "close": 241.02, "delivery_vol": 453992, "deliv_pct": 49.73}, {"time": "2025-08-19", "open": 241.5, "high": 252.85, "low": 239.5, "close": 252.0, "delivery_vol": 665353, "deliv_pct": 48.96}, {"time": "2025-08-20", "open": 252.0, "high": 256.35, "low": 250.3, "close": 253.89, "delivery_vol": 466008, "deliv_pct": 50.07}, {"time": "2025-08-21", "open": 252.06, "high": 255.35, "low": 245.22, "close": 247.2, "delivery_vol": 381134, "deliv_pct": 52.48}, {"time": "2025-08-22", "open": 247.2, "high": 253.0, "low": 244.2, "close": 252.1, "delivery_vol": 648382, "deliv_pct": 52.23}, {"time": "2025-08-25", "open": 254.1, "high": 257.7, "low": 251.21, "close": 254.13, "delivery_vol": 463894, "deliv_pct": 50.51}, {"time": "2025-08-26", "open": 255.3, "high": 255.41, "low": 245.71, "close": 249.21, "delivery_vol": 303300, "deliv_pct": 46.77}, {"time": "2025-08-28", "open": 249.21, "high": 250.0, "low": 237.5, "close": 238.79, "delivery_vol": 470775, "deliv_pct": 50.4}, {"time": "2025-08-29", "open": 240.0, "high": 242.0, "low": 235.0, "close": 236.15, "delivery_vol": 181957, "deliv_pct": 49.43}, {"time": "2025-09-01", "open": 237.0, "high": 241.5, "low": 236.35, "close": 239.44, "delivery_vol": 164451, "deliv_pct": 48.84}, {"time": "2025-09-02", "open": 240.1, "high": 244.29, "low": 238.15, "close": 240.21, "delivery_vol": 164380, "deliv_pct": 41.65}, {"time": "2025-09-03", "open": 240.0, "high": 243.1, "low": 238.5, "close": 239.02, "delivery_vol": 105516, "deliv_pct": 50.61}, {"time": "2025-09-04", "open": 241.9, "high": 247.0, "low": 239.98, "close": 242.94, "delivery_vol": 262109, "deliv_pct": 44.21}, {"time": "2025-09-05", "open": 242.1, "high": 245.0, "low": 238.58, "close": 242.28, "delivery_vol": 184950, "deliv_pct": 45.19}, {"time": "2025-09-08", "open": 243.4, "high": 248.0, "low": 241.85, "close": 246.73, "delivery_vol": 313426, "deliv_pct": 55.28}, {"time": "2025-09-09", "open": 249.0, "high": 252.0, "low": 244.29, "close": 247.99, "delivery_vol": 335568, "deliv_pct": 47.21}, {"time": "2025-09-10", "open": 248.9, "high": 255.02, "low": 246.97, "close": 250.33, "delivery_vol": 429008, "deliv_pct": 53.62}, {"time": "2025-09-11", "open": 251.75, "high": 251.75, "low": 245.0, "close": 246.18, "delivery_vol": 165861, "deliv_pct": 48.85}, {"time": "2025-09-12", "open": 246.99, "high": 248.36, "low": 243.51, "close": 246.42, "delivery_vol": 223670, "deliv_pct": 54.23}, {"time": "2025-09-15", "open": 253.0, "high": 268.64, "low": 251.02, "close": 266.47, "delivery_vol": 1856624, "deliv_pct": 39.05}, {"time": "2025-09-16", "open": 269.77, "high": 270.81, "low": 261.82, "close": 264.78, "delivery_vol": 603415, "deliv_pct": 38.6}, {"time": "2025-09-17", "open": 268.0, "high": 270.8, "low": 261.05, "close": 263.29, "delivery_vol": 524822, "deliv_pct": 50.29}, {"time": "2025-09-18", "open": 265.95, "high": 279.9, "low": 262.29, "close": 277.85, "delivery_vol": 1350249, "deliv_pct": 38.93}, {"time": "2025-09-19", "open": 278.0, "high": 281.7, "low": 272.1, "close": 277.1, "delivery_vol": 639806, "deliv_pct": 40.86}, {"time": "2025-09-22", "open": 280.0, "high": 287.0, "low": 276.52, "close": 279.16, "delivery_vol": 964995, "deliv_pct": 48.33}, {"time": "2025-09-23", "open": 279.2, "high": 283.53, "low": 276.06, "close": 279.1, "delivery_vol": 476791, "deliv_pct": 43.43}, {"time": "2025-09-24", "open": 279.4, "high": 280.55, "low": 273.45, "close": 275.4, "delivery_vol": 503888, "deliv_pct": 50.76}, {"time": "2025-09-25", "open": 275.4, "high": 279.0, "low": 270.32, "close": 271.7, "delivery_vol": 411254, "deliv_pct": 46.68}, {"time": "2025-09-26", "open": 271.7, "high": 272.0, "low": 260.61, "close": 262.31, "delivery_vol": 461832, "deliv_pct": 48.88}, {"time": "2025-09-29", "open": 263.0, "high": 270.81, "low": 259.31, "close": 268.24, "delivery_vol": 439400, "deliv_pct": 47.83}, {"time": "2025-09-30", "open": 267.21, "high": 278.9, "low": 266.75, "close": 271.7, "delivery_vol": 820289, "deliv_pct": 49.69}, {"time": "2025-10-01", "open": 273.5, "high": 280.0, "low": 270.5, "close": 278.3, "delivery_vol": 362928, "deliv_pct": 47.96}, {"time": "2025-10-03", "open": 278.0, "high": 287.0, "low": 275.65, "close": 285.7, "delivery_vol": 443402, "deliv_pct": 50.3}, {"time": "2025-10-06", "open": 289.9, "high": 290.0, "low": 286.05, "close": 288.65, "delivery_vol": 412958, "deliv_pct": 53.28}, {"time": "2025-10-07", "open": 288.5, "high": 288.95, "low": 278.0, "close": 279.05, "delivery_vol": 545209, "deliv_pct": 56.32}, {"time": "2025-10-08", "open": 261.5, "high": 284.8, "low": 261.5, "close": 273.1, "delivery_vol": 384242, "deliv_pct": 34.49}, {"time": "2025-10-09", "open": 273.2, "high": 275.0, "low": 269.0, "close": 270.4, "delivery_vol": 468253, "deliv_pct": 54.85}, {"time": "2025-10-10", "open": 269.8, "high": 273.25, "low": 264.7, "close": 270.3, "delivery_vol": 317081, "deliv_pct": 47.03}, {"time": "2025-10-13", "open": 271.1, "high": 272.7, "low": 266.15, "close": 270.35, "delivery_vol": 167005, "deliv_pct": 44.71}, {"time": "2025-10-14", "open": 270.85, "high": 272.4, "low": 262.45, "close": 263.4, "delivery_vol": 250698, "deliv_pct": 53.29}, {"time": "2025-10-15", "open": 264.15, "high": 279.0, "low": 264.15, "close": 275.25, "delivery_vol": 404625, "deliv_pct": 49.28}, {"time": "2025-10-16", "open": 275.25, "high": 278.7, "low": 267.55, "close": 270.55, "delivery_vol": 400561, "deliv_pct": 53.29}, {"time": "2025-10-17", "open": 270.5, "high": 271.6, "low": 265.5, "close": 267.75, "delivery_vol": 257629, "deliv_pct": 51.9}, {"time": "2025-10-20", "open": 270.8, "high": 276.15, "low": 266.6, "close": 274.9, "delivery_vol": 368430, "deliv_pct": 48.61}, {"time": "2025-10-21", "open": 281.0, "high": 281.0, "low": 276.3, "close": 277.75, "delivery_vol": 161809, "deliv_pct": 68.56}, {"time": "2025-10-22", "open": 281.0, "high": 281.0, "low": 276.3, "close": 277.75, "delivery_vol": 161809, "deliv_pct": 68.56}, {"time": "2025-10-23", "open": 281.3, "high": 281.3, "low": 271.25, "close": 272.65, "delivery_vol": 245764, "deliv_pct": 50.03}, {"time": "2025-10-24", "open": 274.7, "high": 274.7, "low": 267.7, "close": 268.55, "delivery_vol": 172437, "deliv_pct": 55.73}, {"time": "2025-10-27", "open": 270.9, "high": 272.3, "low": 268.0, "close": 268.85, "delivery_vol": 162735, "deliv_pct": 55.22}, {"time": "2025-10-28", "open": 268.0, "high": 269.9, "low": 263.9, "close": 264.85, "delivery_vol": 169755, "deliv_pct": 57.97}, {"time": "2025-10-29", "open": 266.6, "high": 270.15, "low": 264.5, "close": 269.65, "delivery_vol": 185306, "deliv_pct": 51.43}, {"time": "2025-10-30", "open": 272.0, "high": 272.0, "low": 264.75, "close": 270.45, "delivery_vol": 243852, "deliv_pct": 53.94}, {"time": "2025-10-31", "open": 273.5, "high": 276.0, "low": 268.3, "close": 272.15, "delivery_vol": 321634, "deliv_pct": 50.71}, {"time": "2025-11-03", "open": 272.95, "high": 285.0, "low": 272.2, "close": 284.2, "delivery_vol": 1442467, "deliv_pct": 59.99}, {"time": "2025-11-04", "open": 282.7, "high": 283.0, "low": 272.75, "close": 275.0, "delivery_vol": 379627, "deliv_pct": 54.98}, {"time": "2025-11-05", "open": 282.7, "high": 283.0, "low": 272.75, "close": 275.0, "delivery_vol": 379627, "deliv_pct": 54.98}, {"time": "2025-11-06", "open": 278.5, "high": 278.5, "low": 261.6, "close": 263.15, "delivery_vol": 462454, "deliv_pct": 56.6}, {"time": "2025-11-07", "open": 261.0, "high": 270.55, "low": 259.55, "close": 268.9, "delivery_vol": 386703, "deliv_pct": 52.09}, {"time": "2025-11-10", "open": 269.0, "high": 271.4, "low": 265.5, "close": 267.6, "delivery_vol": 298799, "deliv_pct": 58.16}, {"time": "2025-11-11", "open": 267.6, "high": 267.6, "low": 260.55, "close": 262.4, "delivery_vol": 419235, "deliv_pct": 62.18}, {"time": "2025-11-12", "open": 265.0, "high": 271.55, "low": 262.45, "close": 270.95, "delivery_vol": 274228, "deliv_pct": 55.13}, {"time": "2025-11-13", "open": 270.0, "high": 271.45, "low": 265.0, "close": 265.9, "delivery_vol": 142291, "deliv_pct": 56.26}, {"time": "2025-11-14", "open": 262.8, "high": 273.2, "low": 262.8, "close": 270.85, "delivery_vol": 216170, "deliv_pct": 46.02}, {"time": "2025-11-17", "open": 272.9, "high": 272.9, "low": 267.8, "close": 269.75, "delivery_vol": 180301, "deliv_pct": 60.87}, {"time": "2025-11-18", "open": 269.0, "high": 269.6, "low": 259.8, "close": 261.45, "delivery_vol": 375056, "deliv_pct": 56.04}, {"time": "2025-11-19", "open": 261.45, "high": 261.45, "low": 255.2, "close": 256.4, "delivery_vol": 364532, "deliv_pct": 59.41}, {"time": "2025-11-20", "open": 258.0, "high": 259.0, "low": 252.4, "close": 253.8, "delivery_vol": 267887, "deliv_pct": 58.4}, {"time": "2025-11-21", "open": 251.7, "high": 260.0, "low": 251.7, "close": 258.2, "delivery_vol": 257956, "deliv_pct": 54.79}, {"time": "2025-11-24", "open": 258.3, "high": 261.25, "low": 255.7, "close": 260.0, "delivery_vol": 190329, "deliv_pct": 55.57}, {"time": "2025-11-25", "open": 260.0, "high": 262.65, "low": 257.2, "close": 258.05, "delivery_vol": 134145, "deliv_pct": 48.26}, {"time": "2025-11-26", "open": 258.0, "high": 268.7, "low": 258.0, "close": 266.35, "delivery_vol": 373949, "deliv_pct": 66.11}, {"time": "2025-11-27", "open": 267.5, "high": 269.0, "low": 264.4, "close": 267.55, "delivery_vol": 164452, "deliv_pct": 56.46}, {"time": "2025-11-28", "open": 267.0, "high": 271.0, "low": 264.0, "close": 269.45, "delivery_vol": 171781, "deliv_pct": 59.3}, {"time": "2025-12-01", "open": 272.0, "high": 272.4, "low": 265.0, "close": 266.15, "delivery_vol": 114142, "deliv_pct": 54.32}, {"time": "2025-12-02", "open": 266.0, "high": 269.0, "low": 258.55, "close": 259.25, "delivery_vol": 231357, "deliv_pct": 64.6}, {"time": "2025-12-03", "open": 259.25, "high": 261.25, "low": 256.0, "close": 257.65, "delivery_vol": 128168, "deliv_pct": 57.69}, {"time": "2025-12-04", "open": 258.0, "high": 260.0, "low": 256.3, "close": 257.15, "delivery_vol": 123892, "deliv_pct": 54.63}, {"time": "2025-12-05", "open": 259.7, "high": 259.7, "low": 254.15, "close": 257.3, "delivery_vol": 74007, "deliv_pct": 38.13}, {"time": "2025-12-08", "open": 259.0, "high": 259.0, "low": 246.0, "close": 253.35, "delivery_vol": 345481, "deliv_pct": 57.18}, {"time": "2025-12-09", "open": 254.65, "high": 263.6, "low": 250.5, "close": 260.55, "delivery_vol": 404689, "deliv_pct": 56.75}, {"time": "2025-12-10", "open": 260.55, "high": 264.9, "low": 258.8, "close": 260.2, "delivery_vol": 168526, "deliv_pct": 59.5}, {"time": "2025-12-11", "open": 260.0, "high": 261.25, "low": 255.95, "close": 257.1, "delivery_vol": 108207, "deliv_pct": 54.08}, {"time": "2025-12-12", "open": 260.9, "high": 262.35, "low": 256.1, "close": 259.95, "delivery_vol": 111928, "deliv_pct": 53.37}, {"time": "2025-12-15", "open": 258.95, "high": 260.25, "low": 255.25, "close": 259.15, "delivery_vol": 107082, "deliv_pct": 50.39}, {"time": "2025-12-16", "open": 259.9, "high": 259.9, "low": 253.2, "close": 254.0, "delivery_vol": 120102, "deliv_pct": 60.3}, {"time": "2025-12-17", "open": 253.75, "high": 254.4, "low": 245.2, "close": 246.8, "delivery_vol": 170885, "deliv_pct": 64.97}, {"time": "2025-12-18", "open": 248.5, "high": 248.5, "low": 239.15, "close": 245.8, "delivery_vol": 237034, "deliv_pct": 52.63}, {"time": "2025-12-19", "open": 245.4, "high": 255.8, "low": 245.4, "close": 253.45, "delivery_vol": 110091, "deliv_pct": 49.56}, {"time": "2025-12-22", "open": 253.45, "high": 255.55, "low": 251.1, "close": 252.3, "delivery_vol": 130040, "deliv_pct": 48.73}, {"time": "2025-12-23", "open": 253.0, "high": 255.35, "low": 249.6, "close": 253.85, "delivery_vol": 75267, "deliv_pct": 39.61}, {"time": "2025-12-24", "open": 253.0, "high": 260.15, "low": 250.5, "close": 251.55, "delivery_vol": 255995, "deliv_pct": 55.6}, {"time": "2025-12-25", "open": 253.0, "high": 260.15, "low": 250.5, "close": 251.55, "delivery_vol": 255995, "deliv_pct": 55.6}, {"time": "2025-12-26", "open": 252.75, "high": 257.9, "low": 250.65, "close": 252.1, "delivery_vol": 259013, "deliv_pct": 59.92}, {"time": "2025-12-29", "open": 252.1, "high": 254.85, "low": 248.1, "close": 250.25, "delivery_vol": 182473, "deliv_pct": 56.18}, {"time": "2025-12-30", "open": 250.25, "high": 251.0, "low": 242.85, "close": 248.3, "delivery_vol": 212439, "deliv_pct": 50.17}, {"time": "2025-12-31", "open": 248.2, "high": 252.0, "low": 246.55, "close": 249.35, "delivery_vol": 113695, "deliv_pct": 50.49}, {"time": "2026-01-01", "open": 250.6, "high": 258.59, "low": 249.25, "close": 250.19, "delivery_vol": 249359, "deliv_pct": 35.72}, {"time": "2026-01-02", "open": 249.3, "high": 261.5, "low": 249.3, "close": 259.45, "delivery_vol": 463609, "deliv_pct": 60.81}, {"time": "2026-01-05", "open": 260.0, "high": 262.12, "low": 253.0, "close": 257.37, "delivery_vol": 261027, "deliv_pct": 47.58}, {"time": "2026-01-06", "open": 258.25, "high": 268.0, "low": 255.31, "close": 266.84, "delivery_vol": 677775, "deliv_pct": 59.47}, {"time": "2026-01-07", "open": 268.3, "high": 269.51, "low": 263.64, "close": 266.14, "delivery_vol": 242127, "deliv_pct": 52.05}, {"time": "2026-01-08", "open": 265.9, "high": 265.9, "low": 261.41, "close": 264.03, "delivery_vol": 549783, "deliv_pct": 78.49}, {"time": "2026-01-09", "open": 263.55, "high": 264.55, "low": 259.95, "close": 260.62, "delivery_vol": 388871, "deliv_pct": 71.13}, {"time": "2026-01-12", "open": 261.6, "high": 262.27, "low": 257.0, "close": 259.12, "delivery_vol": 489060, "deliv_pct": 68.07}, {"time": "2026-01-13", "open": 259.6, "high": 263.65, "low": 259.6, "close": 262.8, "delivery_vol": 209590, "deliv_pct": 59.55}, {"time": "2026-01-14", "open": 260.3, "high": 269.7, "low": 260.3, "close": 264.76, "delivery_vol": 631100, "deliv_pct": 63.21}, {"time": "2026-01-15", "open": 260.3, "high": 269.7, "low": 260.3, "close": 264.76, "delivery_vol": 631100, "deliv_pct": 63.21}, {"time": "2026-01-16", "open": 265.09, "high": 270.0, "low": 260.79, "close": 265.45, "delivery_vol": 402838, "deliv_pct": 67.32}, {"time": "2026-01-19", "open": 265.0, "high": 266.57, "low": 263.29, "close": 263.5, "delivery_vol": 201282, "deliv_pct": 64.62}, {"time": "2026-01-20", "open": 263.5, "high": 263.66, "low": 258.65, "close": 259.9, "delivery_vol": 497944, "deliv_pct": 70.41}, {"time": "2026-01-21", "open": 259.9, "high": 272.45, "low": 258.75, "close": 268.14, "delivery_vol": 772633, "deliv_pct": 55.67}, {"time": "2026-01-22", "open": 270.0, "high": 280.38, "low": 268.51, "close": 276.87, "delivery_vol": 1189602, "deliv_pct": 57.53}, {"time": "2026-01-23", "open": 276.87, "high": 280.0, "low": 271.5, "close": 273.7, "delivery_vol": 586695, "deliv_pct": 59.34}, {"time": "2026-01-26", "open": 276.87, "high": 280.0, "low": 271.5, "close": 273.7, "delivery_vol": 586695, "deliv_pct": 59.34}, {"time": "2026-01-27", "open": 273.0, "high": 275.19, "low": 257.01, "close": 260.71, "delivery_vol": 317652, "deliv_pct": 51.86}, {"time": "2026-01-28", "open": 260.71, "high": 270.0, "low": 258.39, "close": 268.61, "delivery_vol": 221130, "deliv_pct": 48.96}, {"time": "2026-01-29", "open": 266.0, "high": 268.19, "low": 261.0, "close": 264.07, "delivery_vol": 167657, "deliv_pct": 54.66}, {"time": "2026-01-30", "open": 263.0, "high": 273.9, "low": 258.14, "close": 272.39, "delivery_vol": 170737, "deliv_pct": 41.89}, {"time": "2026-02-02", "open": 255.85, "high": 257.0, "low": 227.9, "close": 241.6, "delivery_vol": 1036517, "deliv_pct": 37.55}, {"time": "2026-02-03", "open": 253.0, "high": 261.0, "low": 245.7, "close": 254.3, "delivery_vol": 341775, "deliv_pct": 46.31}, {"time": "2026-02-04", "open": 253.8, "high": 256.6, "low": 249.1, "close": 253.85, "delivery_vol": 194068, "deliv_pct": 49.89}, {"time": "2026-02-05", "open": 255.0, "high": 264.05, "low": 254.0, "close": 256.55, "delivery_vol": 193018, "deliv_pct": 46.25}, {"time": "2026-02-06", "open": 254.5, "high": 259.4, "low": 252.0, "close": 255.85, "delivery_vol": 99777, "deliv_pct": 37.29}, {"time": "2026-02-09", "open": 257.15, "high": 263.05, "low": 257.15, "close": 262.3, "delivery_vol": 141439, "deliv_pct": 48.05}, {"time": "2026-02-10", "open": 261.85, "high": 262.65, "low": 256.85, "close": 259.65, "delivery_vol": 144126, "deliv_pct": 61.05}, {"time": "2026-02-11", "open": 259.75, "high": 260.05, "low": 253.2, "close": 254.4, "delivery_vol": 114492, "deliv_pct": 62.72}, {"time": "2026-02-12", "open": 255.0, "high": 256.25, "low": 249.25, "close": 251.15, "delivery_vol": 86625, "deliv_pct": 50.03}, {"time": "2026-02-13", "open": 251.0, "high": 255.5, "low": 245.95, "close": 252.05, "delivery_vol": 115894, "deliv_pct": 44.26}, {"time": "2026-02-16", "open": 248.7, "high": 255.45, "low": 247.75, "close": 253.2, "delivery_vol": 159591, "deliv_pct": 53.18}, {"time": "2026-02-17", "open": 254.45, "high": 260.35, "low": 248.0, "close": 251.5, "delivery_vol": 358637, "deliv_pct": 57.82}, {"time": "2026-02-18", "open": 251.0, "high": 259.65, "low": 249.45, "close": 257.65, "delivery_vol": 211100, "deliv_pct": 53.27}, {"time": "2026-02-19", "open": 258.9, "high": 259.55, "low": 249.15, "close": 250.55, "delivery_vol": 170704, "deliv_pct": 51.2}, {"time": "2026-02-20", "open": 250.55, "high": 252.1, "low": 246.5, "close": 250.6, "delivery_vol": 110427, "deliv_pct": 42.39}, {"time": "2026-02-23", "open": 255.9, "high": 255.9, "low": 244.25, "close": 246.0, "delivery_vol": 132004, "deliv_pct": 57.81}, {"time": "2026-02-24", "open": 247.3, "high": 256.0, "low": 247.3, "close": 253.9, "delivery_vol": 345868, "deliv_pct": 37.08}, {"time": "2026-02-25", "open": 258.0, "high": 260.7, "low": 254.85, "close": 255.95, "delivery_vol": 188370, "deliv_pct": 49.7}, {"time": "2026-02-26", "open": 258.0, "high": 259.95, "low": 252.0, "close": 254.0, "delivery_vol": 179961, "deliv_pct": 53.91}, {"time": "2026-02-27", "open": 256.55, "high": 256.55, "low": 250.4, "close": 252.05, "delivery_vol": 67877, "deliv_pct": 43.32}, {"time": "2026-03-02", "open": 240.0, "high": 251.0, "low": 240.0, "close": 248.3, "delivery_vol": 176898, "deliv_pct": 52.78}, {"time": "2026-03-03", "open": 240.0, "high": 251.0, "low": 240.0, "close": 248.3, "delivery_vol": 176898, "deliv_pct": 52.78}, {"time": "2026-03-04", "open": 245.0, "high": 245.1, "low": 236.2, "close": 240.0, "delivery_vol": 242203, "deliv_pct": 56.01}, {"time": "2026-03-05", "open": 241.0, "high": 249.1, "low": 238.7, "close": 240.65, "delivery_vol": 79295, "deliv_pct": 33.29}, {"time": "2026-03-06", "open": 242.6, "high": 242.6, "low": 236.75, "close": 239.95, "delivery_vol": 152513, "deliv_pct": 55.23}, {"time": "2026-03-09", "open": 236.0, "high": 236.25, "low": 227.0, "close": 232.3, "delivery_vol": 238292, "deliv_pct": 54.18}, {"time": "2026-03-10", "open": 236.9, "high": 247.65, "low": 232.4, "close": 244.85, "delivery_vol": 87197, "deliv_pct": 45.59}, {"time": "2026-03-11", "open": 248.0, "high": 248.0, "low": 241.0, "close": 242.4, "delivery_vol": 106525, "deliv_pct": 49.68}, {"time": "2026-03-12", "open": 230.0, "high": 238.95, "low": 230.0, "close": 233.25, "delivery_vol": 306314, "deliv_pct": 53.55}, {"time": "2026-03-13", "open": 234.1, "high": 234.1, "low": 220.35, "close": 222.85, "delivery_vol": 197637, "deliv_pct": 56.34}, {"time": "2026-03-16", "open": 222.85, "high": 226.25, "low": 212.15, "close": 214.0, "delivery_vol": 443440, "deliv_pct": 56.38}, {"time": "2026-03-17", "open": 214.9, "high": 223.5, "low": 211.6, "close": 217.55, "delivery_vol": 403057, "deliv_pct": 58.45}, {"time": "2026-03-18", "open": 219.0, "high": 230.4, "low": 217.2, "close": 228.8, "delivery_vol": 391660, "deliv_pct": 68.39}, {"time": "2026-03-19", "open": 224.0, "high": 232.95, "low": 222.5, "close": 226.9, "delivery_vol": 340142, "deliv_pct": 61.77}, {"time": "2026-03-20", "open": 227.0, "high": 236.5, "low": 225.55, "close": 234.25, "delivery_vol": 200748, "deliv_pct": 55.89}, {"time": "2026-03-23", "open": 231.1, "high": 231.1, "low": 219.0, "close": 220.9, "delivery_vol": 349372, "deliv_pct": 56.65}, {"time": "2026-03-24", "open": 228.1, "high": 235.0, "low": 218.45, "close": 219.8, "delivery_vol": 314678, "deliv_pct": 57.4}, {"time": "2026-03-25", "open": 222.4, "high": 228.9, "low": 219.8, "close": 223.0, "delivery_vol": 311875, "deliv_pct": 58.86}, {"time": "2026-03-26", "open": 222.4, "high": 228.9, "low": 219.8, "close": 223.0, "delivery_vol": 311875, "deliv_pct": 58.86}, {"time": "2026-03-27", "open": 219.65, "high": 223.1, "low": 211.2, "close": 212.15, "delivery_vol": 326659, "deliv_pct": 59.02}, {"time": "2026-03-30", "open": 211.6, "high": 219.3, "low": 206.0, "close": 206.85, "delivery_vol": 490601, "deliv_pct": 51.92}, {"time": "2026-03-31", "open": 211.6, "high": 219.3, "low": 206.0, "close": 206.85, "delivery_vol": 490601, "deliv_pct": 51.92}, {"time": "2026-04-01", "open": 213.95, "high": 220.52, "low": 213.05, "close": 216.95, "delivery_vol": 353154, "deliv_pct": 55.9}, {"time": "2026-04-02", "open": 213.0, "high": 221.15, "low": 208.11, "close": 220.04, "delivery_vol": 120622, "deliv_pct": 39.82}, {"time": "2026-04-03", "open": 213.0, "high": 221.15, "low": 208.11, "close": 220.04, "delivery_vol": 120622, "deliv_pct": 39.82}, {"time": "2026-04-06", "open": 220.1, "high": 226.09, "low": 216.91, "close": 225.14, "delivery_vol": 148384, "deliv_pct": 41.36}, {"time": "2026-04-07", "open": 223.0, "high": 233.2, "low": 221.5, "close": 228.46, "delivery_vol": 169453, "deliv_pct": 52.07}, {"time": "2026-04-08", "open": 239.1, "high": 240.0, "low": 234.04, "close": 237.28, "delivery_vol": 248048, "deliv_pct": 62.75}, {"time": "2026-04-09", "open": 239.0, "high": 242.04, "low": 233.0, "close": 234.6, "delivery_vol": 91164, "deliv_pct": 44.76}, {"time": "2026-04-10", "open": 235.5, "high": 240.0, "low": 235.5, "close": 238.42, "delivery_vol": 116318, "deliv_pct": 60.29}, {"time": "2026-04-13", "open": 233.2, "high": 237.68, "low": 230.0, "close": 235.83, "delivery_vol": 133536, "deliv_pct": 51.02}, {"time": "2026-04-14", "open": 233.2, "high": 237.68, "low": 230.0, "close": 235.83, "delivery_vol": 133536, "deliv_pct": 51.02}, {"time": "2026-04-15", "open": 238.0, "high": 242.9, "low": 236.14, "close": 239.44, "delivery_vol": 312382, "deliv_pct": 54.81}, {"time": "2026-04-16", "open": 240.02, "high": 244.0, "low": 240.0, "close": 242.02, "delivery_vol": 87438, "deliv_pct": 45.56}, {"time": "2026-04-17", "open": 244.79, "high": 244.79, "low": 238.61, "close": 242.13, "delivery_vol": 129576, "deliv_pct": 55.99}, {"time": "2026-04-20", "open": 243.12, "high": 243.13, "low": 238.61, "close": 240.02, "delivery_vol": 75265, "deliv_pct": 47.57}, {"time": "2026-04-21", "open": 241.21, "high": 244.09, "low": 237.0, "close": 239.43, "delivery_vol": 211470, "deliv_pct": 62.93}, {"time": "2026-04-22", "open": 239.43, "high": 249.5, "low": 239.43, "close": 248.03, "delivery_vol": 355514, "deliv_pct": 58.08}, {"time": "2026-04-23", "open": 248.02, "high": 259.45, "low": 245.0, "close": 257.34, "delivery_vol": 274975, "deliv_pct": 48.49}, {"time": "2026-04-24", "open": 257.99, "high": 260.0, "low": 252.09, "close": 256.89, "delivery_vol": 218448, "deliv_pct": 56.5}, {"time": "2026-04-27", "open": 257.0, "high": 264.3, "low": 254.11, "close": 263.26, "delivery_vol": 259365, "deliv_pct": 53.56}, {"time": "2026-04-28", "open": 261.46, "high": 263.0, "low": 258.2, "close": 261.31, "delivery_vol": 119879, "deliv_pct": 56.08}, {"time": "2026-04-29", "open": 261.5, "high": 262.77, "low": 256.5, "close": 257.81, "delivery_vol": 182093, "deliv_pct": 59.55}, {"time": "2026-04-30", "open": 257.81, "high": 263.95, "low": 251.0, "close": 262.13, "delivery_vol": 158890, "deliv_pct": 39.35}, {"time": "2026-05-01", "open": 257.81, "high": 263.95, "low": 251.0, "close": 262.13, "delivery_vol": 158890, "deliv_pct": 39.35}, {"time": "2026-05-04", "open": 261.25, "high": 264.2, "low": 258.6, "close": 262.35, "delivery_vol": 104170, "deliv_pct": 47.33}, {"time": "2026-05-05", "open": 258.3, "high": 278.4, "low": 256.3, "close": 272.9, "delivery_vol": 388445, "deliv_pct": 42.23}, {"time": "2026-05-06", "open": 277.0, "high": 288.0, "low": 274.4, "close": 286.7, "delivery_vol": 517420, "deliv_pct": 51.74}, {"time": "2026-05-07", "open": 289.9, "high": 293.25, "low": 281.0, "close": 284.55, "delivery_vol": 443412, "deliv_pct": 52.06}, {"time": "2026-05-08", "open": 284.3, "high": 292.8, "low": 284.3, "close": 287.3, "delivery_vol": 371198, "deliv_pct": 56.93}, {"time": "2026-05-11", "open": 302.6, "high": 321.7, "low": 301.4, "close": 310.75, "delivery_vol": 2668279, "deliv_pct": 28.83}, {"time": "2026-05-12", "open": 313.3, "high": 318.15, "low": 294.1, "close": 296.15, "delivery_vol": 759797, "deliv_pct": 49.02}, {"time": "2026-05-13", "open": 297.05, "high": 302.0, "low": 284.95, "close": 289.95, "delivery_vol": 598861, "deliv_pct": 46.41}, {"time": "2026-05-14", "open": 292.8, "high": 299.2, "low": 282.75, "close": 289.4, "delivery_vol": 387308, "deliv_pct": 50.71}, {"time": "2026-05-15", "open": 296.3, "high": 296.3, "low": 279.0, "close": 281.2, "delivery_vol": 396462, "deliv_pct": 47.83}, {"time": "2026-05-18", "open": 277.1, "high": 278.1, "low": 269.2, "close": 273.65, "delivery_vol": 367128, "deliv_pct": 48.43}, {"time": "2026-05-19", "open": 273.8, "high": 281.25, "low": 273.4, "close": 275.15, "delivery_vol": 269973, "deliv_pct": 48.97}, {"time": "2026-05-20", "open": 275.25, "high": 280.0, "low": 273.85, "close": 275.85, "delivery_vol": 478932, "deliv_pct": 52.91}, {"time": "2026-05-21", "open": 278.8, "high": 292.9, "low": 276.85, "close": 289.05, "delivery_vol": 801698, "deliv_pct": 53.83}, {"time": "2026-05-22", "open": 291.9, "high": 291.9, "low": 279.15, "close": 280.5, "delivery_vol": 245785, "deliv_pct": 52.96}, {"time": "2026-05-25", "open": 284.0, "high": 291.85, "low": 281.45, "close": 286.6, "delivery_vol": 319970, "deliv_pct": 55.14}, {"time": "2026-05-26", "open": 286.0, "high": 290.5, "low": 279.05, "close": 281.85, "delivery_vol": 199311, "deliv_pct": 58.54}, {"time": "2026-05-27", "open": 280.2, "high": 283.35, "low": 277.8, "close": 282.1, "delivery_vol": 160397, "deliv_pct": 53.62}, {"time": "2026-05-28", "open": 280.2, "high": 283.35, "low": 277.8, "close": 282.1, "delivery_vol": 160397, "deliv_pct": 53.62}, {"time": "2026-05-29", "open": 283.0, "high": 290.0, "low": 275.1, "close": 281.6, "delivery_vol": 319192, "deliv_pct": 58.34}, {"time": "2026-06-01", "open": 281.0, "high": 287.05, "low": 273.1, "close": 278.05, "delivery_vol": 179546, "deliv_pct": 45.7}, {"time": "2026-06-02", "open": 278.85, "high": 289.6, "low": 274.1, "close": 287.4, "delivery_vol": 229419, "deliv_pct": 45.42}, {"time": "2026-06-03", "open": 288.0, "high": 298.95, "low": 280.0, "close": 293.05, "delivery_vol": 563617, "deliv_pct": 54.06}, {"time": "2026-06-04", "open": 294.0, "high": 297.95, "low": 288.0, "close": 290.3, "delivery_vol": 609150, "deliv_pct": 57.94}, {"time": "2026-06-05", "open": 292.95, "high": 305.0, "low": 290.5, "close": 296.85, "delivery_vol": 544201, "deliv_pct": 42.72}, {"time": "2026-06-08", "open": 292.85, "high": 297.45, "low": 283.1, "close": 285.85, "delivery_vol": 254495, "deliv_pct": 49.25}, {"time": "2026-06-09", "open": 286.5, "high": 304.0, "low": 285.9, "close": 299.95, "delivery_vol": 349079, "deliv_pct": 49.61}, {"time": "2026-06-10", "open": 299.95, "high": 301.45, "low": 285.0, "close": 287.4, "delivery_vol": 266335, "deliv_pct": 56.33}, {"time": "2026-06-11", "open": 285.25, "high": 287.4, "low": 275.95, "close": 277.65, "delivery_vol": 168219, "deliv_pct": 50.32}, {"time": "2026-06-12", "open": 281.1, "high": 292.05, "low": 278.3, "close": 289.45, "delivery_vol": 249666, "deliv_pct": 43.65}, {"time": "2026-06-15", "open": 296.0, "high": 298.85, "low": 291.9, "close": 294.9, "delivery_vol": 297118, "deliv_pct": 55.88}, {"time": "2026-06-16", "open": 298.15, "high": 305.0, "low": 295.0, "close": 298.75, "delivery_vol": 277345, "deliv_pct": 41.43}, {"time": "2026-06-17", "open": 300.0, "high": 302.7, "low": 294.3, "close": 295.7, "delivery_vol": 157499, "deliv_pct": 55.62}, {"time": "2026-06-18", "open": 297.9, "high": 299.0, "low": 292.75, "close": 295.05, "delivery_vol": 284582, "deliv_pct": 57.88}, {"time": "2026-06-19", "open": 295.05, "high": 298.4, "low": 292.1, "close": 295.05, "delivery_vol": 97388, "deliv_pct": 46.62}, {"time": "2026-06-22", "open": 295.0, "high": 302.0, "low": 294.05, "close": 297.7, "delivery_vol": 201630, "deliv_pct": 48.7}, {"time": "2026-06-23", "open": 298.9, "high": 298.9, "low": 287.55, "close": 290.9, "delivery_vol": 228259, "deliv_pct": 54.23}, {"time": "2026-06-24", "open": 288.0, "high": 298.0, "low": 288.0, "close": 294.9, "delivery_vol": 234017, "deliv_pct": 59.16}, {"time": "2026-06-25", "open": 295.9, "high": 308.8, "low": 287.05, "close": 288.1, "delivery_vol": 450057, "deliv_pct": 34.02}, {"time": "2026-06-26", "open": 295.9, "high": 308.8, "low": 287.05, "close": 288.1, "delivery_vol": 450057, "deliv_pct": 34.02}, {"time": "2026-06-29", "open": 289.9, "high": 305.8, "low": 289.9, "close": 292.6, "delivery_vol": 441536, "deliv_pct": 40.94}, {"time": "2026-06-30", "open": 294.95, "high": 303.9, "low": 292.5, "close": 298.1, "delivery_vol": 260281, "deliv_pct": 48.56}, {"time": "2026-07-01", "open": 298.3, "high": 312.0, "low": 298.3, "close": 304.15, "delivery_vol": 500826, "deliv_pct": 41.59}, {"time": "2026-07-02", "open": 306.0, "high": 316.4, "low": 302.95, "close": 310.2, "delivery_vol": 599278, "deliv_pct": 48.03}, {"time": "2026-07-03", "open": 314.7, "high": 314.7, "low": 304.05, "close": 307.25, "delivery_vol": 206378, "deliv_pct": 45.16}, {"time": "2026-07-06", "open": 310.0, "high": 312.4, "low": 306.3, "close": 309.55, "delivery_vol": 230380, "deliv_pct": 53.17}, {"time": "2026-07-07", "open": 308.4, "high": 311.7, "low": 301.4, "close": 304.65, "delivery_vol": 156186, "deliv_pct": 51.24}, {"time": "2026-07-08", "open": 304.75, "high": 309.0, "low": 292.55, "close": 296.35, "delivery_vol": 239373, "deliv_pct": 52.56}, {"time": "2026-07-09", "open": 300.0, "high": 311.0, "low": 297.5, "close": 307.85, "delivery_vol": 246023, "deliv_pct": 48.01}, {"time": "2026-07-10", "open": 309.0, "high": 328.0, "low": 309.0, "close": 325.3, "delivery_vol": 1251298, "deliv_pct": 58.21}, {"time": "2026-07-13", "open": 326.45, "high": 334.0, "low": 323.0, "close": 324.95, "delivery_vol": 770427, "deliv_pct": 46.08}, {"time": "2026-07-14", "open": 325.5, "high": 328.25, "low": 315.15, "close": 318.9, "delivery_vol": 314665, "deliv_pct": 50.05}, {"time": "2026-07-15", "open": 321.0, "high": 327.3, "low": 312.35, "close": 317.1, "delivery_vol": 400898, "deliv_pct": 56.15}, {"time": "2026-07-16", "open": 317.0, "high": 319.95, "low": 311.55, "close": 314.3, "delivery_vol": 178160, "deliv_pct": 59.02}, {"time": "2026-07-17", "open": 314.3, "high": 315.7, "low": 297.7, "close": 301.6, "delivery_vol": 668690, "deliv_pct": 53.28}, {"time": "2026-07-20", "open": 300.0, "high": 307.95, "low": 298.55, "close": 305.3, "delivery_vol": 516172, "deliv_pct": 60.74}, {"time": "2026-07-21", "open": 304.4, "high": 312.0, "low": 304.1, "close": 305.75, "delivery_vol": 387206, "deliv_pct": 40.56}, {"time": "2026-07-22", "open": 306.9, "high": 309.5, "low": 297.0, "close": 299.7, "delivery_vol": 837906, "deliv_pct": 68.03}, {"time": "2026-07-23", "open": 299.0, "high": 302.0, "low": 292.15, "close": 296.95, "delivery_vol": 483208, "deliv_pct": 56.82}, {"time": "2026-07-24", "open": 295.9, "high": 301.1, "low": 291.6, "close": 299.4, "delivery_vol": 216530, "deliv_pct": 50.32}, {"time": "2026-07-27", "open": 304.4, "high": 310.0, "low": 296.0, "close": 300.1, "delivery_vol": 736448, "deliv_pct": 62.52}, {"time": "2026-07-28", "open": 300.0, "high": 300.1, "low": 278.6, "close": 285.35, "delivery_vol": 1443892, "deliv_pct": 47.21}, {"time": "2026-07-29", "open": 285.35, "high": 290.95, "low": 281.15, "close": 288.8, "delivery_vol": 454193, "deliv_pct": 53.43}, {"time": "2026-07-30", "open": 289.9, "high": 289.9, "low": 283.15, "close": 285.9, "delivery_vol": 301847, "deliv_pct": 52.8}, {"time": "2026-07-31", "open": 286.0, "high": 292.8, "low": 285.0, "close": 287.0, "delivery_vol": 324162, "deliv_pct": 56.01}, {"time": "2026-08-03", "open": 290.0, "high": 295.6, "low": 282.0, "close": 284.65, "delivery_vol": 361655, "deliv_pct": 60.55}, {"time": "2026-08-04", "open": 284.15, "high": 289.2, "low": 281.85, "close": 285.05, "delivery_vol": 295879, "deliv_pct": 56.48}, {"time": "2026-08-05", "open": 285.05, "high": 287.9, "low": 282.0, "close": 285.15, "delivery_vol": 249497, "deliv_pct": 54.07}, {"time": "2026-08-06", "open": 285.25, "high": 287.9, "low": 278.8, "close": 280.4, "delivery_vol": 213335, "deliv_pct": 57.14}, {"time": "2026-08-07", "open": 280.4, "high": 282.1, "low": 273.15, "close": 276.25, "delivery_vol": 275415, "deliv_pct": 58.13}, {"time": "2026-08-10", "open": 279.8, "high": 289.35, "low": 277.45, "close": 285.35, "delivery_vol": 350221, "deliv_pct": 55.41}, {"time": "2026-08-11", "open": 285.95, "high": 287.7, "low": 281.0, "close": 282.3, "delivery_vol": 324154, "deliv_pct": 57.62}, {"time": "2026-08-12", "open": 283.2, "high": 287.45, "low": 280.8, "close": 284.2, "delivery_vol": 218496, "deliv_pct": 53.85}, {"time": "2026-08-13", "open": 284.0, "high": 288.8, "low": 283.0, "close": 286.5, "delivery_vol": 393544, "deliv_pct": 61.34}, {"time": "2026-08-14", "open": 285.0, "high": 288.4, "low": 280.05, "close": 281.35, "delivery_vol": 237069, "deliv_pct": 58.8}, {"time": "2026-08-17", "open": 280.0, "high": 280.95, "low": 275.85, "close": 278.7, "delivery_vol": 222141, "deliv_pct": 55.47}, {"time": "2026-08-18", "open": 278.4, "high": 295.0, "low": 276.5, "close": 289.2, "delivery_vol": 600356, "deliv_pct": 61.58}]
+[
+  {
+    "time": "2024-09-24",
+    "open": 350.0,
+    "high": 350.0,
+    "low": 308.2,
+    "close": 323.4,
+    "delivery_vol": 15202054,
+    "deliv_pct": 43.48
+  },
+  {
+    "time": "2024-09-25",
+    "open": 328.0,
+    "high": 330.4,
+    "low": 307.05,
+    "close": 313.8,
+    "delivery_vol": 2053069,
+    "deliv_pct": 31.22
+  },
+  {
+    "time": "2024-09-26",
+    "open": 311.3,
+    "high": 316.95,
+    "low": 303.0,
+    "close": 304.6,
+    "delivery_vol": 1095022,
+    "deliv_pct": 45.62
+  },
+  {
+    "time": "2024-09-27",
+    "open": 304.55,
+    "high": 316.7,
+    "low": 304.55,
+    "close": 309.0,
+    "delivery_vol": 1123613,
+    "deliv_pct": 42.31
+  },
+  {
+    "time": "2024-09-30",
+    "open": 306.0,
+    "high": 308.8,
+    "low": 295.05,
+    "close": 300.0,
+    "delivery_vol": 876358,
+    "deliv_pct": 40.25
+  },
+  {
+    "time": "2024-10-01",
+    "open": 310.0,
+    "high": 314.0,
+    "low": 301.7,
+    "close": 306.3,
+    "delivery_vol": 948670,
+    "deliv_pct": 36.43
+  },
+  {
+    "time": "2024-10-02",
+    "open": 310.0,
+    "high": 314.0,
+    "low": 301.7,
+    "close": 306.3,
+    "delivery_vol": 948670,
+    "deliv_pct": 36.43
+  },
+  {
+    "time": "2024-10-03",
+    "open": 297.2,
+    "high": 303.0,
+    "low": 292.0,
+    "close": 293.45,
+    "delivery_vol": 554334,
+    "deliv_pct": 51.37
+  },
+  {
+    "time": "2024-10-04",
+    "open": 294.85,
+    "high": 301.7,
+    "low": 285.2,
+    "close": 292.35,
+    "delivery_vol": 518367,
+    "deliv_pct": 31.94
+  },
+  {
+    "time": "2024-10-07",
+    "open": 294.9,
+    "high": 294.95,
+    "low": 269.5,
+    "close": 278.95,
+    "delivery_vol": 814761,
+    "deliv_pct": 52.34
+  },
+  {
+    "time": "2024-10-08",
+    "open": 277.5,
+    "high": 288.0,
+    "low": 275.8,
+    "close": 285.85,
+    "delivery_vol": 401252,
+    "deliv_pct": 44.95
+  },
+  {
+    "time": "2024-10-09",
+    "open": 286.85,
+    "high": 292.4,
+    "low": 284.65,
+    "close": 285.35,
+    "delivery_vol": 286526,
+    "deliv_pct": 48.38
+  },
+  {
+    "time": "2024-10-10",
+    "open": 288.7,
+    "high": 293.0,
+    "low": 287.5,
+    "close": 289.8,
+    "delivery_vol": 277136,
+    "deliv_pct": 54.58
+  },
+  {
+    "time": "2024-10-11",
+    "open": 287.55,
+    "high": 292.2,
+    "low": 282.55,
+    "close": 283.8,
+    "delivery_vol": 177560,
+    "deliv_pct": 52.81
+  },
+  {
+    "time": "2024-10-14",
+    "open": 285.95,
+    "high": 286.85,
+    "low": 273.3,
+    "close": 274.1,
+    "delivery_vol": 307764,
+    "deliv_pct": 61.25
+  },
+  {
+    "time": "2024-10-15",
+    "open": 274.2,
+    "high": 278.0,
+    "low": 271.0,
+    "close": 274.6,
+    "delivery_vol": 193157,
+    "deliv_pct": 48.62
+  },
+  {
+    "time": "2024-10-16",
+    "open": 273.6,
+    "high": 277.0,
+    "low": 268.0,
+    "close": 268.3,
+    "delivery_vol": 396645,
+    "deliv_pct": 64.72
+  },
+  {
+    "time": "2024-10-17",
+    "open": 268.0,
+    "high": 274.5,
+    "low": 266.5,
+    "close": 269.45,
+    "delivery_vol": 245441,
+    "deliv_pct": 45.24
+  },
+  {
+    "time": "2024-10-18",
+    "open": 269.0,
+    "high": 269.4,
+    "low": 264.15,
+    "close": 266.1,
+    "delivery_vol": 177560,
+    "deliv_pct": 52.6
+  },
+  {
+    "time": "2024-10-21",
+    "open": 268.0,
+    "high": 269.0,
+    "low": 249.05,
+    "close": 251.05,
+    "delivery_vol": 514802,
+    "deliv_pct": 57.76
+  },
+  {
+    "time": "2024-10-22",
+    "open": 250.0,
+    "high": 251.55,
+    "low": 242.1,
+    "close": 243.55,
+    "delivery_vol": 229344,
+    "deliv_pct": 44.94
+  },
+  {
+    "time": "2024-10-23",
+    "open": 243.0,
+    "high": 250.9,
+    "low": 240.65,
+    "close": 244.2,
+    "delivery_vol": 283308,
+    "deliv_pct": 42.51
+  },
+  {
+    "time": "2024-10-24",
+    "open": 245.9,
+    "high": 247.0,
+    "low": 237.5,
+    "close": 239.05,
+    "delivery_vol": 164134,
+    "deliv_pct": 52.26
+  },
+  {
+    "time": "2024-10-25",
+    "open": 239.1,
+    "high": 241.65,
+    "low": 229.05,
+    "close": 231.0,
+    "delivery_vol": 279755,
+    "deliv_pct": 48.13
+  },
+  {
+    "time": "2024-10-28",
+    "open": 234.65,
+    "high": 236.45,
+    "low": 226.65,
+    "close": 232.4,
+    "delivery_vol": 216848,
+    "deliv_pct": 38.86
+  },
+  {
+    "time": "2024-10-29",
+    "open": 243.0,
+    "high": 251.9,
+    "low": 240.2,
+    "close": 246.95,
+    "delivery_vol": 438159,
+    "deliv_pct": 28.61
+  },
+  {
+    "time": "2024-10-30",
+    "open": 248.9,
+    "high": 248.9,
+    "low": 243.2,
+    "close": 246.1,
+    "delivery_vol": 175992,
+    "deliv_pct": 47.09
+  },
+  {
+    "time": "2024-10-31",
+    "open": 246.5,
+    "high": 253.9,
+    "low": 244.1,
+    "close": 250.2,
+    "delivery_vol": 163156,
+    "deliv_pct": 37.7
+  },
+  {
+    "time": "2024-11-01",
+    "open": 252.45,
+    "high": 256.0,
+    "low": 251.75,
+    "close": 254.65,
+    "delivery_vol": 137307,
+    "deliv_pct": 65.7
+  },
+  {
+    "time": "2024-11-04",
+    "open": 256.95,
+    "high": 260.7,
+    "low": 252.35,
+    "close": 259.4,
+    "delivery_vol": 243963,
+    "deliv_pct": 46.65
+  },
+  {
+    "time": "2024-11-05",
+    "open": 259.9,
+    "high": 264.2,
+    "low": 257.15,
+    "close": 259.85,
+    "delivery_vol": 209960,
+    "deliv_pct": 48.54
+  },
+  {
+    "time": "2024-11-06",
+    "open": 262.0,
+    "high": 263.95,
+    "low": 259.15,
+    "close": 261.75,
+    "delivery_vol": 145000,
+    "deliv_pct": 42.8
+  },
+  {
+    "time": "2024-11-07",
+    "open": 262.85,
+    "high": 264.9,
+    "low": 260.15,
+    "close": 260.65,
+    "delivery_vol": 71995,
+    "deliv_pct": 41.28
+  },
+  {
+    "time": "2024-11-08",
+    "open": 261.9,
+    "high": 262.8,
+    "low": 252.0,
+    "close": 253.45,
+    "delivery_vol": 112548,
+    "deliv_pct": 47.76
+  },
+  {
+    "time": "2024-11-11",
+    "open": 255.4,
+    "high": 255.4,
+    "low": 246.6,
+    "close": 250.35,
+    "delivery_vol": 117409,
+    "deliv_pct": 43.97
+  },
+  {
+    "time": "2024-11-12",
+    "open": 251.1,
+    "high": 253.25,
+    "low": 241.2,
+    "close": 242.35,
+    "delivery_vol": 106761,
+    "deliv_pct": 47.78
+  },
+  {
+    "time": "2024-11-13",
+    "open": 242.35,
+    "high": 243.45,
+    "low": 232.5,
+    "close": 233.7,
+    "delivery_vol": 124033,
+    "deliv_pct": 48.06
+  },
+  {
+    "time": "2024-11-14",
+    "open": 233.7,
+    "high": 240.0,
+    "low": 233.7,
+    "close": 237.45,
+    "delivery_vol": 83651,
+    "deliv_pct": 47.62
+  },
+  {
+    "time": "2024-11-18",
+    "open": 238.9,
+    "high": 241.0,
+    "low": 232.55,
+    "close": 236.3,
+    "delivery_vol": 96003,
+    "deliv_pct": 43.68
+  },
+  {
+    "time": "2024-11-19",
+    "open": 237.1,
+    "high": 243.1,
+    "low": 237.0,
+    "close": 237.85,
+    "delivery_vol": 74227,
+    "deliv_pct": 49.03
+  },
+  {
+    "time": "2024-11-20",
+    "open": 237.1,
+    "high": 243.1,
+    "low": 237.0,
+    "close": 237.85,
+    "delivery_vol": 74227,
+    "deliv_pct": 49.03
+  },
+  {
+    "time": "2024-11-21",
+    "open": 240.0,
+    "high": 240.0,
+    "low": 226.0,
+    "close": 227.3,
+    "delivery_vol": 261048,
+    "deliv_pct": 54.39
+  },
+  {
+    "time": "2024-11-22",
+    "open": 227.95,
+    "high": 234.4,
+    "low": 225.35,
+    "close": 232.85,
+    "delivery_vol": 121508,
+    "deliv_pct": 43.27
+  },
+  {
+    "time": "2024-11-25",
+    "open": 238.45,
+    "high": 238.95,
+    "low": 230.05,
+    "close": 230.4,
+    "delivery_vol": 127645,
+    "deliv_pct": 55.44
+  },
+  {
+    "time": "2024-11-26",
+    "open": 232.35,
+    "high": 232.65,
+    "low": 227.85,
+    "close": 229.05,
+    "delivery_vol": 118872,
+    "deliv_pct": 53.31
+  },
+  {
+    "time": "2024-11-27",
+    "open": 229.05,
+    "high": 245.95,
+    "low": 228.4,
+    "close": 243.85,
+    "delivery_vol": 223576,
+    "deliv_pct": 40.4
+  },
+  {
+    "time": "2024-11-28",
+    "open": 246.7,
+    "high": 250.5,
+    "low": 242.0,
+    "close": 242.9,
+    "delivery_vol": 163671,
+    "deliv_pct": 39.1
+  },
+  {
+    "time": "2024-11-29",
+    "open": 242.7,
+    "high": 246.35,
+    "low": 231.7,
+    "close": 234.1,
+    "delivery_vol": 322330,
+    "deliv_pct": 55.35
+  },
+  {
+    "time": "2024-12-02",
+    "open": 234.09,
+    "high": 234.09,
+    "low": 228.41,
+    "close": 228.96,
+    "delivery_vol": 456345,
+    "deliv_pct": 64.77
+  },
+  {
+    "time": "2024-12-03",
+    "open": 230.4,
+    "high": 235.95,
+    "low": 230.39,
+    "close": 232.83,
+    "delivery_vol": 430950,
+    "deliv_pct": 62.06
+  },
+  {
+    "time": "2024-12-04",
+    "open": 234.4,
+    "high": 250.33,
+    "low": 234.1,
+    "close": 243.9,
+    "delivery_vol": 496089,
+    "deliv_pct": 35.68
+  },
+  {
+    "time": "2024-12-05",
+    "open": 246.35,
+    "high": 255.8,
+    "low": 245.61,
+    "close": 251.98,
+    "delivery_vol": 397034,
+    "deliv_pct": 36.91
+  },
+  {
+    "time": "2024-12-06",
+    "open": 254.0,
+    "high": 256.7,
+    "low": 250.29,
+    "close": 251.2,
+    "delivery_vol": 206291,
+    "deliv_pct": 33.55
+  },
+  {
+    "time": "2024-12-09",
+    "open": 252.7,
+    "high": 256.5,
+    "low": 251.45,
+    "close": 252.83,
+    "delivery_vol": 178229,
+    "deliv_pct": 42.94
+  },
+  {
+    "time": "2024-12-10",
+    "open": 257.7,
+    "high": 261.4,
+    "low": 245.58,
+    "close": 247.44,
+    "delivery_vol": 259450,
+    "deliv_pct": 34.53
+  },
+  {
+    "time": "2024-12-11",
+    "open": 248.35,
+    "high": 251.34,
+    "low": 245.55,
+    "close": 246.17,
+    "delivery_vol": 149018,
+    "deliv_pct": 53.57
+  },
+  {
+    "time": "2024-12-12",
+    "open": 246.85,
+    "high": 247.4,
+    "low": 238.0,
+    "close": 239.32,
+    "delivery_vol": 189535,
+    "deliv_pct": 50.19
+  },
+  {
+    "time": "2024-12-13",
+    "open": 239.45,
+    "high": 241.99,
+    "low": 234.7,
+    "close": 236.42,
+    "delivery_vol": 112540,
+    "deliv_pct": 43.18
+  },
+  {
+    "time": "2024-12-16",
+    "open": 237.7,
+    "high": 240.0,
+    "low": 237.0,
+    "close": 239.19,
+    "delivery_vol": 114242,
+    "deliv_pct": 46.77
+  },
+  {
+    "time": "2024-12-17",
+    "open": 239.0,
+    "high": 241.97,
+    "low": 235.25,
+    "close": 235.91,
+    "delivery_vol": 137128,
+    "deliv_pct": 50.33
+  },
+  {
+    "time": "2024-12-18",
+    "open": 234.5,
+    "high": 237.79,
+    "low": 231.82,
+    "close": 233.8,
+    "delivery_vol": 92777,
+    "deliv_pct": 32.2
+  },
+  {
+    "time": "2024-12-19",
+    "open": 225.5,
+    "high": 234.0,
+    "low": 225.45,
+    "close": 230.28,
+    "delivery_vol": 281667,
+    "deliv_pct": 48.52
+  },
+  {
+    "time": "2024-12-20",
+    "open": 230.1,
+    "high": 231.99,
+    "low": 221.0,
+    "close": 221.67,
+    "delivery_vol": 298375,
+    "deliv_pct": 56.93
+  },
+  {
+    "time": "2024-12-23",
+    "open": 226.95,
+    "high": 226.95,
+    "low": 218.91,
+    "close": 219.72,
+    "delivery_vol": 158847,
+    "deliv_pct": 55.14
+  },
+  {
+    "time": "2024-12-24",
+    "open": 220.9,
+    "high": 223.0,
+    "low": 220.05,
+    "close": 220.84,
+    "delivery_vol": 88442,
+    "deliv_pct": 51.62
+  },
+  {
+    "time": "2024-12-25",
+    "open": 220.9,
+    "high": 223.0,
+    "low": 220.05,
+    "close": 220.84,
+    "delivery_vol": 88442,
+    "deliv_pct": 51.62
+  },
+  {
+    "time": "2024-12-26",
+    "open": 221.65,
+    "high": 223.2,
+    "low": 218.16,
+    "close": 218.79,
+    "delivery_vol": 169506,
+    "deliv_pct": 63.14
+  },
+  {
+    "time": "2024-12-27",
+    "open": 219.85,
+    "high": 220.89,
+    "low": 216.93,
+    "close": 217.69,
+    "delivery_vol": 184837,
+    "deliv_pct": 57.99
+  },
+  {
+    "time": "2024-12-30",
+    "open": 218.1,
+    "high": 221.76,
+    "low": 217.0,
+    "close": 217.68,
+    "delivery_vol": 107486,
+    "deliv_pct": 52.48
+  },
+  {
+    "time": "2024-12-31",
+    "open": 216.08,
+    "high": 218.39,
+    "low": 215.53,
+    "close": 217.05,
+    "delivery_vol": 115002,
+    "deliv_pct": 59.61
+  },
+  {
+    "time": "2025-01-01",
+    "open": 218.9,
+    "high": 220.08,
+    "low": 217.2,
+    "close": 218.0,
+    "delivery_vol": 122589,
+    "deliv_pct": 54.03
+  },
+  {
+    "time": "2025-01-02",
+    "open": 219.69,
+    "high": 222.89,
+    "low": 217.52,
+    "close": 221.82,
+    "delivery_vol": 239584,
+    "deliv_pct": 48.14
+  },
+  {
+    "time": "2025-01-03",
+    "open": 222.0,
+    "high": 233.29,
+    "low": 222.0,
+    "close": 229.28,
+    "delivery_vol": 194583,
+    "deliv_pct": 31.04
+  },
+  {
+    "time": "2025-01-06",
+    "open": 229.6,
+    "high": 231.46,
+    "low": 218.05,
+    "close": 219.37,
+    "delivery_vol": 215067,
+    "deliv_pct": 49.55
+  },
+  {
+    "time": "2025-01-07",
+    "open": 219.53,
+    "high": 228.0,
+    "low": 217.71,
+    "close": 225.55,
+    "delivery_vol": 150871,
+    "deliv_pct": 49.04
+  },
+  {
+    "time": "2025-01-08",
+    "open": 225.55,
+    "high": 225.64,
+    "low": 220.0,
+    "close": 222.44,
+    "delivery_vol": 100225,
+    "deliv_pct": 44.02
+  },
+  {
+    "time": "2025-01-09",
+    "open": 221.8,
+    "high": 224.65,
+    "low": 219.0,
+    "close": 221.15,
+    "delivery_vol": 81162,
+    "deliv_pct": 52.37
+  },
+  {
+    "time": "2025-01-10",
+    "open": 220.03,
+    "high": 221.0,
+    "low": 214.5,
+    "close": 215.09,
+    "delivery_vol": 169390,
+    "deliv_pct": 59.3
+  },
+  {
+    "time": "2025-01-13",
+    "open": 214.99,
+    "high": 214.99,
+    "low": 201.87,
+    "close": 204.18,
+    "delivery_vol": 262787,
+    "deliv_pct": 60.41
+  },
+  {
+    "time": "2025-01-14",
+    "open": 204.41,
+    "high": 214.5,
+    "low": 204.41,
+    "close": 210.24,
+    "delivery_vol": 81479,
+    "deliv_pct": 51.42
+  },
+  {
+    "time": "2025-01-15",
+    "open": 211.75,
+    "high": 213.0,
+    "low": 207.14,
+    "close": 207.83,
+    "delivery_vol": 57731,
+    "deliv_pct": 44.27
+  },
+  {
+    "time": "2025-01-16",
+    "open": 209.55,
+    "high": 213.0,
+    "low": 209.55,
+    "close": 210.85,
+    "delivery_vol": 99078,
+    "deliv_pct": 61.22
+  },
+  {
+    "time": "2025-01-17",
+    "open": 211.0,
+    "high": 211.91,
+    "low": 208.01,
+    "close": 209.96,
+    "delivery_vol": 70052,
+    "deliv_pct": 53.0
+  },
+  {
+    "time": "2025-01-20",
+    "open": 210.0,
+    "high": 212.63,
+    "low": 208.01,
+    "close": 210.53,
+    "delivery_vol": 75956,
+    "deliv_pct": 51.18
+  },
+  {
+    "time": "2025-01-21",
+    "open": 211.01,
+    "high": 212.0,
+    "low": 205.2,
+    "close": 207.7,
+    "delivery_vol": 82250,
+    "deliv_pct": 49.83
+  },
+  {
+    "time": "2025-01-22",
+    "open": 208.25,
+    "high": 210.0,
+    "low": 201.0,
+    "close": 203.53,
+    "delivery_vol": 141802,
+    "deliv_pct": 63.68
+  },
+  {
+    "time": "2025-01-23",
+    "open": 202.45,
+    "high": 207.7,
+    "low": 200.15,
+    "close": 201.74,
+    "delivery_vol": 149125,
+    "deliv_pct": 51.97
+  },
+  {
+    "time": "2025-01-24",
+    "open": 201.6,
+    "high": 203.48,
+    "low": 196.0,
+    "close": 197.42,
+    "delivery_vol": 166661,
+    "deliv_pct": 60.69
+  },
+  {
+    "time": "2025-01-27",
+    "open": 197.99,
+    "high": 198.01,
+    "low": 190.2,
+    "close": 192.07,
+    "delivery_vol": 165440,
+    "deliv_pct": 52.42
+  },
+  {
+    "time": "2025-01-28",
+    "open": 193.09,
+    "high": 195.07,
+    "low": 187.8,
+    "close": 191.8,
+    "delivery_vol": 127096,
+    "deliv_pct": 46.98
+  },
+  {
+    "time": "2025-01-29",
+    "open": 192.89,
+    "high": 198.75,
+    "low": 191.81,
+    "close": 197.11,
+    "delivery_vol": 89202,
+    "deliv_pct": 47.87
+  },
+  {
+    "time": "2025-01-30",
+    "open": 197.14,
+    "high": 198.09,
+    "low": 193.7,
+    "close": 194.41,
+    "delivery_vol": 65446,
+    "deliv_pct": 51.38
+  },
+  {
+    "time": "2025-01-31",
+    "open": 194.1,
+    "high": 204.5,
+    "low": 194.1,
+    "close": 202.84,
+    "delivery_vol": 118865,
+    "deliv_pct": 51.65
+  },
+  {
+    "time": "2025-02-03",
+    "open": 201.0,
+    "high": 201.97,
+    "low": 195.92,
+    "close": 197.38,
+    "delivery_vol": 68799,
+    "deliv_pct": 56.94
+  },
+  {
+    "time": "2025-02-04",
+    "open": 199.0,
+    "high": 200.0,
+    "low": 193.3,
+    "close": 197.69,
+    "delivery_vol": 132245,
+    "deliv_pct": 49.96
+  },
+  {
+    "time": "2025-02-05",
+    "open": 198.45,
+    "high": 200.0,
+    "low": 197.03,
+    "close": 197.97,
+    "delivery_vol": 130963,
+    "deliv_pct": 57.91
+  },
+  {
+    "time": "2025-02-06",
+    "open": 198.0,
+    "high": 199.49,
+    "low": 195.42,
+    "close": 195.81,
+    "delivery_vol": 76074,
+    "deliv_pct": 57.92
+  },
+  {
+    "time": "2025-02-07",
+    "open": 196.0,
+    "high": 197.85,
+    "low": 190.5,
+    "close": 191.24,
+    "delivery_vol": 120166,
+    "deliv_pct": 55.32
+  },
+  {
+    "time": "2025-02-10",
+    "open": 192.47,
+    "high": 193.08,
+    "low": 184.35,
+    "close": 187.36,
+    "delivery_vol": 146215,
+    "deliv_pct": 56.87
+  },
+  {
+    "time": "2025-02-11",
+    "open": 187.01,
+    "high": 188.0,
+    "low": 182.8,
+    "close": 184.52,
+    "delivery_vol": 180681,
+    "deliv_pct": 52.64
+  },
+  {
+    "time": "2025-02-12",
+    "open": 182.81,
+    "high": 191.0,
+    "low": 177.0,
+    "close": 181.7,
+    "delivery_vol": 274901,
+    "deliv_pct": 49.58
+  },
+  {
+    "time": "2025-02-13",
+    "open": 181.7,
+    "high": 185.0,
+    "low": 178.9,
+    "close": 180.71,
+    "delivery_vol": 334424,
+    "deliv_pct": 73.67
+  },
+  {
+    "time": "2025-02-14",
+    "open": 181.85,
+    "high": 183.5,
+    "low": 170.0,
+    "close": 174.75,
+    "delivery_vol": 195209,
+    "deliv_pct": 52.33
+  },
+  {
+    "time": "2025-02-17",
+    "open": 172.57,
+    "high": 173.75,
+    "low": 166.12,
+    "close": 171.11,
+    "delivery_vol": 267999,
+    "deliv_pct": 37.56
+  },
+  {
+    "time": "2025-02-18",
+    "open": 171.15,
+    "high": 172.99,
+    "low": 165.16,
+    "close": 167.29,
+    "delivery_vol": 161473,
+    "deliv_pct": 49.46
+  },
+  {
+    "time": "2025-02-19",
+    "open": 166.25,
+    "high": 176.7,
+    "low": 165.94,
+    "close": 175.63,
+    "delivery_vol": 219212,
+    "deliv_pct": 49.87
+  },
+  {
+    "time": "2025-02-20",
+    "open": 175.63,
+    "high": 179.09,
+    "low": 173.03,
+    "close": 173.78,
+    "delivery_vol": 127261,
+    "deliv_pct": 55.46
+  },
+  {
+    "time": "2025-02-21",
+    "open": 172.15,
+    "high": 178.22,
+    "low": 172.0,
+    "close": 173.76,
+    "delivery_vol": 128926,
+    "deliv_pct": 48.03
+  },
+  {
+    "time": "2025-02-24",
+    "open": 173.55,
+    "high": 173.8,
+    "low": 168.11,
+    "close": 169.08,
+    "delivery_vol": 171951,
+    "deliv_pct": 55.37
+  },
+  {
+    "time": "2025-02-25",
+    "open": 169.51,
+    "high": 174.0,
+    "low": 168.01,
+    "close": 168.31,
+    "delivery_vol": 117581,
+    "deliv_pct": 57.02
+  },
+  {
+    "time": "2025-02-27",
+    "open": 172.0,
+    "high": 178.0,
+    "low": 169.93,
+    "close": 175.13,
+    "delivery_vol": 292906,
+    "deliv_pct": 45.27
+  },
+  {
+    "time": "2025-02-28",
+    "open": 174.0,
+    "high": 174.19,
+    "low": 169.59,
+    "close": 171.63,
+    "delivery_vol": 272484,
+    "deliv_pct": 66.23
+  },
+  {
+    "time": "2025-03-03",
+    "open": 171.0,
+    "high": 174.94,
+    "low": 163.6,
+    "close": 167.54,
+    "delivery_vol": 326102,
+    "deliv_pct": 61.39
+  },
+  {
+    "time": "2025-03-04",
+    "open": 165.0,
+    "high": 169.37,
+    "low": 163.5,
+    "close": 166.23,
+    "delivery_vol": 94864,
+    "deliv_pct": 46.56
+  },
+  {
+    "time": "2025-03-05",
+    "open": 167.1,
+    "high": 170.58,
+    "low": 166.0,
+    "close": 169.1,
+    "delivery_vol": 137182,
+    "deliv_pct": 49.15
+  },
+  {
+    "time": "2025-03-06",
+    "open": 171.65,
+    "high": 174.0,
+    "low": 170.61,
+    "close": 172.64,
+    "delivery_vol": 680273,
+    "deliv_pct": 78.41
+  },
+  {
+    "time": "2025-03-07",
+    "open": 173.0,
+    "high": 175.5,
+    "low": 171.01,
+    "close": 173.2,
+    "delivery_vol": 247743,
+    "deliv_pct": 61.07
+  },
+  {
+    "time": "2025-03-10",
+    "open": 174.6,
+    "high": 175.0,
+    "low": 168.0,
+    "close": 169.27,
+    "delivery_vol": 254074,
+    "deliv_pct": 61.46
+  },
+  {
+    "time": "2025-03-11",
+    "open": 168.85,
+    "high": 172.71,
+    "low": 166.0,
+    "close": 171.14,
+    "delivery_vol": 206951,
+    "deliv_pct": 52.27
+  },
+  {
+    "time": "2025-03-12",
+    "open": 172.0,
+    "high": 172.0,
+    "low": 168.21,
+    "close": 170.48,
+    "delivery_vol": 370512,
+    "deliv_pct": 65.69
+  },
+  {
+    "time": "2025-03-13",
+    "open": 171.5,
+    "high": 171.79,
+    "low": 169.16,
+    "close": 170.83,
+    "delivery_vol": 148859,
+    "deliv_pct": 59.13
+  },
+  {
+    "time": "2025-03-17",
+    "open": 172.0,
+    "high": 172.85,
+    "low": 167.0,
+    "close": 170.51,
+    "delivery_vol": 238625,
+    "deliv_pct": 68.39
+  },
+  {
+    "time": "2025-03-18",
+    "open": 170.5,
+    "high": 170.99,
+    "low": 167.5,
+    "close": 169.47,
+    "delivery_vol": 286984,
+    "deliv_pct": 58.24
+  },
+  {
+    "time": "2025-03-19",
+    "open": 168.55,
+    "high": 175.9,
+    "low": 168.5,
+    "close": 175.39,
+    "delivery_vol": 175882,
+    "deliv_pct": 45.09
+  },
+  {
+    "time": "2025-03-20",
+    "open": 177.42,
+    "high": 177.5,
+    "low": 172.0,
+    "close": 172.59,
+    "delivery_vol": 172991,
+    "deliv_pct": 57.07
+  },
+  {
+    "time": "2025-03-21",
+    "open": 172.5,
+    "high": 179.75,
+    "low": 171.67,
+    "close": 175.48,
+    "delivery_vol": 333801,
+    "deliv_pct": 51.56
+  },
+  {
+    "time": "2025-03-24",
+    "open": 175.5,
+    "high": 179.27,
+    "low": 171.9,
+    "close": 172.71,
+    "delivery_vol": 353421,
+    "deliv_pct": 55.66
+  },
+  {
+    "time": "2025-03-25",
+    "open": 173.99,
+    "high": 174.81,
+    "low": 166.39,
+    "close": 168.4,
+    "delivery_vol": 365757,
+    "deliv_pct": 53.82
+  },
+  {
+    "time": "2025-03-26",
+    "open": 168.48,
+    "high": 170.19,
+    "low": 166.25,
+    "close": 167.81,
+    "delivery_vol": 954621,
+    "deliv_pct": 74.6
+  },
+  {
+    "time": "2025-03-27",
+    "open": 168.61,
+    "high": 170.0,
+    "low": 166.51,
+    "close": 168.18,
+    "delivery_vol": 834561,
+    "deliv_pct": 71.83
+  },
+  {
+    "time": "2025-03-28",
+    "open": 166.8,
+    "high": 171.11,
+    "low": 166.0,
+    "close": 167.52,
+    "delivery_vol": 459043,
+    "deliv_pct": 61.16
+  },
+  {
+    "time": "2025-04-01",
+    "open": 167.45,
+    "high": 175.65,
+    "low": 165.65,
+    "close": 171.86,
+    "delivery_vol": 157640,
+    "deliv_pct": 37.02
+  },
+  {
+    "time": "2025-04-02",
+    "open": 173.0,
+    "high": 177.8,
+    "low": 170.62,
+    "close": 176.44,
+    "delivery_vol": 144548,
+    "deliv_pct": 46.36
+  },
+  {
+    "time": "2025-04-03",
+    "open": 176.0,
+    "high": 191.7,
+    "low": 175.0,
+    "close": 188.63,
+    "delivery_vol": 273637,
+    "deliv_pct": 35.25
+  },
+  {
+    "time": "2025-04-04",
+    "open": 191.8,
+    "high": 191.8,
+    "low": 175.0,
+    "close": 175.67,
+    "delivery_vol": 278030,
+    "deliv_pct": 44.99
+  },
+  {
+    "time": "2025-04-07",
+    "open": 166.0,
+    "high": 174.59,
+    "low": 141.47,
+    "close": 173.33,
+    "delivery_vol": 209667,
+    "deliv_pct": 34.28
+  },
+  {
+    "time": "2025-04-08",
+    "open": 176.9,
+    "high": 177.29,
+    "low": 172.25,
+    "close": 173.9,
+    "delivery_vol": 71231,
+    "deliv_pct": 35.86
+  },
+  {
+    "time": "2025-04-09",
+    "open": 174.0,
+    "high": 174.39,
+    "low": 168.5,
+    "close": 169.38,
+    "delivery_vol": 125818,
+    "deliv_pct": 46.67
+  },
+  {
+    "time": "2025-04-11",
+    "open": 180.02,
+    "high": 198.99,
+    "low": 178.9,
+    "close": 190.75,
+    "delivery_vol": 596287,
+    "deliv_pct": 19.43
+  },
+  {
+    "time": "2025-04-15",
+    "open": 195.9,
+    "high": 199.0,
+    "low": 191.55,
+    "close": 193.23,
+    "delivery_vol": 421986,
+    "deliv_pct": 43.26
+  },
+  {
+    "time": "2025-04-16",
+    "open": 193.95,
+    "high": 194.7,
+    "low": 190.0,
+    "close": 191.17,
+    "delivery_vol": 223528,
+    "deliv_pct": 58.31
+  },
+  {
+    "time": "2025-04-17",
+    "open": 191.7,
+    "high": 202.91,
+    "low": 191.2,
+    "close": 199.28,
+    "delivery_vol": 516330,
+    "deliv_pct": 40.32
+  },
+  {
+    "time": "2025-04-21",
+    "open": 200.0,
+    "high": 210.42,
+    "low": 199.02,
+    "close": 208.51,
+    "delivery_vol": 430695,
+    "deliv_pct": 45.05
+  },
+  {
+    "time": "2025-04-22",
+    "open": 210.0,
+    "high": 216.04,
+    "low": 204.71,
+    "close": 210.92,
+    "delivery_vol": 253241,
+    "deliv_pct": 34.21
+  },
+  {
+    "time": "2025-04-23",
+    "open": 211.99,
+    "high": 224.4,
+    "low": 207.41,
+    "close": 221.95,
+    "delivery_vol": 346545,
+    "deliv_pct": 33.63
+  },
+  {
+    "time": "2025-04-24",
+    "open": 220.9,
+    "high": 226.05,
+    "low": 216.97,
+    "close": 218.78,
+    "delivery_vol": 221060,
+    "deliv_pct": 41.34
+  },
+  {
+    "time": "2025-04-25",
+    "open": 220.49,
+    "high": 221.13,
+    "low": 208.03,
+    "close": 210.7,
+    "delivery_vol": 190969,
+    "deliv_pct": 39.4
+  },
+  {
+    "time": "2025-04-28",
+    "open": 210.5,
+    "high": 218.0,
+    "low": 206.21,
+    "close": 212.9,
+    "delivery_vol": 190704,
+    "deliv_pct": 40.64
+  },
+  {
+    "time": "2025-04-29",
+    "open": 213.48,
+    "high": 231.6,
+    "low": 213.48,
+    "close": 228.4,
+    "delivery_vol": 657472,
+    "deliv_pct": 21.68
+  },
+  {
+    "time": "2025-04-30",
+    "open": 230.0,
+    "high": 230.59,
+    "low": 222.19,
+    "close": 223.76,
+    "delivery_vol": 299672,
+    "deliv_pct": 30.38
+  },
+  {
+    "time": "2025-05-02",
+    "open": 224.9,
+    "high": 228.9,
+    "low": 219.14,
+    "close": 220.36,
+    "delivery_vol": 137119,
+    "deliv_pct": 28.86
+  },
+  {
+    "time": "2025-05-05",
+    "open": 222.9,
+    "high": 225.9,
+    "low": 218.51,
+    "close": 220.03,
+    "delivery_vol": 126661,
+    "deliv_pct": 25.42
+  },
+  {
+    "time": "2025-05-06",
+    "open": 220.04,
+    "high": 221.35,
+    "low": 204.02,
+    "close": 205.23,
+    "delivery_vol": 244538,
+    "deliv_pct": 38.64
+  },
+  {
+    "time": "2025-05-07",
+    "open": 204.55,
+    "high": 209.58,
+    "low": 200.35,
+    "close": 205.78,
+    "delivery_vol": 174259,
+    "deliv_pct": 26.93
+  },
+  {
+    "time": "2025-05-08",
+    "open": 207.75,
+    "high": 211.6,
+    "low": 204.0,
+    "close": 204.66,
+    "delivery_vol": 132605,
+    "deliv_pct": 41.3
+  },
+  {
+    "time": "2025-05-09",
+    "open": 200.0,
+    "high": 206.01,
+    "low": 197.02,
+    "close": 202.98,
+    "delivery_vol": 122463,
+    "deliv_pct": 47.04
+  },
+  {
+    "time": "2025-05-12",
+    "open": 210.96,
+    "high": 221.2,
+    "low": 192.07,
+    "close": 205.02,
+    "delivery_vol": 3707370,
+    "deliv_pct": 59.58
+  },
+  {
+    "time": "2025-05-13",
+    "open": 208.1,
+    "high": 213.55,
+    "low": 206.0,
+    "close": 212.88,
+    "delivery_vol": 258321,
+    "deliv_pct": 34.69
+  },
+  {
+    "time": "2025-05-14",
+    "open": 214.0,
+    "high": 220.0,
+    "low": 211.26,
+    "close": 217.21,
+    "delivery_vol": 483308,
+    "deliv_pct": 49.76
+  },
+  {
+    "time": "2025-05-15",
+    "open": 217.81,
+    "high": 218.8,
+    "low": 213.45,
+    "close": 215.73,
+    "delivery_vol": 228223,
+    "deliv_pct": 50.62
+  },
+  {
+    "time": "2025-05-16",
+    "open": 216.98,
+    "high": 217.95,
+    "low": 214.01,
+    "close": 215.24,
+    "delivery_vol": 228412,
+    "deliv_pct": 50.33
+  },
+  {
+    "time": "2025-05-19",
+    "open": 216.1,
+    "high": 220.0,
+    "low": 212.25,
+    "close": 217.38,
+    "delivery_vol": 463892,
+    "deliv_pct": 50.57
+  },
+  {
+    "time": "2025-05-20",
+    "open": 206.18,
+    "high": 215.08,
+    "low": 202.0,
+    "close": 209.15,
+    "delivery_vol": 562892,
+    "deliv_pct": 35.09
+  },
+  {
+    "time": "2025-05-21",
+    "open": 209.15,
+    "high": 211.63,
+    "low": 202.39,
+    "close": 205.26,
+    "delivery_vol": 359539,
+    "deliv_pct": 38.21
+  },
+  {
+    "time": "2025-05-22",
+    "open": 205.27,
+    "high": 219.0,
+    "low": 205.27,
+    "close": 218.63,
+    "delivery_vol": 652021,
+    "deliv_pct": 46.66
+  },
+  {
+    "time": "2025-05-23",
+    "open": 216.0,
+    "high": 219.44,
+    "low": 214.1,
+    "close": 218.33,
+    "delivery_vol": 387913,
+    "deliv_pct": 48.84
+  },
+  {
+    "time": "2025-05-26",
+    "open": 216.5,
+    "high": 219.5,
+    "low": 212.26,
+    "close": 213.43,
+    "delivery_vol": 361853,
+    "deliv_pct": 59.4
+  },
+  {
+    "time": "2025-05-27",
+    "open": 214.35,
+    "high": 217.9,
+    "low": 211.0,
+    "close": 213.73,
+    "delivery_vol": 150497,
+    "deliv_pct": 42.62
+  },
+  {
+    "time": "2025-05-28",
+    "open": 215.0,
+    "high": 216.51,
+    "low": 209.76,
+    "close": 212.17,
+    "delivery_vol": 147175,
+    "deliv_pct": 51.54
+  },
+  {
+    "time": "2025-05-29",
+    "open": 213.0,
+    "high": 219.95,
+    "low": 211.28,
+    "close": 218.75,
+    "delivery_vol": 270164,
+    "deliv_pct": 54.46
+  },
+  {
+    "time": "2025-05-30",
+    "open": 219.88,
+    "high": 221.0,
+    "low": 213.0,
+    "close": 214.63,
+    "delivery_vol": 366945,
+    "deliv_pct": 41.36
+  },
+  {
+    "time": "2025-06-02",
+    "open": 214.95,
+    "high": 220.1,
+    "low": 213.2,
+    "close": 219.55,
+    "delivery_vol": 407190,
+    "deliv_pct": 52.55
+  },
+  {
+    "time": "2025-06-03",
+    "open": 221.0,
+    "high": 223.92,
+    "low": 212.51,
+    "close": 214.15,
+    "delivery_vol": 246191,
+    "deliv_pct": 43.52
+  },
+  {
+    "time": "2025-06-04",
+    "open": 215.79,
+    "high": 215.79,
+    "low": 204.21,
+    "close": 207.74,
+    "delivery_vol": 268122,
+    "deliv_pct": 49.7
+  },
+  {
+    "time": "2025-06-05",
+    "open": 209.0,
+    "high": 213.02,
+    "low": 205.9,
+    "close": 206.38,
+    "delivery_vol": 268050,
+    "deliv_pct": 50.46
+  },
+  {
+    "time": "2025-06-06",
+    "open": 208.03,
+    "high": 219.51,
+    "low": 206.6,
+    "close": 217.17,
+    "delivery_vol": 378385,
+    "deliv_pct": 31.84
+  },
+  {
+    "time": "2025-06-09",
+    "open": 221.0,
+    "high": 227.8,
+    "low": 221.0,
+    "close": 223.71,
+    "delivery_vol": 538266,
+    "deliv_pct": 43.76
+  },
+  {
+    "time": "2025-06-10",
+    "open": 226.0,
+    "high": 245.08,
+    "low": 226.0,
+    "close": 235.62,
+    "delivery_vol": 1042095,
+    "deliv_pct": 32.37
+  },
+  {
+    "time": "2025-06-11",
+    "open": 238.62,
+    "high": 238.9,
+    "low": 230.3,
+    "close": 232.23,
+    "delivery_vol": 368565,
+    "deliv_pct": 43.95
+  },
+  {
+    "time": "2025-06-12",
+    "open": 237.1,
+    "high": 241.39,
+    "low": 225.05,
+    "close": 226.42,
+    "delivery_vol": 318469,
+    "deliv_pct": 21.43
+  },
+  {
+    "time": "2025-06-13",
+    "open": 221.99,
+    "high": 225.97,
+    "low": 219.76,
+    "close": 223.87,
+    "delivery_vol": 389072,
+    "deliv_pct": 55.42
+  },
+  {
+    "time": "2025-06-16",
+    "open": 225.0,
+    "high": 228.0,
+    "low": 218.05,
+    "close": 225.22,
+    "delivery_vol": 237487,
+    "deliv_pct": 41.6
+  },
+  {
+    "time": "2025-06-17",
+    "open": 225.0,
+    "high": 225.22,
+    "low": 216.5,
+    "close": 217.61,
+    "delivery_vol": 292757,
+    "deliv_pct": 50.14
+  },
+  {
+    "time": "2025-06-18",
+    "open": 216.65,
+    "high": 222.34,
+    "low": 213.1,
+    "close": 218.59,
+    "delivery_vol": 318112,
+    "deliv_pct": 27.02
+  },
+  {
+    "time": "2025-06-19",
+    "open": 218.98,
+    "high": 225.0,
+    "low": 208.01,
+    "close": 213.88,
+    "delivery_vol": 407423,
+    "deliv_pct": 38.37
+  },
+  {
+    "time": "2025-06-20",
+    "open": 203.0,
+    "high": 218.81,
+    "low": 195.3,
+    "close": 208.38,
+    "delivery_vol": 20681680,
+    "deliv_pct": 41.2
+  },
+  {
+    "time": "2025-06-23",
+    "open": 211.0,
+    "high": 234.88,
+    "low": 211.0,
+    "close": 225.56,
+    "delivery_vol": 5573419,
+    "deliv_pct": 21.16
+  },
+  {
+    "time": "2025-06-24",
+    "open": 228.9,
+    "high": 239.9,
+    "low": 225.6,
+    "close": 233.61,
+    "delivery_vol": 2785714,
+    "deliv_pct": 27.97
+  },
+  {
+    "time": "2025-06-25",
+    "open": 235.0,
+    "high": 246.5,
+    "low": 232.66,
+    "close": 243.1,
+    "delivery_vol": 2119003,
+    "deliv_pct": 37.16
+  },
+  {
+    "time": "2025-06-26",
+    "open": 242.8,
+    "high": 247.9,
+    "low": 238.84,
+    "close": 241.14,
+    "delivery_vol": 1164017,
+    "deliv_pct": 32.7
+  },
+  {
+    "time": "2025-06-27",
+    "open": 242.44,
+    "high": 247.9,
+    "low": 238.0,
+    "close": 240.16,
+    "delivery_vol": 1187256,
+    "deliv_pct": 38.24
+  },
+  {
+    "time": "2025-06-30",
+    "open": 241.2,
+    "high": 243.4,
+    "low": 230.73,
+    "close": 232.75,
+    "delivery_vol": 1308042,
+    "deliv_pct": 47.37
+  },
+  {
+    "time": "2025-07-01",
+    "open": 234.0,
+    "high": 240.33,
+    "low": 224.3,
+    "close": 238.38,
+    "delivery_vol": 1565175,
+    "deliv_pct": 39.18
+  },
+  {
+    "time": "2025-07-02",
+    "open": 236.41,
+    "high": 243.0,
+    "low": 234.01,
+    "close": 240.69,
+    "delivery_vol": 784792,
+    "deliv_pct": 39.37
+  },
+  {
+    "time": "2025-07-03",
+    "open": 240.35,
+    "high": 243.8,
+    "low": 237.09,
+    "close": 240.06,
+    "delivery_vol": 408701,
+    "deliv_pct": 33.29
+  },
+  {
+    "time": "2025-07-04",
+    "open": 240.4,
+    "high": 261.8,
+    "low": 239.07,
+    "close": 257.03,
+    "delivery_vol": 2379706,
+    "deliv_pct": 23.78
+  },
+  {
+    "time": "2025-07-07",
+    "open": 258.49,
+    "high": 258.49,
+    "low": 245.2,
+    "close": 248.05,
+    "delivery_vol": 925032,
+    "deliv_pct": 33.17
+  },
+  {
+    "time": "2025-07-08",
+    "open": 248.0,
+    "high": 256.0,
+    "low": 245.46,
+    "close": 255.38,
+    "delivery_vol": 755159,
+    "deliv_pct": 34.67
+  },
+  {
+    "time": "2025-07-09",
+    "open": 257.0,
+    "high": 261.8,
+    "low": 253.73,
+    "close": 255.68,
+    "delivery_vol": 658828,
+    "deliv_pct": 35.89
+  },
+  {
+    "time": "2025-07-10",
+    "open": 257.5,
+    "high": 265.0,
+    "low": 252.24,
+    "close": 256.59,
+    "delivery_vol": 1416046,
+    "deliv_pct": 27.08
+  },
+  {
+    "time": "2025-07-11",
+    "open": 256.45,
+    "high": 257.34,
+    "low": 245.2,
+    "close": 247.37,
+    "delivery_vol": 707922,
+    "deliv_pct": 44.85
+  },
+  {
+    "time": "2025-07-14",
+    "open": 246.18,
+    "high": 253.58,
+    "low": 243.31,
+    "close": 252.18,
+    "delivery_vol": 768240,
+    "deliv_pct": 39.96
+  },
+  {
+    "time": "2025-07-15",
+    "open": 254.0,
+    "high": 259.8,
+    "low": 251.11,
+    "close": 256.43,
+    "delivery_vol": 1198984,
+    "deliv_pct": 56.76
+  },
+  {
+    "time": "2025-07-16",
+    "open": 258.17,
+    "high": 262.7,
+    "low": 254.26,
+    "close": 258.87,
+    "delivery_vol": 442114,
+    "deliv_pct": 33.86
+  },
+  {
+    "time": "2025-07-17",
+    "open": 262.0,
+    "high": 269.0,
+    "low": 260.55,
+    "close": 267.15,
+    "delivery_vol": 1209267,
+    "deliv_pct": 40.63
+  },
+  {
+    "time": "2025-07-18",
+    "open": 267.8,
+    "high": 267.8,
+    "low": 256.1,
+    "close": 257.25,
+    "delivery_vol": 702359,
+    "deliv_pct": 47.09
+  },
+  {
+    "time": "2025-07-21",
+    "open": 258.9,
+    "high": 274.0,
+    "low": 254.3,
+    "close": 269.79,
+    "delivery_vol": 1404889,
+    "deliv_pct": 39.6
+  },
+  {
+    "time": "2025-07-22",
+    "open": 270.0,
+    "high": 272.8,
+    "low": 265.0,
+    "close": 267.59,
+    "delivery_vol": 838415,
+    "deliv_pct": 46.97
+  },
+  {
+    "time": "2025-07-23",
+    "open": 269.5,
+    "high": 269.89,
+    "low": 263.34,
+    "close": 266.02,
+    "delivery_vol": 426462,
+    "deliv_pct": 45.24
+  },
+  {
+    "time": "2025-07-24",
+    "open": 265.9,
+    "high": 266.62,
+    "low": 258.25,
+    "close": 259.52,
+    "delivery_vol": 466405,
+    "deliv_pct": 51.49
+  },
+  {
+    "time": "2025-07-25",
+    "open": 258.5,
+    "high": 259.22,
+    "low": 249.0,
+    "close": 252.19,
+    "delivery_vol": 668122,
+    "deliv_pct": 46.77
+  },
+  {
+    "time": "2025-07-28",
+    "open": 250.0,
+    "high": 250.99,
+    "low": 231.11,
+    "close": 232.83,
+    "delivery_vol": 1010620,
+    "deliv_pct": 44.95
+  },
+  {
+    "time": "2025-07-29",
+    "open": 234.0,
+    "high": 246.23,
+    "low": 232.21,
+    "close": 244.69,
+    "delivery_vol": 594706,
+    "deliv_pct": 37.05
+  },
+  {
+    "time": "2025-07-30",
+    "open": 250.0,
+    "high": 259.89,
+    "low": 234.55,
+    "close": 235.91,
+    "delivery_vol": 1742671,
+    "deliv_pct": 43.61
+  },
+  {
+    "time": "2025-07-31",
+    "open": 235.91,
+    "high": 240.36,
+    "low": 229.23,
+    "close": 234.84,
+    "delivery_vol": 581026,
+    "deliv_pct": 39.03
+  },
+  {
+    "time": "2025-08-01",
+    "open": 234.77,
+    "high": 235.99,
+    "low": 224.17,
+    "close": 227.82,
+    "delivery_vol": 837836,
+    "deliv_pct": 37.38
+  },
+  {
+    "time": "2025-08-04",
+    "open": 230.0,
+    "high": 232.37,
+    "low": 223.2,
+    "close": 226.84,
+    "delivery_vol": 806998,
+    "deliv_pct": 48.24
+  },
+  {
+    "time": "2025-08-05",
+    "open": 228.0,
+    "high": 230.41,
+    "low": 223.5,
+    "close": 225.29,
+    "delivery_vol": 244773,
+    "deliv_pct": 46.32
+  },
+  {
+    "time": "2025-08-06",
+    "open": 225.29,
+    "high": 226.6,
+    "low": 217.5,
+    "close": 221.99,
+    "delivery_vol": 465645,
+    "deliv_pct": 40.75
+  },
+  {
+    "time": "2025-08-07",
+    "open": 220.6,
+    "high": 228.45,
+    "low": 217.02,
+    "close": 227.6,
+    "delivery_vol": 442263,
+    "deliv_pct": 49.55
+  },
+  {
+    "time": "2025-08-08",
+    "open": 226.55,
+    "high": 231.99,
+    "low": 223.33,
+    "close": 224.48,
+    "delivery_vol": 585452,
+    "deliv_pct": 43.62
+  },
+  {
+    "time": "2025-08-11",
+    "open": 225.0,
+    "high": 232.0,
+    "low": 222.75,
+    "close": 230.66,
+    "delivery_vol": 462606,
+    "deliv_pct": 52.26
+  },
+  {
+    "time": "2025-08-12",
+    "open": 230.94,
+    "high": 234.1,
+    "low": 226.88,
+    "close": 230.91,
+    "delivery_vol": 447122,
+    "deliv_pct": 46.12
+  },
+  {
+    "time": "2025-08-13",
+    "open": 229.4,
+    "high": 239.4,
+    "low": 229.4,
+    "close": 236.37,
+    "delivery_vol": 693924,
+    "deliv_pct": 52.94
+  },
+  {
+    "time": "2025-08-14",
+    "open": 238.0,
+    "high": 238.74,
+    "low": 230.98,
+    "close": 232.0,
+    "delivery_vol": 235464,
+    "deliv_pct": 50.55
+  },
+  {
+    "time": "2025-08-18",
+    "open": 236.9,
+    "high": 242.39,
+    "low": 234.0,
+    "close": 241.02,
+    "delivery_vol": 453992,
+    "deliv_pct": 49.73
+  },
+  {
+    "time": "2025-08-19",
+    "open": 241.5,
+    "high": 252.85,
+    "low": 239.5,
+    "close": 252.0,
+    "delivery_vol": 665353,
+    "deliv_pct": 48.96
+  },
+  {
+    "time": "2025-08-20",
+    "open": 252.0,
+    "high": 256.35,
+    "low": 250.3,
+    "close": 253.89,
+    "delivery_vol": 466008,
+    "deliv_pct": 50.07
+  },
+  {
+    "time": "2025-08-21",
+    "open": 252.06,
+    "high": 255.35,
+    "low": 245.22,
+    "close": 247.2,
+    "delivery_vol": 381134,
+    "deliv_pct": 52.48
+  },
+  {
+    "time": "2025-08-22",
+    "open": 247.2,
+    "high": 253.0,
+    "low": 244.2,
+    "close": 252.1,
+    "delivery_vol": 648382,
+    "deliv_pct": 52.23
+  },
+  {
+    "time": "2025-08-25",
+    "open": 254.1,
+    "high": 257.7,
+    "low": 251.21,
+    "close": 254.13,
+    "delivery_vol": 463894,
+    "deliv_pct": 50.51
+  },
+  {
+    "time": "2025-08-26",
+    "open": 255.3,
+    "high": 255.41,
+    "low": 245.71,
+    "close": 249.21,
+    "delivery_vol": 303300,
+    "deliv_pct": 46.77
+  },
+  {
+    "time": "2025-08-28",
+    "open": 249.21,
+    "high": 250.0,
+    "low": 237.5,
+    "close": 238.79,
+    "delivery_vol": 470775,
+    "deliv_pct": 50.4
+  },
+  {
+    "time": "2025-08-29",
+    "open": 240.0,
+    "high": 242.0,
+    "low": 235.0,
+    "close": 236.15,
+    "delivery_vol": 181957,
+    "deliv_pct": 49.43
+  },
+  {
+    "time": "2025-09-01",
+    "open": 237.0,
+    "high": 241.5,
+    "low": 236.35,
+    "close": 239.44,
+    "delivery_vol": 164451,
+    "deliv_pct": 48.84
+  },
+  {
+    "time": "2025-09-02",
+    "open": 240.1,
+    "high": 244.29,
+    "low": 238.15,
+    "close": 240.21,
+    "delivery_vol": 164380,
+    "deliv_pct": 41.65
+  },
+  {
+    "time": "2025-09-03",
+    "open": 240.0,
+    "high": 243.1,
+    "low": 238.5,
+    "close": 239.02,
+    "delivery_vol": 105516,
+    "deliv_pct": 50.61
+  },
+  {
+    "time": "2025-09-04",
+    "open": 241.9,
+    "high": 247.0,
+    "low": 239.98,
+    "close": 242.94,
+    "delivery_vol": 262109,
+    "deliv_pct": 44.21
+  },
+  {
+    "time": "2025-09-05",
+    "open": 242.1,
+    "high": 245.0,
+    "low": 238.58,
+    "close": 242.28,
+    "delivery_vol": 184950,
+    "deliv_pct": 45.19
+  },
+  {
+    "time": "2025-09-08",
+    "open": 243.4,
+    "high": 248.0,
+    "low": 241.85,
+    "close": 246.73,
+    "delivery_vol": 313426,
+    "deliv_pct": 55.28
+  },
+  {
+    "time": "2025-09-09",
+    "open": 249.0,
+    "high": 252.0,
+    "low": 244.29,
+    "close": 247.99,
+    "delivery_vol": 335568,
+    "deliv_pct": 47.21
+  },
+  {
+    "time": "2025-09-10",
+    "open": 248.9,
+    "high": 255.02,
+    "low": 246.97,
+    "close": 250.33,
+    "delivery_vol": 429008,
+    "deliv_pct": 53.62
+  },
+  {
+    "time": "2025-09-11",
+    "open": 251.75,
+    "high": 251.75,
+    "low": 245.0,
+    "close": 246.18,
+    "delivery_vol": 165861,
+    "deliv_pct": 48.85
+  },
+  {
+    "time": "2025-09-12",
+    "open": 246.99,
+    "high": 248.36,
+    "low": 243.51,
+    "close": 246.42,
+    "delivery_vol": 223670,
+    "deliv_pct": 54.23
+  },
+  {
+    "time": "2025-09-15",
+    "open": 253.0,
+    "high": 268.64,
+    "low": 251.02,
+    "close": 266.47,
+    "delivery_vol": 1856624,
+    "deliv_pct": 39.05
+  },
+  {
+    "time": "2025-09-16",
+    "open": 269.77,
+    "high": 270.81,
+    "low": 261.82,
+    "close": 264.78,
+    "delivery_vol": 603415,
+    "deliv_pct": 38.6
+  },
+  {
+    "time": "2025-09-17",
+    "open": 268.0,
+    "high": 270.8,
+    "low": 261.05,
+    "close": 263.29,
+    "delivery_vol": 524822,
+    "deliv_pct": 50.29
+  },
+  {
+    "time": "2025-09-18",
+    "open": 265.95,
+    "high": 279.9,
+    "low": 262.29,
+    "close": 277.85,
+    "delivery_vol": 1350249,
+    "deliv_pct": 38.93
+  },
+  {
+    "time": "2025-09-19",
+    "open": 278.0,
+    "high": 281.7,
+    "low": 272.1,
+    "close": 277.1,
+    "delivery_vol": 639806,
+    "deliv_pct": 40.86
+  },
+  {
+    "time": "2025-09-22",
+    "open": 280.0,
+    "high": 287.0,
+    "low": 276.52,
+    "close": 279.16,
+    "delivery_vol": 964995,
+    "deliv_pct": 48.33
+  },
+  {
+    "time": "2025-09-23",
+    "open": 279.2,
+    "high": 283.53,
+    "low": 276.06,
+    "close": 279.1,
+    "delivery_vol": 476791,
+    "deliv_pct": 43.43
+  },
+  {
+    "time": "2025-09-24",
+    "open": 279.4,
+    "high": 280.55,
+    "low": 273.45,
+    "close": 275.4,
+    "delivery_vol": 503888,
+    "deliv_pct": 50.76
+  },
+  {
+    "time": "2025-09-25",
+    "open": 275.4,
+    "high": 279.0,
+    "low": 270.32,
+    "close": 271.7,
+    "delivery_vol": 411254,
+    "deliv_pct": 46.68
+  },
+  {
+    "time": "2025-09-26",
+    "open": 271.7,
+    "high": 272.0,
+    "low": 260.61,
+    "close": 262.31,
+    "delivery_vol": 461832,
+    "deliv_pct": 48.88
+  },
+  {
+    "time": "2025-09-29",
+    "open": 263.0,
+    "high": 270.81,
+    "low": 259.31,
+    "close": 268.24,
+    "delivery_vol": 439400,
+    "deliv_pct": 47.83
+  },
+  {
+    "time": "2025-09-30",
+    "open": 267.21,
+    "high": 278.9,
+    "low": 266.75,
+    "close": 271.7,
+    "delivery_vol": 820289,
+    "deliv_pct": 49.69
+  },
+  {
+    "time": "2025-10-01",
+    "open": 273.5,
+    "high": 280.0,
+    "low": 270.5,
+    "close": 278.3,
+    "delivery_vol": 362928,
+    "deliv_pct": 47.96
+  },
+  {
+    "time": "2025-10-03",
+    "open": 278.0,
+    "high": 287.0,
+    "low": 275.65,
+    "close": 285.7,
+    "delivery_vol": 443402,
+    "deliv_pct": 50.3
+  },
+  {
+    "time": "2025-10-06",
+    "open": 289.9,
+    "high": 290.0,
+    "low": 286.05,
+    "close": 288.65,
+    "delivery_vol": 412958,
+    "deliv_pct": 53.28
+  },
+  {
+    "time": "2025-10-07",
+    "open": 288.5,
+    "high": 288.95,
+    "low": 278.0,
+    "close": 279.05,
+    "delivery_vol": 545209,
+    "deliv_pct": 56.32
+  },
+  {
+    "time": "2025-10-08",
+    "open": 261.5,
+    "high": 284.8,
+    "low": 261.5,
+    "close": 273.1,
+    "delivery_vol": 384242,
+    "deliv_pct": 34.49
+  },
+  {
+    "time": "2025-10-09",
+    "open": 273.2,
+    "high": 275.0,
+    "low": 269.0,
+    "close": 270.4,
+    "delivery_vol": 468253,
+    "deliv_pct": 54.85
+  },
+  {
+    "time": "2025-10-10",
+    "open": 269.8,
+    "high": 273.25,
+    "low": 264.7,
+    "close": 270.3,
+    "delivery_vol": 317081,
+    "deliv_pct": 47.03
+  },
+  {
+    "time": "2025-10-13",
+    "open": 271.1,
+    "high": 272.7,
+    "low": 266.15,
+    "close": 270.35,
+    "delivery_vol": 167005,
+    "deliv_pct": 44.71
+  },
+  {
+    "time": "2025-10-14",
+    "open": 270.85,
+    "high": 272.4,
+    "low": 262.45,
+    "close": 263.4,
+    "delivery_vol": 250698,
+    "deliv_pct": 53.29
+  },
+  {
+    "time": "2025-10-15",
+    "open": 264.15,
+    "high": 279.0,
+    "low": 264.15,
+    "close": 275.25,
+    "delivery_vol": 404625,
+    "deliv_pct": 49.28
+  },
+  {
+    "time": "2025-10-16",
+    "open": 275.25,
+    "high": 278.7,
+    "low": 267.55,
+    "close": 270.55,
+    "delivery_vol": 400561,
+    "deliv_pct": 53.29
+  },
+  {
+    "time": "2025-10-17",
+    "open": 270.5,
+    "high": 271.6,
+    "low": 265.5,
+    "close": 267.75,
+    "delivery_vol": 257629,
+    "deliv_pct": 51.9
+  },
+  {
+    "time": "2025-10-20",
+    "open": 270.8,
+    "high": 276.15,
+    "low": 266.6,
+    "close": 274.9,
+    "delivery_vol": 368430,
+    "deliv_pct": 48.61
+  },
+  {
+    "time": "2025-10-21",
+    "open": 281.0,
+    "high": 281.0,
+    "low": 276.3,
+    "close": 277.75,
+    "delivery_vol": 161809,
+    "deliv_pct": 68.56
+  },
+  {
+    "time": "2025-10-22",
+    "open": 281.0,
+    "high": 281.0,
+    "low": 276.3,
+    "close": 277.75,
+    "delivery_vol": 161809,
+    "deliv_pct": 68.56
+  },
+  {
+    "time": "2025-10-23",
+    "open": 281.3,
+    "high": 281.3,
+    "low": 271.25,
+    "close": 272.65,
+    "delivery_vol": 245764,
+    "deliv_pct": 50.03
+  },
+  {
+    "time": "2025-10-24",
+    "open": 274.7,
+    "high": 274.7,
+    "low": 267.7,
+    "close": 268.55,
+    "delivery_vol": 172437,
+    "deliv_pct": 55.73
+  },
+  {
+    "time": "2025-10-27",
+    "open": 270.9,
+    "high": 272.3,
+    "low": 268.0,
+    "close": 268.85,
+    "delivery_vol": 162735,
+    "deliv_pct": 55.22
+  },
+  {
+    "time": "2025-10-28",
+    "open": 268.0,
+    "high": 269.9,
+    "low": 263.9,
+    "close": 264.85,
+    "delivery_vol": 169755,
+    "deliv_pct": 57.97
+  },
+  {
+    "time": "2025-10-29",
+    "open": 266.6,
+    "high": 270.15,
+    "low": 264.5,
+    "close": 269.65,
+    "delivery_vol": 185306,
+    "deliv_pct": 51.43
+  },
+  {
+    "time": "2025-10-30",
+    "open": 272.0,
+    "high": 272.0,
+    "low": 264.75,
+    "close": 270.45,
+    "delivery_vol": 243852,
+    "deliv_pct": 53.94
+  },
+  {
+    "time": "2025-10-31",
+    "open": 273.5,
+    "high": 276.0,
+    "low": 268.3,
+    "close": 272.15,
+    "delivery_vol": 321634,
+    "deliv_pct": 50.71
+  },
+  {
+    "time": "2025-11-03",
+    "open": 272.95,
+    "high": 285.0,
+    "low": 272.2,
+    "close": 284.2,
+    "delivery_vol": 1442467,
+    "deliv_pct": 59.99
+  },
+  {
+    "time": "2025-11-04",
+    "open": 282.7,
+    "high": 283.0,
+    "low": 272.75,
+    "close": 275.0,
+    "delivery_vol": 379627,
+    "deliv_pct": 54.98
+  },
+  {
+    "time": "2025-11-05",
+    "open": 282.7,
+    "high": 283.0,
+    "low": 272.75,
+    "close": 275.0,
+    "delivery_vol": 379627,
+    "deliv_pct": 54.98
+  },
+  {
+    "time": "2025-11-06",
+    "open": 278.5,
+    "high": 278.5,
+    "low": 261.6,
+    "close": 263.15,
+    "delivery_vol": 462454,
+    "deliv_pct": 56.6
+  },
+  {
+    "time": "2025-11-07",
+    "open": 261.0,
+    "high": 270.55,
+    "low": 259.55,
+    "close": 268.9,
+    "delivery_vol": 386703,
+    "deliv_pct": 52.09
+  },
+  {
+    "time": "2025-11-10",
+    "open": 269.0,
+    "high": 271.4,
+    "low": 265.5,
+    "close": 267.6,
+    "delivery_vol": 298799,
+    "deliv_pct": 58.16
+  },
+  {
+    "time": "2025-11-11",
+    "open": 267.6,
+    "high": 267.6,
+    "low": 260.55,
+    "close": 262.4,
+    "delivery_vol": 419235,
+    "deliv_pct": 62.18
+  },
+  {
+    "time": "2025-11-12",
+    "open": 265.0,
+    "high": 271.55,
+    "low": 262.45,
+    "close": 270.95,
+    "delivery_vol": 274228,
+    "deliv_pct": 55.13
+  },
+  {
+    "time": "2025-11-13",
+    "open": 270.0,
+    "high": 271.45,
+    "low": 265.0,
+    "close": 265.9,
+    "delivery_vol": 142291,
+    "deliv_pct": 56.26
+  },
+  {
+    "time": "2025-11-14",
+    "open": 262.8,
+    "high": 273.2,
+    "low": 262.8,
+    "close": 270.85,
+    "delivery_vol": 216170,
+    "deliv_pct": 46.02
+  },
+  {
+    "time": "2025-11-17",
+    "open": 272.9,
+    "high": 272.9,
+    "low": 267.8,
+    "close": 269.75,
+    "delivery_vol": 180301,
+    "deliv_pct": 60.87
+  },
+  {
+    "time": "2025-11-18",
+    "open": 269.0,
+    "high": 269.6,
+    "low": 259.8,
+    "close": 261.45,
+    "delivery_vol": 375056,
+    "deliv_pct": 56.04
+  },
+  {
+    "time": "2025-11-19",
+    "open": 261.45,
+    "high": 261.45,
+    "low": 255.2,
+    "close": 256.4,
+    "delivery_vol": 364532,
+    "deliv_pct": 59.41
+  },
+  {
+    "time": "2025-11-20",
+    "open": 258.0,
+    "high": 259.0,
+    "low": 252.4,
+    "close": 253.8,
+    "delivery_vol": 267887,
+    "deliv_pct": 58.4
+  },
+  {
+    "time": "2025-11-21",
+    "open": 251.7,
+    "high": 260.0,
+    "low": 251.7,
+    "close": 258.2,
+    "delivery_vol": 257956,
+    "deliv_pct": 54.79
+  },
+  {
+    "time": "2025-11-24",
+    "open": 258.3,
+    "high": 261.25,
+    "low": 255.7,
+    "close": 260.0,
+    "delivery_vol": 190329,
+    "deliv_pct": 55.57
+  },
+  {
+    "time": "2025-11-25",
+    "open": 260.0,
+    "high": 262.65,
+    "low": 257.2,
+    "close": 258.05,
+    "delivery_vol": 134145,
+    "deliv_pct": 48.26
+  },
+  {
+    "time": "2025-11-26",
+    "open": 258.0,
+    "high": 268.7,
+    "low": 258.0,
+    "close": 266.35,
+    "delivery_vol": 373949,
+    "deliv_pct": 66.11
+  },
+  {
+    "time": "2025-11-27",
+    "open": 267.5,
+    "high": 269.0,
+    "low": 264.4,
+    "close": 267.55,
+    "delivery_vol": 164452,
+    "deliv_pct": 56.46
+  },
+  {
+    "time": "2025-11-28",
+    "open": 267.0,
+    "high": 271.0,
+    "low": 264.0,
+    "close": 269.45,
+    "delivery_vol": 171781,
+    "deliv_pct": 59.3
+  },
+  {
+    "time": "2025-12-01",
+    "open": 272.0,
+    "high": 272.4,
+    "low": 265.0,
+    "close": 266.15,
+    "delivery_vol": 114142,
+    "deliv_pct": 54.32
+  },
+  {
+    "time": "2025-12-02",
+    "open": 266.0,
+    "high": 269.0,
+    "low": 258.55,
+    "close": 259.25,
+    "delivery_vol": 231357,
+    "deliv_pct": 64.6
+  },
+  {
+    "time": "2025-12-03",
+    "open": 259.25,
+    "high": 261.25,
+    "low": 256.0,
+    "close": 257.65,
+    "delivery_vol": 128168,
+    "deliv_pct": 57.69
+  },
+  {
+    "time": "2025-12-04",
+    "open": 258.0,
+    "high": 260.0,
+    "low": 256.3,
+    "close": 257.15,
+    "delivery_vol": 123892,
+    "deliv_pct": 54.63
+  },
+  {
+    "time": "2025-12-05",
+    "open": 259.7,
+    "high": 259.7,
+    "low": 254.15,
+    "close": 257.3,
+    "delivery_vol": 74007,
+    "deliv_pct": 38.13
+  },
+  {
+    "time": "2025-12-08",
+    "open": 259.0,
+    "high": 259.0,
+    "low": 246.0,
+    "close": 253.35,
+    "delivery_vol": 345481,
+    "deliv_pct": 57.18
+  },
+  {
+    "time": "2025-12-09",
+    "open": 254.65,
+    "high": 263.6,
+    "low": 250.5,
+    "close": 260.55,
+    "delivery_vol": 404689,
+    "deliv_pct": 56.75
+  },
+  {
+    "time": "2025-12-10",
+    "open": 260.55,
+    "high": 264.9,
+    "low": 258.8,
+    "close": 260.2,
+    "delivery_vol": 168526,
+    "deliv_pct": 59.5
+  },
+  {
+    "time": "2025-12-11",
+    "open": 260.0,
+    "high": 261.25,
+    "low": 255.95,
+    "close": 257.1,
+    "delivery_vol": 108207,
+    "deliv_pct": 54.08
+  },
+  {
+    "time": "2025-12-12",
+    "open": 260.9,
+    "high": 262.35,
+    "low": 256.1,
+    "close": 259.95,
+    "delivery_vol": 111928,
+    "deliv_pct": 53.37
+  },
+  {
+    "time": "2025-12-15",
+    "open": 258.95,
+    "high": 260.25,
+    "low": 255.25,
+    "close": 259.15,
+    "delivery_vol": 107082,
+    "deliv_pct": 50.39
+  },
+  {
+    "time": "2025-12-16",
+    "open": 259.9,
+    "high": 259.9,
+    "low": 253.2,
+    "close": 254.0,
+    "delivery_vol": 120102,
+    "deliv_pct": 60.3
+  },
+  {
+    "time": "2025-12-17",
+    "open": 253.75,
+    "high": 254.4,
+    "low": 245.2,
+    "close": 246.8,
+    "delivery_vol": 170885,
+    "deliv_pct": 64.97
+  },
+  {
+    "time": "2025-12-18",
+    "open": 248.5,
+    "high": 248.5,
+    "low": 239.15,
+    "close": 245.8,
+    "delivery_vol": 237034,
+    "deliv_pct": 52.63
+  },
+  {
+    "time": "2025-12-19",
+    "open": 245.4,
+    "high": 255.8,
+    "low": 245.4,
+    "close": 253.45,
+    "delivery_vol": 110091,
+    "deliv_pct": 49.56
+  },
+  {
+    "time": "2025-12-22",
+    "open": 253.45,
+    "high": 255.55,
+    "low": 251.1,
+    "close": 252.3,
+    "delivery_vol": 130040,
+    "deliv_pct": 48.73
+  },
+  {
+    "time": "2025-12-23",
+    "open": 253.0,
+    "high": 255.35,
+    "low": 249.6,
+    "close": 253.85,
+    "delivery_vol": 75267,
+    "deliv_pct": 39.61
+  },
+  {
+    "time": "2025-12-24",
+    "open": 253.0,
+    "high": 260.15,
+    "low": 250.5,
+    "close": 251.55,
+    "delivery_vol": 255995,
+    "deliv_pct": 55.6
+  },
+  {
+    "time": "2025-12-25",
+    "open": 253.0,
+    "high": 260.15,
+    "low": 250.5,
+    "close": 251.55,
+    "delivery_vol": 255995,
+    "deliv_pct": 55.6
+  },
+  {
+    "time": "2025-12-26",
+    "open": 252.75,
+    "high": 257.9,
+    "low": 250.65,
+    "close": 252.1,
+    "delivery_vol": 259013,
+    "deliv_pct": 59.92
+  },
+  {
+    "time": "2025-12-29",
+    "open": 252.1,
+    "high": 254.85,
+    "low": 248.1,
+    "close": 250.25,
+    "delivery_vol": 182473,
+    "deliv_pct": 56.18
+  },
+  {
+    "time": "2025-12-30",
+    "open": 250.25,
+    "high": 251.0,
+    "low": 242.85,
+    "close": 248.3,
+    "delivery_vol": 212439,
+    "deliv_pct": 50.17
+  },
+  {
+    "time": "2025-12-31",
+    "open": 248.2,
+    "high": 252.0,
+    "low": 246.55,
+    "close": 249.35,
+    "delivery_vol": 113695,
+    "deliv_pct": 50.49
+  },
+  {
+    "time": "2026-01-01",
+    "open": 250.6,
+    "high": 258.59,
+    "low": 249.25,
+    "close": 250.19,
+    "delivery_vol": 249359,
+    "deliv_pct": 35.72
+  },
+  {
+    "time": "2026-01-02",
+    "open": 249.3,
+    "high": 261.5,
+    "low": 249.3,
+    "close": 259.45,
+    "delivery_vol": 463609,
+    "deliv_pct": 60.81
+  },
+  {
+    "time": "2026-01-05",
+    "open": 260.0,
+    "high": 262.12,
+    "low": 253.0,
+    "close": 257.37,
+    "delivery_vol": 261027,
+    "deliv_pct": 47.58
+  },
+  {
+    "time": "2026-01-06",
+    "open": 258.25,
+    "high": 268.0,
+    "low": 255.31,
+    "close": 266.84,
+    "delivery_vol": 677775,
+    "deliv_pct": 59.47
+  },
+  {
+    "time": "2026-01-07",
+    "open": 268.3,
+    "high": 269.51,
+    "low": 263.64,
+    "close": 266.14,
+    "delivery_vol": 242127,
+    "deliv_pct": 52.05
+  },
+  {
+    "time": "2026-01-08",
+    "open": 265.9,
+    "high": 265.9,
+    "low": 261.41,
+    "close": 264.03,
+    "delivery_vol": 549783,
+    "deliv_pct": 78.49
+  },
+  {
+    "time": "2026-01-09",
+    "open": 263.55,
+    "high": 264.55,
+    "low": 259.95,
+    "close": 260.62,
+    "delivery_vol": 388871,
+    "deliv_pct": 71.13
+  },
+  {
+    "time": "2026-01-12",
+    "open": 261.6,
+    "high": 262.27,
+    "low": 257.0,
+    "close": 259.12,
+    "delivery_vol": 489060,
+    "deliv_pct": 68.07
+  },
+  {
+    "time": "2026-01-13",
+    "open": 259.6,
+    "high": 263.65,
+    "low": 259.6,
+    "close": 262.8,
+    "delivery_vol": 209590,
+    "deliv_pct": 59.55
+  },
+  {
+    "time": "2026-01-14",
+    "open": 260.3,
+    "high": 269.7,
+    "low": 260.3,
+    "close": 264.76,
+    "delivery_vol": 631100,
+    "deliv_pct": 63.21
+  },
+  {
+    "time": "2026-01-15",
+    "open": 260.3,
+    "high": 269.7,
+    "low": 260.3,
+    "close": 264.76,
+    "delivery_vol": 631100,
+    "deliv_pct": 63.21
+  },
+  {
+    "time": "2026-01-16",
+    "open": 265.09,
+    "high": 270.0,
+    "low": 260.79,
+    "close": 265.45,
+    "delivery_vol": 402838,
+    "deliv_pct": 67.32
+  },
+  {
+    "time": "2026-01-19",
+    "open": 265.0,
+    "high": 266.57,
+    "low": 263.29,
+    "close": 263.5,
+    "delivery_vol": 201282,
+    "deliv_pct": 64.62
+  },
+  {
+    "time": "2026-01-20",
+    "open": 263.5,
+    "high": 263.66,
+    "low": 258.65,
+    "close": 259.9,
+    "delivery_vol": 497944,
+    "deliv_pct": 70.41
+  },
+  {
+    "time": "2026-01-21",
+    "open": 259.9,
+    "high": 272.45,
+    "low": 258.75,
+    "close": 268.14,
+    "delivery_vol": 772633,
+    "deliv_pct": 55.67
+  },
+  {
+    "time": "2026-01-22",
+    "open": 270.0,
+    "high": 280.38,
+    "low": 268.51,
+    "close": 276.87,
+    "delivery_vol": 1189602,
+    "deliv_pct": 57.53
+  },
+  {
+    "time": "2026-01-23",
+    "open": 276.87,
+    "high": 280.0,
+    "low": 271.5,
+    "close": 273.7,
+    "delivery_vol": 586695,
+    "deliv_pct": 59.34
+  },
+  {
+    "time": "2026-01-26",
+    "open": 276.87,
+    "high": 280.0,
+    "low": 271.5,
+    "close": 273.7,
+    "delivery_vol": 586695,
+    "deliv_pct": 59.34
+  },
+  {
+    "time": "2026-01-27",
+    "open": 273.0,
+    "high": 275.19,
+    "low": 257.01,
+    "close": 260.71,
+    "delivery_vol": 317652,
+    "deliv_pct": 51.86
+  },
+  {
+    "time": "2026-01-28",
+    "open": 260.71,
+    "high": 270.0,
+    "low": 258.39,
+    "close": 268.61,
+    "delivery_vol": 221130,
+    "deliv_pct": 48.96
+  },
+  {
+    "time": "2026-01-29",
+    "open": 266.0,
+    "high": 268.19,
+    "low": 261.0,
+    "close": 264.07,
+    "delivery_vol": 167657,
+    "deliv_pct": 54.66
+  },
+  {
+    "time": "2026-01-30",
+    "open": 263.0,
+    "high": 273.9,
+    "low": 258.14,
+    "close": 272.39,
+    "delivery_vol": 170737,
+    "deliv_pct": 41.89
+  },
+  {
+    "time": "2026-02-02",
+    "open": 255.85,
+    "high": 257.0,
+    "low": 227.9,
+    "close": 241.6,
+    "delivery_vol": 1036517,
+    "deliv_pct": 37.55
+  },
+  {
+    "time": "2026-02-03",
+    "open": 253.0,
+    "high": 261.0,
+    "low": 245.7,
+    "close": 254.3,
+    "delivery_vol": 341775,
+    "deliv_pct": 46.31
+  },
+  {
+    "time": "2026-02-04",
+    "open": 253.8,
+    "high": 256.6,
+    "low": 249.1,
+    "close": 253.85,
+    "delivery_vol": 194068,
+    "deliv_pct": 49.89
+  },
+  {
+    "time": "2026-02-05",
+    "open": 255.0,
+    "high": 264.05,
+    "low": 254.0,
+    "close": 256.55,
+    "delivery_vol": 193018,
+    "deliv_pct": 46.25
+  },
+  {
+    "time": "2026-02-06",
+    "open": 254.5,
+    "high": 259.4,
+    "low": 252.0,
+    "close": 255.85,
+    "delivery_vol": 99777,
+    "deliv_pct": 37.29
+  },
+  {
+    "time": "2026-02-09",
+    "open": 257.15,
+    "high": 263.05,
+    "low": 257.15,
+    "close": 262.3,
+    "delivery_vol": 141439,
+    "deliv_pct": 48.05
+  },
+  {
+    "time": "2026-02-10",
+    "open": 261.85,
+    "high": 262.65,
+    "low": 256.85,
+    "close": 259.65,
+    "delivery_vol": 144126,
+    "deliv_pct": 61.05
+  },
+  {
+    "time": "2026-02-11",
+    "open": 259.75,
+    "high": 260.05,
+    "low": 253.2,
+    "close": 254.4,
+    "delivery_vol": 114492,
+    "deliv_pct": 62.72
+  },
+  {
+    "time": "2026-02-12",
+    "open": 255.0,
+    "high": 256.25,
+    "low": 249.25,
+    "close": 251.15,
+    "delivery_vol": 86625,
+    "deliv_pct": 50.03
+  },
+  {
+    "time": "2026-02-13",
+    "open": 251.0,
+    "high": 255.5,
+    "low": 245.95,
+    "close": 252.05,
+    "delivery_vol": 115894,
+    "deliv_pct": 44.26
+  },
+  {
+    "time": "2026-02-16",
+    "open": 248.7,
+    "high": 255.45,
+    "low": 247.75,
+    "close": 253.2,
+    "delivery_vol": 159591,
+    "deliv_pct": 53.18
+  },
+  {
+    "time": "2026-02-17",
+    "open": 254.45,
+    "high": 260.35,
+    "low": 248.0,
+    "close": 251.5,
+    "delivery_vol": 358637,
+    "deliv_pct": 57.82
+  },
+  {
+    "time": "2026-02-18",
+    "open": 251.0,
+    "high": 259.65,
+    "low": 249.45,
+    "close": 257.65,
+    "delivery_vol": 211100,
+    "deliv_pct": 53.27
+  },
+  {
+    "time": "2026-02-19",
+    "open": 258.9,
+    "high": 259.55,
+    "low": 249.15,
+    "close": 250.55,
+    "delivery_vol": 170704,
+    "deliv_pct": 51.2
+  },
+  {
+    "time": "2026-02-20",
+    "open": 250.55,
+    "high": 252.1,
+    "low": 246.5,
+    "close": 250.6,
+    "delivery_vol": 110427,
+    "deliv_pct": 42.39
+  },
+  {
+    "time": "2026-02-23",
+    "open": 255.9,
+    "high": 255.9,
+    "low": 244.25,
+    "close": 246.0,
+    "delivery_vol": 132004,
+    "deliv_pct": 57.81
+  },
+  {
+    "time": "2026-02-24",
+    "open": 247.3,
+    "high": 256.0,
+    "low": 247.3,
+    "close": 253.9,
+    "delivery_vol": 345868,
+    "deliv_pct": 37.08
+  },
+  {
+    "time": "2026-02-25",
+    "open": 258.0,
+    "high": 260.7,
+    "low": 254.85,
+    "close": 255.95,
+    "delivery_vol": 188370,
+    "deliv_pct": 49.7
+  },
+  {
+    "time": "2026-02-26",
+    "open": 258.0,
+    "high": 259.95,
+    "low": 252.0,
+    "close": 254.0,
+    "delivery_vol": 179961,
+    "deliv_pct": 53.91
+  },
+  {
+    "time": "2026-02-27",
+    "open": 256.55,
+    "high": 256.55,
+    "low": 250.4,
+    "close": 252.05,
+    "delivery_vol": 67877,
+    "deliv_pct": 43.32
+  },
+  {
+    "time": "2026-03-02",
+    "open": 240.0,
+    "high": 251.0,
+    "low": 240.0,
+    "close": 248.3,
+    "delivery_vol": 176898,
+    "deliv_pct": 52.78
+  },
+  {
+    "time": "2026-03-03",
+    "open": 240.0,
+    "high": 251.0,
+    "low": 240.0,
+    "close": 248.3,
+    "delivery_vol": 176898,
+    "deliv_pct": 52.78
+  },
+  {
+    "time": "2026-03-04",
+    "open": 245.0,
+    "high": 245.1,
+    "low": 236.2,
+    "close": 240.0,
+    "delivery_vol": 242203,
+    "deliv_pct": 56.01
+  },
+  {
+    "time": "2026-03-05",
+    "open": 241.0,
+    "high": 249.1,
+    "low": 238.7,
+    "close": 240.65,
+    "delivery_vol": 79295,
+    "deliv_pct": 33.29
+  },
+  {
+    "time": "2026-03-06",
+    "open": 242.6,
+    "high": 242.6,
+    "low": 236.75,
+    "close": 239.95,
+    "delivery_vol": 152513,
+    "deliv_pct": 55.23
+  },
+  {
+    "time": "2026-03-09",
+    "open": 236.0,
+    "high": 236.25,
+    "low": 227.0,
+    "close": 232.3,
+    "delivery_vol": 238292,
+    "deliv_pct": 54.18
+  },
+  {
+    "time": "2026-03-10",
+    "open": 236.9,
+    "high": 247.65,
+    "low": 232.4,
+    "close": 244.85,
+    "delivery_vol": 87197,
+    "deliv_pct": 45.59
+  },
+  {
+    "time": "2026-03-11",
+    "open": 248.0,
+    "high": 248.0,
+    "low": 241.0,
+    "close": 242.4,
+    "delivery_vol": 106525,
+    "deliv_pct": 49.68
+  },
+  {
+    "time": "2026-03-12",
+    "open": 230.0,
+    "high": 238.95,
+    "low": 230.0,
+    "close": 233.25,
+    "delivery_vol": 306314,
+    "deliv_pct": 53.55
+  },
+  {
+    "time": "2026-03-13",
+    "open": 234.1,
+    "high": 234.1,
+    "low": 220.35,
+    "close": 222.85,
+    "delivery_vol": 197637,
+    "deliv_pct": 56.34
+  },
+  {
+    "time": "2026-03-16",
+    "open": 222.85,
+    "high": 226.25,
+    "low": 212.15,
+    "close": 214.0,
+    "delivery_vol": 443440,
+    "deliv_pct": 56.38
+  },
+  {
+    "time": "2026-03-17",
+    "open": 214.9,
+    "high": 223.5,
+    "low": 211.6,
+    "close": 217.55,
+    "delivery_vol": 403057,
+    "deliv_pct": 58.45
+  },
+  {
+    "time": "2026-03-18",
+    "open": 219.0,
+    "high": 230.4,
+    "low": 217.2,
+    "close": 228.8,
+    "delivery_vol": 391660,
+    "deliv_pct": 68.39
+  },
+  {
+    "time": "2026-03-19",
+    "open": 224.0,
+    "high": 232.95,
+    "low": 222.5,
+    "close": 226.9,
+    "delivery_vol": 340142,
+    "deliv_pct": 61.77
+  },
+  {
+    "time": "2026-03-20",
+    "open": 227.0,
+    "high": 236.5,
+    "low": 225.55,
+    "close": 234.25,
+    "delivery_vol": 200748,
+    "deliv_pct": 55.89
+  },
+  {
+    "time": "2026-03-23",
+    "open": 231.1,
+    "high": 231.1,
+    "low": 219.0,
+    "close": 220.9,
+    "delivery_vol": 349372,
+    "deliv_pct": 56.65
+  },
+  {
+    "time": "2026-03-24",
+    "open": 228.1,
+    "high": 235.0,
+    "low": 218.45,
+    "close": 219.8,
+    "delivery_vol": 314678,
+    "deliv_pct": 57.4
+  },
+  {
+    "time": "2026-03-25",
+    "open": 222.4,
+    "high": 228.9,
+    "low": 219.8,
+    "close": 223.0,
+    "delivery_vol": 311875,
+    "deliv_pct": 58.86
+  },
+  {
+    "time": "2026-03-26",
+    "open": 222.4,
+    "high": 228.9,
+    "low": 219.8,
+    "close": 223.0,
+    "delivery_vol": 311875,
+    "deliv_pct": 58.86
+  },
+  {
+    "time": "2026-03-27",
+    "open": 219.65,
+    "high": 223.1,
+    "low": 211.2,
+    "close": 212.15,
+    "delivery_vol": 326659,
+    "deliv_pct": 59.02
+  },
+  {
+    "time": "2026-03-30",
+    "open": 211.6,
+    "high": 219.3,
+    "low": 206.0,
+    "close": 206.85,
+    "delivery_vol": 490601,
+    "deliv_pct": 51.92
+  },
+  {
+    "time": "2026-03-31",
+    "open": 211.6,
+    "high": 219.3,
+    "low": 206.0,
+    "close": 206.85,
+    "delivery_vol": 490601,
+    "deliv_pct": 51.92
+  },
+  {
+    "time": "2026-04-01",
+    "open": 213.95,
+    "high": 220.52,
+    "low": 213.05,
+    "close": 216.95,
+    "delivery_vol": 353154,
+    "deliv_pct": 55.9
+  },
+  {
+    "time": "2026-04-02",
+    "open": 213.0,
+    "high": 221.15,
+    "low": 208.11,
+    "close": 220.04,
+    "delivery_vol": 120622,
+    "deliv_pct": 39.82
+  },
+  {
+    "time": "2026-04-03",
+    "open": 213.0,
+    "high": 221.15,
+    "low": 208.11,
+    "close": 220.04,
+    "delivery_vol": 120622,
+    "deliv_pct": 39.82
+  },
+  {
+    "time": "2026-04-06",
+    "open": 220.1,
+    "high": 226.09,
+    "low": 216.91,
+    "close": 225.14,
+    "delivery_vol": 148384,
+    "deliv_pct": 41.36
+  },
+  {
+    "time": "2026-04-07",
+    "open": 223.0,
+    "high": 233.2,
+    "low": 221.5,
+    "close": 228.46,
+    "delivery_vol": 169453,
+    "deliv_pct": 52.07
+  },
+  {
+    "time": "2026-04-08",
+    "open": 239.1,
+    "high": 240.0,
+    "low": 234.04,
+    "close": 237.28,
+    "delivery_vol": 248048,
+    "deliv_pct": 62.75
+  },
+  {
+    "time": "2026-04-09",
+    "open": 239.0,
+    "high": 242.04,
+    "low": 233.0,
+    "close": 234.6,
+    "delivery_vol": 91164,
+    "deliv_pct": 44.76
+  },
+  {
+    "time": "2026-04-10",
+    "open": 235.5,
+    "high": 240.0,
+    "low": 235.5,
+    "close": 238.42,
+    "delivery_vol": 116318,
+    "deliv_pct": 60.29
+  },
+  {
+    "time": "2026-04-13",
+    "open": 233.2,
+    "high": 237.68,
+    "low": 230.0,
+    "close": 235.83,
+    "delivery_vol": 133536,
+    "deliv_pct": 51.02
+  },
+  {
+    "time": "2026-04-14",
+    "open": 233.2,
+    "high": 237.68,
+    "low": 230.0,
+    "close": 235.83,
+    "delivery_vol": 133536,
+    "deliv_pct": 51.02
+  },
+  {
+    "time": "2026-04-15",
+    "open": 238.0,
+    "high": 242.9,
+    "low": 236.14,
+    "close": 239.44,
+    "delivery_vol": 312382,
+    "deliv_pct": 54.81
+  },
+  {
+    "time": "2026-04-16",
+    "open": 240.02,
+    "high": 244.0,
+    "low": 240.0,
+    "close": 242.02,
+    "delivery_vol": 87438,
+    "deliv_pct": 45.56
+  },
+  {
+    "time": "2026-04-17",
+    "open": 244.79,
+    "high": 244.79,
+    "low": 238.61,
+    "close": 242.13,
+    "delivery_vol": 129576,
+    "deliv_pct": 55.99
+  },
+  {
+    "time": "2026-04-20",
+    "open": 243.12,
+    "high": 243.13,
+    "low": 238.61,
+    "close": 240.02,
+    "delivery_vol": 75265,
+    "deliv_pct": 47.57
+  },
+  {
+    "time": "2026-04-21",
+    "open": 241.21,
+    "high": 244.09,
+    "low": 237.0,
+    "close": 239.43,
+    "delivery_vol": 211470,
+    "deliv_pct": 62.93
+  },
+  {
+    "time": "2026-04-22",
+    "open": 239.43,
+    "high": 249.5,
+    "low": 239.43,
+    "close": 248.03,
+    "delivery_vol": 355514,
+    "deliv_pct": 58.08
+  },
+  {
+    "time": "2026-04-23",
+    "open": 248.02,
+    "high": 259.45,
+    "low": 245.0,
+    "close": 257.34,
+    "delivery_vol": 274975,
+    "deliv_pct": 48.49
+  },
+  {
+    "time": "2026-04-24",
+    "open": 257.99,
+    "high": 260.0,
+    "low": 252.09,
+    "close": 256.89,
+    "delivery_vol": 218448,
+    "deliv_pct": 56.5
+  },
+  {
+    "time": "2026-04-27",
+    "open": 257.0,
+    "high": 264.3,
+    "low": 254.11,
+    "close": 263.26,
+    "delivery_vol": 259365,
+    "deliv_pct": 53.56
+  },
+  {
+    "time": "2026-04-28",
+    "open": 261.46,
+    "high": 263.0,
+    "low": 258.2,
+    "close": 261.31,
+    "delivery_vol": 119879,
+    "deliv_pct": 56.08
+  },
+  {
+    "time": "2026-04-29",
+    "open": 261.5,
+    "high": 262.77,
+    "low": 256.5,
+    "close": 257.81,
+    "delivery_vol": 182093,
+    "deliv_pct": 59.55
+  },
+  {
+    "time": "2026-04-30",
+    "open": 257.81,
+    "high": 263.95,
+    "low": 251.0,
+    "close": 262.13,
+    "delivery_vol": 158890,
+    "deliv_pct": 39.35
+  },
+  {
+    "time": "2026-05-01",
+    "open": 257.81,
+    "high": 263.95,
+    "low": 251.0,
+    "close": 262.13,
+    "delivery_vol": 158890,
+    "deliv_pct": 39.35
+  },
+  {
+    "time": "2026-05-04",
+    "open": 261.25,
+    "high": 264.2,
+    "low": 258.6,
+    "close": 262.35,
+    "delivery_vol": 104170,
+    "deliv_pct": 47.33
+  },
+  {
+    "time": "2026-05-05",
+    "open": 258.3,
+    "high": 278.4,
+    "low": 256.3,
+    "close": 272.9,
+    "delivery_vol": 388445,
+    "deliv_pct": 42.23
+  },
+  {
+    "time": "2026-05-06",
+    "open": 277.0,
+    "high": 288.0,
+    "low": 274.4,
+    "close": 286.7,
+    "delivery_vol": 517420,
+    "deliv_pct": 51.74
+  },
+  {
+    "time": "2026-05-07",
+    "open": 289.9,
+    "high": 293.25,
+    "low": 281.0,
+    "close": 284.55,
+    "delivery_vol": 443412,
+    "deliv_pct": 52.06
+  },
+  {
+    "time": "2026-05-08",
+    "open": 284.3,
+    "high": 292.8,
+    "low": 284.3,
+    "close": 287.3,
+    "delivery_vol": 371198,
+    "deliv_pct": 56.93
+  },
+  {
+    "time": "2026-05-11",
+    "open": 302.6,
+    "high": 321.7,
+    "low": 301.4,
+    "close": 310.75,
+    "delivery_vol": 2668279,
+    "deliv_pct": 28.83
+  },
+  {
+    "time": "2026-05-12",
+    "open": 313.3,
+    "high": 318.15,
+    "low": 294.1,
+    "close": 296.15,
+    "delivery_vol": 759797,
+    "deliv_pct": 49.02
+  },
+  {
+    "time": "2026-05-13",
+    "open": 297.05,
+    "high": 302.0,
+    "low": 284.95,
+    "close": 289.95,
+    "delivery_vol": 598861,
+    "deliv_pct": 46.41
+  },
+  {
+    "time": "2026-05-14",
+    "open": 292.8,
+    "high": 299.2,
+    "low": 282.75,
+    "close": 289.4,
+    "delivery_vol": 387308,
+    "deliv_pct": 50.71
+  },
+  {
+    "time": "2026-05-15",
+    "open": 296.3,
+    "high": 296.3,
+    "low": 279.0,
+    "close": 281.2,
+    "delivery_vol": 396462,
+    "deliv_pct": 47.83
+  },
+  {
+    "time": "2026-05-18",
+    "open": 277.1,
+    "high": 278.1,
+    "low": 269.2,
+    "close": 273.65,
+    "delivery_vol": 367128,
+    "deliv_pct": 48.43
+  },
+  {
+    "time": "2026-05-19",
+    "open": 273.8,
+    "high": 281.25,
+    "low": 273.4,
+    "close": 275.15,
+    "delivery_vol": 269973,
+    "deliv_pct": 48.97
+  },
+  {
+    "time": "2026-05-20",
+    "open": 275.25,
+    "high": 280.0,
+    "low": 273.85,
+    "close": 275.85,
+    "delivery_vol": 478932,
+    "deliv_pct": 52.91
+  },
+  {
+    "time": "2026-05-21",
+    "open": 278.8,
+    "high": 292.9,
+    "low": 276.85,
+    "close": 289.05,
+    "delivery_vol": 801698,
+    "deliv_pct": 53.83
+  },
+  {
+    "time": "2026-05-22",
+    "open": 291.9,
+    "high": 291.9,
+    "low": 279.15,
+    "close": 280.5,
+    "delivery_vol": 245785,
+    "deliv_pct": 52.96
+  },
+  {
+    "time": "2026-05-25",
+    "open": 284.0,
+    "high": 291.85,
+    "low": 281.45,
+    "close": 286.6,
+    "delivery_vol": 319970,
+    "deliv_pct": 55.14
+  },
+  {
+    "time": "2026-05-26",
+    "open": 286.0,
+    "high": 290.5,
+    "low": 279.05,
+    "close": 281.85,
+    "delivery_vol": 199311,
+    "deliv_pct": 58.54
+  },
+  {
+    "time": "2026-05-27",
+    "open": 280.2,
+    "high": 283.35,
+    "low": 277.8,
+    "close": 282.1,
+    "delivery_vol": 160397,
+    "deliv_pct": 53.62
+  },
+  {
+    "time": "2026-05-28",
+    "open": 280.2,
+    "high": 283.35,
+    "low": 277.8,
+    "close": 282.1,
+    "delivery_vol": 160397,
+    "deliv_pct": 53.62
+  },
+  {
+    "time": "2026-05-29",
+    "open": 283.0,
+    "high": 290.0,
+    "low": 275.1,
+    "close": 281.6,
+    "delivery_vol": 319192,
+    "deliv_pct": 58.34
+  },
+  {
+    "time": "2026-06-01",
+    "open": 281.0,
+    "high": 287.05,
+    "low": 273.1,
+    "close": 278.05,
+    "delivery_vol": 179546,
+    "deliv_pct": 45.7
+  },
+  {
+    "time": "2026-06-02",
+    "open": 278.85,
+    "high": 289.6,
+    "low": 274.1,
+    "close": 287.4,
+    "delivery_vol": 229419,
+    "deliv_pct": 45.42
+  },
+  {
+    "time": "2026-06-03",
+    "open": 288.0,
+    "high": 298.95,
+    "low": 280.0,
+    "close": 293.05,
+    "delivery_vol": 563617,
+    "deliv_pct": 54.06
+  },
+  {
+    "time": "2026-06-04",
+    "open": 294.0,
+    "high": 297.95,
+    "low": 288.0,
+    "close": 290.3,
+    "delivery_vol": 609150,
+    "deliv_pct": 57.94
+  },
+  {
+    "time": "2026-06-05",
+    "open": 292.95,
+    "high": 305.0,
+    "low": 290.5,
+    "close": 296.85,
+    "delivery_vol": 544201,
+    "deliv_pct": 42.72
+  },
+  {
+    "time": "2026-06-08",
+    "open": 292.85,
+    "high": 297.45,
+    "low": 283.1,
+    "close": 285.85,
+    "delivery_vol": 254495,
+    "deliv_pct": 49.25
+  },
+  {
+    "time": "2026-06-09",
+    "open": 286.5,
+    "high": 304.0,
+    "low": 285.9,
+    "close": 299.95,
+    "delivery_vol": 349079,
+    "deliv_pct": 49.61
+  },
+  {
+    "time": "2026-06-10",
+    "open": 299.95,
+    "high": 301.45,
+    "low": 285.0,
+    "close": 287.4,
+    "delivery_vol": 266335,
+    "deliv_pct": 56.33
+  },
+  {
+    "time": "2026-06-11",
+    "open": 285.25,
+    "high": 287.4,
+    "low": 275.95,
+    "close": 277.65,
+    "delivery_vol": 168219,
+    "deliv_pct": 50.32
+  },
+  {
+    "time": "2026-06-12",
+    "open": 281.1,
+    "high": 292.05,
+    "low": 278.3,
+    "close": 289.45,
+    "delivery_vol": 249666,
+    "deliv_pct": 43.65
+  },
+  {
+    "time": "2026-06-15",
+    "open": 296.0,
+    "high": 298.85,
+    "low": 291.9,
+    "close": 294.9,
+    "delivery_vol": 297118,
+    "deliv_pct": 55.88
+  },
+  {
+    "time": "2026-06-16",
+    "open": 298.15,
+    "high": 305.0,
+    "low": 295.0,
+    "close": 298.75,
+    "delivery_vol": 277345,
+    "deliv_pct": 41.43
+  },
+  {
+    "time": "2026-06-17",
+    "open": 300.0,
+    "high": 302.7,
+    "low": 294.3,
+    "close": 295.7,
+    "delivery_vol": 157499,
+    "deliv_pct": 55.62
+  },
+  {
+    "time": "2026-06-18",
+    "open": 297.9,
+    "high": 299.0,
+    "low": 292.75,
+    "close": 295.05,
+    "delivery_vol": 284582,
+    "deliv_pct": 57.88
+  },
+  {
+    "time": "2026-06-19",
+    "open": 295.05,
+    "high": 298.4,
+    "low": 292.1,
+    "close": 295.05,
+    "delivery_vol": 97388,
+    "deliv_pct": 46.62
+  },
+  {
+    "time": "2026-06-22",
+    "open": 295.0,
+    "high": 302.0,
+    "low": 294.05,
+    "close": 297.7,
+    "delivery_vol": 201630,
+    "deliv_pct": 48.7
+  },
+  {
+    "time": "2026-06-23",
+    "open": 298.9,
+    "high": 298.9,
+    "low": 287.55,
+    "close": 290.9,
+    "delivery_vol": 228259,
+    "deliv_pct": 54.23
+  },
+  {
+    "time": "2026-06-24",
+    "open": 288.0,
+    "high": 298.0,
+    "low": 288.0,
+    "close": 294.9,
+    "delivery_vol": 234017,
+    "deliv_pct": 59.16
+  },
+  {
+    "time": "2026-06-25",
+    "open": 295.9,
+    "high": 308.8,
+    "low": 287.05,
+    "close": 288.1,
+    "delivery_vol": 450057,
+    "deliv_pct": 34.02
+  },
+  {
+    "time": "2026-06-26",
+    "open": 295.9,
+    "high": 308.8,
+    "low": 287.05,
+    "close": 288.1,
+    "delivery_vol": 450057,
+    "deliv_pct": 34.02
+  },
+  {
+    "time": "2026-06-29",
+    "open": 289.9,
+    "high": 305.8,
+    "low": 289.9,
+    "close": 292.6,
+    "delivery_vol": 441536,
+    "deliv_pct": 40.94
+  },
+  {
+    "time": "2026-06-30",
+    "open": 294.95,
+    "high": 303.9,
+    "low": 292.5,
+    "close": 298.1,
+    "delivery_vol": 260281,
+    "deliv_pct": 48.56
+  },
+  {
+    "time": "2026-07-01",
+    "open": 298.3,
+    "high": 312.0,
+    "low": 298.3,
+    "close": 304.15,
+    "delivery_vol": 500826,
+    "deliv_pct": 41.59
+  },
+  {
+    "time": "2026-07-02",
+    "open": 306.0,
+    "high": 316.4,
+    "low": 302.95,
+    "close": 310.2,
+    "delivery_vol": 599278,
+    "deliv_pct": 48.03
+  },
+  {
+    "time": "2026-07-03",
+    "open": 314.7,
+    "high": 314.7,
+    "low": 304.05,
+    "close": 307.25,
+    "delivery_vol": 206378,
+    "deliv_pct": 45.16
+  },
+  {
+    "time": "2026-07-06",
+    "open": 310.0,
+    "high": 312.4,
+    "low": 306.3,
+    "close": 309.55,
+    "delivery_vol": 230380,
+    "deliv_pct": 53.17
+  },
+  {
+    "time": "2026-07-07",
+    "open": 308.4,
+    "high": 311.7,
+    "low": 301.4,
+    "close": 304.65,
+    "delivery_vol": 156186,
+    "deliv_pct": 51.24
+  },
+  {
+    "time": "2026-07-08",
+    "open": 304.75,
+    "high": 309.0,
+    "low": 292.55,
+    "close": 296.35,
+    "delivery_vol": 239373,
+    "deliv_pct": 52.56
+  },
+  {
+    "time": "2026-07-09",
+    "open": 300.0,
+    "high": 311.0,
+    "low": 297.5,
+    "close": 307.85,
+    "delivery_vol": 246023,
+    "deliv_pct": 48.01
+  },
+  {
+    "time": "2026-07-10",
+    "open": 309.0,
+    "high": 328.0,
+    "low": 309.0,
+    "close": 325.3,
+    "delivery_vol": 1251298,
+    "deliv_pct": 58.21
+  },
+  {
+    "time": "2026-07-13",
+    "open": 326.45,
+    "high": 334.0,
+    "low": 323.0,
+    "close": 324.95,
+    "delivery_vol": 770427,
+    "deliv_pct": 46.08
+  },
+  {
+    "time": "2026-07-14",
+    "open": 325.5,
+    "high": 328.25,
+    "low": 315.15,
+    "close": 318.9,
+    "delivery_vol": 314665,
+    "deliv_pct": 50.05
+  },
+  {
+    "time": "2026-07-15",
+    "open": 321.0,
+    "high": 327.3,
+    "low": 312.35,
+    "close": 317.1,
+    "delivery_vol": 400898,
+    "deliv_pct": 56.15
+  },
+  {
+    "time": "2026-07-16",
+    "open": 317.0,
+    "high": 319.95,
+    "low": 311.55,
+    "close": 314.3,
+    "delivery_vol": 178160,
+    "deliv_pct": 59.02
+  },
+  {
+    "time": "2026-07-17",
+    "open": 314.3,
+    "high": 315.7,
+    "low": 297.7,
+    "close": 301.6,
+    "delivery_vol": 668690,
+    "deliv_pct": 53.28
+  },
+  {
+    "time": "2026-07-20",
+    "open": 300.0,
+    "high": 307.95,
+    "low": 298.55,
+    "close": 305.3,
+    "delivery_vol": 516172,
+    "deliv_pct": 60.74
+  },
+  {
+    "time": "2026-07-21",
+    "open": 304.4,
+    "high": 312.0,
+    "low": 304.1,
+    "close": 305.75,
+    "delivery_vol": 387206,
+    "deliv_pct": 40.56
+  },
+  {
+    "time": "2026-07-22",
+    "open": 306.9,
+    "high": 309.5,
+    "low": 297.0,
+    "close": 299.7,
+    "delivery_vol": 837906,
+    "deliv_pct": 68.03
+  },
+  {
+    "time": "2026-07-23",
+    "open": 299.0,
+    "high": 302.0,
+    "low": 292.15,
+    "close": 296.95,
+    "delivery_vol": 483208,
+    "deliv_pct": 56.82
+  },
+  {
+    "time": "2026-07-24",
+    "open": 295.9,
+    "high": 301.1,
+    "low": 291.6,
+    "close": 299.4,
+    "delivery_vol": 216530,
+    "deliv_pct": 50.32
+  },
+  {
+    "time": "2026-07-27",
+    "open": 304.4,
+    "high": 310.0,
+    "low": 296.0,
+    "close": 300.1,
+    "delivery_vol": 736448,
+    "deliv_pct": 62.52
+  },
+  {
+    "time": "2026-07-28",
+    "open": 300.0,
+    "high": 300.1,
+    "low": 278.6,
+    "close": 285.35,
+    "delivery_vol": 1443892,
+    "deliv_pct": 47.21
+  },
+  {
+    "time": "2026-07-29",
+    "open": 285.35,
+    "high": 290.95,
+    "low": 281.15,
+    "close": 288.8,
+    "delivery_vol": 454193,
+    "deliv_pct": 53.43
+  },
+  {
+    "time": "2026-07-30",
+    "open": 289.9,
+    "high": 289.9,
+    "low": 283.15,
+    "close": 285.9,
+    "delivery_vol": 301847,
+    "deliv_pct": 52.8
+  },
+  {
+    "time": "2026-07-31",
+    "open": 286.0,
+    "high": 292.8,
+    "low": 285.0,
+    "close": 287.0,
+    "delivery_vol": 324162,
+    "deliv_pct": 56.01
+  },
+  {
+    "time": "2026-08-03",
+    "open": 290.0,
+    "high": 295.6,
+    "low": 282.0,
+    "close": 284.65,
+    "delivery_vol": 361655,
+    "deliv_pct": 60.55
+  },
+  {
+    "time": "2026-08-04",
+    "open": 284.15,
+    "high": 289.2,
+    "low": 281.85,
+    "close": 285.05,
+    "delivery_vol": 295879,
+    "deliv_pct": 56.48
+  },
+  {
+    "time": "2026-08-05",
+    "open": 285.05,
+    "high": 287.9,
+    "low": 282.0,
+    "close": 285.15,
+    "delivery_vol": 249497,
+    "deliv_pct": 54.07
+  },
+  {
+    "time": "2026-08-06",
+    "open": 285.25,
+    "high": 287.9,
+    "low": 278.8,
+    "close": 280.4,
+    "delivery_vol": 213335,
+    "deliv_pct": 57.14
+  },
+  {
+    "time": "2026-08-07",
+    "open": 280.4,
+    "high": 282.1,
+    "low": 273.15,
+    "close": 276.25,
+    "delivery_vol": 275415,
+    "deliv_pct": 58.13
+  },
+  {
+    "time": "2026-08-10",
+    "open": 279.8,
+    "high": 289.35,
+    "low": 277.45,
+    "close": 285.35,
+    "delivery_vol": 350221,
+    "deliv_pct": 55.41
+  },
+  {
+    "time": "2026-08-11",
+    "open": 285.95,
+    "high": 287.7,
+    "low": 281.0,
+    "close": 282.3,
+    "delivery_vol": 324154,
+    "deliv_pct": 57.62
+  },
+  {
+    "time": "2026-08-12",
+    "open": 283.2,
+    "high": 287.45,
+    "low": 280.8,
+    "close": 284.2,
+    "delivery_vol": 218496,
+    "deliv_pct": 53.85
+  },
+  {
+    "time": "2026-08-13",
+    "open": 284.0,
+    "high": 288.8,
+    "low": 283.0,
+    "close": 286.5,
+    "delivery_vol": 393544,
+    "deliv_pct": 61.34
+  },
+  {
+    "time": "2026-08-14",
+    "open": 285.0,
+    "high": 288.4,
+    "low": 280.05,
+    "close": 281.35,
+    "delivery_vol": 237069,
+    "deliv_pct": 58.8
+  },
+  {
+    "time": "2026-08-17",
+    "open": 280.0,
+    "high": 280.95,
+    "low": 275.85,
+    "close": 278.7,
+    "delivery_vol": 222141,
+    "deliv_pct": 55.47
+  },
+  {
+    "time": "2026-08-18",
+    "open": 278.4,
+    "high": 295.0,
+    "low": 276.5,
+    "close": 289.2,
+    "delivery_vol": 600356,
+    "deliv_pct": 61.58
+  },
+  {
+    "time": "2026-08-19",
+    "open": 289.2,
+    "high": 289.95,
+    "low": 282.3,
+    "close": 284.35,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2026-08-20",
+    "open": 286.0,
+    "high": 293.8,
+    "low": 282.0,
+    "close": 292.6,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2026-08-21",
+    "open": 292.6,
+    "high": 297.9,
+    "low": 286.5,
+    "close": 288.35,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2026-08-24",
+    "open": 289.05,
+    "high": 290.7,
+    "low": 282.95,
+    "close": 284.35,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2026-08-25",
+    "open": 282.55,
+    "high": 294.4,
+    "low": 282.55,
+    "close": 291.65,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2026-08-26",
+    "open": 293.75,
+    "high": 298.15,
+    "low": 284.0,
+    "close": 293.5,
+    "volume": 0.0,
+    "delivery_vol": 0.0,
+    "deliv_pct": 0.0
+  }
+]
