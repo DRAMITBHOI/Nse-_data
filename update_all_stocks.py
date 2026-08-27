@@ -17,47 +17,26 @@ HEADERS = {
     "Referer": "https://www.nseindia.com/"
 }
 
-def get_latest_recorded_date():
-    files = [
-        f for f in os.listdir(DATA_DIR) 
-        if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", 
-            "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
-        ]
-    ]
-    if not files:
-        return datetime.date.today() - datetime.timedelta(days=15)
-    
-    dates = []
-    for f in files[:40]:
-        try:
-            with open(os.path.join(DATA_DIR, f), "r") as fp:
-                raw = json.load(fp)
-                if isinstance(raw, list) and len(raw) > 0 and isinstance(raw[-1], dict):
-                    dates.append(raw[-1].get("time"))
-        except Exception:
-            continue
-    valid_dates = [d for d in dates if d]
-    if valid_dates:
-        return datetime.datetime.strptime(max(valid_dates), "%Y-%m-%d").date()
-    return datetime.date.today() - datetime.timedelta(days=15)
+def get_repair_start_date():
+    """Starts repair from 2026-08-19 to fix the flat 0-volume days."""
+    return datetime.date(2026, 8, 19)
 
-def download_nse_session_data(session, target_date):
-    """Fetches daily bhavcopy using established NSE cookies across archive URLs."""
-    d_str = target_date.strftime("%d%m%Y")
+def download_nse_complete_delivery_data(session, target_date):
+    """Downloads official daily NSE Delivery & Price Bhavdata."""
+    d_mto = target_date.strftime("%d%m%Y")
     d_udiff = target_date.strftime("%Y%m%d")
     
+    # Priority order: Combined Delivery Bhavdata > Separate MTO + Bhavcopy
     urls = [
-        f"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_{d_udiff}_F_0000.csv.zip",
-        f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{d_str}.csv",
-        f"https://archives.nseindia.com/products/content/sec_bhavdata_full_{d_str}.csv"
+        f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{d_mto}.csv",
+        f"https://archives.nseindia.com/products/content/sec_bhavdata_full_{d_mto}.csv",
+        f"https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_{d_udiff}_F_0000.csv.zip"
     ]
 
     for url in urls:
         try:
-            resp = session.get(url, timeout=20)
-            if resp.status_code == 200 and len(resp.content) > 1500:
+            resp = session.get(url, timeout=25)
+            if resp.status_code == 200 and len(resp.content) > 2000:
                 if url.endswith(".zip"):
                     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
                         csv_name = z.namelist()[0]
@@ -74,9 +53,9 @@ def download_nse_session_data(session, target_date):
                 opn_col = next((c for c in ["OPEN_PRICE", "OPEN", "OPNPRIC"] if c in df.columns), None)
                 hgh_col = next((c for c in ["HIGH_PRICE", "HIGH", "HGHPRIC"] if c in df.columns), None)
                 low_col = next((c for c in ["LOW_PRICE", "LOW", "LWPRIC"] if c in df.columns), None)
-                vol_col = next((c for c in ["TTL_TRD_QNTY", "VOLUME", "TTLTRADEDQTY"] if c in df.columns), None)
-                dlv_col = next((c for c in ["DELIV_QTY", "DELIVERY_QTY", "DLVRYQTY"] if c in df.columns), None)
-                pct_col = next((c for c in ["DELIV_PER", "DELIVERY_PCT", "DLVRYPER"] if c in df.columns), None)
+                vol_col = next((c for c in ["TTL_TRD_QNTY", "TTL_TRADG_VOL", "VOLUME", "TTLTRADEDQTY", "TTL_TRADED_QTY"] if c in df.columns), None)
+                dlv_col = next((c for c in ["DELIV_QTY", "DELIVERY_QTY", "DLVRYQTY", "DLVRY_QTY"] if c in df.columns), None)
+                pct_col = next((c for c in ["DELIV_PER", "DELIVERY_PCT", "DLVRYPER", "DLVRY_PER"] if c in df.columns), None)
 
                 if not (sym_col and cls_col):
                     continue
@@ -95,10 +74,10 @@ def download_nse_session_data(session, target_date):
                         tot_vol = float(row[vol_col]) if vol_col else 0.0
 
                         d_raw = str(row.get(dlv_col, "")).strip().replace("-", "") if dlv_col else ""
-                        d_vol = float(d_raw) if d_raw and d_raw.lower() != "nan" else tot_vol
+                        d_vol = float(d_raw) if (d_raw and d_raw.lower() != "nan") else tot_vol
 
                         p_raw = str(row.get(pct_col, "")).strip().replace("-", "") if pct_col else ""
-                        d_pct = float(p_raw) if p_raw and p_raw.lower() != "nan" else (round((d_vol / tot_vol) * 100, 1) if tot_vol > 0 else 0.0)
+                        d_pct = float(p_raw) if (p_raw and p_raw.lower() != "nan") else (round((d_vol / tot_vol) * 100, 1) if tot_vol > 0 else 0.0)
 
                         day_records[sym] = {
                             "time": target_date.strftime("%Y-%m-%d"),
@@ -123,7 +102,6 @@ def update_all_stocks():
     session = requests.Session()
     session.headers.update(HEADERS)
 
-    # Establish initial session with NSE to capture cookies
     try:
         session.get("https://www.nseindia.com", timeout=15)
         time.sleep(1)
@@ -132,36 +110,29 @@ def update_all_stocks():
     except Exception as e:
         print(f"⚠️ Session notice: {e}")
 
-    last_date = get_latest_recorded_date()
+    start_date = get_repair_start_date()
     today = datetime.date.today()
 
-    print(f"📅 Last recorded date in repo: {last_date}")
-    print(f"📅 Scanning dates from {last_date + datetime.timedelta(days=1)} to {today}...")
+    print(f"📅 Repairing and updating data from {start_date} to {today}...")
 
-    missing_dates = []
-    curr = last_date + datetime.timedelta(days=1)
+    target_dates = []
+    curr = start_date
     while curr <= today:
-        if curr.weekday() < 5:  # Mon-Fri
-            missing_dates.append(curr)
+        if curr.weekday() < 5:  # Monday-Friday
+            target_dates.append(curr)
         curr += datetime.timedelta(days=1)
 
-    if not missing_dates:
-        print("✅ Data is already up to date!")
-        return
-
     daily_updates = {}
-    for d in missing_dates:
-        print(f"📥 Fetching NSE data for {d}...")
-        records = download_nse_session_data(session, d)
+    for d in target_dates:
+        print(f"📥 Fetching official volume & delivery data for {d}...")
+        records = download_nse_complete_delivery_data(session, d)
         if records:
             daily_updates[d.strftime("%Y-%m-%d")] = records
-            print(f"   -> ✅ SUCCESS: Saved {len(records)} stocks for {d}")
-        else:
-            print(f"   -> ⚠️ No session data returned for {d}")
+            print(f"   -> ✅ SUCCESS: Extracted {len(records)} stocks for {d}")
         time.sleep(1)
 
     if not daily_updates:
-        print("ℹ️ No new trading days were fetched.")
+        print("ℹ️ No data available.")
         return
 
     stock_files = [
@@ -184,28 +155,24 @@ def update_all_stocks():
         except Exception:
             continue
 
-        # Guard against non-list JSON formats
         if not isinstance(stock_data, list):
             continue
 
-        existing_times = {
-            r.get("time") for r in stock_data 
-            if isinstance(r, dict) and "time" in r
-        }
-        added = False
+        # Convert to dictionary keyed by date to overwrite zero-volume days
+        data_dict = {r["time"]: r for r in stock_data if isinstance(r, dict) and "time" in r}
 
         for d_str, records in daily_updates.items():
-            if d_str not in existing_times and sym in records:
-                stock_data.append(records[sym])
-                added = True
+            if sym in records:
+                # Overwrite or append with real volume data
+                data_dict[d_str] = records[sym]
 
-        if added:
-            stock_data.sort(key=lambda x: str(x.get("time", "")))
-            with open(json_path, "w") as fp:
-                json.dump(stock_data, fp, indent=2)
-            updated_count += 1
+        final_list = sorted(list(data_dict.values()), key=lambda x: str(x.get("time", "")))
 
-    print(f"🎉 Updated {updated_count} stock files with new records!")
+        with open(json_path, "w") as fp:
+            json.dump(final_list, fp, indent=2)
+        updated_count += 1
+
+    print(f"🎉 Successfully repaired & updated {updated_count} stock files with live Demat volumes!")
 
 if __name__ == "__main__":
     update_all_stocks()
