@@ -2,7 +2,7 @@ name: NSE Daily 6:30 PM Update
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'  # Mon-Fri at 18:30 IST (13:00 UTC)
+    - cron: '0 13 * * 1-5'  # Runs Mon-Fri at 18:30 IST (13:00 UTC)
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install pandas numpy requests
+        run: pip install pandas numpy requests urllib3
 
       - name: Download & Compute Delivery OBV
         run: python update_all_stocks.py
