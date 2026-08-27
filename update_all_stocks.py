@@ -30,16 +30,17 @@ def get_latest_recorded_date():
         return datetime.date.today() - datetime.timedelta(days=15)
     
     dates = []
-    for f in files[:35]:
+    for f in files[:40]:
         try:
             with open(os.path.join(DATA_DIR, f), "r") as fp:
                 raw = json.load(fp)
-                if raw:
-                    dates.append(raw[-1]["time"])
+                if isinstance(raw, list) and len(raw) > 0 and isinstance(raw[-1], dict):
+                    dates.append(raw[-1].get("time"))
         except Exception:
             continue
-    if dates:
-        return datetime.datetime.strptime(max(dates), "%Y-%m-%d").date()
+    valid_dates = [d for d in dates if d]
+    if valid_dates:
+        return datetime.datetime.strptime(max(valid_dates), "%Y-%m-%d").date()
     return datetime.date.today() - datetime.timedelta(days=15)
 
 def download_nse_session_data(session, target_date):
@@ -122,14 +123,14 @@ def update_all_stocks():
     session = requests.Session()
     session.headers.update(HEADERS)
 
-    # Establish initial handshake to get valid cookies
+    # Establish initial session with NSE to capture cookies
     try:
         session.get("https://www.nseindia.com", timeout=15)
         time.sleep(1)
         session.get("https://www.nseindia.com/all-reports", timeout=15)
         time.sleep(1)
     except Exception as e:
-        print(f"⚠️ Session initialization notice: {e}")
+        print(f"⚠️ Session notice: {e}")
 
     last_date = get_latest_recorded_date()
     today = datetime.date.today()
@@ -140,7 +141,7 @@ def update_all_stocks():
     missing_dates = []
     curr = last_date + datetime.timedelta(days=1)
     while curr <= today:
-        if curr.weekday() < 5:  # Monday through Friday
+        if curr.weekday() < 5:  # Mon-Fri
             missing_dates.append(curr)
         curr += datetime.timedelta(days=1)
 
@@ -183,7 +184,14 @@ def update_all_stocks():
         except Exception:
             continue
 
-        existing_times = {r["time"] for r in stock_data}
+        # Guard against non-list JSON formats
+        if not isinstance(stock_data, list):
+            continue
+
+        existing_times = {
+            r.get("time") for r in stock_data 
+            if isinstance(r, dict) and "time" in r
+        }
         added = False
 
         for d_str, records in daily_updates.items():
@@ -192,7 +200,7 @@ def update_all_stocks():
                 added = True
 
         if added:
-            stock_data.sort(key=lambda x: x["time"])
+            stock_data.sort(key=lambda x: str(x.get("time", "")))
             with open(json_path, "w") as fp:
                 json.dump(stock_data, fp, indent=2)
             updated_count += 1
