@@ -112,7 +112,6 @@ def download_nse_session_data(session, target_date):
                             "deliv_pct": d_pct
                         }
 
-                        # If duplicate series exist on same day, retain the one with higher traded volume
                         if sym not in day_records or entry["volume"] > day_records[sym]["volume"]:
                             day_records[sym] = entry
                     except Exception:
@@ -134,18 +133,18 @@ def update_all_stocks():
         session.get("https://www.nseindia.com/all-reports", timeout=15)
         time.sleep(1)
     except Exception as e:
-        print(f"⚠️ Session initialization notice: {e}")
+        print(f"⚠️ Session notice: {e}")
 
     last_date = get_latest_recorded_date()
     today = datetime.date.today()
 
-    print(f"📅 Last recorded date in repo: {last_date}")
+    print(f"📅 Last recorded date: {last_date}")
     print(f"📅 Scanning dates from {last_date + datetime.timedelta(days=1)} to {today}...")
 
     missing_dates = []
     curr = last_date + datetime.timedelta(days=1)
     while curr <= today:
-        if curr.weekday() < 5:  # Monday through Friday
+        if curr.weekday() < 5:
             missing_dates.append(curr)
         curr += datetime.timedelta(days=1)
 
@@ -157,8 +156,6 @@ def update_all_stocks():
             if records:
                 daily_updates[d.strftime("%Y-%m-%d")] = records
                 print(f"   -> ✅ SUCCESS: Extracted {len(records)} stocks for {d}")
-            else:
-                print(f"   -> ℹ️ No session data returned for {d}")
             time.sleep(1)
 
     stock_files = [
@@ -193,7 +190,6 @@ def update_all_stocks():
                 if t not in date_map or float(r.get("volume", 0)) > float(date_map[t].get("volume", 0)):
                     date_map[t] = r
 
-        # Append new days
         for d_str, records in daily_updates.items():
             if sym in records:
                 date_map[d_str] = records[sym]
@@ -205,62 +201,6 @@ def update_all_stocks():
         updated_count += 1
 
     print(f"🎉 Processed and cleaned {updated_count} stock files!")
-    update_fundamentals(session)
-
-def update_fundamentals(session):
-    print("📡 Updating index constituents & fundamentals.json...")
-    index_urls = [
-        "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv"
-    ]
-    verified_symbols = {}
-    for url in index_urls:
-        try:
-            resp = session.get(url, timeout=15)
-            if resp.status_code == 200:
-                df = pd.read_csv(io.StringIO(resp.text))
-                df.columns = df.columns.str.strip()
-                for _, row in df.iterrows():
-                    sym = str(row.get("Symbol", "")).strip().upper()
-                    industry = str(row.get("Industry", "General"))
-                    if sym and sym != "NAN":
-                        verified_symbols[sym] = {"industry": industry, "is_nse_tracked": True}
-        except Exception as e:
-            print(f"⚠️ Could not load index file {url}: {e}")
-
-    fundamentals = {}
-    stock_files = [
-        f for f in os.listdir(DATA_DIR) 
-        if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", 
-            "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
-        ]
-    ]
-    for f_name in stock_files:
-        sym = f_name.replace(".json", "").strip().upper()
-        json_path = os.path.join(DATA_DIR, f_name)
-        try:
-            with open(json_path, "r") as fp:
-                raw_data = json.load(fp)
-            if not raw_data:
-                continue
-            latest_close = float(raw_data[-1]["close"])
-        except Exception:
-            continue
-
-        fundamentals[sym] = {
-            "market_cap_status": "Verified Listed Equity" if sym in verified_symbols else "NSE Equity",
-            "industry": verified_symbols.get(sym, {}).get("industry", "NSE Listed"),
-            "price": latest_close,
-            "is_qualified": True if (sym in verified_symbols or latest_close >= 20.0) else False
-        }
-
-    out_file = os.path.join(DATA_DIR, "fundamentals.json")
-    with open(out_file, "w") as fp:
-        json.dump(fundamentals, fp, indent=2)
-    print(f"🎉 Saved {len(fundamentals)} records into {out_file}!")
 
 if __name__ == "__main__":
     update_all_stocks()
