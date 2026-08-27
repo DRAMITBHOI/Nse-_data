@@ -1,1 +1,245 @@
-[{"time": "2021-08-19", "open": 3.8, "high": 3.8, "low": 3.6, "close": 3.6, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-20", "open": 3.5, "high": 3.75, "low": 3.45, "close": 3.55, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-23", "open": 3.5, "high": 3.55, "low": 3.4, "close": 3.45, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-24", "open": 3.35, "high": 3.5, "low": 3.3, "close": 3.5, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-25", "open": 3.55, "high": 3.65, "low": 3.45, "close": 3.65, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-26", "open": 3.8, "high": 3.8, "low": 3.8, "close": 3.8, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-27", "open": 3.95, "high": 3.95, "low": 3.95, "close": 3.95, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-30", "open": 4.1, "high": 4.1, "low": 3.8, "close": 3.9, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-08-31", "open": 4.0, "high": 4.0, "low": 3.9, "close": 3.95, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-01", "open": 3.95, "high": 3.95, "low": 3.8, "close": 3.8, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-02", "open": 3.85, "high": 3.95, "low": 3.7, "close": 3.85, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-03", "open": 3.95, "high": 3.95, "low": 3.75, "close": 3.8, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-06", "open": 3.7, "high": 3.85, "low": 3.7, "close": 3.85, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-07", "open": 3.85, "high": 3.9, "low": 3.7, "close": 3.85, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-08", "open": 3.85, "high": 3.85, "low": 3.7, "close": 3.8, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-09", "open": 3.7, "high": 3.85, "low": 3.7, "close": 3.75, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-10", "open": 3.7, "high": 3.85, "low": 3.7, "close": 3.75, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-13", "open": 3.65, "high": 3.8, "low": 3.65, "close": 3.7, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-14", "open": 3.75, "high": 3.8, "low": 3.65, "close": 3.7, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-15", "open": 3.8, "high": 3.8, "low": 3.65, "close": 3.7, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-16", "open": 3.75, "high": 3.8, "low": 3.65, "close": 3.7, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-17", "open": 3.65, "high": 3.8, "low": 3.65, "close": 3.65, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-20", "open": 3.7, "high": 3.7, "low": 3.5, "close": 3.55, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-21", "open": 3.55, "high": 3.7, "low": 3.55, "close": 3.65, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-22", "open": 3.6, "high": 3.7, "low": 3.55, "close": 3.6, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-23", "open": 3.65, "high": 3.65, "low": 3.5, "close": 3.55, "delivery_vol": 0, "deliv_pct": 0.0}, {"time": "2021-09-24", "open": 3.6, "high": 3.6, "low": 3.45, "close": 3.5, "delivery_vol": 0, "deliv_pct": 0.0}]
+[
+  {
+    "time": "2021-08-19",
+    "open": 3.8,
+    "high": 3.8,
+    "low": 3.6,
+    "close": 3.6,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-20",
+    "open": 3.5,
+    "high": 3.75,
+    "low": 3.45,
+    "close": 3.55,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-23",
+    "open": 3.5,
+    "high": 3.55,
+    "low": 3.4,
+    "close": 3.45,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-24",
+    "open": 3.35,
+    "high": 3.5,
+    "low": 3.3,
+    "close": 3.5,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-25",
+    "open": 3.55,
+    "high": 3.65,
+    "low": 3.45,
+    "close": 3.65,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-26",
+    "open": 3.8,
+    "high": 3.8,
+    "low": 3.8,
+    "close": 3.8,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-27",
+    "open": 3.95,
+    "high": 3.95,
+    "low": 3.95,
+    "close": 3.95,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-30",
+    "open": 4.1,
+    "high": 4.1,
+    "low": 3.8,
+    "close": 3.9,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-08-31",
+    "open": 4.0,
+    "high": 4.0,
+    "low": 3.9,
+    "close": 3.95,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-01",
+    "open": 3.95,
+    "high": 3.95,
+    "low": 3.8,
+    "close": 3.8,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-02",
+    "open": 3.85,
+    "high": 3.95,
+    "low": 3.7,
+    "close": 3.85,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-03",
+    "open": 3.95,
+    "high": 3.95,
+    "low": 3.75,
+    "close": 3.8,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-06",
+    "open": 3.7,
+    "high": 3.85,
+    "low": 3.7,
+    "close": 3.85,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-07",
+    "open": 3.85,
+    "high": 3.9,
+    "low": 3.7,
+    "close": 3.85,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-08",
+    "open": 3.85,
+    "high": 3.85,
+    "low": 3.7,
+    "close": 3.8,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-09",
+    "open": 3.7,
+    "high": 3.85,
+    "low": 3.7,
+    "close": 3.75,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-10",
+    "open": 3.7,
+    "high": 3.85,
+    "low": 3.7,
+    "close": 3.75,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-13",
+    "open": 3.65,
+    "high": 3.8,
+    "low": 3.65,
+    "close": 3.7,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-14",
+    "open": 3.75,
+    "high": 3.8,
+    "low": 3.65,
+    "close": 3.7,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-15",
+    "open": 3.8,
+    "high": 3.8,
+    "low": 3.65,
+    "close": 3.7,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-16",
+    "open": 3.75,
+    "high": 3.8,
+    "low": 3.65,
+    "close": 3.7,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-17",
+    "open": 3.65,
+    "high": 3.8,
+    "low": 3.65,
+    "close": 3.65,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-20",
+    "open": 3.7,
+    "high": 3.7,
+    "low": 3.5,
+    "close": 3.55,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-21",
+    "open": 3.55,
+    "high": 3.7,
+    "low": 3.55,
+    "close": 3.65,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-22",
+    "open": 3.6,
+    "high": 3.7,
+    "low": 3.55,
+    "close": 3.6,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-23",
+    "open": 3.65,
+    "high": 3.65,
+    "low": 3.5,
+    "close": 3.55,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  },
+  {
+    "time": "2021-09-24",
+    "open": 3.6,
+    "high": 3.6,
+    "low": 3.45,
+    "close": 3.5,
+    "delivery_vol": 0,
+    "deliv_pct": 0.0
+  }
+]
