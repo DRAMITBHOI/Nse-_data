@@ -16,7 +16,6 @@ HEADERS = {
 }
 
 def get_latest_existing_date():
-    """Finds the most recent date recorded across data/*.json"""
     files = [
         f for f in os.listdir(DATA_DIR) 
         if f.endswith(".json") and f not in [
@@ -29,7 +28,7 @@ def get_latest_existing_date():
         return datetime.date.today() - datetime.timedelta(days=10)
     
     dates = []
-    for f in files[:30]:
+    for f in files[:35]:
         try:
             with open(os.path.join(DATA_DIR, f), "r") as fp:
                 raw = json.load(fp)
@@ -43,7 +42,7 @@ def get_latest_existing_date():
     return datetime.date.today() - datetime.timedelta(days=10)
 
 def fetch_nse_full_bhavdata(target_date):
-    """Downloads official daily combined Price & Delivery Bhavcopy (sec_bhavdata_full)"""
+    """Downloads official daily unified Price & Delivery Bhavcopy from NSE archives"""
     d_str = target_date.strftime("%d%m%Y")
     url = f"https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{d_str}.csv"
     
@@ -54,7 +53,7 @@ def fetch_nse_full_bhavdata(target_date):
             df = pd.read_csv(io.StringIO(content))
             df.columns = df.columns.str.strip()
             
-            # Filter EQ and BE series
+            # Keep equity series
             df = df[df["SERIES"].isin(["EQ", "BE"])]
             
             day_records = {}
@@ -67,7 +66,6 @@ def fetch_nse_full_bhavdata(target_date):
                     c = float(row["CLOSE_PRICE"])
                     tot_vol = float(row["TTL_TRD_QNTY"])
                     
-                    # Handle delivery quantity & percentage
                     deliv_raw = str(row.get("DELIV_QTY", "")).strip().replace("-", "")
                     deliv_vol = float(deliv_raw) if deliv_raw else tot_vol
                     
@@ -88,7 +86,7 @@ def fetch_nse_full_bhavdata(target_date):
                     continue
             return day_records
     except Exception as e:
-        print(f"ℹ️ {target_date} skipped or not yet available: {e}")
+        print(f"ℹ️ {target_date} skipped / not yet uploaded on NSE: {e}")
         return None
 
 def update_all_stock_jsons():
@@ -96,7 +94,7 @@ def update_all_stock_jsons():
     today = datetime.date.today()
     
     print(f"📅 Last recorded date in repo: {last_date}")
-    print(f"📅 Checking missing sessions from {last_date + datetime.timedelta(days=1)} to {today}...")
+    print(f"📅 Fetching missing trading days between {last_date + datetime.timedelta(days=1)} and {today}...")
 
     missing_dates = []
     curr = last_date + datetime.timedelta(days=1)
@@ -112,11 +110,11 @@ def update_all_stock_jsons():
 
     daily_updates = {}
     for d in missing_dates:
-        print(f"📥 Downloading unified NSE Delivery Bhavcopy for {d}...")
+        print(f"📥 Downloading NSE Bhavcopy for {d}...")
         records = fetch_nse_full_bhavdata(d)
         if records:
             daily_updates[d.strftime("%Y-%m-%d")] = records
-            print(f"   -> Successfully extracted {len(records)} stocks for {d}")
+            print(f"   -> Extracted {len(records)} stocks for {d}")
 
     if not daily_updates:
         print("ℹ️ No new trading days fetched.")
@@ -161,7 +159,7 @@ def update_all_stock_jsons():
     update_fundamentals()
 
 def update_fundamentals():
-    print("📡 Updating index tracking & fundamentals.json...")
+    print("📡 Updating index constituents & fundamentals.json...")
     index_urls = [
         "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
         "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
