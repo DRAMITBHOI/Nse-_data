@@ -2,9 +2,12 @@ name: NSE Daily 6:30 PM Update & Wyckoff Scan
 
 on:
   schedule:
-    # 6:30 PM IST (Monday to Friday) = 1:00 PM UTC
+    # 6:30 PM IST (Mon-Fri) = 1:00 PM UTC
     - cron: '0 13 * * 1-5'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-nse-data:
@@ -13,12 +16,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip'
 
       - name: Install Dependencies
         run: |
@@ -35,8 +39,10 @@ jobs:
             python scanobv.py
           elif [ -f "wyckoff_scan.py" ]; then
             python wyckoff_scan.py
+          elif [ -f "obv_scan.py" ]; then
+            python obv_scan.py
           else
-            echo "⚠️ Scanner script not found, skipping screener recalculation."
+            echo "⚠️ No dedicated scanner script found, continuing..."
           fi
 
       - name: 3. Commit & Push Updated Data
