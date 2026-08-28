@@ -38,10 +38,9 @@ def run_obv_divergence_backtest():
         except Exception:
             continue
 
-        if not isinstance(data, list) or len(data) < 100:
+        if not isinstance(data, list) or len(data) < 70:
             continue
 
-        # Sort and deduplicate
         d_map = {}
         for r in data:
             if isinstance(r, dict) and "time" in r:
@@ -49,7 +48,6 @@ def run_obv_divergence_backtest():
                 d_map[t] = r
         clean = [d_map[k] for k in sorted(d_map.keys())]
 
-        # Calculate True Delivery OBV
         cur_obv = 0
         for i, r in enumerate(clean):
             dv = float(r.get("delivery_vol", 0))
@@ -64,10 +62,11 @@ def run_obv_divergence_backtest():
         closes = [float(x["close"]) for x in clean]
         obvs = [float(x["deliv_obv"]) for x in clean]
 
-        # Evaluate across rolling historical windows (with 60-day forward validation)
-        for idx in range(60, len(clean) - 60, 5):
+        for idx in range(50, len(clean) - 30, 4):
             for label, (min_d, max_d) in spans.items():
                 for s in range(min_d, max_d + 1):
+                    if idx - s < 0:
+                        continue
                     p_start = closes[idx - s]
                     p_low = min(closes[idx - s : idx + 1])
                     p_drop = ((p_low - p_start) / p_start) * 100
@@ -76,15 +75,17 @@ def run_obv_divergence_backtest():
                     o_end = obvs[idx]
                     o_gain = ((o_end - o_start) / abs(o_start)) * 100 if abs(o_start) > 0 else 0
 
-                    # Criteria: Price Drop >= 7.5%, OBV Gain >= 8.0%
                     if p_drop <= -7.5 and o_gain >= 8.0:
                         entry_price = closes[idx]
                         stop_loss = min([float(x["low"]) for x in clean[idx - s : idx + 1]])
-                        target_price = entry_price * 1.20 # 20% Target
+                        target_price = entry_price * 1.20
 
-                        forward_candles = clean[idx + 1 : idx + 61]
+                        forward_candles = clean[idx + 1 : idx + 45]
                         forward_closes = [float(x["close"]) for x in forward_candles]
                         forward_lows = [float(x["low"]) for x in forward_candles]
+
+                        if not forward_closes:
+                            continue
 
                         hit_target = any(c >= target_price for c in forward_closes)
                         hit_stop = any(l <= stop_loss for l in forward_lows)
@@ -114,7 +115,7 @@ def run_obv_divergence_backtest():
 
     with open(REPORT_FILE, "w") as fp:
         json.dump(summary, fp, indent=2)
-    print(f"✅ Backtest completed! Saved summary to {REPORT_FILE}")
+    print(f"✅ Backtest completed! Summary saved to {REPORT_FILE}")
 
 if __name__ == "__main__":
     run_obv_divergence_backtest()
