@@ -1,34 +1,52 @@
-name: NSE Daily 6:30 PM Update
+name: NSE Daily 6:30 PM Update & Wyckoff Scan
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'  # Runs Mon-Fri at 18:30 IST (13:00 UTC)
+    # 6:30 PM IST (Monday to Friday) = 1:00 PM UTC
+    - cron: '0 13 * * 1-5'
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   update-nse-data:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'
+          cache: 'pip'
 
       - name: Install Dependencies
-        run: pip install pandas numpy requests urllib3
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas numpy
 
-      - name: Download & Compute Delivery OBV
-        run: python update_all_stocks.py
+      - name: 1. Update Bhavcopy & Delivery Volume Data
+        run: |
+          python update_all_stocks.py
 
-      - name: Commit and Push Updated Stock JSONs
+      - name: 2. Run Wyckoff True OBV Screener
+        run: |
+          if [ -f "scanobv.py" ]; then
+            python scanobv.py
+          elif [ -f "wyckoff_scan.py" ]; then
+            python wyckoff_scan.py
+          else
+            echo "⚠️ Scanner script not found, skipping screener recalculation."
+          fi
+
+      - name: 3. Commit & Push Updated Data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --staged --quiet || (git commit -m "Auto-update daily NSE delivery data" && git push)
+          if git diff --staged --quiet; then
+            echo "No data changes detected to commit."
+          else
+            git commit -m "Auto-update NSE delivery data & Wyckoff scan [$(date -u +'%Y-%m-%d %H:%M UTC')]"
+            git push
+          fi
