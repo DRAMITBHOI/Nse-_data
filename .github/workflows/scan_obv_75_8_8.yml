@@ -2,33 +2,54 @@ name: Scan OBV (7.5, 8, 8)
 
 on:
   schedule:
-    - cron: '30 13 * * 1-5'  # Runs Mon-Fri at 7:00 PM IST (13:30 UTC)
+    # Runs at 7:00 PM IST (Mon-Fri) = 1:30 PM UTC (after the 6:30 PM Bhavcopy update)
+    - cron: '30 13 * * 1-5'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  run-scanner:
+  run-obv-screener:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Install Dependencies
-        run: pip install pandas numpy requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas requests
 
-      - name: Execute Scan OBV Script
-        run: python "scanobv(7.5,8,8).py"
+      - name: Run OBV (7.5, 8, 8) Screener
+        run: |
+          if [ -f "scanobv.py" ]; then
+            python scanobv.py
+          elif [ -f "obv_scan.py" ]; then
+            python obv_scan.py
+          elif [ -f "wyckoff_scan.py" ]; then
+            python wyckoff_scan.py
+          else
+            echo "⚠️ Scanner script not found!"
+            exit 1
+          fi
 
-      - name: Commit & Push Screener Output
+      - name: Commit & Push Screener Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/wyckoff_screener_results.json
-          git diff --staged --quiet || (git commit -m "Update scanobv(7.5,8,8) results" && git push)
+          git add data/wyckoff_screener_results.json data/screener_results.json || true
+          if git diff --staged --quiet; then
+            echo "No screener changes detected."
+          else
+            git commit -m "Update Wyckoff Screener Results [$(date -u +'%Y-%m-%d %H:%M UTC')]"
+            git push
+          fi
