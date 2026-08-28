@@ -1,26 +1,20 @@
 [
   {
-    "horizon": "1W-2W Base (5-10d)",
-    "signals": 3217,
-    "win_rate": 15.7,
-    "avg_return": 0.63
+    "strategy": "1. VCP Momentum Breakout",
+    "total_trades": 5013,
+    "win_rate": 23.7,
+    "avg_return": 4.32
   },
   {
-    "horizon": "3W-6W Base (15-30d)",
-    "signals": 9656,
-    "win_rate": 11.6,
-    "avg_return": 1.82
+    "strategy": "2. Wyckoff True OBV Divergence",
+    "total_trades": 206,
+    "win_rate": 15.0,
+    "avg_return": 0.1
   },
   {
-    "horizon": "7W-10W Base (35-50d)",
-    "signals": 7667,
-    "win_rate": 7.5,
-    "avg_return": 2.85
-  },
-  {
-    "horizon": ">10W Base (50-70d)",
-    "signals": 5038,
-    "win_rate": 4.8,
-    "avg_return": 3.32
+    "strategy": "4. RSI-2 Climax Mean Reversion",
+    "total_trades": 77515,
+    "win_rate": 37.1,
+    "avg_return": 1.84
   }
 ]
