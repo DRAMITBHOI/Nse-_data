@@ -1,4 +1,4 @@
-name: NSE Daily 6:30 PM Update & Wyckoff Scan
+name: NSE Daily 6:30 PM Update
 
 on:
   schedule:
@@ -29,23 +29,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pandas numpy
 
-      - name: 1. Update Bhavcopy & Delivery Volume Data
+      - name: Update Bhavcopy & Delivery Volume Data
         run: |
           python update_all_stocks.py
 
-      - name: 2. Run Wyckoff True OBV Screener
-        run: |
-          if [ -f "scanobv.py" ]; then
-            python scanobv.py
-          elif [ -f "wyckoff_scan.py" ]; then
-            python wyckoff_scan.py
-          elif [ -f "obv_scan.py" ]; then
-            python obv_scan.py
-          else
-            echo "⚠️ No dedicated scanner script found, continuing..."
-          fi
-
-      - name: 3. Commit & Push Updated Data
+      - name: Commit & Push Updated Data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -53,6 +41,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No data changes detected to commit."
           else
-            git commit -m "Auto-update NSE delivery data & Wyckoff scan [$(date -u +'%Y-%m-%d %H:%M UTC')]"
+            git commit -m "Auto-update NSE delivery data [$(date -u +'%Y-%m-%d %H:%M UTC')]"
             git push
           fi
