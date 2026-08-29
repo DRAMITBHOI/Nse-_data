@@ -143,7 +143,7 @@ def prepare_stock_series(nifty_750_set):
             # 20D Delivery Volume SMA
             df["deliv_vol_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
 
-            # True Delivery OBV
+            # True Delivery OBV (EOD calculated)
             closes = df["close"].values
             vols = df["delivery_vol"].values
             t_vols = df["volume"].values
@@ -170,7 +170,7 @@ def prepare_stock_series(nifty_750_set):
     return stock_map
 
 # ==========================================
-# 4. GRID SEARCH ENGINE (60 TRADING DAYS HORIZON)
+# 4. GRID SEARCH ENGINE (EOD BREAKOUT & OBV > SWING HIGH OBV)
 # ==========================================
 def run_segmented_backtest(stock_map):
     pct_spike_grid = [1.2, 1.4, 1.6, 1.8]
@@ -186,7 +186,7 @@ def run_segmented_backtest(stock_map):
         "Bucket C (Low Liquidity: < 5 Cr)": {"min_to": 0.0, "max_to": 5.0, "results": []}
     }
 
-    print(f"🔬 Testing {len(grid)} Parameter Setups across 3 Liquidity Buckets (3-Month / 60-Day Horizon)...")
+    print(f"🔬 Testing {len(grid)} Parameter Setups (EOD Breakout OBV > Swing High OBV | 60-Day Horizon)...")
 
     for b_name, b_info in buckets.items():
         min_to = b_info["min_to"]
@@ -196,6 +196,7 @@ def run_segmented_backtest(stock_map):
             trades = []
 
             for sym, df in stock_map.items():
+                opens = df["open"].values
                 closes = df["close"].values
                 highs = df["high"].values
                 lows = df["low"].values
@@ -211,8 +212,8 @@ def run_segmented_backtest(stock_map):
 
                 last_exit = -1
 
-                # Ensure at least 60 trading days are available forward for trade evaluation
-                for i in range(max(window + 20, 30), N - 60):
+                # Evaluate up to N - 61 so we have a full 60 trading-day holding window forward
+                for i in range(max(window + 20, 30), N - 61):
                     if i <= last_exit:
                         continue
 
@@ -220,36 +221,44 @@ def run_segmented_backtest(stock_map):
                     if np.isnan(curr_to) or not (min_to <= curr_to < max_to):
                         continue
 
-                    # 1. Cluster Count Condition
+                    # 1. Cluster Count Condition in Base Window
                     cluster_count = np.sum(qualifying_days[i - window : i])
                     if cluster_count < min_cluster:
                         continue
 
-                    # 2. Breakout Condition: Crosses Previous Swing High
-                    swing_high = np.max(highs[i - window : i])
+                    # 2. Identify the Swing High price and its exact candle index in the base
+                    base_highs = highs[i - window : i]
+                    swing_high_rel_idx = np.argmax(base_highs)
+                    swing_high_abs_idx = (i - window) + swing_high_rel_idx
+                    swing_high = base_highs[swing_high_rel_idx]
+                    
                     base_low = np.min(lows[i - window : i])
 
+                    # 3. Price Breakout: EOD Close on Day i crosses previous Swing High
                     if closes[i] > swing_high and closes[i - 1] <= swing_high:
-                        # 3. OBV Expansion Filter: Current OBV > OBV 20 days ago
-                        if (i - 20) < 0 or obvs[i] <= obvs[i - 20]:
+                        
+                        # 4. OBV Confirmation: Finalized EOD OBV on Day i > OBV at Swing High Day
+                        obv_at_swing_high = obvs[swing_high_abs_idx]
+                        if obvs[i] <= obv_at_swing_high:
                             continue
 
-                        entry_price = closes[i]
+                        # Realistic Execution: Entry at Day i+1 Market Open
+                        entry_price = opens[i + 1] if opens[i + 1] > 0 else closes[i]
                         stop_loss = round(base_low * 0.995, 2)
                         risk = entry_price - stop_loss
 
-                        if risk <= 0 or (risk / entry_price) > 0.15:
+                        if risk <= 0 or (risk / entry_price) > 0.15:  # Max 15% Risk Limit
                             continue
 
                         target_2r = entry_price + (2.0 * risk)
 
-                        # 60 Trading Days (~3 Calendar Months) Evaluation Horizon
+                        # 60 Trading Days (~3 Months) Forward Evaluation starting from i+1
                         hit_20pct_rally = False
                         hit_2r_target = False
                         hit_sl = False
                         max_gain = 0.0
 
-                        for fwd in range(i + 1, min(N, i + 61)):
+                        for fwd in range(i + 1, min(N, i + 62)):
                             c_high = highs[fwd]
                             c_low = lows[fwd]
 
@@ -311,7 +320,7 @@ def main():
 
         for b_name, b_info in bucket_results.items():
             print("\n" + "=" * 95)
-            print(f"🏆 TOP 5 OPTIMAL SETUPS FOR: {b_name.upper()} (60-DAY / 3-MONTH HORIZON)")
+            print(f"🏆 TOP 5 OPTIMAL SETUPS FOR: {b_name.upper()} (EOD BREAKOUT OBV | 60-DAY HORIZON)")
             print("=" * 95)
             df_res = pd.DataFrame(b_info["results"])
             if not df_res.empty:
