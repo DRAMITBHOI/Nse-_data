@@ -1,9 +1,12 @@
 name: OBV Segmented Strategy Backtest
 
 on:
-  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
   schedule:
-    - cron: '0 14 * * 6' # Runs automatically every Saturday at 19:30 IST
+    - cron: '0 14 * * 6'
+
+permissions:
+  contents: write
 
 jobs:
   run-backtest:
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -25,7 +30,7 @@ jobs:
 
       - name: Run Liquidity-Segmented OBV Backtest
         run: |
-          python backtest_and_plan.py
+          python backtest_segmented_liquidity.py
 
       - name: Commit and Push Backtest Results
         run: |
