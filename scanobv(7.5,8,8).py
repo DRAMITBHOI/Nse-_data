@@ -1,5 +1,7 @@
 import os
+import io
 import json
+import urllib.request
 import numpy as np
 import pandas as pd
 
@@ -10,6 +12,51 @@ MIN_PRICE_DROP_PCT = -7.5
 MIN_OBV_GAIN_PCT = 8.0
 MIN_LOOKBACK_BARS = 5    # 1 Week (5 trading days)
 MAX_LOOKBACK_BARS = 40   # 8 Weeks (40 trading days)
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+}
+
+def get_nifty_750_universe():
+    """
+    Fetches the official Nifty 500 and Nifty Smallcap 250 index constituent CSVs
+    from NSE Archives, deduplicates them, and saves 'data/nifty750.json'.
+    """
+    index_urls = [
+        "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
+        "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv"
+    ]
+    symbols = set()
+    for url in index_urls:
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                df = pd.read_csv(io.StringIO(resp.read().decode("utf-8")))
+                df.columns = df.columns.str.strip()
+                if "Symbol" in df.columns:
+                    clean = df["Symbol"].dropna().astype(str).str.strip().str.upper()
+                    symbols.update(clean.tolist())
+        except Exception as e:
+            print(f"⚠️ Warning fetching constituent index {url}: {e}")
+
+    # Fallback to existing nifty750.json if network fails
+    local_path = os.path.join(DATA_DIR, "nifty750.json")
+    if not symbols and os.path.exists(local_path):
+        try:
+            with open(local_path, "r") as fp:
+                symbols = set(json.load(fp))
+        except Exception:
+            pass
+
+    sorted_universe = sorted(list(symbols))
+    if sorted_universe:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(local_path, "w") as fp:
+            json.dump(sorted_universe, fp, indent=2)
+        print(f"✅ Loaded {len(sorted_universe)} NIFTY 750 constituents (Nifty 500 + Smallcap 250).")
+    
+    return set(sorted_universe)
 
 def full_corporate_action_adjustment(raw_data):
     if not raw_data or len(raw_data) < 2:
@@ -77,6 +124,9 @@ def scan_wyckoff_stocks():
         print(f"❌ Error: '{DATA_DIR}' directory does not exist.")
         return
 
+    # Load Nifty 750 universe filter
+    nifty_750_set = get_nifty_750_universe()
+
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
     if os.path.exists(fund_path):
@@ -91,11 +141,15 @@ def scan_wyckoff_stocks():
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json",
             "backtest_report.json", "active_trade_plan.json",
-            "wyckoff_screener_results.json"
+            "wyckoff_screener_results.json", "nifty750.json"
         ]
     ]
 
-    print(f"📊 Scanning across {len(stock_files)} stocks...")
+    # Strictly filter file list to Nifty 750
+    if nifty_750_set:
+        stock_files = [f for f in stock_files if f.replace(".json", "").strip().upper() in nifty_750_set]
+
+    print(f"📊 Scanning across {len(stock_files)} Nifty 750 stocks...")
     results = []
 
     for f_name in stock_files:
