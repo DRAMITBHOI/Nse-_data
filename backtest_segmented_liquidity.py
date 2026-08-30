@@ -143,7 +143,7 @@ def prepare_stock_series(nifty_750_set):
             # 20D Delivery Volume SMA
             df["deliv_vol_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
 
-            # True Delivery OBV (EOD calculated)
+            # True Delivery OBV
             closes = df["close"].values
             vols = df["delivery_vol"].values
             t_vols = df["volume"].values
@@ -170,7 +170,7 @@ def prepare_stock_series(nifty_750_set):
     return stock_map
 
 # ==========================================
-# 4. GRID SEARCH ENGINE (EOD BREAKOUT & OBV > SWING HIGH OBV)
+# 4. GRID SEARCH ENGINE (EOD BREAKOUT & OBV CONFIRMATION)
 # ==========================================
 def run_segmented_backtest(stock_map):
     pct_spike_grid = [1.2, 1.4, 1.6, 1.8]
@@ -212,7 +212,7 @@ def run_segmented_backtest(stock_map):
 
                 last_exit = -1
 
-                # Evaluate up to N - 61 so we have a full 60 trading-day holding window forward
+                # Evaluate up to N - 61 for full 60 trading days forward holding
                 for i in range(max(window + 20, 30), N - 61):
                     if i <= last_exit:
                         continue
@@ -221,12 +221,12 @@ def run_segmented_backtest(stock_map):
                     if np.isnan(curr_to) or not (min_to <= curr_to < max_to):
                         continue
 
-                    # 1. Cluster Count Condition in Base Window
+                    # 1. Cluster Count in Base Window
                     cluster_count = np.sum(qualifying_days[i - window : i])
                     if cluster_count < min_cluster:
                         continue
 
-                    # 2. Identify the Swing High price and its exact candle index in the base
+                    # 2. Identify Swing High price and its candle index
                     base_highs = highs[i - window : i]
                     swing_high_rel_idx = np.argmax(base_highs)
                     swing_high_abs_idx = (i - window) + swing_high_rel_idx
@@ -234,15 +234,15 @@ def run_segmented_backtest(stock_map):
                     
                     base_low = np.min(lows[i - window : i])
 
-                    # 3. Price Breakout: EOD Close on Day i crosses previous Swing High
+                    # 3. EOD Price Breakout on Day i
                     if closes[i] > swing_high and closes[i - 1] <= swing_high:
                         
-                        # 4. OBV Confirmation: Finalized EOD OBV on Day i > OBV at Swing High Day
+                        # 4. Finalized EOD OBV Confirmation on Day i
                         obv_at_swing_high = obvs[swing_high_abs_idx]
                         if obvs[i] <= obv_at_swing_high:
                             continue
 
-                        # Realistic Execution: Entry at Day i+1 Market Open
+                        # Entry on Day i+1 Open
                         entry_price = opens[i + 1] if opens[i + 1] > 0 else closes[i]
                         stop_loss = round(base_low * 0.995, 2)
                         risk = entry_price - stop_loss
@@ -252,7 +252,7 @@ def run_segmented_backtest(stock_map):
 
                         target_2r = entry_price + (2.0 * risk)
 
-                        # 60 Trading Days (~3 Months) Forward Evaluation starting from i+1
+                        # 60 Trading Days Forward Evaluation
                         hit_20pct_rally = False
                         hit_2r_target = False
                         hit_sl = False
@@ -284,7 +284,7 @@ def run_segmented_backtest(stock_map):
                             "hit_sl": 1 if hit_sl else 0,
                             "max_gain": max_gain
                         })
-                        last_exit = i + 10  # Prevent consecutive duplicate triggers
+                        last_exit = i + 10
 
             tot = len(trades)
             if tot >= 10:
