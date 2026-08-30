@@ -1,170 +1,38 @@
 {
   "Bucket A (>30 Cr)": [
     {
-      "Exit Model": "Baseline: Base SL Only (Unconstrained)",
-      "Total Trades": 310,
-      "Win Rate %": 36.1,
-      "Avg Return %": "+7.01%",
-      "Profit Factor": 2.09,
-      "Avg Hold (Days)": 90.4,
-      "Score": 75.4
-    },
-    {
-      "Exit Model": "Model 1: Bearish OBV Divergence",
-      "Total Trades": 310,
-      "Win Rate %": 40.0,
-      "Avg Return %": "-0.23%",
-      "Profit Factor": 0.95,
-      "Avg Hold (Days)": 25.5,
-      "Score": 38.0
-    },
-    {
-      "Exit Model": "Model 2A: Volume Vacuum (Shrinkage)",
-      "Total Trades": 310,
-      "Win Rate %": 36.5,
-      "Avg Return %": "+1.23%",
-      "Profit Factor": 1.33,
-      "Avg Hold (Days)": 29.7,
-      "Score": 48.5
-    },
-    {
-      "Exit Model": "Model 2B: High-Vol Churn Day",
-      "Total Trades": 310,
-      "Win Rate %": 40.3,
-      "Avg Return %": "+3.62%",
-      "Profit Factor": 1.62,
-      "Avg Hold (Days)": 70.6,
-      "Score": 65.3
-    },
-    {
-      "Exit Model": "Model 2C: Distribution Cluster",
-      "Total Trades": 310,
-      "Win Rate %": 38.7,
-      "Avg Return %": "+3.62%",
-      "Profit Factor": 1.75,
-      "Avg Hold (Days)": 48.7,
-      "Score": 67.7
-    },
-    {
-      "Exit Model": "Model 3: Dynamic Trailing Stop",
-      "Total Trades": 310,
-      "Win Rate %": 33.2,
-      "Avg Return %": "+0.18%",
-      "Profit Factor": 1.04,
-      "Avg Hold (Days)": 38.9,
-      "Score": 34.5
+      "Exit Model": "Composite (Dynamic Trail + Climax Churn 2B)",
+      "Total Trades": 295,
+      "Win Rate %": 34.6,
+      "Hit 20% Rally %": 18.0,
+      "Avg Return %": "+0.01%",
+      "Profit Factor": 1.0,
+      "Avg Hold (Days)": 34.5,
+      "Score": 34.6
     }
   ],
   "Bucket B (5-30 Cr)": [
     {
-      "Exit Model": "Baseline: Base SL Only (Unconstrained)",
-      "Total Trades": 1920,
-      "Win Rate %": 42.5,
-      "Avg Return %": "+13.61%",
-      "Profit Factor": 3.31,
-      "Avg Hold (Days)": 103.7,
-      "Score": 140.7
-    },
-    {
-      "Exit Model": "Model 1: Bearish OBV Divergence",
-      "Total Trades": 1920,
-      "Win Rate %": 48.0,
-      "Avg Return %": "+2.89%",
-      "Profit Factor": 1.78,
-      "Avg Hold (Days)": 32.3,
-      "Score": 85.4
-    },
-    {
-      "Exit Model": "Model 2A: Volume Vacuum (Shrinkage)",
-      "Total Trades": 1920,
-      "Win Rate %": 44.3,
-      "Avg Return %": "+2.92%",
-      "Profit Factor": 1.93,
-      "Avg Hold (Days)": 27.4,
-      "Score": 85.5
-    },
-    {
-      "Exit Model": "Model 2B: High-Vol Churn Day",
-      "Total Trades": 1920,
-      "Win Rate %": 48.7,
-      "Avg Return %": "+8.57%",
-      "Profit Factor": 2.76,
-      "Avg Hold (Days)": 67.1,
-      "Score": 134.4
-    },
-    {
-      "Exit Model": "Model 2C: Distribution Cluster",
-      "Total Trades": 1920,
-      "Win Rate %": 47.1,
-      "Avg Return %": "+6.39%",
-      "Profit Factor": 2.59,
-      "Avg Hold (Days)": 48.8,
-      "Score": 122.0
-    },
-    {
-      "Exit Model": "Model 3: Dynamic Trailing Stop",
-      "Total Trades": 1920,
-      "Win Rate %": 42.4,
-      "Avg Return %": "+2.94%",
-      "Profit Factor": 1.7,
-      "Avg Hold (Days)": 40.9,
-      "Score": 72.1
+      "Exit Model": "Composite (Dynamic Trail + Climax Churn 2B)",
+      "Total Trades": 1440,
+      "Win Rate %": 43.3,
+      "Hit 20% Rally %": 23.3,
+      "Avg Return %": "+2.07%",
+      "Profit Factor": 1.5,
+      "Avg Hold (Days)": 33.3,
+      "Score": 64.9
     }
   ],
   "Bucket C (<5 Cr)": [
     {
-      "Exit Model": "Baseline: Base SL Only (Unconstrained)",
-      "Total Trades": 30,
-      "Win Rate %": 70.0,
-      "Avg Return %": "+30.00%",
-      "Profit Factor": 9.98,
-      "Avg Hold (Days)": 140.4,
-      "Score": 698.6
-    },
-    {
-      "Exit Model": "Model 1: Bearish OBV Divergence",
-      "Total Trades": 30,
-      "Win Rate %": 66.7,
-      "Avg Return %": "+12.34%",
-      "Profit Factor": 5.28,
-      "Avg Hold (Days)": 47.5,
-      "Score": 352.2
-    },
-    {
-      "Exit Model": "Model 2A: Volume Vacuum (Shrinkage)",
-      "Total Trades": 30,
-      "Win Rate %": 66.7,
-      "Avg Return %": "+16.27%",
-      "Profit Factor": 8.01,
-      "Avg Hold (Days)": 33.5,
-      "Score": 534.3
-    },
-    {
-      "Exit Model": "Model 2B: High-Vol Churn Day",
-      "Total Trades": 30,
-      "Win Rate %": 73.3,
-      "Avg Return %": "+17.95%",
-      "Profit Factor": 6.84,
-      "Avg Hold (Days)": 77.8,
-      "Score": 501.4
-    },
-    {
-      "Exit Model": "Model 2C: Distribution Cluster",
-      "Total Trades": 30,
-      "Win Rate %": 66.7,
-      "Avg Return %": "+12.75%",
-      "Profit Factor": 4.92,
-      "Avg Hold (Days)": 59.7,
-      "Score": 328.2
-    },
-    {
-      "Exit Model": "Model 3: Dynamic Trailing Stop",
-      "Total Trades": 30,
-      "Win Rate %": 66.7,
-      "Avg Return %": "+15.65%",
-      "Profit Factor": 7.05,
-      "Avg Hold (Days)": 51.1,
-      "Score": 470.2
+      "Exit Model": "Composite (Dynamic Trail + Climax Churn 2B)",
+      "Total Trades": 28,
+      "Win Rate %": 71.4,
+      "Hit 20% Rally %": 46.4,
+      "Avg Return %": "+8.52%",
+      "Profit Factor": 4.43,
+      "Avg Hold (Days)": 40.8,
+      "Score": 316.3
     }
   ]
 }
