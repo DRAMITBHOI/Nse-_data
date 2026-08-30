@@ -1,7 +1,6 @@
 import os
 import io
 import json
-import itertools
 import urllib.request
 import numpy as np
 import pandas as pd
@@ -101,7 +100,7 @@ def full_corporate_action_adjustment(raw_data):
     return clean
 
 # ==========================================
-# 3. PREPARE STOCK SERIES
+# 3. PREPARE STOCK DATA & SERIES
 # ==========================================
 def prepare_stock_series(nifty_750_set):
     stock_map = {}
@@ -133,15 +132,15 @@ def prepare_stock_series(nifty_750_set):
 
             df = pd.DataFrame(clean)
             
-            # Turnover in Crores & 50D average
+            # Turnover & Baseline Metrics
             df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
             df["turnover_50d_avg"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
-
-            # 50D Mean Delivery %
             df["deliv_pct_50d_avg"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
-
-            # 20D Delivery Volume SMA
             df["deliv_vol_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
+            df["deliv_vol_sma50"] = df["delivery_vol"].rolling(50, min_periods=10).mean()
+            df["deliv_vol_sma5"] = df["delivery_vol"].rolling(5, min_periods=1).mean()
+            df["vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
+            df["ema10"] = df["close"].ewm(span=10, adjust=False).mean()
 
             # True Delivery OBV
             closes = df["close"].values
@@ -166,175 +165,264 @@ def prepare_stock_series(nifty_750_set):
         except Exception:
             continue
 
-    print(f"✅ Prepared {len(stock_map)} stocks for liquidity-segmented testing.\n")
+    print(f"✅ Prepared {len(stock_map)} stocks for unconstrained exit evaluation.\n")
     return stock_map
 
 # ==========================================
-# 4. GRID SEARCH ENGINE (EOD BREAKOUT & OBV CONFIRMATION)
+# 4. UNCONSTRAINED TRADE SIMULATOR
 # ==========================================
-def run_segmented_backtest(stock_map):
-    pct_spike_grid = [1.2, 1.4, 1.6, 1.8]
-    vol_sma_grid = [1.0, 1.2, 1.5, 1.8]
-    cluster_cnt_grid = [2, 3, 4]
-    window_grid = [15, 20, 30]
+def simulate_trade_exit(df, entry_idx, entry_price, initial_stop_loss, exit_model, max_unconstrained_hold=180):
+    opens = df["open"].values
+    highs = df["high"].values
+    lows = df["low"].values
+    closes = df["close"].values
+    vols = df["volume"].values
+    d_vols = df["delivery_vol"].values
+    pcts = df["deliv_pct"].values
+    pct_50_avg = df["deliv_pct_50d_avg"].values
+    d_vol_sma50 = df["deliv_vol_sma50"].values
+    d_vol_sma5 = df["deliv_vol_sma5"].values
+    vol_sma20 = df["vol_sma20"].values
+    ema10 = df["ema10"].values
+    obvs = df["deliv_obv"].values
+    N = len(closes)
 
-    grid = list(itertools.product(pct_spike_grid, vol_sma_grid, cluster_cnt_grid, window_grid))
+    end_idx = min(N - 1, entry_idx + max_unconstrained_hold)
+    hit_20pct = False
+    max_gain = 0.0
+    current_sl = initial_stop_loss
 
-    buckets = {
-        "Bucket A (High Liquidity: > 30 Cr)": {"min_to": 30.0, "max_to": 1e9, "results": []},
-        "Bucket B (Medium Liquidity: 5 - 30 Cr)": {"min_to": 5.0, "max_to": 30.0, "results": []},
-        "Bucket C (Low Liquidity: < 5 Cr)": {"min_to": 0.0, "max_to": 5.0, "results": []}
+    for curr in range(entry_idx, end_idx + 1):
+        c_open = opens[curr]
+        c_high = highs[curr]
+        c_low = lows[curr]
+        c_close = closes[curr]
+
+        gain = ((c_high - entry_price) / entry_price) * 100
+        if gain > max_gain:
+            max_gain = gain
+        if gain >= 20.0:
+            hit_20pct = True
+
+        # Model 3: Dynamic Trailing Stop Adjustment
+        if exit_model == "Model 3: Dynamic Trailing Stop":
+            # Stage 1: Move SL to Breakeven once gain >= +10%
+            if max_gain >= 10.0 and current_sl < entry_price:
+                current_sl = entry_price
+            
+            # Stage 2: Trail 10-Day Swing Low once gain >= +15%
+            if max_gain >= 15.0 and curr >= entry_idx + 10:
+                trail_10d_low = float(np.min(lows[curr - 10 : curr]))
+                if trail_10d_low > current_sl:
+                    current_sl = trail_10d_low
+
+        # Stop Loss Trigger (Evaluated Intraday)
+        if c_low <= current_sl:
+            exit_price = min(c_open, current_sl)
+            pnl = ((exit_price - entry_price) / entry_price) * 100
+            return pnl, (curr - entry_idx + 1), hit_20pct, max_gain, "Stop Triggered"
+
+        # Signal-Based Exits (Evaluated at Close of Day 'curr', Exited at Day 'curr + 1' Open)
+        trigger_exit = False
+        exit_reason = ""
+
+        if curr > entry_idx + 2 and curr < end_idx:
+            # Model 1: Bearish True Delivery OBV Divergence
+            if exit_model == "Model 1: Bearish OBV Divergence":
+                for k in range(5, min(21, curr - entry_idx + 1)):
+                    prev_idx = curr - k
+                    if c_high >= highs[prev_idx] and obvs[curr] < obvs[prev_idx]:
+                        recent_5d_low = np.min(lows[curr - 4 : curr])
+                        if c_close < recent_5d_low:
+                            trigger_exit = True
+                            exit_reason = "OBV Divergence"
+                            break
+
+            # Model 2A: Buyer Vacuum / Delivery Volume Shrinkage
+            elif exit_model == "Model 2A: Volume Vacuum (Shrinkage)":
+                if d_vol_sma50[curr] > 0 and d_vol_sma5[curr] <= (0.60 * d_vol_sma50[curr]):
+                    if c_close < ema10[curr]:
+                        trigger_exit = True
+                        exit_reason = "Delivery Vacuum"
+
+            # Model 2B: High-Volume Intraday Churn Day
+            elif exit_model == "Model 2B: High-Vol Churn Day":
+                if vol_sma20[curr] > 0 and pct_50_avg[curr] > 0:
+                    is_heavy_vol = vols[curr] >= (1.5 * vol_sma20[curr])
+                    is_low_deliv = pcts[curr] <= (0.70 * pct_50_avg[curr])
+                    is_red_or_doji = c_close <= (c_open * 1.002)
+                    if is_heavy_vol and is_low_deliv and is_red_or_doji:
+                        trigger_exit = True
+                        exit_reason = "Heavy Churn Climax"
+
+            # Model 2C: Distribution Cluster
+            elif exit_model == "Model 2C: Distribution Cluster":
+                sub_par_days = 0
+                for look in range(curr - 4, curr + 1):
+                    if pct_50_avg[look] > 0 and pcts[look] < (0.80 * pct_50_avg[look]):
+                        sub_par_days += 1
+                if sub_par_days >= 3 and c_close < ema10[curr]:
+                    trigger_exit = True
+                    exit_reason = "Distribution Cluster"
+
+        if trigger_exit and (curr + 1) <= end_idx:
+            next_open = opens[curr + 1]
+            pnl = ((next_open - entry_price) / entry_price) * 100
+            return pnl, (curr - entry_idx + 2), hit_20pct, max_gain, exit_reason
+
+    final_close = closes[end_idx]
+    pnl = ((final_close - entry_price) / entry_price) * 100
+    return pnl, (end_idx - entry_idx + 1), hit_20pct, max_gain, "End of History"
+
+# ==========================================
+# 5. EXECUTE COMPARATIVE GRID
+# ==========================================
+def run_exit_comparison_backtest(stock_map):
+    exit_models = [
+        "Baseline: Base SL Only (Unconstrained)",
+        "Model 1: Bearish OBV Divergence",
+        "Model 2A: Volume Vacuum (Shrinkage)",
+        "Model 2B: High-Vol Churn Day",
+        "Model 2C: Distribution Cluster",
+        "Model 3: Dynamic Trailing Stop"
+    ]
+
+    tier_config = {
+        "Bucket A (>30 Cr)": {"min_to": 30.0, "max_to": 1e9, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 3, "window": 15},
+        "Bucket B (5-30 Cr)": {"min_to": 5.0, "max_to": 30.0, "pct_mult": 1.2, "vol_mult": 1.0, "cluster": 2, "window": 15},
+        "Bucket C (<5 Cr)": {"min_to": 0.0, "max_to": 5.0, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 4, "window": 20}
     }
 
-    print(f"🔬 Testing {len(grid)} Parameter Setups (EOD Breakout OBV > Swing High OBV | 60-Day Horizon)...")
+    report_data = {}
 
-    for b_name, b_info in buckets.items():
-        min_to = b_info["min_to"]
-        max_to = b_info["max_to"]
+    for b_name, b_cfg in tier_config.items():
+        print(f"📊 Testing 6 Exit Models on {b_name}...")
+        min_to = b_cfg["min_to"]
+        max_to = b_cfg["max_to"]
+        pct_mult = b_cfg["pct_mult"]
+        vol_mult = b_cfg["vol_mult"]
+        min_cluster = b_cfg["cluster"]
+        window = b_cfg["window"]
 
-        for pct_mult, vol_mult, min_cluster, window in grid:
-            trades = []
+        entry_signals = []
+        for sym, df in stock_map.items():
+            opens = df["open"].values
+            closes = df["close"].values
+            highs = df["high"].values
+            lows = df["low"].values
+            pcts = df["deliv_pct"].values
+            pct_50_avg = df["deliv_pct_50d_avg"].values
+            d_vols = df["delivery_vol"].values
+            vol_sma20 = df["deliv_vol_sma20"].values
+            to_50_avg = df["turnover_50d_avg"].values
+            obvs = df["deliv_obv"].values
+            N = len(closes)
 
-            for sym, df in stock_map.items():
-                opens = df["open"].values
-                closes = df["close"].values
-                highs = df["high"].values
-                lows = df["low"].values
-                pcts = df["deliv_pct"].values
-                pct_50_avg = df["deliv_pct_50d_avg"].values
-                d_vols = df["delivery_vol"].values
-                vol_sma20 = df["deliv_vol_sma20"].values
-                to_50_avg = df["turnover_50d_avg"].values
-                obvs = df["deliv_obv"].values
-                N = len(closes)
+            qualifying_days = (pct_50_avg > 0) & (pcts >= (pct_mult * pct_50_avg)) & (d_vols >= (vol_mult * vol_sma20))
+            last_exit = -1
 
-                qualifying_days = (pct_50_avg > 0) & (pcts >= (pct_mult * pct_50_avg)) & (d_vols >= (vol_mult * vol_sma20))
+            for i in range(max(window + 20, 30), N - 30):
+                if i <= last_exit:
+                    continue
 
-                last_exit = -1
+                curr_to = to_50_avg[i]
+                if np.isnan(curr_to) or not (min_to <= curr_to < max_to):
+                    continue
 
-                # Evaluate up to N - 61 for full 60 trading days forward holding
-                for i in range(max(window + 20, 30), N - 61):
-                    if i <= last_exit:
+                if np.sum(qualifying_days[i - window : i]) < min_cluster:
+                    continue
+
+                base_highs = highs[i - window : i]
+                swing_high_rel_idx = np.argmax(base_highs)
+                swing_high_abs_idx = (i - window) + swing_high_rel_idx
+                swing_high = base_highs[swing_high_rel_idx]
+                base_low = np.min(lows[i - window : i])
+
+                if closes[i] > swing_high and closes[i - 1] <= swing_high:
+                    if obvs[i] <= obvs[swing_high_abs_idx]:
                         continue
 
-                    curr_to = to_50_avg[i]
-                    if np.isnan(curr_to) or not (min_to <= curr_to < max_to):
+                    entry_price = opens[i + 1] if opens[i + 1] > 0 else closes[i]
+                    stop_loss = round(base_low * 0.995, 2)
+                    risk = entry_price - stop_loss
+
+                    if risk <= 0 or (risk / entry_price) > 0.15:
                         continue
 
-                    # 1. Cluster Count in Base Window
-                    cluster_count = np.sum(qualifying_days[i - window : i])
-                    if cluster_count < min_cluster:
-                        continue
+                    entry_signals.append({
+                        "sym": sym,
+                        "entry_idx": i + 1,
+                        "entry_price": entry_price,
+                        "stop_loss": stop_loss
+                    })
+                    last_exit = i + 10
 
-                    # 2. Identify Swing High price and its candle index
-                    base_highs = highs[i - window : i]
-                    swing_high_rel_idx = np.argmax(base_highs)
-                    swing_high_abs_idx = (i - window) + swing_high_rel_idx
-                    swing_high = base_highs[swing_high_rel_idx]
-                    
-                    base_low = np.min(lows[i - window : i])
+        tier_results = []
+        for model in exit_models:
+            trades_pnl = []
+            trades_hold = []
+            trades_hit_20 = []
+            trades_win = []
 
-                    # 3. EOD Price Breakout on Day i
-                    if closes[i] > swing_high and closes[i - 1] <= swing_high:
-                        
-                        # 4. Finalized EOD OBV Confirmation on Day i
-                        obv_at_swing_high = obvs[swing_high_abs_idx]
-                        if obvs[i] <= obv_at_swing_high:
-                            continue
+            for sig in entry_signals:
+                df = stock_map[sig["sym"]]
+                pnl, hold_days, hit_20, max_g, reason = simulate_trade_exit(
+                    df, sig["entry_idx"], sig["entry_price"], sig["stop_loss"], model, max_unconstrained_hold=180
+                )
+                trades_pnl.append(pnl)
+                trades_hold.append(hold_days)
+                trades_hit_20.append(1 if hit_20 else 0)
+                trades_win.append(1 if pnl > 0 else 0)
 
-                        # Entry on Day i+1 Open
-                        entry_price = opens[i + 1] if opens[i + 1] > 0 else closes[i]
-                        stop_loss = round(base_low * 0.995, 2)
-                        risk = entry_price - stop_loss
+            tot = len(trades_pnl)
+            if tot > 0:
+                win_rate = round((sum(trades_win) / tot) * 100, 1)
+                win_20pct = round((sum(trades_hit_20) / tot) * 100, 1)
+                avg_pnl = round(float(np.mean(trades_pnl)), 2)
+                avg_days = round(float(np.mean(trades_hold)), 1)
+                
+                neg_sum = abs(float(np.sum([p for p in trades_pnl if p < 0])))
+                pos_sum = float(np.sum([p for p in trades_pnl if p > 0]))
+                profit_factor = round(pos_sum / neg_sum, 2) if neg_sum > 0 else 99.0
 
-                        if risk <= 0 or (risk / entry_price) > 0.15:  # Max 15% Risk Limit
-                            continue
-
-                        target_2r = entry_price + (2.0 * risk)
-
-                        # 60 Trading Days Forward Evaluation
-                        hit_20pct_rally = False
-                        hit_2r_target = False
-                        hit_sl = False
-                        max_gain = 0.0
-
-                        for fwd in range(i + 1, min(N, i + 62)):
-                            c_high = highs[fwd]
-                            c_low = lows[fwd]
-
-                            gain = ((c_high - entry_price) / entry_price) * 100
-                            if gain > max_gain:
-                                max_gain = gain
-
-                            # Check Stop Loss first
-                            if c_low <= stop_loss:
-                                hit_sl = True
-                                break
-
-                            if c_high >= target_2r:
-                                hit_2r_target = True
-
-                            if gain >= 20.0:
-                                hit_20pct_rally = True
-                                break
-
-                        trades.append({
-                            "hit_20pct": 1 if hit_20pct_rally else 0,
-                            "hit_2r": 1 if hit_2r_target else 0,
-                            "hit_sl": 1 if hit_sl else 0,
-                            "max_gain": max_gain
-                        })
-                        last_exit = i + 10
-
-            tot = len(trades)
-            if tot >= 10:
-                win_rate_20pct = round((sum(t["hit_20pct"] for t in trades) / tot) * 100, 1)
-                win_rate_2r = round((sum(t["hit_2r"] for t in trades) / tot) * 100, 1)
-                sl_rate = round((sum(t["hit_sl"] for t in trades) / tot) * 100, 1)
-                avg_rally = round(float(np.mean([t["max_gain"] for t in trades])), 1)
-
-                b_info["results"].append({
-                    "Deliv % Spike": f"{pct_mult}x 50D Mean",
-                    "Vol vs SMA20": f"{vol_mult}x SMA20",
-                    "Cluster Count": f"{min_cluster} days",
-                    "Base Window": f"{window}d",
+                tier_results.append({
+                    "Exit Model": model,
                     "Total Trades": tot,
-                    "Hit 20% Rally %": win_rate_20pct,
-                    "Hit 1:2 RR %": win_rate_2r,
-                    "Hit SL %": sl_rate,
-                    "Avg Max Rally %": avg_rally,
-                    "Score": round(win_rate_20pct * np.log10(tot) * (avg_rally / 10), 1)
+                    "Win Rate %": win_rate,
+                    "Avg Return %": f"{avg_pnl:+0.2f}%",
+                    "Profit Factor": profit_factor,
+                    "Avg Hold (Days)": avg_days,
+                    "Score": round(win_rate * profit_factor, 1)
                 })
 
-    return buckets
+        report_data[b_name] = tier_results
+
+    return report_data
 
 # ==========================================
-# 5. MAIN EXECUTION
+# 6. MAIN
 # ==========================================
 def main():
     nifty750 = get_nifty_750_universe()
     stock_map = prepare_stock_series(nifty750)
 
     if stock_map:
-        bucket_results = run_segmented_backtest(stock_map)
+        report_data = run_exit_comparison_backtest(stock_map)
 
-        for b_name, b_info in bucket_results.items():
+        for b_name, res in report_data.items():
             print("\n" + "=" * 95)
-            print(f"🏆 TOP 5 OPTIMAL SETUPS FOR: {b_name.upper()} (EOD BREAKOUT OBV | 60-DAY HORIZON)")
+            print(f"🏆 EXIT STRATEGY COMPARISON FOR: {b_name.upper()}")
             print("=" * 95)
-            df_res = pd.DataFrame(b_info["results"])
+            df_res = pd.DataFrame(res)
             if not df_res.empty:
-                df_top = df_res.sort_values(by="Score", ascending=False).head(5)
-                print(df_top.to_string(index=False))
-            else:
-                print("No configurations met minimum trade sample threshold.")
+                print(df_res.to_string(index=False))
 
         out_file = os.path.join(DATA_DIR, "segmented_backtest_report.json")
         with open(out_file, "w") as fp:
-            json.dump({k: v["results"] for k, v in bucket_results.items()}, fp, indent=2)
-        print(f"\n💾 Full backtest grid saved to '{out_file}'")
+            json.dump(report_data, fp, indent=2)
+        print(f"\n💾 Exit comparison backtest saved to '{out_file}'")
     else:
-        print("⚠️ No stock data available to run backtest.")
+        print("⚠️ No stock data available.")
 
 if __name__ == "__main__":
     main()
