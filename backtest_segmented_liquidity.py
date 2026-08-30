@@ -119,7 +119,7 @@ def clean_and_prepare_dataset(raw_data):
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
 
-    # Forward-fill missing delivery gaps
+    # Forward fill missing volume gaps
     running_vol = 50000.0
     for i in range(len(clean)):
         v = clean[i]["volume"]
@@ -142,7 +142,7 @@ def clean_and_prepare_dataset(raw_data):
     return clean
 
 def run_segmented_backtest():
-    print("🚀 Starting Segmented Liquidity Strategy Backtest (Updated Bucket A Architecture)...")
+    print("🚀 Running Segmented Liquidity Backtest Engine...")
     
     nifty_750_set = get_nifty_750_universe()
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
@@ -197,7 +197,6 @@ def run_segmented_backtest():
         df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
         df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
 
-        # True Demat Delivery OBV
         cur_obv = 0
         obvs = []
         for i, row in df.iterrows():
@@ -240,11 +239,10 @@ def run_segmented_backtest():
         for i in range(50, N):
             curr_to = to_50[i] if not np.isnan(to_50[i]) else 0.0
 
-            # Tier parameter mapping
             if is_n750:
                 if curr_to >= 30.0:
                     tier = "Bucket A (>30 Cr)"
-                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45  # 45-day lookback
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
                 elif curr_to >= 5.0:
                     tier = "Bucket B (5-30 Cr)"
                     pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
@@ -261,7 +259,7 @@ def run_segmented_backtest():
                 if gain > max_run_gain:
                     max_run_gain = gain
 
-                # Tier trailing rules
+                # Active Dynamic Trailing Per Bucket
                 if "Bucket C" in active_bucket:
                     if max_run_gain >= 10.0 and active_sl < entry_price:
                         active_sl = entry_price
@@ -277,20 +275,23 @@ def run_segmented_backtest():
                         if trail_20 > active_sl:
                             active_sl = trail_20
                 else:
-                    # Bucket A: Initial Base SL remains active (open trend riding)
-                    pass
+                    # Bucket A: Breakeven at +15%, Wide Trend Trail (40-day low) at +25%
+                    if max_run_gain >= 15.0 and active_sl < entry_price:
+                        active_sl = entry_price
+                    if max_run_gain >= 25.0 and i >= entry_idx + 30:
+                        trail_40 = float(np.min(lows[i - 30 : i]))
+                        if trail_40 > active_sl:
+                            active_sl = trail_40
 
                 exit_triggered = False
                 exit_reason = ""
                 exit_price = closes[i]
 
-                # Hard SL / Trailing Stop Trigger
                 if lows[i] <= active_sl:
                     exit_triggered = True
                     exit_reason = "Hard/Trailing Stop Loss"
                     exit_price = min(closes[i], active_sl)
                 
-                # Model 2B Climax Churn Exit (Bucket C only)
                 elif "Bucket C" in active_bucket and i > entry_idx + 2:
                     if gross_sma[i] > 0 and pct_50[i] > 0:
                         if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= (opens[i] * 1.002):
@@ -310,6 +311,7 @@ def run_segmented_backtest():
                         "Exit Price": round(exit_price, 2),
                         "Return %": ret_pct,
                         "Max Run Gain %": round(max_run_gain, 2),
+                        "Rally 20%": bool(max_run_gain >= 20.0),
                         "Holding Days": holding_days,
                         "Exit Reason": exit_reason,
                         "Is Win": bool(ret_pct > 0)
@@ -341,9 +343,9 @@ def run_segmented_backtest():
                             entry_date = times[i]
                             max_run_gain = 0.0
 
-    print(f"\n📊 Total Trades Executed Across Strategy: {len(all_trades)}")
+    print(f"📊 Total Trades Executed: {len(all_trades)}")
 
-    # Segmented Performance Analytics
+    # Format Segmented Summary
     df_trades = pd.DataFrame(all_trades)
     summary = {}
 
@@ -357,32 +359,29 @@ def run_segmented_backtest():
             wins = len(b_df[b_df["Is Win"] == True])
             losses = total_t - wins
             win_rate = round((wins / total_t) * 100, 1)
+            rally_20_count = len(b_df[b_df["Rally 20%"] == True])
+            rally_20_pct = round((rally_20_count / total_t) * 100, 1)
             
             avg_ret = round(float(b_df["Return %"].mean()), 2)
             avg_win = round(float(b_df[b_df["Is Win"] == True]["Return %"].mean()), 2) if wins > 0 else 0.0
             avg_loss = round(float(b_df[b_df["Is Win"] == False]["Return %"].mean()), 2) if losses > 0 else 0.0
             
-            pl_ratio = round(abs(avg_win / avg_loss), 2) if avg_loss != 0 else np.nan
-            max_gain = round(float(b_df["Return %"].max()), 2)
-            max_dd = round(float(b_df["Return %"].min()), 2)
+            gross_win = b_df[b_df["Is Win"] == True]["Return %"].sum()
+            gross_loss = abs(b_df[b_df["Is Win"] == False]["Return %"].sum())
+            profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else 99.0
+            
             avg_hold = round(float(b_df["Holding Days"].mean()), 1)
+            score = round((win_rate * profit_factor) / 10.0, 1)
 
             summary[bucket] = {
-                "Total Trades": total_t,
+                "Trades": total_t,
                 "Win Rate %": f"{win_rate}%",
-                "Profit Factor / PL Ratio": pl_ratio,
-                "Avg Return %": f"{avg_ret}%",
-                "Avg Win %": f"{avg_win}%",
-                "Avg Loss %": f"{avg_loss}%",
-                "Max Single Gain %": f"{max_gain}%",
-                "Max Single Loss %": f"{max_dd}%",
-                "Avg Holding Period (Days)": avg_hold
+                "+20% Rally %": f"{rally_20_pct}%",
+                "Avg Return %": f"{'+' if avg_ret >= 0 else ''}{avg_ret}%",
+                "Profit Factor": profit_factor,
+                "Avg Hold": f"{avg_hold} d",
+                "Score": score
             }
-
-            print(f"\n🔹 {bucket.upper()} PERFORMANCE:")
-            print(f"   • Total Trades: {total_t} | Win Rate: {win_rate}%")
-            print(f"   • Avg Win: +{avg_win}% | Avg Loss: {avg_loss}% | P/L Ratio: {pl_ratio}")
-            print(f"   • Avg Trade Return: {avg_ret}% | Avg Holding: {avg_hold} days")
 
     final_report = {
         "Segmented Summary": summary,
@@ -392,7 +391,7 @@ def run_segmented_backtest():
     with open(OUTPUT_REPORT, "w") as fp:
         json.dump(final_report, fp, indent=2)
 
-    print(f"\n🎉 Segmented Backtest Complete! Saved full report to '{OUTPUT_REPORT}'.")
+    print(f"🎉 Segmented Backtest Complete! Saved to '{OUTPUT_REPORT}'.")
 
 if __name__ == "__main__":
     run_segmented_backtest()
