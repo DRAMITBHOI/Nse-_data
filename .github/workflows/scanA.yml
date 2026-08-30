@@ -1,0 +1,42 @@
+name: ScanA Daily Scanner
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 7:00 PM IST is 13:30 UTC (Monday to Friday)
+    - cron: '30 13 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  run-scanA:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas requests
+
+      - name: Execute ScanA Engine
+        run: |
+          python scanA.py
+
+      - name: Commit and Push Daily Scan Results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/scanA_results.json data/nifty750.json || true
+          git commit -m "Auto-update scanA screener results" || exit 0
+          git push
