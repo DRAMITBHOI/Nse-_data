@@ -1,12 +1,73 @@
 [
   {
+    "time": "2021-01-01",
+    "open": 4.2,
+    "high": 4.3,
+    "low": 4.0,
+    "close": 4.15,
+    "volume": 99276.0,
+    "delivery_vol": 64772.0,
+    "deliv_pct": 65.24
+  },
+  {
+    "time": "2021-01-04",
+    "open": 4.15,
+    "high": 4.25,
+    "low": 4.0,
+    "close": 4.15,
+    "volume": 105445.0,
+    "delivery_vol": 60412.0,
+    "deliv_pct": 57.29
+  },
+  {
+    "time": "2021-01-05",
+    "open": 4.2,
+    "high": 4.25,
+    "low": 4.05,
+    "close": 4.1,
+    "volume": 66997.0,
+    "delivery_vol": 49161.0,
+    "deliv_pct": 73.38
+  },
+  {
+    "time": "2021-01-06",
+    "open": 4.2,
+    "high": 4.2,
+    "low": 3.9,
+    "close": 3.95,
+    "volume": 76466.0,
+    "delivery_vol": 61642.0,
+    "deliv_pct": 80.61
+  },
+  {
+    "time": "2021-01-07",
+    "open": 3.95,
+    "high": 4.1,
+    "low": 3.85,
+    "close": 3.95,
+    "volume": 58404.0,
+    "delivery_vol": 47933.0,
+    "deliv_pct": 82.07
+  },
+  {
+    "time": "2021-01-08",
+    "open": 4.1,
+    "high": 4.1,
+    "low": 3.85,
+    "close": 4.0,
+    "volume": 66758.0,
+    "delivery_vol": 46266.0,
+    "deliv_pct": 69.3
+  },
+  {
     "time": "2022-03-07",
     "open": 3.65,
     "high": 3.7,
     "low": 3.65,
     "close": 3.7,
-    "delivery_vol": 454,
-    "deliv_pct": 100.0
+    "delivery_vol": 454.0,
+    "deliv_pct": 100.0,
+    "volume": 454.0
   },
   {
     "time": "2023-08-25",
@@ -14,8 +75,9 @@
     "high": 3.3,
     "low": 3.2,
     "close": 3.2,
-    "delivery_vol": 9778,
-    "deliv_pct": 100.0
+    "delivery_vol": 9778.0,
+    "deliv_pct": 100.0,
+    "volume": 9778.0
   },
   {
     "time": "2023-08-28",
@@ -23,8 +85,9 @@
     "high": 3.4,
     "low": 3.2,
     "close": 3.4,
-    "delivery_vol": 4110,
-    "deliv_pct": 100.0
+    "delivery_vol": 4110.0,
+    "deliv_pct": 100.0,
+    "volume": 4110.0
   },
   {
     "time": "2023-08-29",
@@ -32,8 +95,19 @@
     "high": 3.4,
     "low": 3.4,
     "close": 3.4,
-    "delivery_vol": 2967,
-    "deliv_pct": 80.36
+    "delivery_vol": 2967.0,
+    "deliv_pct": 80.36,
+    "volume": 3692.0
+  },
+  {
+    "time": "2023-08-30",
+    "open": 3.4,
+    "high": 3.4,
+    "low": 3.4,
+    "close": 3.4,
+    "volume": 504.0,
+    "delivery_vol": 504.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2023-08-31",
@@ -41,8 +115,9 @@
     "high": 3.35,
     "low": 3.3,
     "close": 3.3,
-    "delivery_vol": 3751,
-    "deliv_pct": 100.0
+    "delivery_vol": 3751.0,
+    "deliv_pct": 100.0,
+    "volume": 3751.0
   },
   {
     "time": "2023-09-01",
@@ -50,8 +125,9 @@
     "high": 3.4,
     "low": 3.3,
     "close": 3.4,
-    "delivery_vol": 14435,
-    "deliv_pct": 100.0
+    "delivery_vol": 14435.0,
+    "deliv_pct": 100.0,
+    "volume": 14435.0
   },
   {
     "time": "2023-09-04",
@@ -59,7 +135,18 @@
     "high": 3.4,
     "low": 3.35,
     "close": 3.35,
-    "delivery_vol": 6460,
+    "delivery_vol": 6460.0,
+    "deliv_pct": 100.0,
+    "volume": 6460.0
+  },
+  {
+    "time": "2023-09-05",
+    "open": 3.4,
+    "high": 3.4,
+    "low": 3.35,
+    "close": 3.35,
+    "volume": 156.0,
+    "delivery_vol": 156.0,
     "deliv_pct": 100.0
   },
   {
@@ -68,8 +155,9 @@
     "high": 3.4,
     "low": 3.2,
     "close": 3.3,
-    "delivery_vol": 7013,
-    "deliv_pct": 97.23
+    "delivery_vol": 7013.0,
+    "deliv_pct": 97.23,
+    "volume": 7213.0
   },
   {
     "time": "2023-09-07",
@@ -77,8 +165,9 @@
     "high": 3.4,
     "low": 3.4,
     "close": 3.4,
-    "delivery_vol": 8284,
-    "deliv_pct": 100.0
+    "delivery_vol": 8284.0,
+    "deliv_pct": 100.0,
+    "volume": 8284.0
   },
   {
     "time": "2023-09-08",
@@ -86,8 +175,9 @@
     "high": 3.5,
     "low": 3.3,
     "close": 3.5,
-    "delivery_vol": 9975,
-    "deliv_pct": 100.0
+    "delivery_vol": 9975.0,
+    "deliv_pct": 100.0,
+    "volume": 9975.0
   },
   {
     "time": "2023-09-11",
@@ -95,8 +185,9 @@
     "high": 3.5,
     "low": 3.5,
     "close": 3.5,
-    "delivery_vol": 725,
-    "deliv_pct": 100.0
+    "delivery_vol": 725.0,
+    "deliv_pct": 100.0,
+    "volume": 725.0
   },
   {
     "time": "2023-09-12",
@@ -104,8 +195,9 @@
     "high": 3.65,
     "low": 3.5,
     "close": 3.65,
-    "delivery_vol": 5171,
-    "deliv_pct": 100.0
+    "delivery_vol": 5171.0,
+    "deliv_pct": 100.0,
+    "volume": 5171.0
   },
   {
     "time": "2023-09-13",
@@ -113,8 +205,9 @@
     "high": 3.6,
     "low": 3.25,
     "close": 3.6,
-    "delivery_vol": 902,
-    "deliv_pct": 81.85
+    "delivery_vol": 902.0,
+    "deliv_pct": 81.85,
+    "volume": 1102.0
   },
   {
     "time": "2023-09-14",
@@ -122,8 +215,9 @@
     "high": 3.75,
     "low": 3.55,
     "close": 3.75,
-    "delivery_vol": 2892,
-    "deliv_pct": 100.0
+    "delivery_vol": 2892.0,
+    "deliv_pct": 100.0,
+    "volume": 2892.0
   },
   {
     "time": "2023-09-15",
@@ -131,8 +225,9 @@
     "high": 3.9,
     "low": 3.6,
     "close": 3.8,
-    "delivery_vol": 19302,
-    "deliv_pct": 100.0
+    "delivery_vol": 19302.0,
+    "deliv_pct": 100.0,
+    "volume": 19302.0
   },
   {
     "time": "2023-09-18",
@@ -140,7 +235,18 @@
     "high": 3.8,
     "low": 3.55,
     "close": 3.8,
-    "delivery_vol": 18316,
+    "delivery_vol": 18316.0,
+    "deliv_pct": 100.0,
+    "volume": 18316.0
+  },
+  {
+    "time": "2023-09-19",
+    "open": 3.8,
+    "high": 3.8,
+    "low": 3.55,
+    "close": 3.8,
+    "volume": 18316.0,
+    "delivery_vol": 18316.0,
     "deliv_pct": 100.0
   },
   {
@@ -149,8 +255,9 @@
     "high": 3.95,
     "low": 3.7,
     "close": 3.95,
-    "delivery_vol": 9579,
-    "deliv_pct": 97.06
+    "delivery_vol": 9579.0,
+    "deliv_pct": 97.06,
+    "volume": 9869.0
   },
   {
     "time": "2023-09-21",
@@ -158,8 +265,9 @@
     "high": 4.0,
     "low": 3.75,
     "close": 4.0,
-    "delivery_vol": 11201,
-    "deliv_pct": 100.0
+    "delivery_vol": 11201.0,
+    "deliv_pct": 100.0,
+    "volume": 11201.0
   },
   {
     "time": "2023-09-22",
@@ -167,8 +275,9 @@
     "high": 4.0,
     "low": 3.6,
     "close": 3.9,
-    "delivery_vol": 11299,
-    "deliv_pct": 92.27
+    "delivery_vol": 11299.0,
+    "deliv_pct": 92.27,
+    "volume": 12245.0
   },
   {
     "time": "2023-09-25",
@@ -176,8 +285,9 @@
     "high": 3.85,
     "low": 3.65,
     "close": 3.8,
-    "delivery_vol": 25945,
-    "deliv_pct": 99.74
+    "delivery_vol": 25945.0,
+    "deliv_pct": 99.74,
+    "volume": 26012.0
   },
   {
     "time": "2023-09-26",
@@ -185,8 +295,9 @@
     "high": 3.8,
     "low": 3.55,
     "close": 3.8,
-    "delivery_vol": 2701,
-    "deliv_pct": 52.32
+    "delivery_vol": 2701.0,
+    "deliv_pct": 52.32,
+    "volume": 5162.0
   },
   {
     "time": "2023-09-27",
@@ -194,8 +305,9 @@
     "high": 4.0,
     "low": 3.75,
     "close": 3.75,
-    "delivery_vol": 2387,
-    "deliv_pct": 100.0
+    "delivery_vol": 2387.0,
+    "deliv_pct": 100.0,
+    "volume": 2387.0
   },
   {
     "time": "2023-09-28",
@@ -203,8 +315,9 @@
     "high": 3.9,
     "low": 3.75,
     "close": 3.9,
-    "delivery_vol": 2024,
-    "deliv_pct": 100.0
+    "delivery_vol": 2024.0,
+    "deliv_pct": 100.0,
+    "volume": 2024.0
   },
   {
     "time": "2023-09-29",
@@ -212,7 +325,18 @@
     "high": 3.85,
     "low": 3.8,
     "close": 3.8,
-    "delivery_vol": 6898,
+    "delivery_vol": 6898.0,
+    "deliv_pct": 100.0,
+    "volume": 6898.0
+  },
+  {
+    "time": "2023-10-02",
+    "open": 3.8,
+    "high": 3.85,
+    "low": 3.8,
+    "close": 3.8,
+    "volume": 6898.0,
+    "delivery_vol": 6898.0,
     "deliv_pct": 100.0
   },
   {
@@ -221,8 +345,9 @@
     "high": 3.8,
     "low": 3.8,
     "close": 3.8,
-    "delivery_vol": 699,
-    "deliv_pct": 100.0
+    "delivery_vol": 699.0,
+    "deliv_pct": 100.0,
+    "volume": 699.0
   },
   {
     "time": "2023-10-04",
@@ -230,8 +355,9 @@
     "high": 4.2,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 4570,
-    "deliv_pct": 100.0
+    "delivery_vol": 4570.0,
+    "deliv_pct": 100.0,
+    "volume": 4570.0
   },
   {
     "time": "2023-10-05",
@@ -239,8 +365,9 @@
     "high": 4.1,
     "low": 4.0,
     "close": 4.1,
-    "delivery_vol": 3310,
-    "deliv_pct": 100.0
+    "delivery_vol": 3310.0,
+    "deliv_pct": 100.0,
+    "volume": 3310.0
   },
   {
     "time": "2023-10-06",
@@ -248,8 +375,9 @@
     "high": 4.1,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1137,
-    "deliv_pct": 100.0
+    "delivery_vol": 1137.0,
+    "deliv_pct": 100.0,
+    "volume": 1137.0
   },
   {
     "time": "2023-10-09",
@@ -257,8 +385,9 @@
     "high": 4.0,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1,
-    "deliv_pct": 100.0
+    "delivery_vol": 1.0,
+    "deliv_pct": 100.0,
+    "volume": 1.0
   },
   {
     "time": "2023-10-10",
@@ -266,8 +395,9 @@
     "high": 4.0,
     "low": 3.75,
     "close": 3.9,
-    "delivery_vol": 1785,
-    "deliv_pct": 100.0
+    "delivery_vol": 1785.0,
+    "deliv_pct": 100.0,
+    "volume": 1785.0
   },
   {
     "time": "2023-10-11",
@@ -275,8 +405,9 @@
     "high": 4.0,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1105,
-    "deliv_pct": 100.0
+    "delivery_vol": 1105.0,
+    "deliv_pct": 100.0,
+    "volume": 1105.0
   },
   {
     "time": "2023-10-12",
@@ -284,8 +415,9 @@
     "high": 4.0,
     "low": 3.95,
     "close": 3.95,
-    "delivery_vol": 597,
-    "deliv_pct": 100.0
+    "delivery_vol": 597.0,
+    "deliv_pct": 100.0,
+    "volume": 597.0
   },
   {
     "time": "2023-10-13",
@@ -293,8 +425,9 @@
     "high": 4.35,
     "low": 3.95,
     "close": 4.35,
-    "delivery_vol": 2719,
-    "deliv_pct": 100.0
+    "delivery_vol": 2719.0,
+    "deliv_pct": 100.0,
+    "volume": 2719.0
   },
   {
     "time": "2023-10-16",
@@ -302,8 +435,9 @@
     "high": 4.95,
     "low": 4.3,
     "close": 4.3,
-    "delivery_vol": 1047,
-    "deliv_pct": 100.0
+    "delivery_vol": 1047.0,
+    "deliv_pct": 100.0,
+    "volume": 1047.0
   },
   {
     "time": "2023-10-17",
@@ -311,8 +445,9 @@
     "high": 4.3,
     "low": 4.05,
     "close": 4.05,
-    "delivery_vol": 1100,
-    "deliv_pct": 100.0
+    "delivery_vol": 1100.0,
+    "deliv_pct": 100.0,
+    "volume": 1100.0
   },
   {
     "time": "2023-10-18",
@@ -320,8 +455,9 @@
     "high": 4.1,
     "low": 4.0,
     "close": 4.05,
-    "delivery_vol": 5614,
-    "deliv_pct": 100.0
+    "delivery_vol": 5614.0,
+    "deliv_pct": 100.0,
+    "volume": 5614.0
   },
   {
     "time": "2023-10-20",
@@ -329,8 +465,9 @@
     "high": 4.75,
     "low": 4.05,
     "close": 4.75,
-    "delivery_vol": 2010,
-    "deliv_pct": 100.0
+    "delivery_vol": 2010.0,
+    "deliv_pct": 100.0,
+    "volume": 2010.0
   },
   {
     "time": "2023-10-23",
@@ -338,7 +475,18 @@
     "high": 4.65,
     "low": 4.15,
     "close": 4.15,
-    "delivery_vol": 3231,
+    "delivery_vol": 3231.0,
+    "deliv_pct": 100.0,
+    "volume": 3231.0
+  },
+  {
+    "time": "2023-10-24",
+    "open": 4.65,
+    "high": 4.65,
+    "low": 4.15,
+    "close": 4.15,
+    "volume": 3231.0,
+    "delivery_vol": 3231.0,
     "deliv_pct": 100.0
   },
   {
@@ -347,8 +495,9 @@
     "high": 4.15,
     "low": 3.8,
     "close": 3.9,
-    "delivery_vol": 1780,
-    "deliv_pct": 100.0
+    "delivery_vol": 1780.0,
+    "deliv_pct": 100.0,
+    "volume": 1780.0
   },
   {
     "time": "2023-10-26",
@@ -356,8 +505,9 @@
     "high": 3.9,
     "low": 3.75,
     "close": 3.9,
-    "delivery_vol": 2686,
-    "deliv_pct": 91.49
+    "delivery_vol": 2686.0,
+    "deliv_pct": 91.49,
+    "volume": 2936.0
   },
   {
     "time": "2023-10-27",
@@ -365,7 +515,18 @@
     "high": 3.9,
     "low": 3.9,
     "close": 3.9,
-    "delivery_vol": 30,
+    "delivery_vol": 30.0,
+    "deliv_pct": 100.0,
+    "volume": 30.0
+  },
+  {
+    "time": "2023-10-30",
+    "open": 3.9,
+    "high": 3.9,
+    "low": 3.9,
+    "close": 3.9,
+    "volume": 88.0,
+    "delivery_vol": 88.0,
     "deliv_pct": 100.0
   },
   {
@@ -374,8 +535,9 @@
     "high": 3.65,
     "low": 3.65,
     "close": 3.65,
-    "delivery_vol": 400,
-    "deliv_pct": 100.0
+    "delivery_vol": 400.0,
+    "deliv_pct": 100.0,
+    "volume": 400.0
   },
   {
     "time": "2023-11-02",
@@ -383,8 +545,9 @@
     "high": 3.8,
     "low": 3.75,
     "close": 3.8,
-    "delivery_vol": 100,
-    "deliv_pct": 100.0
+    "delivery_vol": 100.0,
+    "deliv_pct": 100.0,
+    "volume": 100.0
   },
   {
     "time": "2023-11-03",
@@ -392,8 +555,9 @@
     "high": 3.8,
     "low": 3.55,
     "close": 3.8,
-    "delivery_vol": 556,
-    "deliv_pct": 100.0
+    "delivery_vol": 556.0,
+    "deliv_pct": 100.0,
+    "volume": 556.0
   },
   {
     "time": "2023-11-06",
@@ -401,8 +565,9 @@
     "high": 3.8,
     "low": 3.65,
     "close": 3.65,
-    "delivery_vol": 3175,
-    "deliv_pct": 100.0
+    "delivery_vol": 3175.0,
+    "deliv_pct": 100.0,
+    "volume": 3175.0
   },
   {
     "time": "2023-11-07",
@@ -410,8 +575,9 @@
     "high": 3.75,
     "low": 3.65,
     "close": 3.7,
-    "delivery_vol": 17931,
-    "deliv_pct": 100.0
+    "delivery_vol": 17931.0,
+    "deliv_pct": 100.0,
+    "volume": 17931.0
   },
   {
     "time": "2023-11-08",
@@ -419,8 +585,9 @@
     "high": 3.85,
     "low": 3.65,
     "close": 3.85,
-    "delivery_vol": 11550,
-    "deliv_pct": 100.0
+    "delivery_vol": 11550.0,
+    "deliv_pct": 100.0,
+    "volume": 11550.0
   },
   {
     "time": "2023-11-09",
@@ -428,8 +595,9 @@
     "high": 3.85,
     "low": 3.8,
     "close": 3.8,
-    "delivery_vol": 3157,
-    "deliv_pct": 100.0
+    "delivery_vol": 3157.0,
+    "deliv_pct": 100.0,
+    "volume": 3157.0
   },
   {
     "time": "2023-11-10",
@@ -437,8 +605,9 @@
     "high": 3.8,
     "low": 3.8,
     "close": 3.8,
-    "delivery_vol": 165,
-    "deliv_pct": 100.0
+    "delivery_vol": 165.0,
+    "deliv_pct": 100.0,
+    "volume": 165.0
   },
   {
     "time": "2023-11-13",
@@ -446,7 +615,18 @@
     "high": 4.5,
     "low": 3.8,
     "close": 4.35,
-    "delivery_vol": 12311,
+    "delivery_vol": 12311.0,
+    "deliv_pct": 99.99,
+    "volume": 12312.0
+  },
+  {
+    "time": "2023-11-14",
+    "open": 3.8,
+    "high": 4.5,
+    "low": 3.8,
+    "close": 4.35,
+    "volume": 12312.0,
+    "delivery_vol": 12311.0,
     "deliv_pct": 99.99
   },
   {
@@ -455,8 +635,9 @@
     "high": 4.1,
     "low": 3.95,
     "close": 3.95,
-    "delivery_vol": 8239,
-    "deliv_pct": 100.0
+    "delivery_vol": 8239.0,
+    "deliv_pct": 100.0,
+    "volume": 8239.0
   },
   {
     "time": "2023-11-16",
@@ -464,8 +645,9 @@
     "high": 4.35,
     "low": 3.95,
     "close": 3.95,
-    "delivery_vol": 4986,
-    "deliv_pct": 100.0
+    "delivery_vol": 4986.0,
+    "deliv_pct": 100.0,
+    "volume": 4986.0
   },
   {
     "time": "2023-11-17",
@@ -473,8 +655,9 @@
     "high": 4.0,
     "low": 3.9,
     "close": 4.0,
-    "delivery_vol": 3100,
-    "deliv_pct": 100.0
+    "delivery_vol": 3100.0,
+    "deliv_pct": 100.0,
+    "volume": 3100.0
   },
   {
     "time": "2023-11-20",
@@ -482,8 +665,9 @@
     "high": 4.0,
     "low": 3.95,
     "close": 3.95,
-    "delivery_vol": 15842,
-    "deliv_pct": 100.0
+    "delivery_vol": 15842.0,
+    "deliv_pct": 100.0,
+    "volume": 15842.0
   },
   {
     "time": "2023-11-21",
@@ -491,8 +675,9 @@
     "high": 3.95,
     "low": 3.95,
     "close": 3.95,
-    "delivery_vol": 271,
-    "deliv_pct": 100.0
+    "delivery_vol": 271.0,
+    "deliv_pct": 100.0,
+    "volume": 271.0
   },
   {
     "time": "2023-11-22",
@@ -500,8 +685,9 @@
     "high": 4.0,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1730,
-    "deliv_pct": 100.0
+    "delivery_vol": 1730.0,
+    "deliv_pct": 100.0,
+    "volume": 1730.0
   },
   {
     "time": "2023-11-23",
@@ -509,8 +695,9 @@
     "high": 4.0,
     "low": 3.9,
     "close": 3.9,
-    "delivery_vol": 1516,
-    "deliv_pct": 100.0
+    "delivery_vol": 1516.0,
+    "deliv_pct": 100.0,
+    "volume": 1516.0
   },
   {
     "time": "2023-11-24",
@@ -518,7 +705,18 @@
     "high": 3.9,
     "low": 3.9,
     "close": 3.9,
-    "delivery_vol": 200,
+    "delivery_vol": 200.0,
+    "deliv_pct": 100.0,
+    "volume": 200.0
+  },
+  {
+    "time": "2023-11-27",
+    "open": 3.9,
+    "high": 3.9,
+    "low": 3.9,
+    "close": 3.9,
+    "volume": 200.0,
+    "delivery_vol": 200.0,
     "deliv_pct": 100.0
   },
   {
@@ -527,8 +725,9 @@
     "high": 4.2,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1256,
-    "deliv_pct": 100.0
+    "delivery_vol": 1256.0,
+    "deliv_pct": 100.0,
+    "volume": 1256.0
   },
   {
     "time": "2023-11-29",
@@ -536,8 +735,9 @@
     "high": 4.0,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 352,
-    "deliv_pct": 100.0
+    "delivery_vol": 352.0,
+    "deliv_pct": 100.0,
+    "volume": 352.0
   },
   {
     "time": "2023-11-30",
@@ -545,8 +745,9 @@
     "high": 4.25,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 602,
-    "deliv_pct": 99.83
+    "delivery_vol": 602.0,
+    "deliv_pct": 99.83,
+    "volume": 603.0
   },
   {
     "time": "2023-12-01",
@@ -554,7 +755,18 @@
     "high": 4.0,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1798,
+    "delivery_vol": 1798.0,
+    "deliv_pct": 100.0,
+    "volume": 1798.0
+  },
+  {
+    "time": "2023-12-04",
+    "open": 4.0,
+    "high": 4.0,
+    "low": 4.0,
+    "close": 4.0,
+    "volume": 2006.0,
+    "delivery_vol": 2006.0,
     "deliv_pct": 100.0
   },
   {
@@ -563,8 +775,9 @@
     "high": 3.8,
     "low": 3.65,
     "close": 3.8,
-    "delivery_vol": 1300,
-    "deliv_pct": 68.46
+    "delivery_vol": 1300.0,
+    "deliv_pct": 68.46,
+    "volume": 1899.0
   },
   {
     "time": "2023-12-06",
@@ -572,8 +785,9 @@
     "high": 4.45,
     "low": 4.45,
     "close": 4.45,
-    "delivery_vol": 100,
-    "deliv_pct": 100.0
+    "delivery_vol": 100.0,
+    "deliv_pct": 100.0,
+    "volume": 100.0
   },
   {
     "time": "2023-12-07",
@@ -581,8 +795,9 @@
     "high": 4.3,
     "low": 4.1,
     "close": 4.2,
-    "delivery_vol": 9235,
-    "deliv_pct": 70.85
+    "delivery_vol": 9235.0,
+    "deliv_pct": 70.85,
+    "volume": 13035.0
   },
   {
     "time": "2023-12-08",
@@ -590,8 +805,9 @@
     "high": 4.2,
     "low": 4.0,
     "close": 4.2,
-    "delivery_vol": 3903,
-    "deliv_pct": 100.0
+    "delivery_vol": 3903.0,
+    "deliv_pct": 100.0,
+    "volume": 3903.0
   },
   {
     "time": "2023-12-11",
@@ -599,8 +815,9 @@
     "high": 4.2,
     "low": 4.1,
     "close": 4.1,
-    "delivery_vol": 3373,
-    "deliv_pct": 100.0
+    "delivery_vol": 3373.0,
+    "deliv_pct": 100.0,
+    "volume": 3373.0
   },
   {
     "time": "2023-12-12",
@@ -608,8 +825,9 @@
     "high": 4.1,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 2031,
-    "deliv_pct": 100.0
+    "delivery_vol": 2031.0,
+    "deliv_pct": 100.0,
+    "volume": 2031.0
   },
   {
     "time": "2023-12-13",
@@ -617,8 +835,9 @@
     "high": 4.4,
     "low": 4.0,
     "close": 4.4,
-    "delivery_vol": 21145,
-    "deliv_pct": 98.83
+    "delivery_vol": 21145.0,
+    "deliv_pct": 98.83,
+    "volume": 21395.0
   },
   {
     "time": "2023-12-14",
@@ -626,8 +845,9 @@
     "high": 5.25,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 15943,
-    "deliv_pct": 65.73
+    "delivery_vol": 15943.0,
+    "deliv_pct": 65.73,
+    "volume": 24254.0
   },
   {
     "time": "2023-12-15",
@@ -635,8 +855,9 @@
     "high": 4.7,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 15376,
-    "deliv_pct": 93.9
+    "delivery_vol": 15376.0,
+    "deliv_pct": 93.9,
+    "volume": 16375.0
   },
   {
     "time": "2023-12-18",
@@ -644,8 +865,9 @@
     "high": 4.2,
     "low": 4.05,
     "close": 4.05,
-    "delivery_vol": 4398,
-    "deliv_pct": 100.0
+    "delivery_vol": 4398.0,
+    "deliv_pct": 100.0,
+    "volume": 4398.0
   },
   {
     "time": "2023-12-19",
@@ -653,8 +875,9 @@
     "high": 4.3,
     "low": 4.05,
     "close": 4.3,
-    "delivery_vol": 8371,
-    "deliv_pct": 100.0
+    "delivery_vol": 8371.0,
+    "deliv_pct": 100.0,
+    "volume": 8371.0
   },
   {
     "time": "2023-12-20",
@@ -662,8 +885,9 @@
     "high": 4.45,
     "low": 4.3,
     "close": 4.3,
-    "delivery_vol": 21339,
-    "deliv_pct": 100.0
+    "delivery_vol": 21339.0,
+    "deliv_pct": 100.0,
+    "volume": 21339.0
   },
   {
     "time": "2023-12-21",
@@ -671,8 +895,9 @@
     "high": 4.3,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 8905,
-    "deliv_pct": 100.0
+    "delivery_vol": 8905.0,
+    "deliv_pct": 100.0,
+    "volume": 8905.0
   },
   {
     "time": "2023-12-22",
@@ -680,7 +905,18 @@
     "high": 4.2,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 2710,
+    "delivery_vol": 2710.0,
+    "deliv_pct": 100.0,
+    "volume": 2710.0
+  },
+  {
+    "time": "2023-12-25",
+    "open": 4.2,
+    "high": 4.2,
+    "low": 4.2,
+    "close": 4.2,
+    "volume": 2710.0,
+    "delivery_vol": 2710.0,
     "deliv_pct": 100.0
   },
   {
@@ -689,8 +925,9 @@
     "high": 4.2,
     "low": 4.1,
     "close": 4.1,
-    "delivery_vol": 7603,
-    "deliv_pct": 100.0
+    "delivery_vol": 7603.0,
+    "deliv_pct": 100.0,
+    "volume": 7603.0
   },
   {
     "time": "2023-12-27",
@@ -698,8 +935,9 @@
     "high": 4.85,
     "low": 4.1,
     "close": 4.35,
-    "delivery_vol": 13652,
-    "deliv_pct": 94.75
+    "delivery_vol": 13652.0,
+    "deliv_pct": 94.75,
+    "volume": 14409.0
   },
   {
     "time": "2023-12-28",
@@ -707,8 +945,9 @@
     "high": 4.35,
     "low": 4.0,
     "close": 4.0,
-    "delivery_vol": 1638,
-    "deliv_pct": 100.0
+    "delivery_vol": 1638.0,
+    "deliv_pct": 100.0,
+    "volume": 1638.0
   },
   {
     "time": "2023-12-29",
@@ -716,8 +955,9 @@
     "high": 4.05,
     "low": 4.0,
     "close": 4.05,
-    "delivery_vol": 5330,
-    "deliv_pct": 100.0
+    "delivery_vol": 5330.0,
+    "deliv_pct": 100.0,
+    "volume": 5330.0
   },
   {
     "time": "2024-01-01",
@@ -725,8 +965,9 @@
     "high": 4.35,
     "low": 4.1,
     "close": 4.3,
-    "delivery_vol": 3690,
-    "deliv_pct": 100.0
+    "delivery_vol": 3690.0,
+    "deliv_pct": 100.0,
+    "volume": 3690.0
   },
   {
     "time": "2024-01-02",
@@ -734,8 +975,9 @@
     "high": 4.3,
     "low": 4.25,
     "close": 4.25,
-    "delivery_vol": 5260,
-    "deliv_pct": 100.0
+    "delivery_vol": 5260.0,
+    "deliv_pct": 100.0,
+    "volume": 5260.0
   },
   {
     "time": "2024-01-03",
@@ -743,8 +985,9 @@
     "high": 4.45,
     "low": 4.25,
     "close": 4.4,
-    "delivery_vol": 7494,
-    "deliv_pct": 88.23
+    "delivery_vol": 7494.0,
+    "deliv_pct": 88.23,
+    "volume": 8494.0
   },
   {
     "time": "2024-01-04",
@@ -752,8 +995,9 @@
     "high": 4.7,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 26276,
-    "deliv_pct": 78.96
+    "delivery_vol": 26276.0,
+    "deliv_pct": 78.96,
+    "volume": 33276.0
   },
   {
     "time": "2024-01-05",
@@ -761,8 +1005,9 @@
     "high": 4.65,
     "low": 4.55,
     "close": 4.55,
-    "delivery_vol": 13252,
-    "deliv_pct": 100.0
+    "delivery_vol": 13252.0,
+    "deliv_pct": 100.0,
+    "volume": 13252.0
   },
   {
     "time": "2024-01-08",
@@ -770,8 +1015,9 @@
     "high": 5.2,
     "low": 4.85,
     "close": 4.85,
-    "delivery_vol": 11724,
-    "deliv_pct": 95.91
+    "delivery_vol": 11724.0,
+    "deliv_pct": 95.91,
+    "volume": 12224.0
   },
   {
     "time": "2024-01-09",
@@ -779,8 +1025,9 @@
     "high": 5.15,
     "low": 4.85,
     "close": 5.15,
-    "delivery_vol": 15471,
-    "deliv_pct": 96.87
+    "delivery_vol": 15471.0,
+    "deliv_pct": 96.87,
+    "volume": 15971.0
   },
   {
     "time": "2024-01-10",
@@ -788,8 +1035,9 @@
     "high": 5.1,
     "low": 4.95,
     "close": 4.95,
-    "delivery_vol": 7098,
-    "deliv_pct": 100.0
+    "delivery_vol": 7098.0,
+    "deliv_pct": 100.0,
+    "volume": 7098.0
   },
   {
     "time": "2024-01-11",
@@ -797,8 +1045,9 @@
     "high": 4.95,
     "low": 4.95,
     "close": 4.95,
-    "delivery_vol": 11923,
-    "deliv_pct": 100.0
+    "delivery_vol": 11923.0,
+    "deliv_pct": 100.0,
+    "volume": 11923.0
   },
   {
     "time": "2024-01-12",
@@ -806,8 +1055,9 @@
     "high": 4.95,
     "low": 4.9,
     "close": 4.9,
-    "delivery_vol": 9789,
-    "deliv_pct": 99.99
+    "delivery_vol": 9789.0,
+    "deliv_pct": 99.99,
+    "volume": 9790.0
   },
   {
     "time": "2024-01-15",
@@ -815,8 +1065,9 @@
     "high": 5.0,
     "low": 4.9,
     "close": 5.0,
-    "delivery_vol": 28170,
-    "deliv_pct": 100.0
+    "delivery_vol": 28170.0,
+    "deliv_pct": 100.0,
+    "volume": 28170.0
   },
   {
     "time": "2024-01-16",
@@ -824,8 +1075,9 @@
     "high": 5.35,
     "low": 5.0,
     "close": 5.2,
-    "delivery_vol": 22683,
-    "deliv_pct": 98.27
+    "delivery_vol": 22683.0,
+    "deliv_pct": 98.27,
+    "volume": 23083.0
   },
   {
     "time": "2024-01-17",
@@ -833,8 +1085,9 @@
     "high": 5.2,
     "low": 4.65,
     "close": 4.65,
-    "delivery_vol": 12763,
-    "deliv_pct": 100.0
+    "delivery_vol": 12763.0,
+    "deliv_pct": 100.0,
+    "volume": 12763.0
   },
   {
     "time": "2024-01-18",
@@ -842,8 +1095,9 @@
     "high": 5.0,
     "low": 4.8,
     "close": 4.9,
-    "delivery_vol": 15272,
-    "deliv_pct": 100.0
+    "delivery_vol": 15272.0,
+    "deliv_pct": 100.0,
+    "volume": 15272.0
   },
   {
     "time": "2024-01-19",
@@ -851,8 +1105,9 @@
     "high": 5.05,
     "low": 5.0,
     "close": 5.0,
-    "delivery_vol": 27417,
-    "deliv_pct": 100.0
+    "delivery_vol": 27417.0,
+    "deliv_pct": 100.0,
+    "volume": 27417.0
   },
   {
     "time": "2024-01-22",
@@ -860,8 +1115,9 @@
     "high": 5.9,
     "low": 5.3,
     "close": 5.75,
-    "delivery_vol": 46979,
-    "deliv_pct": 97.71
+    "delivery_vol": 46979.0,
+    "deliv_pct": 97.71,
+    "volume": 48079.0
   },
   {
     "time": "2024-01-23",
@@ -869,8 +1125,9 @@
     "high": 6.0,
     "low": 5.8,
     "close": 5.9,
-    "delivery_vol": 69558,
-    "deliv_pct": 100.0
+    "delivery_vol": 69558.0,
+    "deliv_pct": 100.0,
+    "volume": 69558.0
   },
   {
     "time": "2024-01-24",
@@ -878,8 +1135,9 @@
     "high": 6.15,
     "low": 5.9,
     "close": 5.9,
-    "delivery_vol": 35538,
-    "deliv_pct": 77.19
+    "delivery_vol": 35538.0,
+    "deliv_pct": 77.19,
+    "volume": 46038.0
   },
   {
     "time": "2024-01-25",
@@ -887,7 +1145,18 @@
     "high": 6.25,
     "low": 5.9,
     "close": 6.25,
-    "delivery_vol": 10029,
+    "delivery_vol": 10029.0,
+    "deliv_pct": 95.25,
+    "volume": 10529.0
+  },
+  {
+    "time": "2024-01-26",
+    "open": 5.9,
+    "high": 6.25,
+    "low": 5.9,
+    "close": 6.25,
+    "volume": 10529.0,
+    "delivery_vol": 10029.0,
     "deliv_pct": 95.25
   },
   {
@@ -896,8 +1165,9 @@
     "high": 6.0,
     "low": 5.6,
     "close": 5.6,
-    "delivery_vol": 29449,
-    "deliv_pct": 97.04
+    "delivery_vol": 29449.0,
+    "deliv_pct": 97.04,
+    "volume": 30346.0
   },
   {
     "time": "2024-01-30",
@@ -905,8 +1175,9 @@
     "high": 5.6,
     "low": 5.55,
     "close": 5.55,
-    "delivery_vol": 3774,
-    "deliv_pct": 100.0
+    "delivery_vol": 3774.0,
+    "deliv_pct": 100.0,
+    "volume": 3774.0
   },
   {
     "time": "2024-01-31",
@@ -914,8 +1185,9 @@
     "high": 5.3,
     "low": 5.3,
     "close": 5.3,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 32157.0,
+    "deliv_pct": 100.0,
+    "volume": 32157.0
   },
   {
     "time": "2024-02-01",
@@ -923,8 +1195,9 @@
     "high": 5.55,
     "low": 5.3,
     "close": 5.55,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3188.0,
+    "deliv_pct": 100.0,
+    "volume": 3188.0
   },
   {
     "time": "2024-02-02",
@@ -932,8 +1205,9 @@
     "high": 5.6,
     "low": 5.5,
     "close": 5.55,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 37343.0,
+    "deliv_pct": 100.0,
+    "volume": 37343.0
   },
   {
     "time": "2024-02-05",
@@ -941,8 +1215,9 @@
     "high": 5.55,
     "low": 5.45,
     "close": 5.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13540.0,
+    "deliv_pct": 100.0,
+    "volume": 13540.0
   },
   {
     "time": "2024-02-06",
@@ -950,8 +1225,9 @@
     "high": 5.45,
     "low": 5.35,
     "close": 5.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2444.0,
+    "deliv_pct": 100.0,
+    "volume": 2444.0
   },
   {
     "time": "2024-02-07",
@@ -959,8 +1235,9 @@
     "high": 5.35,
     "low": 5.25,
     "close": 5.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1095.0,
+    "deliv_pct": 100.0,
+    "volume": 1095.0
   },
   {
     "time": "2024-02-08",
@@ -968,8 +1245,9 @@
     "high": 5.25,
     "low": 5.0,
     "close": 5.0,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6214.0,
+    "deliv_pct": 100.0,
+    "volume": 6214.0
   },
   {
     "time": "2024-02-09",
@@ -977,8 +1255,9 @@
     "high": 5.0,
     "low": 4.75,
     "close": 5.0,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14471.0,
+    "deliv_pct": 100.0,
+    "volume": 14471.0
   },
   {
     "time": "2024-02-12",
@@ -986,8 +1265,9 @@
     "high": 5.0,
     "low": 4.9,
     "close": 4.9,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1508.0,
+    "deliv_pct": 100.0,
+    "volume": 1508.0
   },
   {
     "time": "2024-02-13",
@@ -995,8 +1275,9 @@
     "high": 4.9,
     "low": 4.85,
     "close": 4.85,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2632.0,
+    "deliv_pct": 100.0,
+    "volume": 2632.0
   },
   {
     "time": "2024-02-14",
@@ -1004,8 +1285,9 @@
     "high": 4.85,
     "low": 4.85,
     "close": 4.85,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1040.0,
+    "deliv_pct": 100.0,
+    "volume": 1040.0
   },
   {
     "time": "2024-02-15",
@@ -1013,8 +1295,9 @@
     "high": 4.85,
     "low": 4.8,
     "close": 4.8,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2204.0,
+    "deliv_pct": 100.0,
+    "volume": 2204.0
   },
   {
     "time": "2024-02-16",
@@ -1022,8 +1305,9 @@
     "high": 4.8,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 446.0,
+    "deliv_pct": 100.0,
+    "volume": 446.0
   },
   {
     "time": "2024-02-19",
@@ -1031,8 +1315,9 @@
     "high": 4.8,
     "low": 4.6,
     "close": 4.8,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4851.0,
+    "deliv_pct": 100.0,
+    "volume": 4851.0
   },
   {
     "time": "2024-02-20",
@@ -1040,8 +1325,9 @@
     "high": 4.8,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3137.0,
+    "deliv_pct": 100.0,
+    "volume": 3137.0
   },
   {
     "time": "2024-02-21",
@@ -1049,8 +1335,19 @@
     "high": 4.6,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1639.0,
+    "deliv_pct": 100.0,
+    "volume": 1639.0
+  },
+  {
+    "time": "2024-02-22",
+    "open": 4.6,
+    "high": 4.6,
+    "low": 4.6,
+    "close": 4.6,
+    "volume": 931.0,
+    "delivery_vol": 931.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-02-23",
@@ -1058,8 +1355,9 @@
     "high": 4.75,
     "low": 4.6,
     "close": 4.75,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1460.0,
+    "deliv_pct": 100.0,
+    "volume": 1460.0
   },
   {
     "time": "2024-02-26",
@@ -1067,8 +1365,9 @@
     "high": 4.75,
     "low": 4.55,
     "close": 4.55,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5964.0,
+    "deliv_pct": 100.0,
+    "volume": 5964.0
   },
   {
     "time": "2024-02-27",
@@ -1076,8 +1375,9 @@
     "high": 4.75,
     "low": 4.7,
     "close": 4.7,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6103.0,
+    "deliv_pct": 100.0,
+    "volume": 6103.0
   },
   {
     "time": "2024-02-28",
@@ -1085,8 +1385,9 @@
     "high": 4.7,
     "low": 4.7,
     "close": 4.7,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2127.0,
+    "deliv_pct": 100.0,
+    "volume": 2127.0
   },
   {
     "time": "2024-02-29",
@@ -1094,8 +1395,9 @@
     "high": 4.7,
     "low": 4.5,
     "close": 4.5,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2766.0,
+    "deliv_pct": 100.0,
+    "volume": 2766.0
   },
   {
     "time": "2024-03-01",
@@ -1103,8 +1405,9 @@
     "high": 4.7,
     "low": 4.65,
     "close": 4.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2016.0,
+    "deliv_pct": 100.0,
+    "volume": 2016.0
   },
   {
     "time": "2024-03-04",
@@ -1112,8 +1415,9 @@
     "high": 4.65,
     "low": 4.5,
     "close": 4.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1362.0,
+    "deliv_pct": 100.0,
+    "volume": 1362.0
   },
   {
     "time": "2024-03-05",
@@ -1121,8 +1425,9 @@
     "high": 4.85,
     "low": 4.65,
     "close": 4.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 758.0,
+    "deliv_pct": 100.0,
+    "volume": 758.0
   },
   {
     "time": "2024-03-06",
@@ -1130,8 +1435,9 @@
     "high": 4.65,
     "low": 4.65,
     "close": 4.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20.0,
+    "deliv_pct": 100.0,
+    "volume": 20.0
   },
   {
     "time": "2024-03-07",
@@ -1139,8 +1445,19 @@
     "high": 4.65,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 53.0,
+    "deliv_pct": 100.0,
+    "volume": 53.0
+  },
+  {
+    "time": "2024-03-08",
+    "open": 4.65,
+    "high": 4.65,
+    "low": 4.6,
+    "close": 4.6,
+    "volume": 53.0,
+    "delivery_vol": 53.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-03-11",
@@ -1148,8 +1465,19 @@
     "high": 4.6,
     "low": 4.6,
     "close": 4.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 679.0,
+    "deliv_pct": 100.0,
+    "volume": 679.0
+  },
+  {
+    "time": "2024-03-12",
+    "open": 4.6,
+    "high": 4.6,
+    "low": 4.6,
+    "close": 4.6,
+    "volume": 513.0,
+    "delivery_vol": 513.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-03-13",
@@ -1157,8 +1485,9 @@
     "high": 4.6,
     "low": 4.4,
     "close": 4.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 872.0,
+    "deliv_pct": 100.0,
+    "volume": 872.0
   },
   {
     "time": "2024-03-14",
@@ -1166,8 +1495,9 @@
     "high": 4.35,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3813.0,
+    "deliv_pct": 100.0,
+    "volume": 3813.0
   },
   {
     "time": "2024-03-15",
@@ -1175,8 +1505,19 @@
     "high": 4.2,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1696.0,
+    "deliv_pct": 100.0,
+    "volume": 1696.0
+  },
+  {
+    "time": "2024-03-18",
+    "open": 4.2,
+    "high": 4.2,
+    "low": 4.2,
+    "close": 4.2,
+    "volume": 460.0,
+    "delivery_vol": 460.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-03-19",
@@ -1184,8 +1525,9 @@
     "high": 4.1,
     "low": 4.1,
     "close": 4.1,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2065.0,
+    "deliv_pct": 100.0,
+    "volume": 2065.0
   },
   {
     "time": "2024-03-20",
@@ -1193,8 +1535,9 @@
     "high": 4.3,
     "low": 4.1,
     "close": 4.1,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 418.0,
+    "deliv_pct": 100.0,
+    "volume": 418.0
   },
   {
     "time": "2024-03-21",
@@ -1202,8 +1545,9 @@
     "high": 4.2,
     "low": 3.95,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 10236.0,
+    "deliv_pct": 100.0,
+    "volume": 10236.0
   },
   {
     "time": "2024-03-22",
@@ -1211,8 +1555,19 @@
     "high": 4.2,
     "low": 4.0,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6068.0,
+    "deliv_pct": 100.0,
+    "volume": 6068.0
+  },
+  {
+    "time": "2024-03-25",
+    "open": 4.0,
+    "high": 4.2,
+    "low": 4.0,
+    "close": 4.2,
+    "volume": 6068.0,
+    "delivery_vol": 6068.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-03-26",
@@ -1220,8 +1575,9 @@
     "high": 4.2,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1020.0,
+    "deliv_pct": 100.0,
+    "volume": 1020.0
   },
   {
     "time": "2024-03-27",
@@ -1229,8 +1585,9 @@
     "high": 4.4,
     "low": 4.4,
     "close": 4.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2001.0,
+    "deliv_pct": 100.0,
+    "volume": 2001.0
   },
   {
     "time": "2024-03-28",
@@ -1238,8 +1595,19 @@
     "high": 4.4,
     "low": 4.25,
     "close": 4.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 498.0,
+    "deliv_pct": 100.0,
+    "volume": 498.0
+  },
+  {
+    "time": "2024-03-29",
+    "open": 4.4,
+    "high": 4.4,
+    "low": 4.25,
+    "close": 4.25,
+    "volume": 498.0,
+    "delivery_vol": 498.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-04-01",
@@ -1247,8 +1615,9 @@
     "high": 4.25,
     "low": 4.25,
     "close": 4.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2532.0,
+    "deliv_pct": 100.0,
+    "volume": 2532.0
   },
   {
     "time": "2024-04-02",
@@ -1256,8 +1625,19 @@
     "high": 4.45,
     "low": 4.25,
     "close": 4.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 315.0,
+    "deliv_pct": 100.0,
+    "volume": 315.0
+  },
+  {
+    "time": "2024-04-03",
+    "open": 4.25,
+    "high": 4.45,
+    "low": 4.25,
+    "close": 4.45,
+    "volume": 11691.0,
+    "delivery_vol": 11691.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-04-04",
@@ -1265,8 +1645,9 @@
     "high": 4.45,
     "low": 4.4,
     "close": 4.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1499.0,
+    "deliv_pct": 100.0,
+    "volume": 1499.0
   },
   {
     "time": "2024-04-05",
@@ -1274,8 +1655,9 @@
     "high": 4.4,
     "low": 4.4,
     "close": 4.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3266.0,
+    "deliv_pct": 100.0,
+    "volume": 3266.0
   },
   {
     "time": "2024-04-08",
@@ -1283,8 +1665,9 @@
     "high": 4.6,
     "low": 4.2,
     "close": 4.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 19517.0,
+    "deliv_pct": 100.0,
+    "volume": 19517.0
   },
   {
     "time": "2024-04-09",
@@ -1292,8 +1675,9 @@
     "high": 4.4,
     "low": 4.2,
     "close": 4.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4537.0,
+    "deliv_pct": 100.0,
+    "volume": 4537.0
   },
   {
     "time": "2024-04-10",
@@ -1301,8 +1685,19 @@
     "high": 4.45,
     "low": 4.05,
     "close": 4.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 22018.0,
+    "deliv_pct": 100.0,
+    "volume": 22018.0
+  },
+  {
+    "time": "2024-04-11",
+    "open": 4.45,
+    "high": 4.45,
+    "low": 4.05,
+    "close": 4.35,
+    "volume": 22018.0,
+    "delivery_vol": 22018.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-04-12",
@@ -1310,8 +1705,9 @@
     "high": 4.55,
     "low": 4.15,
     "close": 4.3,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 16065.0,
+    "deliv_pct": 100.0,
+    "volume": 16065.0
   },
   {
     "time": "2024-04-15",
@@ -1319,8 +1715,9 @@
     "high": 4.5,
     "low": 4.1,
     "close": 4.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12955.0,
+    "deliv_pct": 100.0,
+    "volume": 12955.0
   },
   {
     "time": "2024-04-16",
@@ -1328,8 +1725,19 @@
     "high": 4.5,
     "low": 4.2,
     "close": 4.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18490.0,
+    "deliv_pct": 100.0,
+    "volume": 18490.0
+  },
+  {
+    "time": "2024-04-17",
+    "open": 4.5,
+    "high": 4.5,
+    "low": 4.2,
+    "close": 4.45,
+    "volume": 18490.0,
+    "delivery_vol": 18490.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-04-18",
@@ -1337,8 +1745,9 @@
     "high": 4.65,
     "low": 4.25,
     "close": 4.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 17640.0,
+    "deliv_pct": 100.0,
+    "volume": 17640.0
   },
   {
     "time": "2024-04-19",
@@ -1346,8 +1755,9 @@
     "high": 4.85,
     "low": 4.45,
     "close": 4.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 24816.0,
+    "deliv_pct": 100.0,
+    "volume": 24816.0
   },
   {
     "time": "2024-04-22",
@@ -1355,8 +1765,9 @@
     "high": 4.65,
     "low": 4.25,
     "close": 4.55,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13835.0,
+    "deliv_pct": 100.0,
+    "volume": 13835.0
   },
   {
     "time": "2024-04-23",
@@ -1364,8 +1775,9 @@
     "high": 4.6,
     "low": 4.35,
     "close": 4.5,
-    "delivery_vol": 15606,
-    "deliv_pct": 81.08
+    "delivery_vol": 15606.0,
+    "deliv_pct": 81.08,
+    "volume": 19248.0
   },
   {
     "time": "2024-04-24",
@@ -1373,8 +1785,9 @@
     "high": 4.7,
     "low": 4.45,
     "close": 4.7,
-    "delivery_vol": 8604,
-    "deliv_pct": 81.59
+    "delivery_vol": 8604.0,
+    "deliv_pct": 81.59,
+    "volume": 10546.0
   },
   {
     "time": "2024-04-25",
@@ -1382,8 +1795,9 @@
     "high": 4.9,
     "low": 4.8,
     "close": 4.9,
-    "delivery_vol": 9513,
-    "deliv_pct": 93.86
+    "delivery_vol": 9513.0,
+    "deliv_pct": 93.86,
+    "volume": 10135.0
   },
   {
     "time": "2024-04-26",
@@ -1391,8 +1805,9 @@
     "high": 5.1,
     "low": 4.9,
     "close": 5.1,
-    "delivery_vol": 9781,
-    "deliv_pct": 100.0
+    "delivery_vol": 9781.0,
+    "deliv_pct": 100.0,
+    "volume": 9781.0
   },
   {
     "time": "2024-04-29",
@@ -1400,8 +1815,9 @@
     "high": 5.35,
     "low": 5.35,
     "close": 5.35,
-    "delivery_vol": 5259,
-    "deliv_pct": 99.62
+    "delivery_vol": 5259.0,
+    "deliv_pct": 99.62,
+    "volume": 5279.0
   },
   {
     "time": "2024-04-30",
@@ -1409,7 +1825,18 @@
     "high": 5.6,
     "low": 5.6,
     "close": 5.6,
-    "delivery_vol": 18005,
+    "delivery_vol": 18005.0,
+    "deliv_pct": 100.0,
+    "volume": 18005.0
+  },
+  {
+    "time": "2024-05-01",
+    "open": 5.6,
+    "high": 5.6,
+    "low": 5.6,
+    "close": 5.6,
+    "volume": 18005.0,
+    "delivery_vol": 18005.0,
     "deliv_pct": 100.0
   },
   {
@@ -1418,8 +1845,9 @@
     "high": 5.85,
     "low": 5.85,
     "close": 5.85,
-    "delivery_vol": 13172,
-    "deliv_pct": 100.0
+    "delivery_vol": 13172.0,
+    "deliv_pct": 100.0,
+    "volume": 13172.0
   },
   {
     "time": "2024-05-03",
@@ -1427,8 +1855,9 @@
     "high": 6.1,
     "low": 5.55,
     "close": 6.05,
-    "delivery_vol": 98259,
-    "deliv_pct": 81.69
+    "delivery_vol": 98259.0,
+    "deliv_pct": 81.69,
+    "volume": 120278.0
   },
   {
     "time": "2024-05-06",
@@ -1436,8 +1865,9 @@
     "high": 6.35,
     "low": 5.85,
     "close": 6.2,
-    "delivery_vol": 80935,
-    "deliv_pct": 86.37
+    "delivery_vol": 80935.0,
+    "deliv_pct": 86.37,
+    "volume": 93710.0
   },
   {
     "time": "2024-05-07",
@@ -1445,8 +1875,9 @@
     "high": 6.4,
     "low": 5.9,
     "close": 5.9,
-    "delivery_vol": 47450,
-    "deliv_pct": 83.57
+    "delivery_vol": 47450.0,
+    "deliv_pct": 83.57,
+    "volume": 56776.0
   },
   {
     "time": "2024-05-08",
@@ -1454,8 +1885,9 @@
     "high": 6.05,
     "low": 5.6,
     "close": 5.6,
-    "delivery_vol": 47793,
-    "deliv_pct": 80.55
+    "delivery_vol": 47793.0,
+    "deliv_pct": 80.55,
+    "volume": 59334.0
   },
   {
     "time": "2024-05-09",
@@ -1463,8 +1895,9 @@
     "high": 5.85,
     "low": 5.55,
     "close": 5.85,
-    "delivery_vol": 29749,
-    "deliv_pct": 94.04
+    "delivery_vol": 29749.0,
+    "deliv_pct": 94.04,
+    "volume": 31635.0
   },
   {
     "time": "2024-05-10",
@@ -1472,8 +1905,9 @@
     "high": 6.1,
     "low": 5.9,
     "close": 6.1,
-    "delivery_vol": 49492,
-    "deliv_pct": 96.06
+    "delivery_vol": 49492.0,
+    "deliv_pct": 96.06,
+    "volume": 51520.0
   },
   {
     "time": "2024-05-13",
@@ -1481,8 +1915,9 @@
     "high": 6.4,
     "low": 5.8,
     "close": 6.0,
-    "delivery_vol": 24578,
-    "deliv_pct": 58.27
+    "delivery_vol": 24578.0,
+    "deliv_pct": 58.27,
+    "volume": 42180.0
   },
   {
     "time": "2024-05-14",
@@ -1490,8 +1925,9 @@
     "high": 6.15,
     "low": 5.75,
     "close": 5.9,
-    "delivery_vol": 14347,
-    "deliv_pct": 63.74
+    "delivery_vol": 14347.0,
+    "deliv_pct": 63.74,
+    "volume": 22509.0
   },
   {
     "time": "2024-05-15",
@@ -1499,8 +1935,9 @@
     "high": 6.15,
     "low": 5.8,
     "close": 5.9,
-    "delivery_vol": 19506,
-    "deliv_pct": 80.13
+    "delivery_vol": 19506.0,
+    "deliv_pct": 80.13,
+    "volume": 24343.0
   },
   {
     "time": "2024-05-16",
@@ -1508,8 +1945,9 @@
     "high": 6.15,
     "low": 5.6,
     "close": 5.7,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 28285.0,
+    "deliv_pct": 100.0,
+    "volume": 28285.0
   },
   {
     "time": "2024-05-17",
@@ -1517,8 +1955,9 @@
     "high": 5.95,
     "low": 5.8,
     "close": 5.9,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8004.0,
+    "deliv_pct": 100.0,
+    "volume": 8004.0
   },
   {
     "time": "2024-05-20",
@@ -1526,8 +1965,9 @@
     "high": 6.15,
     "low": 5.6,
     "close": 6.05,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6215.0,
+    "deliv_pct": 100.0,
+    "volume": 6215.0
   },
   {
     "time": "2024-05-21",
@@ -1535,8 +1975,9 @@
     "high": 6.35,
     "low": 5.75,
     "close": 5.85,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 28542.0,
+    "deliv_pct": 100.0,
+    "volume": 28542.0
   },
   {
     "time": "2024-05-22",
@@ -1544,8 +1985,9 @@
     "high": 6.1,
     "low": 5.65,
     "close": 5.85,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 34134.0,
+    "deliv_pct": 100.0,
+    "volume": 34134.0
   },
   {
     "time": "2024-05-23",
@@ -1553,8 +1995,9 @@
     "high": 6.1,
     "low": 5.6,
     "close": 5.95,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 21208.0,
+    "deliv_pct": 100.0,
+    "volume": 21208.0
   },
   {
     "time": "2024-05-24",
@@ -1562,8 +2005,9 @@
     "high": 6.2,
     "low": 5.75,
     "close": 6.15,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 17637.0,
+    "deliv_pct": 100.0,
+    "volume": 17637.0
   },
   {
     "time": "2024-05-27",
@@ -1571,8 +2015,9 @@
     "high": 6.45,
     "low": 6.0,
     "close": 6.15,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 43365.0,
+    "deliv_pct": 100.0,
+    "volume": 43365.0
   },
   {
     "time": "2024-05-28",
@@ -1580,8 +2025,9 @@
     "high": 6.45,
     "low": 6.3,
     "close": 6.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 55996.0,
+    "deliv_pct": 100.0,
+    "volume": 55996.0
   },
   {
     "time": "2024-05-29",
@@ -1589,8 +2035,9 @@
     "high": 6.75,
     "low": 6.3,
     "close": 6.75,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 69581.0,
+    "deliv_pct": 100.0,
+    "volume": 69581.0
   },
   {
     "time": "2024-05-30",
@@ -1598,8 +2045,9 @@
     "high": 7.05,
     "low": 7.05,
     "close": 7.05,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 45300.0,
+    "deliv_pct": 100.0,
+    "volume": 45300.0
   },
   {
     "time": "2024-05-31",
@@ -1607,8 +2055,9 @@
     "high": 7.4,
     "low": 6.7,
     "close": 7.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 171323.0,
+    "deliv_pct": 100.0,
+    "volume": 171323.0
   },
   {
     "time": "2024-06-03",
@@ -1616,8 +2065,9 @@
     "high": 7.75,
     "low": 7.6,
     "close": 7.75,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 94868.0,
+    "deliv_pct": 100.0,
+    "volume": 94868.0
   },
   {
     "time": "2024-06-04",
@@ -1625,8 +2075,9 @@
     "high": 8.1,
     "low": 7.4,
     "close": 7.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 204559.0,
+    "deliv_pct": 100.0,
+    "volume": 204559.0
   },
   {
     "time": "2024-06-05",
@@ -1634,8 +2085,9 @@
     "high": 7.5,
     "low": 7.05,
     "close": 7.05,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 39619.0,
+    "deliv_pct": 100.0,
+    "volume": 39619.0
   },
   {
     "time": "2024-06-06",
@@ -1643,8 +2095,9 @@
     "high": 6.7,
     "low": 6.7,
     "close": 6.7,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12973.0,
+    "deliv_pct": 100.0,
+    "volume": 12973.0
   },
   {
     "time": "2024-06-07",
@@ -1652,8 +2105,9 @@
     "high": 6.4,
     "low": 6.4,
     "close": 6.4,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18635.0,
+    "deliv_pct": 100.0,
+    "volume": 18635.0
   },
   {
     "time": "2024-06-10",
@@ -1661,8 +2115,9 @@
     "high": 6.72,
     "low": 6.08,
     "close": 6.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 122284.0,
+    "deliv_pct": 100.0,
+    "volume": 122284.0
   },
   {
     "time": "2024-06-11",
@@ -1670,8 +2125,9 @@
     "high": 6.93,
     "low": 6.54,
     "close": 6.92,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 38043.0,
+    "deliv_pct": 100.0,
+    "volume": 38043.0
   },
   {
     "time": "2024-06-12",
@@ -1679,8 +2135,9 @@
     "high": 7.26,
     "low": 7.0,
     "close": 7.26,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 36483.0,
+    "deliv_pct": 100.0,
+    "volume": 36483.0
   },
   {
     "time": "2024-06-13",
@@ -1688,8 +2145,9 @@
     "high": 7.62,
     "low": 6.89,
     "close": 7.62,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 133762.0,
+    "deliv_pct": 100.0,
+    "volume": 133762.0
   },
   {
     "time": "2024-06-14",
@@ -1697,8 +2155,19 @@
     "high": 8.0,
     "low": 7.51,
     "close": 8.0,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 86483.0,
+    "deliv_pct": 100.0,
+    "volume": 86483.0
+  },
+  {
+    "time": "2024-06-17",
+    "open": 8.0,
+    "high": 8.0,
+    "low": 7.51,
+    "close": 8.0,
+    "volume": 86483.0,
+    "delivery_vol": 86483.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-06-18",
@@ -1706,8 +2175,9 @@
     "high": 8.0,
     "low": 7.96,
     "close": 7.96,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 87677.0,
+    "deliv_pct": 100.0,
+    "volume": 87677.0
   },
   {
     "time": "2024-06-19",
@@ -1715,8 +2185,9 @@
     "high": 7.9,
     "low": 7.8,
     "close": 7.8,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 28062.0,
+    "deliv_pct": 100.0,
+    "volume": 28062.0
   },
   {
     "time": "2024-06-20",
@@ -1724,8 +2195,9 @@
     "high": 7.65,
     "low": 7.64,
     "close": 7.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 36589.0,
+    "deliv_pct": 100.0,
+    "volume": 36589.0
   },
   {
     "time": "2024-06-21",
@@ -1733,8 +2205,9 @@
     "high": 7.65,
     "low": 7.49,
     "close": 7.49,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12352.0,
+    "deliv_pct": 100.0,
+    "volume": 12352.0
   },
   {
     "time": "2024-06-24",
@@ -1742,8 +2215,9 @@
     "high": 7.34,
     "low": 7.34,
     "close": 7.34,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3008.0,
+    "deliv_pct": 100.0,
+    "volume": 3008.0
   },
   {
     "time": "2024-06-25",
@@ -1751,8 +2225,9 @@
     "high": 7.34,
     "low": 7.19,
     "close": 7.19,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3656.0,
+    "deliv_pct": 100.0,
+    "volume": 3656.0
   },
   {
     "time": "2024-06-26",
@@ -1760,8 +2235,9 @@
     "high": 7.19,
     "low": 7.04,
     "close": 7.04,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14904.0,
+    "deliv_pct": 100.0,
+    "volume": 14904.0
   },
   {
     "time": "2024-06-27",
@@ -1769,8 +2245,9 @@
     "high": 7.18,
     "low": 7.04,
     "close": 7.18,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7134.0,
+    "deliv_pct": 100.0,
+    "volume": 7134.0
   },
   {
     "time": "2024-06-28",
@@ -1778,8 +2255,9 @@
     "high": 7.18,
     "low": 7.15,
     "close": 7.15,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 23278.0,
+    "deliv_pct": 100.0,
+    "volume": 23278.0
   },
   {
     "time": "2024-07-01",
@@ -1787,8 +2265,19 @@
     "high": 7.15,
     "low": 7.14,
     "close": 7.15,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 25100.0,
+    "deliv_pct": 100.0,
+    "volume": 25100.0
+  },
+  {
+    "time": "2024-07-02",
+    "open": 7.15,
+    "high": 7.15,
+    "low": 7.14,
+    "close": 7.15,
+    "volume": 2430.0,
+    "delivery_vol": 2430.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-07-03",
@@ -1796,8 +2285,9 @@
     "high": 7.15,
     "low": 7.0,
     "close": 7.0,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3096.0,
+    "deliv_pct": 100.0,
+    "volume": 3096.0
   },
   {
     "time": "2024-07-04",
@@ -1805,8 +2295,9 @@
     "high": 6.99,
     "low": 6.86,
     "close": 6.86,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5760.0,
+    "deliv_pct": 100.0,
+    "volume": 5760.0
   },
   {
     "time": "2024-07-05",
@@ -1814,8 +2305,9 @@
     "high": 6.86,
     "low": 6.72,
     "close": 6.72,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3256.0,
+    "deliv_pct": 100.0,
+    "volume": 3256.0
   },
   {
     "time": "2024-07-08",
@@ -1823,8 +2315,9 @@
     "high": 6.7,
     "low": 6.58,
     "close": 6.58,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3575.0,
+    "deliv_pct": 100.0,
+    "volume": 3575.0
   },
   {
     "time": "2024-07-09",
@@ -1832,8 +2325,9 @@
     "high": 6.5,
     "low": 6.44,
     "close": 6.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7316.0,
+    "deliv_pct": 100.0,
+    "volume": 7316.0
   },
   {
     "time": "2024-07-10",
@@ -1841,8 +2335,9 @@
     "high": 6.32,
     "low": 6.32,
     "close": 6.32,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7956.0,
+    "deliv_pct": 100.0,
+    "volume": 7956.0
   },
   {
     "time": "2024-07-11",
@@ -1850,8 +2345,9 @@
     "high": 6.2,
     "low": 6.19,
     "close": 6.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18722.0,
+    "deliv_pct": 100.0,
+    "volume": 18722.0
   },
   {
     "time": "2024-07-12",
@@ -1859,8 +2355,9 @@
     "high": 6.08,
     "low": 6.07,
     "close": 6.07,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8499.0,
+    "deliv_pct": 100.0,
+    "volume": 8499.0
   },
   {
     "time": "2024-07-15",
@@ -1868,8 +2365,9 @@
     "high": 6.07,
     "low": 5.94,
     "close": 5.99,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9135.0,
+    "deliv_pct": 100.0,
+    "volume": 9135.0
   },
   {
     "time": "2024-07-16",
@@ -1877,8 +2375,19 @@
     "high": 5.99,
     "low": 5.87,
     "close": 5.88,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18405.0,
+    "deliv_pct": 100.0,
+    "volume": 18405.0
+  },
+  {
+    "time": "2024-07-17",
+    "open": 5.99,
+    "high": 5.99,
+    "low": 5.87,
+    "close": 5.88,
+    "volume": 18405.0,
+    "delivery_vol": 18405.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-07-18",
@@ -1886,8 +2395,9 @@
     "high": 5.88,
     "low": 5.76,
     "close": 5.76,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12831.0,
+    "deliv_pct": 100.0,
+    "volume": 12831.0
   },
   {
     "time": "2024-07-19",
@@ -1895,8 +2405,9 @@
     "high": 5.76,
     "low": 5.7,
     "close": 5.76,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2209.0,
+    "deliv_pct": 100.0,
+    "volume": 2209.0
   },
   {
     "time": "2024-07-22",
@@ -1904,8 +2415,9 @@
     "high": 6.04,
     "low": 5.51,
     "close": 6.04,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 23432.0,
+    "deliv_pct": 100.0,
+    "volume": 23432.0
   },
   {
     "time": "2024-07-23",
@@ -1913,8 +2425,9 @@
     "high": 6.34,
     "low": 6.0,
     "close": 6.19,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 34403.0,
+    "deliv_pct": 100.0,
+    "volume": 34403.0
   },
   {
     "time": "2024-07-24",
@@ -1922,8 +2435,9 @@
     "high": 6.49,
     "low": 6.31,
     "close": 6.41,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12901.0,
+    "deliv_pct": 100.0,
+    "volume": 12901.0
   },
   {
     "time": "2024-07-25",
@@ -1931,8 +2445,9 @@
     "high": 6.73,
     "low": 6.5,
     "close": 6.73,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 15269.0,
+    "deliv_pct": 100.0,
+    "volume": 15269.0
   },
   {
     "time": "2024-07-26",
@@ -1940,8 +2455,9 @@
     "high": 7.06,
     "low": 6.5,
     "close": 6.86,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 36161.0,
+    "deliv_pct": 100.0,
+    "volume": 36161.0
   },
   {
     "time": "2024-07-29",
@@ -1949,8 +2465,9 @@
     "high": 7.2,
     "low": 6.66,
     "close": 7.03,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 50924.0,
+    "deliv_pct": 100.0,
+    "volume": 50924.0
   },
   {
     "time": "2024-07-30",
@@ -1958,8 +2475,9 @@
     "high": 7.38,
     "low": 6.8,
     "close": 6.9,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 19069.0,
+    "deliv_pct": 100.0,
+    "volume": 19069.0
   },
   {
     "time": "2024-07-31",
@@ -1967,8 +2485,9 @@
     "high": 6.76,
     "low": 6.76,
     "close": 6.76,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4735.0,
+    "deliv_pct": 100.0,
+    "volume": 4735.0
   },
   {
     "time": "2024-08-01",
@@ -1976,8 +2495,9 @@
     "high": 6.62,
     "low": 6.62,
     "close": 6.62,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5283.0,
+    "deliv_pct": 100.0,
+    "volume": 5283.0
   },
   {
     "time": "2024-08-02",
@@ -1985,8 +2505,9 @@
     "high": 6.48,
     "low": 6.48,
     "close": 6.48,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7728.0,
+    "deliv_pct": 100.0,
+    "volume": 7728.0
   },
   {
     "time": "2024-08-05",
@@ -1994,8 +2515,9 @@
     "high": 6.35,
     "low": 6.35,
     "close": 6.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4502.0,
+    "deliv_pct": 100.0,
+    "volume": 4502.0
   },
   {
     "time": "2024-08-06",
@@ -2003,8 +2525,9 @@
     "high": 6.22,
     "low": 6.22,
     "close": 6.22,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 685.0,
+    "deliv_pct": 100.0,
+    "volume": 685.0
   },
   {
     "time": "2024-08-07",
@@ -2012,8 +2535,9 @@
     "high": 6.2,
     "low": 6.09,
     "close": 6.09,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6125.0,
+    "deliv_pct": 100.0,
+    "volume": 6125.0
   },
   {
     "time": "2024-08-08",
@@ -2021,8 +2545,9 @@
     "high": 6.03,
     "low": 5.96,
     "close": 5.96,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2330.0,
+    "deliv_pct": 100.0,
+    "volume": 2330.0
   },
   {
     "time": "2024-08-09",
@@ -2030,8 +2555,9 @@
     "high": 5.96,
     "low": 5.84,
     "close": 5.84,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8992.0,
+    "deliv_pct": 100.0,
+    "volume": 8992.0
   },
   {
     "time": "2024-08-12",
@@ -2039,8 +2565,9 @@
     "high": 5.84,
     "low": 5.74,
     "close": 5.74,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3348.0,
+    "deliv_pct": 100.0,
+    "volume": 3348.0
   },
   {
     "time": "2024-08-13",
@@ -2048,8 +2575,9 @@
     "high": 5.74,
     "low": 5.62,
     "close": 5.62,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14614.0,
+    "deliv_pct": 100.0,
+    "volume": 14614.0
   },
   {
     "time": "2024-08-14",
@@ -2057,8 +2585,19 @@
     "high": 5.62,
     "low": 5.5,
     "close": 5.5,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3361.0,
+    "deliv_pct": 100.0,
+    "volume": 3361.0
+  },
+  {
+    "time": "2024-08-15",
+    "open": 5.62,
+    "high": 5.62,
+    "low": 5.5,
+    "close": 5.5,
+    "volume": 3361.0,
+    "delivery_vol": 3361.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-08-16",
@@ -2066,8 +2605,9 @@
     "high": 5.61,
     "low": 5.39,
     "close": 5.39,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20777.0,
+    "deliv_pct": 100.0,
+    "volume": 20777.0
   },
   {
     "time": "2024-08-19",
@@ -2075,8 +2615,9 @@
     "high": 5.49,
     "low": 5.39,
     "close": 5.49,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2510.0,
+    "deliv_pct": 100.0,
+    "volume": 2510.0
   },
   {
     "time": "2024-08-20",
@@ -2084,8 +2625,9 @@
     "high": 5.53,
     "low": 5.38,
     "close": 5.53,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1497.0,
+    "deliv_pct": 100.0,
+    "volume": 1497.0
   },
   {
     "time": "2024-08-21",
@@ -2093,8 +2635,9 @@
     "high": 5.64,
     "low": 5.64,
     "close": 5.64,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4016.0,
+    "deliv_pct": 100.0,
+    "volume": 4016.0
   },
   {
     "time": "2024-08-22",
@@ -2102,8 +2645,9 @@
     "high": 5.75,
     "low": 5.65,
     "close": 5.75,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9473.0,
+    "deliv_pct": 100.0,
+    "volume": 9473.0
   },
   {
     "time": "2024-08-23",
@@ -2111,8 +2655,9 @@
     "high": 5.86,
     "low": 5.86,
     "close": 5.86,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 143.0,
+    "deliv_pct": 100.0,
+    "volume": 143.0
   },
   {
     "time": "2024-08-26",
@@ -2120,8 +2665,9 @@
     "high": 5.97,
     "low": 5.97,
     "close": 5.97,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8078.0,
+    "deliv_pct": 100.0,
+    "volume": 8078.0
   },
   {
     "time": "2024-08-27",
@@ -2129,8 +2675,9 @@
     "high": 6.08,
     "low": 5.97,
     "close": 6.08,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1125.0,
+    "deliv_pct": 100.0,
+    "volume": 1125.0
   },
   {
     "time": "2024-08-28",
@@ -2138,8 +2685,9 @@
     "high": 6.2,
     "low": 6.08,
     "close": 6.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6207.0,
+    "deliv_pct": 100.0,
+    "volume": 6207.0
   },
   {
     "time": "2024-08-29",
@@ -2147,8 +2695,19 @@
     "high": 6.32,
     "low": 6.32,
     "close": 6.32,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4493.0,
+    "deliv_pct": 100.0,
+    "volume": 4493.0
+  },
+  {
+    "time": "2024-08-30",
+    "open": 6.32,
+    "high": 6.32,
+    "low": 6.32,
+    "close": 6.32,
+    "volume": 14313.0,
+    "delivery_vol": 14313.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-09-02",
@@ -2156,8 +2715,9 @@
     "high": 6.44,
     "low": 6.43,
     "close": 6.44,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 10476.0,
+    "deliv_pct": 100.0,
+    "volume": 10476.0
   },
   {
     "time": "2024-09-03",
@@ -2165,8 +2725,9 @@
     "high": 6.54,
     "low": 6.32,
     "close": 6.47,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13470.0,
+    "deliv_pct": 100.0,
+    "volume": 13470.0
   },
   {
     "time": "2024-09-04",
@@ -2174,8 +2735,9 @@
     "high": 6.59,
     "low": 6.4,
     "close": 6.59,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9562.0,
+    "deliv_pct": 100.0,
+    "volume": 9562.0
   },
   {
     "time": "2024-09-05",
@@ -2183,8 +2745,9 @@
     "high": 6.59,
     "low": 6.45,
     "close": 6.45,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1825.0,
+    "deliv_pct": 100.0,
+    "volume": 1825.0
   },
   {
     "time": "2024-09-06",
@@ -2192,8 +2755,9 @@
     "high": 6.53,
     "low": 6.32,
     "close": 6.53,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13147.0,
+    "deliv_pct": 100.0,
+    "volume": 13147.0
   },
   {
     "time": "2024-09-09",
@@ -2201,8 +2765,9 @@
     "high": 6.85,
     "low": 6.2,
     "close": 6.43,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 15580.0,
+    "deliv_pct": 100.0,
+    "volume": 15580.0
   },
   {
     "time": "2024-09-10",
@@ -2210,8 +2775,9 @@
     "high": 6.69,
     "low": 6.11,
     "close": 6.47,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 15598.0,
+    "deliv_pct": 100.0,
+    "volume": 15598.0
   },
   {
     "time": "2024-09-11",
@@ -2219,8 +2785,9 @@
     "high": 6.6,
     "low": 6.16,
     "close": 6.33,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 19194.0,
+    "deliv_pct": 100.0,
+    "volume": 19194.0
   },
   {
     "time": "2024-09-12",
@@ -2228,8 +2795,9 @@
     "high": 6.6,
     "low": 6.05,
     "close": 6.34,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8440.0,
+    "deliv_pct": 100.0,
+    "volume": 8440.0
   },
   {
     "time": "2024-09-13",
@@ -2237,8 +2805,9 @@
     "high": 6.58,
     "low": 6.05,
     "close": 6.21,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14278.0,
+    "deliv_pct": 100.0,
+    "volume": 14278.0
   },
   {
     "time": "2024-09-16",
@@ -2246,8 +2815,9 @@
     "high": 6.45,
     "low": 5.93,
     "close": 6.31,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 22172.0,
+    "deliv_pct": 100.0,
+    "volume": 22172.0
   },
   {
     "time": "2024-09-17",
@@ -2255,8 +2825,9 @@
     "high": 6.4,
     "low": 6.05,
     "close": 6.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13816.0,
+    "deliv_pct": 100.0,
+    "volume": 13816.0
   },
   {
     "time": "2024-09-18",
@@ -2264,8 +2835,9 @@
     "high": 6.55,
     "low": 6.03,
     "close": 6.37,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18115.0,
+    "deliv_pct": 100.0,
+    "volume": 18115.0
   },
   {
     "time": "2024-09-19",
@@ -2273,8 +2845,9 @@
     "high": 6.53,
     "low": 6.05,
     "close": 6.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7749.0,
+    "deliv_pct": 100.0,
+    "volume": 7749.0
   },
   {
     "time": "2024-09-20",
@@ -2282,8 +2855,9 @@
     "high": 6.35,
     "low": 5.96,
     "close": 6.2,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 16690.0,
+    "deliv_pct": 100.0,
+    "volume": 16690.0
   },
   {
     "time": "2024-09-23",
@@ -2291,8 +2865,9 @@
     "high": 6.49,
     "low": 6.0,
     "close": 6.15,
-    "delivery_vol": 14796,
-    "deliv_pct": 49.81
+    "delivery_vol": 14796.0,
+    "deliv_pct": 49.81,
+    "volume": 29707.0
   },
   {
     "time": "2024-09-24",
@@ -2300,8 +2875,9 @@
     "high": 6.39,
     "low": 5.92,
     "close": 6.17,
-    "delivery_vol": 20615,
-    "deliv_pct": 58.86
+    "delivery_vol": 20615.0,
+    "deliv_pct": 58.86,
+    "volume": 35021.0
   },
   {
     "time": "2024-09-25",
@@ -2309,8 +2885,9 @@
     "high": 6.25,
     "low": 6.0,
     "close": 6.03,
-    "delivery_vol": 19655,
-    "deliv_pct": 67.43
+    "delivery_vol": 19655.0,
+    "deliv_pct": 67.43,
+    "volume": 29148.0
   },
   {
     "time": "2024-09-26",
@@ -2318,8 +2895,9 @@
     "high": 6.17,
     "low": 5.87,
     "close": 5.96,
-    "delivery_vol": 25795,
-    "deliv_pct": 65.31
+    "delivery_vol": 25795.0,
+    "deliv_pct": 65.31,
+    "volume": 39495.0
   },
   {
     "time": "2024-09-27",
@@ -2327,8 +2905,9 @@
     "high": 6.04,
     "low": 5.72,
     "close": 5.9,
-    "delivery_vol": 11941,
-    "deliv_pct": 64.64
+    "delivery_vol": 11941.0,
+    "deliv_pct": 64.64,
+    "volume": 18472.0
   },
   {
     "time": "2024-09-30",
@@ -2336,8 +2915,9 @@
     "high": 6.14,
     "low": 5.73,
     "close": 5.86,
-    "delivery_vol": 21456,
-    "deliv_pct": 91.66
+    "delivery_vol": 21456.0,
+    "deliv_pct": 91.66,
+    "volume": 23407.0
   },
   {
     "time": "2024-10-01",
@@ -2345,7 +2925,18 @@
     "high": 6.13,
     "low": 5.82,
     "close": 5.98,
-    "delivery_vol": 47009,
+    "delivery_vol": 47009.0,
+    "deliv_pct": 93.84,
+    "volume": 50094.0
+  },
+  {
+    "time": "2024-10-02",
+    "open": 6.01,
+    "high": 6.13,
+    "low": 5.82,
+    "close": 5.98,
+    "volume": 50094.0,
+    "delivery_vol": 47009.0,
     "deliv_pct": 93.84
   },
   {
@@ -2354,8 +2945,9 @@
     "high": 6.17,
     "low": 5.84,
     "close": 5.98,
-    "delivery_vol": 17646,
-    "deliv_pct": 69.19
+    "delivery_vol": 17646.0,
+    "deliv_pct": 69.19,
+    "volume": 25504.0
   },
   {
     "time": "2024-10-04",
@@ -2363,8 +2955,9 @@
     "high": 6.18,
     "low": 5.72,
     "close": 5.93,
-    "delivery_vol": 8434,
-    "deliv_pct": 59.67
+    "delivery_vol": 8434.0,
+    "deliv_pct": 59.67,
+    "volume": 14135.0
   },
   {
     "time": "2024-10-07",
@@ -2372,8 +2965,9 @@
     "high": 6.01,
     "low": 5.63,
     "close": 5.63,
-    "delivery_vol": 12736,
-    "deliv_pct": 50.27
+    "delivery_vol": 12736.0,
+    "deliv_pct": 50.27,
+    "volume": 25333.0
   },
   {
     "time": "2024-10-08",
@@ -2381,8 +2975,9 @@
     "high": 6.18,
     "low": 5.31,
     "close": 5.81,
-    "delivery_vol": 9664,
-    "deliv_pct": 65.02
+    "delivery_vol": 9664.0,
+    "deliv_pct": 65.02,
+    "volume": 14863.0
   },
   {
     "time": "2024-10-09",
@@ -2390,8 +2985,9 @@
     "high": 5.99,
     "low": 5.42,
     "close": 5.77,
-    "delivery_vol": 3683,
-    "deliv_pct": 73.69
+    "delivery_vol": 3683.0,
+    "deliv_pct": 73.69,
+    "volume": 4998.0
   },
   {
     "time": "2024-10-10",
@@ -2399,8 +2995,9 @@
     "high": 6.34,
     "low": 5.52,
     "close": 6.16,
-    "delivery_vol": 41408,
-    "deliv_pct": 87.64
+    "delivery_vol": 41408.0,
+    "deliv_pct": 87.64,
+    "volume": 47250.0
   },
   {
     "time": "2024-10-11",
@@ -2408,8 +3005,9 @@
     "high": 6.77,
     "low": 6.18,
     "close": 6.77,
-    "delivery_vol": 63526,
-    "deliv_pct": 79.99
+    "delivery_vol": 63526.0,
+    "deliv_pct": 79.99,
+    "volume": 79420.0
   },
   {
     "time": "2024-10-14",
@@ -2417,8 +3015,9 @@
     "high": 7.44,
     "low": 6.91,
     "close": 7.44,
-    "delivery_vol": 151071,
-    "deliv_pct": 44.14
+    "delivery_vol": 151071.0,
+    "deliv_pct": 44.14,
+    "volume": 342278.0
   },
   {
     "time": "2024-10-15",
@@ -2426,8 +3025,9 @@
     "high": 7.81,
     "low": 7.45,
     "close": 7.81,
-    "delivery_vol": 115358,
-    "deliv_pct": 68.6
+    "delivery_vol": 115358.0,
+    "deliv_pct": 68.6,
+    "volume": 168155.0
   },
   {
     "time": "2024-10-16",
@@ -2435,8 +3035,9 @@
     "high": 8.2,
     "low": 7.83,
     "close": 8.2,
-    "delivery_vol": 81908,
-    "deliv_pct": 73.69
+    "delivery_vol": 81908.0,
+    "deliv_pct": 73.69,
+    "volume": 111147.0
   },
   {
     "time": "2024-10-17",
@@ -2444,8 +3045,9 @@
     "high": 8.61,
     "low": 8.61,
     "close": 8.61,
-    "delivery_vol": 40476,
-    "deliv_pct": 100.0
+    "delivery_vol": 40476.0,
+    "deliv_pct": 100.0,
+    "volume": 40476.0
   },
   {
     "time": "2024-10-18",
@@ -2453,8 +3055,9 @@
     "high": 9.04,
     "low": 8.85,
     "close": 9.04,
-    "delivery_vol": 230721,
-    "deliv_pct": 63.48
+    "delivery_vol": 230721.0,
+    "deliv_pct": 63.48,
+    "volume": 363453.0
   },
   {
     "time": "2024-10-21",
@@ -2462,8 +3065,9 @@
     "high": 9.49,
     "low": 9.23,
     "close": 9.49,
-    "delivery_vol": 146587,
-    "deliv_pct": 53.68
+    "delivery_vol": 146587.0,
+    "deliv_pct": 53.68,
+    "volume": 273087.0
   },
   {
     "time": "2024-10-22",
@@ -2471,8 +3075,9 @@
     "high": 9.96,
     "low": 9.85,
     "close": 9.96,
-    "delivery_vol": 60105,
-    "deliv_pct": 76.56
+    "delivery_vol": 60105.0,
+    "deliv_pct": 76.56,
+    "volume": 78509.0
   },
   {
     "time": "2024-10-23",
@@ -2480,8 +3085,9 @@
     "high": 10.45,
     "low": 10.45,
     "close": 10.45,
-    "delivery_vol": 22404,
-    "deliv_pct": 100.0
+    "delivery_vol": 22404.0,
+    "deliv_pct": 100.0,
+    "volume": 22404.0
   },
   {
     "time": "2024-10-24",
@@ -2489,8 +3095,9 @@
     "high": 10.97,
     "low": 10.97,
     "close": 10.97,
-    "delivery_vol": 15342,
-    "deliv_pct": 100.0
+    "delivery_vol": 15342.0,
+    "deliv_pct": 100.0,
+    "volume": 15342.0
   },
   {
     "time": "2024-10-25",
@@ -2498,8 +3105,9 @@
     "high": 10.65,
     "low": 10.42,
     "close": 10.42,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 61556.0,
+    "deliv_pct": 100.0,
+    "volume": 61556.0
   },
   {
     "time": "2024-10-28",
@@ -2507,8 +3115,9 @@
     "high": 9.89,
     "low": 9.89,
     "close": 9.89,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12036.0,
+    "deliv_pct": 100.0,
+    "volume": 12036.0
   },
   {
     "time": "2024-10-29",
@@ -2516,8 +3125,9 @@
     "high": 9.39,
     "low": 9.39,
     "close": 9.39,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 31610.0,
+    "deliv_pct": 100.0,
+    "volume": 31610.0
   },
   {
     "time": "2024-10-30",
@@ -2525,8 +3135,9 @@
     "high": 8.92,
     "low": 8.92,
     "close": 8.92,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13466.0,
+    "deliv_pct": 100.0,
+    "volume": 13466.0
   },
   {
     "time": "2024-10-31",
@@ -2534,8 +3145,9 @@
     "high": 8.47,
     "low": 8.47,
     "close": 8.47,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7783.0,
+    "deliv_pct": 100.0,
+    "volume": 7783.0
   },
   {
     "time": "2024-11-01",
@@ -2543,8 +3155,9 @@
     "high": 8.04,
     "low": 8.04,
     "close": 8.04,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 32890.0,
+    "deliv_pct": 100.0,
+    "volume": 32890.0
   },
   {
     "time": "2024-11-04",
@@ -2552,8 +3165,9 @@
     "high": 8.44,
     "low": 7.63,
     "close": 8.44,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 103285.0,
+    "deliv_pct": 100.0,
+    "volume": 103285.0
   },
   {
     "time": "2024-11-05",
@@ -2561,8 +3175,9 @@
     "high": 8.86,
     "low": 8.11,
     "close": 8.46,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 101693.0,
+    "deliv_pct": 100.0,
+    "volume": 101693.0
   },
   {
     "time": "2024-11-06",
@@ -2570,8 +3185,9 @@
     "high": 8.84,
     "low": 8.45,
     "close": 8.61,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 76514.0,
+    "deliv_pct": 100.0,
+    "volume": 76514.0
   },
   {
     "time": "2024-11-07",
@@ -2579,8 +3195,9 @@
     "high": 9.0,
     "low": 8.17,
     "close": 8.24,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 107575.0,
+    "deliv_pct": 100.0,
+    "volume": 107575.0
   },
   {
     "time": "2024-11-08",
@@ -2588,8 +3205,9 @@
     "high": 8.4,
     "low": 7.82,
     "close": 7.82,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 61653.0,
+    "deliv_pct": 100.0,
+    "volume": 61653.0
   },
   {
     "time": "2024-11-11",
@@ -2597,8 +3215,9 @@
     "high": 8.0,
     "low": 7.45,
     "close": 7.65,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 35983.0,
+    "deliv_pct": 100.0,
+    "volume": 35983.0
   },
   {
     "time": "2024-11-12",
@@ -2606,8 +3225,9 @@
     "high": 8.02,
     "low": 7.34,
     "close": 7.41,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20434.0,
+    "deliv_pct": 100.0,
+    "volume": 20434.0
   },
   {
     "time": "2024-11-13",
@@ -2615,8 +3235,9 @@
     "high": 7.78,
     "low": 7.2,
     "close": 7.72,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 39398.0,
+    "deliv_pct": 100.0,
+    "volume": 39398.0
   },
   {
     "time": "2024-11-14",
@@ -2624,8 +3245,9 @@
     "high": 8.1,
     "low": 7.41,
     "close": 7.67,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 32539.0,
+    "deliv_pct": 100.0,
+    "volume": 32539.0
   },
   {
     "time": "2024-11-18",
@@ -2633,8 +3255,9 @@
     "high": 8.05,
     "low": 7.4,
     "close": 7.9,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 65841.0,
+    "deliv_pct": 100.0,
+    "volume": 65841.0
   },
   {
     "time": "2024-11-19",
@@ -2642,8 +3265,19 @@
     "high": 8.23,
     "low": 7.6,
     "close": 8.02,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 35287.0,
+    "deliv_pct": 100.0,
+    "volume": 35287.0
+  },
+  {
+    "time": "2024-11-20",
+    "open": 8.23,
+    "high": 8.23,
+    "low": 7.6,
+    "close": 8.02,
+    "volume": 35287.0,
+    "delivery_vol": 35287.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-11-21",
@@ -2651,8 +3285,9 @@
     "high": 8.37,
     "low": 7.61,
     "close": 7.63,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 77089.0,
+    "deliv_pct": 100.0,
+    "volume": 77089.0
   },
   {
     "time": "2024-11-22",
@@ -2660,8 +3295,9 @@
     "high": 7.8,
     "low": 7.25,
     "close": 7.49,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18314.0,
+    "deliv_pct": 100.0,
+    "volume": 18314.0
   },
   {
     "time": "2024-11-25",
@@ -2669,8 +3305,9 @@
     "high": 7.86,
     "low": 7.14,
     "close": 7.22,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 17995.0,
+    "deliv_pct": 100.0,
+    "volume": 17995.0
   },
   {
     "time": "2024-11-26",
@@ -2678,8 +3315,9 @@
     "high": 7.58,
     "low": 6.88,
     "close": 7.43,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 36386.0,
+    "deliv_pct": 100.0,
+    "volume": 36386.0
   },
   {
     "time": "2024-11-27",
@@ -2687,8 +3325,9 @@
     "high": 7.79,
     "low": 7.06,
     "close": 7.17,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18585.0,
+    "deliv_pct": 100.0,
+    "volume": 18585.0
   },
   {
     "time": "2024-11-28",
@@ -2696,8 +3335,9 @@
     "high": 7.4,
     "low": 6.9,
     "close": 7.34,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 18489.0,
+    "deliv_pct": 100.0,
+    "volume": 18489.0
   },
   {
     "time": "2024-11-29",
@@ -2705,8 +3345,9 @@
     "high": 7.69,
     "low": 7.01,
     "close": 7.5,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 21596.0,
+    "deliv_pct": 100.0,
+    "volume": 21596.0
   },
   {
     "time": "2024-12-02",
@@ -2714,8 +3355,9 @@
     "high": 7.87,
     "low": 7.2,
     "close": 7.59,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 23107.0,
+    "deliv_pct": 100.0,
+    "volume": 23107.0
   },
   {
     "time": "2024-12-03",
@@ -2723,8 +3365,9 @@
     "high": 7.95,
     "low": 7.36,
     "close": 7.61,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13697.0,
+    "deliv_pct": 100.0,
+    "volume": 13697.0
   },
   {
     "time": "2024-12-04",
@@ -2732,8 +3375,9 @@
     "high": 7.81,
     "low": 7.51,
     "close": 7.52,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 19810.0,
+    "deliv_pct": 100.0,
+    "volume": 19810.0
   },
   {
     "time": "2024-12-05",
@@ -2741,8 +3385,9 @@
     "high": 7.89,
     "low": 7.2,
     "close": 7.38,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 27899.0,
+    "deliv_pct": 100.0,
+    "volume": 27899.0
   },
   {
     "time": "2024-12-06",
@@ -2750,8 +3395,9 @@
     "high": 7.7,
     "low": 7.25,
     "close": 7.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13991.0,
+    "deliv_pct": 100.0,
+    "volume": 13991.0
   },
   {
     "time": "2024-12-09",
@@ -2759,8 +3405,9 @@
     "high": 7.69,
     "low": 7.02,
     "close": 7.55,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 55835.0,
+    "deliv_pct": 100.0,
+    "volume": 55835.0
   },
   {
     "time": "2024-12-10",
@@ -2768,8 +3415,9 @@
     "high": 7.92,
     "low": 7.31,
     "close": 7.92,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 41964.0,
+    "deliv_pct": 100.0,
+    "volume": 41964.0
   },
   {
     "time": "2024-12-11",
@@ -2777,8 +3425,9 @@
     "high": 8.31,
     "low": 7.66,
     "close": 8.31,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 58543.0,
+    "deliv_pct": 100.0,
+    "volume": 58543.0
   },
   {
     "time": "2024-12-12",
@@ -2786,8 +3435,9 @@
     "high": 8.72,
     "low": 8.01,
     "close": 8.69,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 56827.0,
+    "deliv_pct": 100.0,
+    "volume": 56827.0
   },
   {
     "time": "2024-12-13",
@@ -2795,8 +3445,9 @@
     "high": 9.12,
     "low": 8.36,
     "close": 8.96,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 36460.0,
+    "deliv_pct": 100.0,
+    "volume": 36460.0
   },
   {
     "time": "2024-12-16",
@@ -2804,8 +3455,9 @@
     "high": 8.78,
     "low": 8.78,
     "close": 8.78,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 3481.0,
+    "deliv_pct": 100.0,
+    "volume": 3481.0
   },
   {
     "time": "2024-12-17",
@@ -2813,8 +3465,9 @@
     "high": 8.6,
     "low": 8.6,
     "close": 8.6,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1484.0,
+    "deliv_pct": 100.0,
+    "volume": 1484.0
   },
   {
     "time": "2024-12-18",
@@ -2822,8 +3475,9 @@
     "high": 8.42,
     "low": 8.42,
     "close": 8.42,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2065.0,
+    "deliv_pct": 100.0,
+    "volume": 2065.0
   },
   {
     "time": "2024-12-19",
@@ -2831,8 +3485,9 @@
     "high": 8.25,
     "low": 8.25,
     "close": 8.25,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7094.0,
+    "deliv_pct": 100.0,
+    "volume": 7094.0
   },
   {
     "time": "2024-12-20",
@@ -2840,8 +3495,9 @@
     "high": 8.08,
     "low": 8.08,
     "close": 8.08,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1042.0,
+    "deliv_pct": 100.0,
+    "volume": 1042.0
   },
   {
     "time": "2024-12-23",
@@ -2849,8 +3505,9 @@
     "high": 7.91,
     "low": 7.91,
     "close": 7.91,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20525.0,
+    "deliv_pct": 100.0,
+    "volume": 20525.0
   },
   {
     "time": "2024-12-24",
@@ -2858,8 +3515,19 @@
     "high": 7.91,
     "low": 7.75,
     "close": 7.91,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20130.0,
+    "deliv_pct": 100.0,
+    "volume": 20130.0
+  },
+  {
+    "time": "2024-12-25",
+    "open": 7.75,
+    "high": 7.91,
+    "low": 7.75,
+    "close": 7.91,
+    "volume": 20130.0,
+    "delivery_vol": 20130.0,
+    "deliv_pct": 100.0
   },
   {
     "time": "2024-12-26",
@@ -2867,8 +3535,9 @@
     "high": 8.06,
     "low": 7.9,
     "close": 8.06,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 22418.0,
+    "deliv_pct": 100.0,
+    "volume": 22418.0
   },
   {
     "time": "2024-12-27",
@@ -2876,8 +3545,9 @@
     "high": 8.22,
     "low": 8.1,
     "close": 8.13,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 13414.0,
+    "deliv_pct": 100.0,
+    "volume": 13414.0
   },
   {
     "time": "2024-12-30",
@@ -2885,8 +3555,9 @@
     "high": 8.13,
     "low": 8.09,
     "close": 8.09,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 8203.0,
+    "deliv_pct": 100.0,
+    "volume": 8203.0
   },
   {
     "time": "2024-12-31",
@@ -2894,8 +3565,9 @@
     "high": 7.92,
     "low": 7.92,
     "close": 7.92,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5068.0,
+    "deliv_pct": 100.0,
+    "volume": 5068.0
   },
   {
     "time": "2025-01-01",
@@ -2903,8 +3575,9 @@
     "high": 7.92,
     "low": 7.82,
     "close": 7.82,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2056.0,
+    "deliv_pct": 100.0,
+    "volume": 2056.0
   },
   {
     "time": "2025-01-02",
@@ -2912,8 +3585,9 @@
     "high": 7.79,
     "low": 7.66,
     "close": 7.66,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7890.0,
+    "deliv_pct": 100.0,
+    "volume": 7890.0
   },
   {
     "time": "2025-01-03",
@@ -2921,8 +3595,9 @@
     "high": 7.77,
     "low": 7.66,
     "close": 7.77,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1898.0,
+    "deliv_pct": 100.0,
+    "volume": 1898.0
   },
   {
     "time": "2025-01-06",
@@ -2930,8 +3605,9 @@
     "high": 7.77,
     "low": 7.61,
     "close": 7.61,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5424.0,
+    "deliv_pct": 100.0,
+    "volume": 5424.0
   },
   {
     "time": "2025-01-07",
@@ -2939,8 +3615,9 @@
     "high": 7.62,
     "low": 7.5,
     "close": 7.5,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5140.0,
+    "deliv_pct": 100.0,
+    "volume": 5140.0
   },
   {
     "time": "2025-01-08",
@@ -2948,8 +3625,9 @@
     "high": 7.5,
     "low": 7.5,
     "close": 7.5,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 1775.0,
+    "deliv_pct": 100.0,
+    "volume": 1775.0
   },
   {
     "time": "2025-01-09",
@@ -2957,8 +3635,9 @@
     "high": 7.35,
     "low": 7.35,
     "close": 7.35,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 11418.0,
+    "deliv_pct": 100.0,
+    "volume": 11418.0
   },
   {
     "time": "2025-01-10",
@@ -2966,8 +3645,9 @@
     "high": 7.35,
     "low": 7.3,
     "close": 7.3,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 5444.0,
+    "deliv_pct": 100.0,
+    "volume": 5444.0
   },
   {
     "time": "2025-01-13",
@@ -2975,8 +3655,9 @@
     "high": 7.3,
     "low": 7.15,
     "close": 7.15,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 6802.0,
+    "deliv_pct": 100.0,
+    "volume": 6802.0
   },
   {
     "time": "2025-01-14",
@@ -2984,8 +3665,9 @@
     "high": 7.15,
     "low": 7.0,
     "close": 7.04,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 2099.0,
+    "deliv_pct": 100.0,
+    "volume": 2099.0
   },
   {
     "time": "2025-01-15",
@@ -2993,8 +3675,9 @@
     "high": 7.05,
     "low": 7.04,
     "close": 7.04,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 451.0,
+    "deliv_pct": 100.0,
+    "volume": 451.0
   },
   {
     "time": "2025-01-16",
@@ -3002,8 +3685,9 @@
     "high": 7.18,
     "low": 7.07,
     "close": 7.18,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9627.0,
+    "deliv_pct": 100.0,
+    "volume": 9627.0
   },
   {
     "time": "2025-01-17",
@@ -3011,8 +3695,9 @@
     "high": 7.32,
     "low": 7.32,
     "close": 7.32,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 16464.0,
+    "deliv_pct": 100.0,
+    "volume": 16464.0
   },
   {
     "time": "2025-01-20",
@@ -3020,8 +3705,9 @@
     "high": 7.62,
     "low": 7.01,
     "close": 7.51,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20521.0,
+    "deliv_pct": 100.0,
+    "volume": 20521.0
   },
   {
     "time": "2025-01-21",
@@ -3029,8 +3715,9 @@
     "high": 7.68,
     "low": 7.13,
     "close": 7.13,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9341.0,
+    "deliv_pct": 100.0,
+    "volume": 9341.0
   },
   {
     "time": "2025-01-22",
@@ -3038,8 +3725,9 @@
     "high": 7.3,
     "low": 6.77,
     "close": 7.1,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14087.0,
+    "deliv_pct": 100.0,
+    "volume": 14087.0
   },
   {
     "time": "2025-01-23",
@@ -3047,8 +3735,9 @@
     "high": 7.25,
     "low": 6.77,
     "close": 7.1,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 20707.0,
+    "deliv_pct": 100.0,
+    "volume": 20707.0
   },
   {
     "time": "2025-01-24",
@@ -3056,8 +3745,9 @@
     "high": 7.2,
     "low": 6.78,
     "close": 6.87,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 7232.0,
+    "deliv_pct": 100.0,
+    "volume": 7232.0
   },
   {
     "time": "2025-01-27",
@@ -3065,8 +3755,9 @@
     "high": 6.8,
     "low": 6.52,
     "close": 6.52,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 4564.0,
+    "deliv_pct": 100.0,
+    "volume": 4564.0
   },
   {
     "time": "2025-01-28",
@@ -3074,8 +3765,9 @@
     "high": 6.75,
     "low": 6.19,
     "close": 6.19,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 23074.0,
+    "deliv_pct": 100.0,
+    "volume": 23074.0
   },
   {
     "time": "2025-01-29",
@@ -3083,8 +3775,9 @@
     "high": 6.47,
     "low": 5.89,
     "close": 6.14,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 14254.0,
+    "deliv_pct": 100.0,
+    "volume": 14254.0
   },
   {
     "time": "2025-01-30",
@@ -3092,8 +3785,9 @@
     "high": 6.42,
     "low": 5.86,
     "close": 5.99,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 9185.0,
+    "deliv_pct": 100.0,
+    "volume": 9185.0
   },
   {
     "time": "2025-01-31",
@@ -3101,8 +3795,9 @@
     "high": 6.27,
     "low": 6.1,
     "close": 6.11,
-    "delivery_vol": 0,
-    "deliv_pct": 0.0
+    "delivery_vol": 12359.0,
+    "deliv_pct": 100.0,
+    "volume": 12359.0
   },
   {
     "time": "2025-02-03",
@@ -3110,8 +3805,9 @@
     "high": 6.55,
     "low": 5.98,
     "close": 6.35,
-    "delivery_vol": 7412,
-    "deliv_pct": 46.41
+    "delivery_vol": 7412.0,
+    "deliv_pct": 46.41,
+    "volume": 15971.0
   },
   {
     "time": "2025-02-04",
@@ -3119,8 +3815,9 @@
     "high": 6.65,
     "low": 6.35,
     "close": 6.49,
-    "delivery_vol": 13072,
-    "deliv_pct": 84.39
+    "delivery_vol": 13072.0,
+    "deliv_pct": 84.39,
+    "volume": 15490.0
   },
   {
     "time": "2025-02-05",
@@ -3128,8 +3825,9 @@
     "high": 6.8,
     "low": 6.22,
     "close": 6.71,
-    "delivery_vol": 7791,
-    "deliv_pct": 60.87
+    "delivery_vol": 7791.0,
+    "deliv_pct": 60.87,
+    "volume": 12800.0
   },
   {
     "time": "2025-02-06",
@@ -3137,8 +3835,9 @@
     "high": 7.38,
     "low": 6.89,
     "close": 7.38,
-    "delivery_vol": 64576,
-    "deliv_pct": 79.12
+    "delivery_vol": 64576.0,
+    "deliv_pct": 79.12,
+    "volume": 81613.0
   },
   {
     "time": "2025-02-07",
@@ -3146,8 +3845,9 @@
     "high": 8.11,
     "low": 7.55,
     "close": 8.11,
-    "delivery_vol": 81173,
-    "deliv_pct": 35.26
+    "delivery_vol": 81173.0,
+    "deliv_pct": 35.26,
+    "volume": 230188.0
   },
   {
     "time": "2025-02-10",
@@ -3155,8 +3855,9 @@
     "high": 8.92,
     "low": 8.32,
     "close": 8.87,
-    "delivery_vol": 144256,
-    "deliv_pct": 40.99
+    "delivery_vol": 144256.0,
+    "deliv_pct": 40.99,
+    "volume": 351969.0
   },
   {
     "time": "2025-02-11",
@@ -3164,8 +3865,9 @@
     "high": 8.86,
     "low": 8.42,
     "close": 8.42,
-    "delivery_vol": 54149,
-    "deliv_pct": 69.27
+    "delivery_vol": 54149.0,
+    "deliv_pct": 69.27,
+    "volume": 78168.0
   },
   {
     "time": "2025-02-12",
@@ -3173,8 +3875,9 @@
     "high": 8.22,
     "low": 7.99,
     "close": 7.99,
-    "delivery_vol": 31734,
-    "deliv_pct": 83.42
+    "delivery_vol": 31734.0,
+    "deliv_pct": 83.42,
+    "volume": 38041.0
   },
   {
     "time": "2025-02-13",
@@ -3182,8 +3885,9 @@
     "high": 8.34,
     "low": 7.59,
     "close": 7.59,
-    "delivery_vol": 48666,
-    "deliv_pct": 54.79
+    "delivery_vol": 48666.0,
+    "deliv_pct": 54.79,
+    "volume": 88830.0
   },
   {
     "time": "2025-02-14",
@@ -3191,8 +3895,9 @@
     "high": 7.54,
     "low": 7.21,
     "close": 7.21,
-    "delivery_vol": 14493,
-    "deliv_pct": 83.94
+    "delivery_vol": 14493.0,
+    "deliv_pct": 83.94,
+    "volume": 17266.0
   },
   {
     "time": "2025-02-17",
@@ -3200,8 +3905,9 @@
     "high": 6.84,
     "low": 6.84,
     "close": 6.84,
-    "delivery_vol": 8763,
-    "deliv_pct": 99.99
+    "delivery_vol": 8763.0,
+    "deliv_pct": 99.99,
+    "volume": 8764.0
   },
   {
     "time": "2025-02-18",
@@ -3209,8 +3915,9 @@
     "high": 6.98,
     "low": 6.49,
     "close": 6.49,
-    "delivery_vol": 15402,
-    "deliv_pct": 76.73
+    "delivery_vol": 15402.0,
+    "deliv_pct": 76.73,
+    "volume": 20074.0
   },
   {
     "time": "2025-02-19",
@@ -3218,8 +3925,9 @@
     "high": 6.75,
     "low": 6.16,
     "close": 6.16,
-    "delivery_vol": 29896,
-    "deliv_pct": 50.08
+    "delivery_vol": 29896.0,
+    "deliv_pct": 50.08,
+    "volume": 59697.0
   },
   {
     "time": "2025-02-20",
@@ -3227,8 +3935,9 @@
     "high": 6.39,
     "low": 5.87,
     "close": 6.15,
-    "delivery_vol": 22770,
-    "deliv_pct": 76.31
+    "delivery_vol": 22770.0,
+    "deliv_pct": 76.31,
+    "volume": 29837.0
   },
   {
     "time": "2025-02-21",
@@ -3236,8 +3945,9 @@
     "high": 6.44,
     "low": 6.01,
     "close": 6.23,
-    "delivery_vol": 26888,
-    "deliv_pct": 73.11
+    "delivery_vol": 26888.0,
+    "deliv_pct": 73.11,
+    "volume": 36778.0
   },
   {
     "time": "2025-02-24",
@@ -3245,8 +3955,9 @@
     "high": 6.54,
     "low": 5.91,
     "close": 6.29,
-    "delivery_vol": 30977,
-    "deliv_pct": 58.06
+    "delivery_vol": 30977.0,
+    "deliv_pct": 58.06,
+    "volume": 53353.0
   },
   {
     "time": "2025-02-25",
@@ -3254,8 +3965,9 @@
     "high": 6.6,
     "low": 6.27,
     "close": 6.47,
-    "delivery_vol": 18534,
-    "deliv_pct": 42.18
+    "delivery_vol": 18534.0,
+    "deliv_pct": 42.18,
+    "volume": 43945.0
   },
   {
     "time": "2025-02-27",
@@ -3263,8 +3975,9 @@
     "high": 6.45,
     "low": 6.14,
     "close": 6.14,
-    "delivery_vol": 13120,
-    "deliv_pct": 54.74
+    "delivery_vol": 13120.0,
+    "deliv_pct": 54.74,
+    "volume": 23968.0
   },
   {
     "time": "2025-02-28",
@@ -3272,8 +3985,9 @@
     "high": 6.42,
     "low": 5.83,
     "close": 5.83,
-    "delivery_vol": 19049,
-    "deliv_pct": 75.53
+    "delivery_vol": 19049.0,
+    "deliv_pct": 75.53,
+    "volume": 25221.0
   },
   {
     "time": "2025-03-03",
@@ -3281,8 +3995,9 @@
     "high": 5.94,
     "low": 5.53,
     "close": 5.53,
-    "delivery_vol": 14602,
-    "deliv_pct": 63.49
+    "delivery_vol": 14602.0,
+    "deliv_pct": 63.49,
+    "volume": 23000.0
   },
   {
     "time": "2025-03-04",
@@ -3290,8 +4005,9 @@
     "high": 5.8,
     "low": 5.27,
     "close": 5.73,
-    "delivery_vol": 14396,
-    "deliv_pct": 59.73
+    "delivery_vol": 14396.0,
+    "deliv_pct": 59.73,
+    "volume": 24100.0
   },
   {
     "time": "2025-03-05",
@@ -3299,8 +4015,9 @@
     "high": 6.01,
     "low": 5.5,
     "close": 5.62,
-    "delivery_vol": 15186,
-    "deliv_pct": 59.29
+    "delivery_vol": 15186.0,
+    "deliv_pct": 59.29,
+    "volume": 25612.0
   },
   {
     "time": "2025-03-06",
@@ -3308,8 +4025,9 @@
     "high": 5.9,
     "low": 5.62,
     "close": 5.77,
-    "delivery_vol": 12456,
-    "deliv_pct": 66.93
+    "delivery_vol": 12456.0,
+    "deliv_pct": 66.93,
+    "volume": 18611.0
   },
   {
     "time": "2025-03-07",
@@ -3317,8 +4035,9 @@
     "high": 6.05,
     "low": 5.77,
     "close": 6.05,
-    "delivery_vol": 15500,
-    "deliv_pct": 75.46
+    "delivery_vol": 15500.0,
+    "deliv_pct": 75.46,
+    "volume": 20542.0
   },
   {
     "time": "2025-03-10",
@@ -3326,8 +4045,9 @@
     "high": 6.35,
     "low": 6.02,
     "close": 6.2,
-    "delivery_vol": 11661,
-    "deliv_pct": 72.27
+    "delivery_vol": 11661.0,
+    "deliv_pct": 72.27,
+    "volume": 16136.0
   },
   {
     "time": "2025-03-11",
@@ -3335,8 +4055,9 @@
     "high": 6.48,
     "low": 5.91,
     "close": 6.19,
-    "delivery_vol": 12005,
-    "deliv_pct": 85.81
+    "delivery_vol": 12005.0,
+    "deliv_pct": 85.81,
+    "volume": 13990.0
   },
   {
     "time": "2025-03-12",
@@ -3344,8 +4065,9 @@
     "high": 6.48,
     "low": 5.9,
     "close": 6.06,
-    "delivery_vol": 12335,
-    "deliv_pct": 65.7
+    "delivery_vol": 12335.0,
+    "deliv_pct": 65.7,
+    "volume": 18776.0
   },
   {
     "time": "2025-03-13",
@@ -3353,8 +4075,9 @@
     "high": 6.29,
     "low": 5.89,
     "close": 6.12,
-    "delivery_vol": 6832,
-    "deliv_pct": 55.6
+    "delivery_vol": 6832.0,
+    "deliv_pct": 55.6,
+    "volume": 12287.0
   },
   {
     "time": "2025-03-17",
@@ -3362,8 +4085,9 @@
     "high": 6.39,
     "low": 5.84,
     "close": 6.17,
-    "delivery_vol": 4756,
-    "deliv_pct": 54.42
+    "delivery_vol": 4756.0,
+    "deliv_pct": 54.42,
+    "volume": 8739.0
   },
   {
     "time": "2025-03-18",
@@ -3371,8 +4095,9 @@
     "high": 6.47,
     "low": 5.96,
     "close": 5.99,
-    "delivery_vol": 6361,
-    "deliv_pct": 82.66
+    "delivery_vol": 6361.0,
+    "deliv_pct": 82.66,
+    "volume": 7695.0
   },
   {
     "time": "2025-03-19",
@@ -3380,8 +4105,9 @@
     "high": 6.27,
     "low": 5.74,
     "close": 6.03,
-    "delivery_vol": 5055,
-    "deliv_pct": 58.77
+    "delivery_vol": 5055.0,
+    "deliv_pct": 58.77,
+    "volume": 8602.0
   },
   {
     "time": "2025-03-20",
@@ -3389,8 +4115,9 @@
     "high": 6.24,
     "low": 6.03,
     "close": 6.15,
-    "delivery_vol": 9974,
-    "deliv_pct": 39.21
+    "delivery_vol": 9974.0,
+    "deliv_pct": 39.21,
+    "volume": 25435.0
   },
   {
     "time": "2025-03-21",
@@ -3398,8 +4125,9 @@
     "high": 6.44,
     "low": 5.95,
     "close": 6.25,
-    "delivery_vol": 11853,
-    "deliv_pct": 53.58
+    "delivery_vol": 11853.0,
+    "deliv_pct": 53.58,
+    "volume": 22123.0
   },
   {
     "time": "2025-03-24",
@@ -3407,8 +4135,9 @@
     "high": 6.38,
     "low": 6.1,
     "close": 6.12,
-    "delivery_vol": 11200,
-    "deliv_pct": 71.98
+    "delivery_vol": 11200.0,
+    "deliv_pct": 71.98,
+    "volume": 15559.0
   },
   {
     "time": "2025-03-25",
@@ -3416,8 +4145,9 @@
     "high": 6.24,
     "low": 6.0,
     "close": 6.04,
-    "delivery_vol": 5285,
-    "deliv_pct": 67.65
+    "delivery_vol": 5285.0,
+    "deliv_pct": 67.65,
+    "volume": 7812.0
   },
   {
     "time": "2025-03-26",
@@ -3425,8 +4155,9 @@
     "high": 6.3,
     "low": 5.91,
     "close": 6.11,
-    "delivery_vol": 4625,
-    "deliv_pct": 62.92
+    "delivery_vol": 4625.0,
+    "deliv_pct": 62.92,
+    "volume": 7351.0
   },
   {
     "time": "2025-03-27",
@@ -3434,8 +4165,9 @@
     "high": 6.23,
     "low": 5.8,
     "close": 5.8,
-    "delivery_vol": 36439,
-    "deliv_pct": 80.27
+    "delivery_vol": 36439.0,
+    "deliv_pct": 80.27,
+    "volume": 45395.0
   },
   {
     "time": "2025-03-28",
@@ -3443,8 +4175,9 @@
     "high": 6.06,
     "low": 5.54,
     "close": 5.63,
-    "delivery_vol": 13690,
-    "deliv_pct": 65.98
+    "delivery_vol": 13690.0,
+    "deliv_pct": 65.98,
+    "volume": 20748.0
   },
   {
     "time": "2025-04-01",
@@ -3452,8 +4185,9 @@
     "high": 5.91,
     "low": 5.35,
     "close": 5.91,
-    "delivery_vol": 12177,
-    "deliv_pct": 56.28
+    "delivery_vol": 12177.0,
+    "deliv_pct": 56.28,
+    "volume": 21635.0
   },
   {
     "time": "2025-04-02",
@@ -3461,8 +4195,9 @@
     "high": 6.2,
     "low": 5.87,
     "close": 6.04,
-    "delivery_vol": 10706,
-    "deliv_pct": 56.25
+    "delivery_vol": 10706.0,
+    "deliv_pct": 56.25,
+    "volume": 19034.0
   },
   {
     "time": "2025-04-03",
@@ -3470,8 +4205,9 @@
     "high": 6.34,
     "low": 5.83,
     "close": 6.32,
-    "delivery_vol": 22361,
-    "deliv_pct": 87.0
+    "delivery_vol": 22361.0,
+    "deliv_pct": 87.0,
+    "volume": 25702.0
   },
   {
     "time": "2025-04-04",
@@ -3479,8 +4215,9 @@
     "high": 6.49,
     "low": 6.0,
     "close": 6.17,
-    "delivery_vol": 10071,
-    "deliv_pct": 65.15
+    "delivery_vol": 10071.0,
+    "deliv_pct": 65.15,
+    "volume": 15457.0
   },
   {
     "time": "2025-04-07",
@@ -3488,8 +4225,9 @@
     "high": 6.23,
     "low": 5.62,
     "close": 5.99,
-    "delivery_vol": 3179,
-    "deliv_pct": 36.21
+    "delivery_vol": 3179.0,
+    "deliv_pct": 36.21,
+    "volume": 8780.0
   },
   {
     "time": "2025-04-08",
@@ -3497,8 +4235,9 @@
     "high": 6.46,
     "low": 5.52,
     "close": 6.0,
-    "delivery_vol": 5654,
-    "deliv_pct": 54.08
+    "delivery_vol": 5654.0,
+    "deliv_pct": 54.08,
+    "volume": 10454.0
   },
   {
     "time": "2025-04-09",
@@ -3506,8 +4245,9 @@
     "high": 6.44,
     "low": 5.46,
     "close": 6.04,
-    "delivery_vol": 11116,
-    "deliv_pct": 45.27
+    "delivery_vol": 11116.0,
+    "deliv_pct": 45.27,
+    "volume": 24553.0
   },
   {
     "time": "2025-04-11",
@@ -3515,8 +4255,9 @@
     "high": 6.58,
     "low": 5.93,
     "close": 6.01,
-    "delivery_vol": 10417,
-    "deliv_pct": 62.08
+    "delivery_vol": 10417.0,
+    "deliv_pct": 62.08,
+    "volume": 16780.0
   },
   {
     "time": "2025-04-15",
@@ -3524,8 +4265,9 @@
     "high": 6.3,
     "low": 5.95,
     "close": 6.03,
-    "delivery_vol": 4323,
-    "deliv_pct": 60.03
+    "delivery_vol": 4323.0,
+    "deliv_pct": 60.03,
+    "volume": 7201.0
   },
   {
     "time": "2025-04-16",
@@ -3533,8 +4275,9 @@
     "high": 6.63,
     "low": 6.0,
     "close": 6.63,
-    "delivery_vol": 31750,
-    "deliv_pct": 73.61
+    "delivery_vol": 31750.0,
+    "deliv_pct": 73.61,
+    "volume": 43132.0
   },
   {
     "time": "2025-04-17",
@@ -3542,8 +4285,9 @@
     "high": 7.29,
     "low": 6.66,
     "close": 7.29,
-    "delivery_vol": 19976,
-    "deliv_pct": 70.1
+    "delivery_vol": 19976.0,
+    "deliv_pct": 70.1,
+    "volume": 28496.0
   },
   {
     "time": "2025-04-21",
@@ -3551,8 +4295,9 @@
     "high": 7.98,
     "low": 7.0,
     "close": 7.05,
-    "delivery_vol": 54839,
-    "deliv_pct": 46.53
+    "delivery_vol": 54839.0,
+    "deliv_pct": 46.53,
+    "volume": 117848.0
   },
   {
     "time": "2025-04-22",
@@ -3560,8 +4305,9 @@
     "high": 7.43,
     "low": 6.44,
     "close": 6.75,
-    "delivery_vol": 38739,
-    "deliv_pct": 63.09
+    "delivery_vol": 38739.0,
+    "deliv_pct": 63.09,
+    "volume": 61404.0
   },
   {
     "time": "2025-04-23",
@@ -3569,8 +4315,9 @@
     "high": 6.99,
     "low": 6.29,
     "close": 6.74,
-    "delivery_vol": 26438,
-    "deliv_pct": 43.86
+    "delivery_vol": 26438.0,
+    "deliv_pct": 43.86,
+    "volume": 60283.0
   },
   {
     "time": "2025-04-24",
@@ -3578,8 +4325,9 @@
     "high": 7.13,
     "low": 6.38,
     "close": 6.85,
-    "delivery_vol": 9673,
-    "deliv_pct": 71.1
+    "delivery_vol": 9673.0,
+    "deliv_pct": 71.1,
+    "volume": 13604.0
   },
   {
     "time": "2025-04-25",
@@ -3587,8 +4335,9 @@
     "high": 6.97,
     "low": 6.3,
     "close": 6.47,
-    "delivery_vol": 13217,
-    "deliv_pct": 54.74
+    "delivery_vol": 13217.0,
+    "deliv_pct": 54.74,
+    "volume": 24146.0
   },
   {
     "time": "2025-04-28",
@@ -3596,8 +4345,9 @@
     "high": 6.87,
     "low": 6.33,
     "close": 6.43,
-    "delivery_vol": 11585,
-    "deliv_pct": 78.67
+    "delivery_vol": 11585.0,
+    "deliv_pct": 78.67,
+    "volume": 14727.0
   },
   {
     "time": "2025-04-29",
@@ -3605,8 +4355,9 @@
     "high": 6.67,
     "low": 6.2,
     "close": 6.45,
-    "delivery_vol": 9751,
-    "deliv_pct": 84.73
+    "delivery_vol": 9751.0,
+    "deliv_pct": 84.73,
+    "volume": 11508.0
   },
   {
     "time": "2025-04-30",
@@ -3614,8 +4365,9 @@
     "high": 6.45,
     "low": 6.26,
     "close": 6.41,
-    "delivery_vol": 5922,
-    "deliv_pct": 88.36
+    "delivery_vol": 5922.0,
+    "deliv_pct": 88.36,
+    "volume": 6702.0
   },
   {
     "time": "2025-05-02",
@@ -3623,8 +4375,9 @@
     "high": 6.58,
     "low": 6.29,
     "close": 6.36,
-    "delivery_vol": 12308,
-    "deliv_pct": 97.65
+    "delivery_vol": 12308.0,
+    "deliv_pct": 97.65,
+    "volume": 12604.0
   },
   {
     "time": "2025-05-05",
@@ -3632,8 +4385,9 @@
     "high": 6.96,
     "low": 5.9,
     "close": 6.38,
-    "delivery_vol": 12790,
-    "deliv_pct": 74.87
+    "delivery_vol": 12790.0,
+    "deliv_pct": 74.87,
+    "volume": 17082.0
   },
   {
     "time": "2025-05-06",
@@ -3641,8 +4395,9 @@
     "high": 6.57,
     "low": 6.02,
     "close": 6.28,
-    "delivery_vol": 5721,
-    "deliv_pct": 79.97
+    "delivery_vol": 5721.0,
+    "deliv_pct": 79.97,
+    "volume": 7154.0
   },
   {
     "time": "2025-05-07",
@@ -3650,8 +4405,9 @@
     "high": 6.6,
     "low": 5.9,
     "close": 6.22,
-    "delivery_vol": 12026,
-    "deliv_pct": 76.27
+    "delivery_vol": 12026.0,
+    "deliv_pct": 76.27,
+    "volume": 15767.0
   },
   {
     "time": "2025-05-08",
@@ -3659,8 +4415,9 @@
     "high": 6.66,
     "low": 5.66,
     "close": 6.03,
-    "delivery_vol": 19835,
-    "deliv_pct": 52.22
+    "delivery_vol": 19835.0,
+    "deliv_pct": 52.22,
+    "volume": 37987.0
   },
   {
     "time": "2025-05-09",
@@ -3668,8 +4425,9 @@
     "high": 6.46,
     "low": 5.8,
     "close": 6.0,
-    "delivery_vol": 17069,
-    "deliv_pct": 51.53
+    "delivery_vol": 17069.0,
+    "deliv_pct": 51.53,
+    "volume": 33123.0
   },
   {
     "time": "2025-05-12",
@@ -3677,8 +4435,9 @@
     "high": 6.59,
     "low": 5.69,
     "close": 6.37,
-    "delivery_vol": 17027,
-    "deliv_pct": 53.44
+    "delivery_vol": 17027.0,
+    "deliv_pct": 53.44,
+    "volume": 31863.0
   },
   {
     "time": "2025-05-13",
@@ -3686,8 +4445,9 @@
     "high": 6.95,
     "low": 6.04,
     "close": 6.29,
-    "delivery_vol": 18841,
-    "deliv_pct": 72.17
+    "delivery_vol": 18841.0,
+    "deliv_pct": 72.17,
+    "volume": 26106.0
   },
   {
     "time": "2025-05-14",
@@ -3695,8 +4455,9 @@
     "high": 6.65,
     "low": 6.11,
     "close": 6.41,
-    "delivery_vol": 9154,
-    "deliv_pct": 50.27
+    "delivery_vol": 9154.0,
+    "deliv_pct": 50.27,
+    "volume": 18208.0
   },
   {
     "time": "2025-05-15",
@@ -3704,8 +4465,9 @@
     "high": 6.88,
     "low": 6.22,
     "close": 6.51,
-    "delivery_vol": 19176,
-    "deliv_pct": 60.45
+    "delivery_vol": 19176.0,
+    "deliv_pct": 60.45,
+    "volume": 31721.0
   },
   {
     "time": "2025-05-16",
@@ -3713,8 +4475,9 @@
     "high": 6.93,
     "low": 6.3,
     "close": 6.75,
-    "delivery_vol": 21126,
-    "deliv_pct": 68.9
+    "delivery_vol": 21126.0,
+    "deliv_pct": 68.9,
+    "volume": 30664.0
   },
   {
     "time": "2025-05-19",
@@ -3722,8 +4485,9 @@
     "high": 6.89,
     "low": 6.5,
     "close": 6.53,
-    "delivery_vol": 13058,
-    "deliv_pct": 60.32
+    "delivery_vol": 13058.0,
+    "deliv_pct": 60.32,
+    "volume": 21647.0
   },
   {
     "time": "2025-05-20",
@@ -3731,8 +4495,9 @@
     "high": 7.13,
     "low": 6.55,
     "close": 6.64,
-    "delivery_vol": 20701,
-    "deliv_pct": 74.65
+    "delivery_vol": 20701.0,
+    "deliv_pct": 74.65,
+    "volume": 27732.0
   },
   {
     "time": "2025-05-21",
@@ -3740,8 +4505,9 @@
     "high": 6.89,
     "low": 6.38,
     "close": 6.54,
-    "delivery_vol": 10493,
-    "deliv_pct": 68.57
+    "delivery_vol": 10493.0,
+    "deliv_pct": 68.57,
+    "volume": 15303.0
   },
   {
     "time": "2025-05-22",
@@ -3749,8 +4515,9 @@
     "high": 6.73,
     "low": 6.54,
     "close": 6.55,
-    "delivery_vol": 12027,
-    "deliv_pct": 70.71
+    "delivery_vol": 12027.0,
+    "deliv_pct": 70.71,
+    "volume": 17010.0
   },
   {
     "time": "2025-05-23",
@@ -3758,8 +4525,9 @@
     "high": 6.67,
     "low": 6.28,
     "close": 6.43,
-    "delivery_vol": 11378,
-    "deliv_pct": 66.44
+    "delivery_vol": 11378.0,
+    "deliv_pct": 66.44,
+    "volume": 17124.0
   },
   {
     "time": "2025-05-26",
@@ -3767,8 +4535,9 @@
     "high": 6.72,
     "low": 6.36,
     "close": 6.4,
-    "delivery_vol": 14953,
-    "deliv_pct": 71.08
+    "delivery_vol": 14953.0,
+    "deliv_pct": 71.08,
+    "volume": 21037.0
   },
   {
     "time": "2025-05-27",
@@ -3776,8 +4545,9 @@
     "high": 6.6,
     "low": 6.32,
     "close": 6.48,
-    "delivery_vol": 12812,
-    "deliv_pct": 89.3
+    "delivery_vol": 12812.0,
+    "deliv_pct": 89.3,
+    "volume": 14347.0
   },
   {
     "time": "2025-05-28",
@@ -3785,8 +4555,9 @@
     "high": 6.76,
     "low": 6.42,
     "close": 6.76,
-    "delivery_vol": 12932,
-    "deliv_pct": 61.71
+    "delivery_vol": 12932.0,
+    "deliv_pct": 61.71,
+    "volume": 20957.0
   },
   {
     "time": "2025-05-29",
@@ -3794,8 +4565,9 @@
     "high": 6.9,
     "low": 6.51,
     "close": 6.78,
-    "delivery_vol": 4060,
-    "deliv_pct": 86.13
+    "delivery_vol": 4060.0,
+    "deliv_pct": 86.13,
+    "volume": 4714.0
   },
   {
     "time": "2025-05-30",
@@ -3803,8 +4575,9 @@
     "high": 6.85,
     "low": 6.6,
     "close": 6.76,
-    "delivery_vol": 16764,
-    "deliv_pct": 81.58
+    "delivery_vol": 16764.0,
+    "deliv_pct": 81.58,
+    "volume": 20548.0
   },
   {
     "time": "2025-06-02",
@@ -4552,8 +5325,9 @@
     "high": 8.83,
     "low": 7.56,
     "close": 7.83,
-    "delivery_vol": 50623,
-    "deliv_pct": 63.55
+    "delivery_vol": 50623.0,
+    "deliv_pct": 63.55,
+    "volume": 79655.0
   },
   {
     "time": "2025-09-17",
@@ -4561,8 +5335,9 @@
     "high": 8.39,
     "low": 7.75,
     "close": 7.81,
-    "delivery_vol": 15761,
-    "deliv_pct": 37.26
+    "delivery_vol": 15761.0,
+    "deliv_pct": 37.26,
+    "volume": 42298.0
   },
   {
     "time": "2025-09-18",
@@ -4570,8 +5345,9 @@
     "high": 8.09,
     "low": 7.75,
     "close": 7.93,
-    "delivery_vol": 19002,
-    "deliv_pct": 72.93
+    "delivery_vol": 19002.0,
+    "deliv_pct": 72.93,
+    "volume": 26054.0
   },
   {
     "time": "2025-09-19",
@@ -4579,8 +5355,9 @@
     "high": 8.6,
     "low": 7.75,
     "close": 8.17,
-    "delivery_vol": 51242,
-    "deliv_pct": 57.11
+    "delivery_vol": 51242.0,
+    "deliv_pct": 57.11,
+    "volume": 89722.0
   },
   {
     "time": "2025-09-22",
@@ -4588,8 +5365,9 @@
     "high": 8.39,
     "low": 7.52,
     "close": 7.78,
-    "delivery_vol": 14492,
-    "deliv_pct": 66.36
+    "delivery_vol": 14492.0,
+    "deliv_pct": 66.36,
+    "volume": 21837.0
   },
   {
     "time": "2025-09-23",
@@ -4597,8 +5375,9 @@
     "high": 8.1,
     "low": 7.68,
     "close": 7.72,
-    "delivery_vol": 13760,
-    "deliv_pct": 81.9
+    "delivery_vol": 13760.0,
+    "deliv_pct": 81.9,
+    "volume": 16800.0
   },
   {
     "time": "2025-09-24",
@@ -4606,8 +5385,9 @@
     "high": 8.17,
     "low": 7.11,
     "close": 7.65,
-    "delivery_vol": 10666,
-    "deliv_pct": 87.19
+    "delivery_vol": 10666.0,
+    "deliv_pct": 87.19,
+    "volume": 12233.0
   },
   {
     "time": "2025-09-25",
@@ -4615,8 +5395,9 @@
     "high": 7.99,
     "low": 7.53,
     "close": 7.86,
-    "delivery_vol": 9220,
-    "deliv_pct": 58.16
+    "delivery_vol": 9220.0,
+    "deliv_pct": 58.16,
+    "volume": 15853.0
   },
   {
     "time": "2025-09-26",
@@ -4624,8 +5405,9 @@
     "high": 8.36,
     "low": 7.58,
     "close": 7.64,
-    "delivery_vol": 8705,
-    "deliv_pct": 66.72
+    "delivery_vol": 8705.0,
+    "deliv_pct": 66.72,
+    "volume": 13048.0
   },
   {
     "time": "2025-09-29",
@@ -4633,8 +5415,9 @@
     "high": 7.99,
     "low": 7.25,
     "close": 7.49,
-    "delivery_vol": 13321,
-    "deliv_pct": 49.56
+    "delivery_vol": 13321.0,
+    "deliv_pct": 49.56,
+    "volume": 26881.0
   },
   {
     "time": "2025-09-30",
@@ -4642,8 +5425,9 @@
     "high": 7.94,
     "low": 7.36,
     "close": 7.41,
-    "delivery_vol": 5253,
-    "deliv_pct": 42.41
+    "delivery_vol": 5253.0,
+    "deliv_pct": 42.41,
+    "volume": 12386.0
   },
   {
     "time": "2025-10-01",
@@ -4651,8 +5435,9 @@
     "high": 7.8,
     "low": 7.5,
     "close": 7.6,
-    "delivery_vol": 5397,
-    "deliv_pct": 81.56
+    "delivery_vol": 5397.0,
+    "deliv_pct": 81.56,
+    "volume": 6617.0
   },
   {
     "time": "2025-10-03",
@@ -4660,8 +5445,9 @@
     "high": 7.9,
     "low": 7.34,
     "close": 7.44,
-    "delivery_vol": 17826,
-    "deliv_pct": 76.97
+    "delivery_vol": 17826.0,
+    "deliv_pct": 76.97,
+    "volume": 23161.0
   },
   {
     "time": "2025-10-06",
@@ -4669,8 +5455,9 @@
     "high": 7.69,
     "low": 7.22,
     "close": 7.29,
-    "delivery_vol": 18246,
-    "deliv_pct": 92.29
+    "delivery_vol": 18246.0,
+    "deliv_pct": 92.29,
+    "volume": 19770.0
   },
   {
     "time": "2025-10-07",
@@ -4678,8 +5465,9 @@
     "high": 7.47,
     "low": 7.24,
     "close": 7.39,
-    "delivery_vol": 3576,
-    "deliv_pct": 91.76
+    "delivery_vol": 3576.0,
+    "deliv_pct": 91.76,
+    "volume": 3897.0
   },
   {
     "time": "2025-10-08",
@@ -4687,8 +5475,9 @@
     "high": 8.29,
     "low": 7.45,
     "close": 7.97,
-    "delivery_vol": 62852,
-    "deliv_pct": 65.07
+    "delivery_vol": 62852.0,
+    "deliv_pct": 65.07,
+    "volume": 96587.0
   },
   {
     "time": "2025-10-09",
@@ -4696,8 +5485,9 @@
     "high": 8.37,
     "low": 7.6,
     "close": 7.67,
-    "delivery_vol": 30338,
-    "deliv_pct": 86.32
+    "delivery_vol": 30338.0,
+    "deliv_pct": 86.32,
+    "volume": 35144.0
   },
   {
     "time": "2025-10-10",
@@ -4705,8 +5495,9 @@
     "high": 8.07,
     "low": 7.67,
     "close": 7.95,
-    "delivery_vol": 18092,
-    "deliv_pct": 70.64
+    "delivery_vol": 18092.0,
+    "deliv_pct": 70.64,
+    "volume": 25612.0
   },
   {
     "time": "2025-10-13",
@@ -4714,8 +5505,9 @@
     "high": 8.3,
     "low": 7.11,
     "close": 7.59,
-    "delivery_vol": 24744,
-    "deliv_pct": 55.18
+    "delivery_vol": 24744.0,
+    "deliv_pct": 55.18,
+    "volume": 44841.0
   },
   {
     "time": "2025-10-14",
@@ -4723,8 +5515,9 @@
     "high": 7.94,
     "low": 7.27,
     "close": 7.62,
-    "delivery_vol": 19400,
-    "deliv_pct": 86.61
+    "delivery_vol": 19400.0,
+    "deliv_pct": 86.61,
+    "volume": 22400.0
   },
   {
     "time": "2025-10-15",
@@ -4732,8 +5525,9 @@
     "high": 8.16,
     "low": 7.63,
     "close": 8.02,
-    "delivery_vol": 14968,
-    "deliv_pct": 66.67
+    "delivery_vol": 14968.0,
+    "deliv_pct": 66.67,
+    "volume": 22452.0
   },
   {
     "time": "2025-10-16",
@@ -4741,8 +5535,9 @@
     "high": 8.38,
     "low": 7.66,
     "close": 7.78,
-    "delivery_vol": 13677,
-    "deliv_pct": 94.03
+    "delivery_vol": 13677.0,
+    "deliv_pct": 94.03,
+    "volume": 14546.0
   },
   {
     "time": "2025-10-17",
@@ -4750,8 +5545,9 @@
     "high": 8.3,
     "low": 7.5,
     "close": 7.73,
-    "delivery_vol": 7023,
-    "deliv_pct": 73.75
+    "delivery_vol": 7023.0,
+    "deliv_pct": 73.75,
+    "volume": 9523.0
   },
   {
     "time": "2025-10-20",
@@ -4759,8 +5555,9 @@
     "high": 8.25,
     "low": 7.45,
     "close": 7.69,
-    "delivery_vol": 8453,
-    "deliv_pct": 77.0
+    "delivery_vol": 8453.0,
+    "deliv_pct": 77.0,
+    "volume": 10978.0
   },
   {
     "time": "2025-10-21",
@@ -4768,7 +5565,18 @@
     "high": 8.82,
     "low": 7.27,
     "close": 7.68,
-    "delivery_vol": 7327,
+    "delivery_vol": 7327.0,
+    "deliv_pct": 58.03,
+    "volume": 12627.0
+  },
+  {
+    "time": "2025-10-22",
+    "open": 7.51,
+    "high": 8.82,
+    "low": 7.27,
+    "close": 7.68,
+    "volume": 12627.0,
+    "delivery_vol": 7327.0,
     "deliv_pct": 58.03
   },
   {
@@ -4777,8 +5585,9 @@
     "high": 8.6,
     "low": 7.53,
     "close": 7.89,
-    "delivery_vol": 28806,
-    "deliv_pct": 77.08
+    "delivery_vol": 28806.0,
+    "deliv_pct": 77.08,
+    "volume": 37371.0
   },
   {
     "time": "2025-10-24",
@@ -4786,8 +5595,9 @@
     "high": 8.09,
     "low": 7.7,
     "close": 7.73,
-    "delivery_vol": 20395,
-    "deliv_pct": 77.28
+    "delivery_vol": 20395.0,
+    "deliv_pct": 77.28,
+    "volume": 26392.0
   },
   {
     "time": "2025-10-27",
@@ -4795,8 +5605,9 @@
     "high": 7.88,
     "low": 7.73,
     "close": 7.82,
-    "delivery_vol": 7325,
-    "deliv_pct": 95.17
+    "delivery_vol": 7325.0,
+    "deliv_pct": 95.17,
+    "volume": 7697.0
   },
   {
     "time": "2025-10-28",
@@ -4804,8 +5615,9 @@
     "high": 7.87,
     "low": 7.37,
     "close": 7.79,
-    "delivery_vol": 9292,
-    "deliv_pct": 93.58
+    "delivery_vol": 9292.0,
+    "deliv_pct": 93.58,
+    "volume": 9929.0
   },
   {
     "time": "2025-10-29",
@@ -4813,8 +5625,9 @@
     "high": 8.3,
     "low": 7.33,
     "close": 7.69,
-    "delivery_vol": 14759,
-    "deliv_pct": 37.08
+    "delivery_vol": 14759.0,
+    "deliv_pct": 37.08,
+    "volume": 39808.0
   },
   {
     "time": "2025-10-30",
@@ -4822,8 +5635,9 @@
     "high": 7.95,
     "low": 7.37,
     "close": 7.47,
-    "delivery_vol": 17196,
-    "deliv_pct": 92.12
+    "delivery_vol": 17196.0,
+    "deliv_pct": 92.12,
+    "volume": 18666.0
   },
   {
     "time": "2025-10-31",
@@ -4831,8 +5645,9 @@
     "high": 7.85,
     "low": 7.4,
     "close": 7.75,
-    "delivery_vol": 13143,
-    "deliv_pct": 94.32
+    "delivery_vol": 13143.0,
+    "deliv_pct": 94.32,
+    "volume": 13934.0
   },
   {
     "time": "2025-11-03",
@@ -4840,8 +5655,9 @@
     "high": 7.9,
     "low": 7.41,
     "close": 7.46,
-    "delivery_vol": 20354,
-    "deliv_pct": 93.28
+    "delivery_vol": 20354.0,
+    "deliv_pct": 93.28,
+    "volume": 21821.0
   },
   {
     "time": "2025-11-04",
@@ -4849,7 +5665,18 @@
     "high": 7.74,
     "low": 7.1,
     "close": 7.46,
-    "delivery_vol": 28174,
+    "delivery_vol": 28174.0,
+    "deliv_pct": 88.84,
+    "volume": 31713.0
+  },
+  {
+    "time": "2025-11-05",
+    "open": 7.45,
+    "high": 7.74,
+    "low": 7.1,
+    "close": 7.46,
+    "volume": 31713.0,
+    "delivery_vol": 28174.0,
     "deliv_pct": 88.84
   },
   {
@@ -4858,8 +5685,9 @@
     "high": 7.73,
     "low": 7.07,
     "close": 7.56,
-    "delivery_vol": 32703,
-    "deliv_pct": 76.05
+    "delivery_vol": 32703.0,
+    "deliv_pct": 76.05,
+    "volume": 43001.0
   },
   {
     "time": "2025-11-07",
@@ -4867,8 +5695,9 @@
     "high": 8.2,
     "low": 7.31,
     "close": 7.44,
-    "delivery_vol": 29991,
-    "deliv_pct": 26.43
+    "delivery_vol": 29991.0,
+    "deliv_pct": 26.43,
+    "volume": 113465.0
   },
   {
     "time": "2025-11-10",
@@ -4876,8 +5705,9 @@
     "high": 7.78,
     "low": 7.23,
     "close": 7.43,
-    "delivery_vol": 11100,
-    "deliv_pct": 46.32
+    "delivery_vol": 11100.0,
+    "deliv_pct": 46.32,
+    "volume": 23962.0
   },
   {
     "time": "2025-11-11",
@@ -4885,8 +5715,9 @@
     "high": 7.7,
     "low": 7.21,
     "close": 7.31,
-    "delivery_vol": 23910,
-    "deliv_pct": 83.35
+    "delivery_vol": 23910.0,
+    "deliv_pct": 83.35,
+    "volume": 28687.0
   },
   {
     "time": "2025-11-12",
@@ -4894,8 +5725,9 @@
     "high": 7.53,
     "low": 7.22,
     "close": 7.3,
-    "delivery_vol": 12042,
-    "deliv_pct": 96.86
+    "delivery_vol": 12042.0,
+    "deliv_pct": 96.86,
+    "volume": 12433.0
   },
   {
     "time": "2025-11-13",
@@ -4903,8 +5735,9 @@
     "high": 7.54,
     "low": 7.28,
     "close": 7.28,
-    "delivery_vol": 4766,
-    "deliv_pct": 95.11
+    "delivery_vol": 4766.0,
+    "deliv_pct": 95.11,
+    "volume": 5011.0
   },
   {
     "time": "2025-11-14",
@@ -4912,8 +5745,9 @@
     "high": 7.5,
     "low": 7.25,
     "close": 7.28,
-    "delivery_vol": 8906,
-    "deliv_pct": 63.28
+    "delivery_vol": 8906.0,
+    "deliv_pct": 63.28,
+    "volume": 14075.0
   },
   {
     "time": "2025-11-17",
@@ -4921,8 +5755,9 @@
     "high": 7.46,
     "low": 7.22,
     "close": 7.37,
-    "delivery_vol": 5435,
-    "deliv_pct": 64.39
+    "delivery_vol": 5435.0,
+    "deliv_pct": 64.39,
+    "volume": 8441.0
   },
   {
     "time": "2025-11-18",
@@ -4930,8 +5765,9 @@
     "high": 7.55,
     "low": 7.17,
     "close": 7.36,
-    "delivery_vol": 9038,
-    "deliv_pct": 48.81
+    "delivery_vol": 9038.0,
+    "deliv_pct": 48.81,
+    "volume": 18518.0
   },
   {
     "time": "2025-11-19",
@@ -4939,8 +5775,9 @@
     "high": 7.54,
     "low": 7.21,
     "close": 7.21,
-    "delivery_vol": 19029,
-    "deliv_pct": 93.63
+    "delivery_vol": 19029.0,
+    "deliv_pct": 93.63,
+    "volume": 20323.0
   },
   {
     "time": "2025-11-20",
@@ -4948,8 +5785,9 @@
     "high": 7.76,
     "low": 7.21,
     "close": 7.3,
-    "delivery_vol": 25011,
-    "deliv_pct": 71.0
+    "delivery_vol": 25011.0,
+    "deliv_pct": 71.0,
+    "volume": 35228.0
   },
   {
     "time": "2025-11-21",
@@ -4957,8 +5795,9 @@
     "high": 7.45,
     "low": 6.9,
     "close": 6.99,
-    "delivery_vol": 15722,
-    "deliv_pct": 97.62
+    "delivery_vol": 15722.0,
+    "deliv_pct": 97.62,
+    "volume": 16105.0
   },
   {
     "time": "2025-11-24",
@@ -4966,8 +5805,9 @@
     "high": 7.28,
     "low": 6.7,
     "close": 7.01,
-    "delivery_vol": 14256,
-    "deliv_pct": 87.51
+    "delivery_vol": 14256.0,
+    "deliv_pct": 87.51,
+    "volume": 16290.0
   },
   {
     "time": "2025-11-25",
@@ -4975,8 +5815,9 @@
     "high": 7.18,
     "low": 5.66,
     "close": 6.69,
-    "delivery_vol": 26501,
-    "deliv_pct": 66.89
+    "delivery_vol": 26501.0,
+    "deliv_pct": 66.89,
+    "volume": 39619.0
   },
   {
     "time": "2025-11-26",
@@ -4984,8 +5825,9 @@
     "high": 6.83,
     "low": 6.45,
     "close": 6.8,
-    "delivery_vol": 23691,
-    "deliv_pct": 91.18
+    "delivery_vol": 23691.0,
+    "deliv_pct": 91.18,
+    "volume": 25983.0
   },
   {
     "time": "2025-11-27",
@@ -4993,8 +5835,9 @@
     "high": 7.11,
     "low": 6.84,
     "close": 6.93,
-    "delivery_vol": 2285,
-    "deliv_pct": 78.47
+    "delivery_vol": 2285.0,
+    "deliv_pct": 78.47,
+    "volume": 2912.0
   },
   {
     "time": "2025-11-28",
@@ -5002,8 +5845,9 @@
     "high": 7.08,
     "low": 6.09,
     "close": 6.43,
-    "delivery_vol": 20089,
-    "deliv_pct": 63.12
+    "delivery_vol": 20089.0,
+    "deliv_pct": 63.12,
+    "volume": 31829.0
   },
   {
     "time": "2025-12-01",
@@ -5011,8 +5855,9 @@
     "high": 7.71,
     "low": 6.4,
     "close": 7.27,
-    "delivery_vol": 39284,
-    "deliv_pct": 99.13
+    "delivery_vol": 39284.0,
+    "deliv_pct": 99.13,
+    "volume": 39627.0
   },
   {
     "time": "2025-12-02",
@@ -5020,8 +5865,9 @@
     "high": 8.34,
     "low": 7.2,
     "close": 7.3,
-    "delivery_vol": 167167,
-    "deliv_pct": 29.0
+    "delivery_vol": 167167.0,
+    "deliv_pct": 29.0,
+    "volume": 576402.0
   },
   {
     "time": "2025-12-03",
@@ -5029,8 +5875,9 @@
     "high": 7.85,
     "low": 7.33,
     "close": 7.57,
-    "delivery_vol": 24964,
-    "deliv_pct": 62.91
+    "delivery_vol": 24964.0,
+    "deliv_pct": 62.91,
+    "volume": 39681.0
   },
   {
     "time": "2025-12-04",
@@ -5038,8 +5885,9 @@
     "high": 7.93,
     "low": 6.57,
     "close": 7.29,
-    "delivery_vol": 37456,
-    "deliv_pct": 41.76
+    "delivery_vol": 37456.0,
+    "deliv_pct": 41.76,
+    "volume": 89689.0
   },
   {
     "time": "2025-12-05",
@@ -5047,8 +5895,9 @@
     "high": 7.75,
     "low": 7.22,
     "close": 7.59,
-    "delivery_vol": 12454,
-    "deliv_pct": 78.44
+    "delivery_vol": 12454.0,
+    "deliv_pct": 78.44,
+    "volume": 15877.0
   },
   {
     "time": "2025-12-08",
@@ -5056,8 +5905,9 @@
     "high": 7.99,
     "low": 6.8,
     "close": 6.91,
-    "delivery_vol": 41575,
-    "deliv_pct": 85.17
+    "delivery_vol": 41575.0,
+    "deliv_pct": 85.17,
+    "volume": 48817.0
   },
   {
     "time": "2025-12-09",
@@ -5065,8 +5915,9 @@
     "high": 7.32,
     "low": 6.6,
     "close": 6.94,
-    "delivery_vol": 32167,
-    "deliv_pct": 83.11
+    "delivery_vol": 32167.0,
+    "deliv_pct": 83.11,
+    "volume": 38705.0
   },
   {
     "time": "2025-12-10",
@@ -5074,8 +5925,9 @@
     "high": 7.47,
     "low": 6.61,
     "close": 6.92,
-    "delivery_vol": 4023,
-    "deliv_pct": 22.41
+    "delivery_vol": 4023.0,
+    "deliv_pct": 22.41,
+    "volume": 17953.0
   },
   {
     "time": "2025-12-11",
@@ -5083,8 +5935,9 @@
     "high": 7.29,
     "low": 6.8,
     "close": 7.04,
-    "delivery_vol": 5542,
-    "deliv_pct": 64.76
+    "delivery_vol": 5542.0,
+    "deliv_pct": 64.76,
+    "volume": 8558.0
   },
   {
     "time": "2025-12-12",
@@ -5092,8 +5945,9 @@
     "high": 7.38,
     "low": 7.0,
     "close": 7.02,
-    "delivery_vol": 8627,
-    "deliv_pct": 88.49
+    "delivery_vol": 8627.0,
+    "deliv_pct": 88.49,
+    "volume": 9749.0
   },
   {
     "time": "2025-12-15",
@@ -5101,8 +5955,9 @@
     "high": 7.26,
     "low": 6.7,
     "close": 7.1,
-    "delivery_vol": 18913,
-    "deliv_pct": 90.22
+    "delivery_vol": 18913.0,
+    "deliv_pct": 90.22,
+    "volume": 20964.0
   },
   {
     "time": "2025-12-16",
@@ -5110,8 +5965,9 @@
     "high": 7.1,
     "low": 6.87,
     "close": 7.09,
-    "delivery_vol": 12426,
-    "deliv_pct": 80.19
+    "delivery_vol": 12426.0,
+    "deliv_pct": 80.19,
+    "volume": 15496.0
   },
   {
     "time": "2025-12-17",
@@ -5119,8 +5975,9 @@
     "high": 7.0,
     "low": 6.65,
     "close": 6.96,
-    "delivery_vol": 7938,
-    "deliv_pct": 64.92
+    "delivery_vol": 7938.0,
+    "deliv_pct": 64.92,
+    "volume": 12228.0
   },
   {
     "time": "2025-12-18",
@@ -5128,8 +5985,9 @@
     "high": 7.0,
     "low": 6.69,
     "close": 6.96,
-    "delivery_vol": 3636,
-    "deliv_pct": 87.01
+    "delivery_vol": 3636.0,
+    "deliv_pct": 87.01,
+    "volume": 4179.0
   },
   {
     "time": "2025-12-19",
@@ -5137,8 +5995,9 @@
     "high": 7.95,
     "low": 6.71,
     "close": 7.23,
-    "delivery_vol": 11662,
-    "deliv_pct": 81.29
+    "delivery_vol": 11662.0,
+    "deliv_pct": 81.29,
+    "volume": 14346.0
   },
   {
     "time": "2025-12-22",
@@ -5146,8 +6005,9 @@
     "high": 7.59,
     "low": 6.85,
     "close": 7.07,
-    "delivery_vol": 3219,
-    "deliv_pct": 60.18
+    "delivery_vol": 3219.0,
+    "deliv_pct": 60.18,
+    "volume": 5349.0
   },
   {
     "time": "2025-12-23",
@@ -5155,8 +6015,9 @@
     "high": 7.56,
     "low": 7.0,
     "close": 7.03,
-    "delivery_vol": 12397,
-    "deliv_pct": 80.0
+    "delivery_vol": 12397.0,
+    "deliv_pct": 80.0,
+    "volume": 15497.0
   },
   {
     "time": "2025-12-24",
@@ -5164,7 +6025,18 @@
     "high": 8.43,
     "low": 6.98,
     "close": 7.73,
-    "delivery_vol": 77169,
+    "delivery_vol": 77169.0,
+    "deliv_pct": 57.31,
+    "volume": 134653.0
+  },
+  {
+    "time": "2025-12-25",
+    "open": 7.1,
+    "high": 8.43,
+    "low": 6.98,
+    "close": 7.73,
+    "volume": 134653.0,
+    "delivery_vol": 77169.0,
     "deliv_pct": 57.31
   },
   {
@@ -5173,8 +6045,9 @@
     "high": 7.99,
     "low": 7.0,
     "close": 7.06,
-    "delivery_vol": 41971,
-    "deliv_pct": 66.46
+    "delivery_vol": 41971.0,
+    "deliv_pct": 66.46,
+    "volume": 63156.0
   },
   {
     "time": "2025-12-29",
@@ -5182,8 +6055,9 @@
     "high": 7.49,
     "low": 7.0,
     "close": 7.01,
-    "delivery_vol": 23035,
-    "deliv_pct": 79.77
+    "delivery_vol": 23035.0,
+    "deliv_pct": 79.77,
+    "volume": 28877.0
   },
   {
     "time": "2025-12-30",
@@ -5191,8 +6065,9 @@
     "high": 7.6,
     "low": 6.76,
     "close": 6.97,
-    "delivery_vol": 9570,
-    "deliv_pct": 72.95
+    "delivery_vol": 9570.0,
+    "deliv_pct": 72.95,
+    "volume": 13118.0
   },
   {
     "time": "2025-12-31",
@@ -5200,8 +6075,9 @@
     "high": 7.31,
     "low": 6.81,
     "close": 7.05,
-    "delivery_vol": 10367,
-    "deliv_pct": 93.0
+    "delivery_vol": 10367.0,
+    "deliv_pct": 93.0,
+    "volume": 11147.0
   },
   {
     "time": "2026-01-01",
@@ -5209,8 +6085,9 @@
     "high": 7.32,
     "low": 7.0,
     "close": 7.2,
-    "delivery_vol": 2561,
-    "deliv_pct": 90.72
+    "delivery_vol": 2561.0,
+    "deliv_pct": 90.72,
+    "volume": 2823.0
   },
   {
     "time": "2026-01-02",
@@ -5218,8 +6095,9 @@
     "high": 7.31,
     "low": 7.0,
     "close": 7.15,
-    "delivery_vol": 9948,
-    "deliv_pct": 90.88
+    "delivery_vol": 9948.0,
+    "deliv_pct": 90.88,
+    "volume": 10946.0
   },
   {
     "time": "2026-01-05",
@@ -5227,8 +6105,9 @@
     "high": 7.49,
     "low": 7.02,
     "close": 7.09,
-    "delivery_vol": 6948,
-    "deliv_pct": 81.22
+    "delivery_vol": 6948.0,
+    "deliv_pct": 81.22,
+    "volume": 8555.0
   },
   {
     "time": "2026-01-06",
@@ -5236,8 +6115,9 @@
     "high": 7.25,
     "low": 6.74,
     "close": 6.93,
-    "delivery_vol": 11643,
-    "deliv_pct": 86.8
+    "delivery_vol": 11643.0,
+    "deliv_pct": 86.8,
+    "volume": 13413.0
   },
   {
     "time": "2026-01-07",
@@ -5245,8 +6125,9 @@
     "high": 7.39,
     "low": 6.95,
     "close": 7.17,
-    "delivery_vol": 12970,
-    "deliv_pct": 73.46
+    "delivery_vol": 12970.0,
+    "deliv_pct": 73.46,
+    "volume": 17655.0
   },
   {
     "time": "2026-01-08",
@@ -5254,8 +6135,9 @@
     "high": 7.35,
     "low": 6.8,
     "close": 7.27,
-    "delivery_vol": 28815,
-    "deliv_pct": 84.28
+    "delivery_vol": 28815.0,
+    "deliv_pct": 84.28,
+    "volume": 34191.0
   },
   {
     "time": "2026-01-09",
@@ -5263,8 +6145,9 @@
     "high": 7.43,
     "low": 7.0,
     "close": 7.02,
-    "delivery_vol": 2536,
-    "deliv_pct": 77.08
+    "delivery_vol": 2536.0,
+    "deliv_pct": 77.08,
+    "volume": 3290.0
   },
   {
     "time": "2026-01-12",
@@ -5272,8 +6155,9 @@
     "high": 7.45,
     "low": 6.91,
     "close": 7.01,
-    "delivery_vol": 24242,
-    "deliv_pct": 60.86
+    "delivery_vol": 24242.0,
+    "deliv_pct": 60.86,
+    "volume": 39830.0
   },
   {
     "time": "2026-01-13",
@@ -5281,8 +6165,9 @@
     "high": 7.3,
     "low": 6.85,
     "close": 6.97,
-    "delivery_vol": 3635,
-    "deliv_pct": 86.88
+    "delivery_vol": 3635.0,
+    "deliv_pct": 86.88,
+    "volume": 4184.0
   },
   {
     "time": "2026-01-14",
@@ -5290,7 +6175,18 @@
     "high": 7.6,
     "low": 6.86,
     "close": 7.11,
-    "delivery_vol": 8611,
+    "delivery_vol": 8611.0,
+    "deliv_pct": 47.97,
+    "volume": 17952.0
+  },
+  {
+    "time": "2026-01-15",
+    "open": 7.6,
+    "high": 7.6,
+    "low": 6.86,
+    "close": 7.11,
+    "volume": 17952.0,
+    "delivery_vol": 8611.0,
     "deliv_pct": 47.97
   },
   {
@@ -5299,8 +6195,9 @@
     "high": 7.43,
     "low": 6.85,
     "close": 7.07,
-    "delivery_vol": 3753,
-    "deliv_pct": 58.16
+    "delivery_vol": 3753.0,
+    "deliv_pct": 58.16,
+    "volume": 6453.0
   },
   {
     "time": "2026-01-19",
@@ -5308,8 +6205,9 @@
     "high": 7.1,
     "low": 6.91,
     "close": 6.92,
-    "delivery_vol": 2546,
-    "deliv_pct": 83.69
+    "delivery_vol": 2546.0,
+    "deliv_pct": 83.69,
+    "volume": 3042.0
   },
   {
     "time": "2026-01-20",
@@ -5317,8 +6215,9 @@
     "high": 7.3,
     "low": 6.8,
     "close": 6.98,
-    "delivery_vol": 13763,
-    "deliv_pct": 75.28
+    "delivery_vol": 13763.0,
+    "deliv_pct": 75.28,
+    "volume": 18282.0
   },
   {
     "time": "2026-01-21",
@@ -5326,8 +6225,9 @@
     "high": 7.37,
     "low": 6.62,
     "close": 7.06,
-    "delivery_vol": 14287,
-    "deliv_pct": 78.26
+    "delivery_vol": 14287.0,
+    "deliv_pct": 78.26,
+    "volume": 18255.0
   },
   {
     "time": "2026-01-22",
@@ -5335,8 +6235,9 @@
     "high": 7.19,
     "low": 6.63,
     "close": 6.97,
-    "delivery_vol": 4430,
-    "deliv_pct": 95.7
+    "delivery_vol": 4430.0,
+    "deliv_pct": 95.7,
+    "volume": 4629.0
   },
   {
     "time": "2026-01-23",
@@ -5344,7 +6245,18 @@
     "high": 7.18,
     "low": 6.81,
     "close": 7.06,
-    "delivery_vol": 1013,
+    "delivery_vol": 1013.0,
+    "deliv_pct": 95.57,
+    "volume": 1060.0
+  },
+  {
+    "time": "2026-01-26",
+    "open": 6.83,
+    "high": 7.18,
+    "low": 6.81,
+    "close": 7.06,
+    "volume": 1060.0,
+    "delivery_vol": 1013.0,
     "deliv_pct": 95.57
   },
   {
@@ -5353,8 +6265,9 @@
     "high": 7.34,
     "low": 6.26,
     "close": 6.96,
-    "delivery_vol": 8985,
-    "deliv_pct": 60.49
+    "delivery_vol": 8985.0,
+    "deliv_pct": 60.49,
+    "volume": 14853.0
   },
   {
     "time": "2026-01-28",
@@ -5362,8 +6275,9 @@
     "high": 7.0,
     "low": 6.51,
     "close": 6.69,
-    "delivery_vol": 9177,
-    "deliv_pct": 58.01
+    "delivery_vol": 9177.0,
+    "deliv_pct": 58.01,
+    "volume": 15820.0
   },
   {
     "time": "2026-01-29",
@@ -5371,8 +6285,9 @@
     "high": 6.93,
     "low": 6.57,
     "close": 6.63,
-    "delivery_vol": 7337,
-    "deliv_pct": 62.21
+    "delivery_vol": 7337.0,
+    "deliv_pct": 62.21,
+    "volume": 11793.0
   },
   {
     "time": "2026-01-30",
@@ -5380,8 +6295,9 @@
     "high": 6.92,
     "low": 6.57,
     "close": 6.74,
-    "delivery_vol": 7969,
-    "deliv_pct": 80.64
+    "delivery_vol": 7969.0,
+    "deliv_pct": 80.64,
+    "volume": 9882.0
   },
   {
     "time": "2026-02-02",
@@ -5389,8 +6305,9 @@
     "high": 6.96,
     "low": 6.36,
     "close": 6.45,
-    "delivery_vol": 11107,
-    "deliv_pct": 91.19
+    "delivery_vol": 11107.0,
+    "deliv_pct": 91.19,
+    "volume": 12180.0
   },
   {
     "time": "2026-02-03",
@@ -5398,8 +6315,9 @@
     "high": 6.87,
     "low": 6.52,
     "close": 6.64,
-    "delivery_vol": 4002,
-    "deliv_pct": 90.56
+    "delivery_vol": 4002.0,
+    "deliv_pct": 90.56,
+    "volume": 4419.0
   },
   {
     "time": "2026-02-04",
@@ -5407,8 +6325,9 @@
     "high": 6.84,
     "low": 6.45,
     "close": 6.67,
-    "delivery_vol": 1656,
-    "deliv_pct": 58.79
+    "delivery_vol": 1656.0,
+    "deliv_pct": 58.79,
+    "volume": 2817.0
   },
   {
     "time": "2026-02-05",
@@ -5416,8 +6335,9 @@
     "high": 6.84,
     "low": 6.5,
     "close": 6.67,
-    "delivery_vol": 3044,
-    "deliv_pct": 95.39
+    "delivery_vol": 3044.0,
+    "deliv_pct": 95.39,
+    "volume": 3191.0
   },
   {
     "time": "2026-02-06",
@@ -5425,8 +6345,9 @@
     "high": 6.93,
     "low": 6.6,
     "close": 6.83,
-    "delivery_vol": 4326,
-    "deliv_pct": 82.6
+    "delivery_vol": 4326.0,
+    "deliv_pct": 82.6,
+    "volume": 5237.0
   },
   {
     "time": "2026-02-09",
@@ -5434,8 +6355,9 @@
     "high": 6.9,
     "low": 6.69,
     "close": 6.88,
-    "delivery_vol": 4672,
-    "deliv_pct": 85.44
+    "delivery_vol": 4672.0,
+    "deliv_pct": 85.44,
+    "volume": 5468.0
   },
   {
     "time": "2026-02-10",
@@ -5443,8 +6365,9 @@
     "high": 7.19,
     "low": 6.51,
     "close": 6.7,
-    "delivery_vol": 9158,
-    "deliv_pct": 61.59
+    "delivery_vol": 9158.0,
+    "deliv_pct": 61.59,
+    "volume": 14870.0
   },
   {
     "time": "2026-02-11",
@@ -5452,8 +6375,9 @@
     "high": 6.98,
     "low": 6.54,
     "close": 6.84,
-    "delivery_vol": 5917,
-    "deliv_pct": 50.31
+    "delivery_vol": 5917.0,
+    "deliv_pct": 50.31,
+    "volume": 11762.0
   },
   {
     "time": "2026-02-12",
@@ -5461,8 +6385,9 @@
     "high": 6.88,
     "low": 6.61,
     "close": 6.77,
-    "delivery_vol": 2921,
-    "deliv_pct": 94.1
+    "delivery_vol": 2921.0,
+    "deliv_pct": 94.1,
+    "volume": 3104.0
   },
   {
     "time": "2026-02-13",
@@ -5470,8 +6395,9 @@
     "high": 6.98,
     "low": 6.56,
     "close": 6.81,
-    "delivery_vol": 12665,
-    "deliv_pct": 77.64
+    "delivery_vol": 12665.0,
+    "deliv_pct": 77.64,
+    "volume": 16312.0
   },
   {
     "time": "2026-02-16",
@@ -5479,8 +6405,9 @@
     "high": 7.0,
     "low": 6.58,
     "close": 6.67,
-    "delivery_vol": 8694,
-    "deliv_pct": 34.33
+    "delivery_vol": 8694.0,
+    "deliv_pct": 34.33,
+    "volume": 25328.0
   },
   {
     "time": "2026-02-17",
@@ -5488,8 +6415,9 @@
     "high": 7.99,
     "low": 6.61,
     "close": 7.1,
-    "delivery_vol": 34569,
-    "deliv_pct": 50.71
+    "delivery_vol": 34569.0,
+    "deliv_pct": 50.71,
+    "volume": 68170.0
   },
   {
     "time": "2026-02-18",
@@ -5497,8 +6425,9 @@
     "high": 7.5,
     "low": 6.71,
     "close": 6.87,
-    "delivery_vol": 23650,
-    "deliv_pct": 80.9
+    "delivery_vol": 23650.0,
+    "deliv_pct": 80.9,
+    "volume": 29233.0
   },
   {
     "time": "2026-02-19",
@@ -5506,8 +6435,9 @@
     "high": 7.05,
     "low": 6.68,
     "close": 6.76,
-    "delivery_vol": 18972,
-    "deliv_pct": 50.88
+    "delivery_vol": 18972.0,
+    "deliv_pct": 50.88,
+    "volume": 37286.0
   },
   {
     "time": "2026-02-20",
@@ -5515,8 +6445,9 @@
     "high": 7.0,
     "low": 6.7,
     "close": 6.8,
-    "delivery_vol": 8790,
-    "deliv_pct": 97.3
+    "delivery_vol": 8790.0,
+    "deliv_pct": 97.3,
+    "volume": 9034.0
   },
   {
     "time": "2026-02-23",
@@ -5524,8 +6455,9 @@
     "high": 6.97,
     "low": 6.65,
     "close": 6.7,
-    "delivery_vol": 1482,
-    "deliv_pct": 87.64
+    "delivery_vol": 1482.0,
+    "deliv_pct": 87.64,
+    "volume": 1691.0
   },
   {
     "time": "2026-02-24",
@@ -5533,8 +6465,9 @@
     "high": 6.97,
     "low": 6.57,
     "close": 6.85,
-    "delivery_vol": 8336,
-    "deliv_pct": 91.13
+    "delivery_vol": 8336.0,
+    "deliv_pct": 91.13,
+    "volume": 9147.0
   },
   {
     "time": "2026-02-25",
@@ -5542,8 +6475,9 @@
     "high": 6.92,
     "low": 6.61,
     "close": 6.64,
-    "delivery_vol": 10657,
-    "deliv_pct": 95.19
+    "delivery_vol": 10657.0,
+    "deliv_pct": 95.19,
+    "volume": 11195.0
   },
   {
     "time": "2026-02-26",
@@ -5551,8 +6485,9 @@
     "high": 7.0,
     "low": 6.6,
     "close": 6.67,
-    "delivery_vol": 5888,
-    "deliv_pct": 83.66
+    "delivery_vol": 5888.0,
+    "deliv_pct": 83.66,
+    "volume": 7038.0
   },
   {
     "time": "2026-02-27",
@@ -5560,11 +6495,22 @@
     "high": 6.95,
     "low": 6.31,
     "close": 6.6,
-    "delivery_vol": 9489,
-    "deliv_pct": 65.1
+    "delivery_vol": 9489.0,
+    "deliv_pct": 65.1,
+    "volume": 14575.0
   },
   {
     "time": "2026-03-02",
+    "open": 6.33,
+    "high": 6.34,
+    "low": 6.1,
+    "close": 6.3,
+    "volume": 6141.0,
+    "delivery_vol": 4090.0,
+    "deliv_pct": 66.6
+  },
+  {
+    "time": "2026-03-03",
     "open": 6.33,
     "high": 6.34,
     "low": 6.1,
@@ -5734,6 +6680,16 @@
     "deliv_pct": 79.16
   },
   {
+    "time": "2026-03-26",
+    "open": 6.01,
+    "high": 6.35,
+    "low": 6.01,
+    "close": 6.13,
+    "volume": 18719.0,
+    "delivery_vol": 14818.0,
+    "deliv_pct": 79.16
+  },
+  {
     "time": "2026-03-27",
     "open": 6.02,
     "high": 6.55,
@@ -5754,6 +6710,16 @@
     "deliv_pct": 98.81
   },
   {
+    "time": "2026-03-31",
+    "open": 6.09,
+    "high": 6.39,
+    "low": 5.41,
+    "close": 5.67,
+    "volume": 37462.0,
+    "delivery_vol": 37017.0,
+    "deliv_pct": 98.81
+  },
+  {
     "time": "2026-04-01",
     "open": 5.67,
     "high": 6.29,
@@ -5765,6 +6731,16 @@
   },
   {
     "time": "2026-04-02",
+    "open": 5.9,
+    "high": 6.8,
+    "low": 5.9,
+    "close": 6.16,
+    "volume": 8677.0,
+    "delivery_vol": 5812.0,
+    "deliv_pct": 66.98
+  },
+  {
+    "time": "2026-04-03",
     "open": 5.9,
     "high": 6.8,
     "low": 5.9,
@@ -5825,6 +6801,16 @@
   },
   {
     "time": "2026-04-13",
+    "open": 7.15,
+    "high": 7.15,
+    "low": 6.22,
+    "close": 6.29,
+    "volume": 100555.0,
+    "delivery_vol": 73454.0,
+    "deliv_pct": 73.05
+  },
+  {
+    "time": "2026-04-14",
     "open": 7.15,
     "high": 7.15,
     "low": 6.22,
@@ -5945,6 +6931,16 @@
   },
   {
     "time": "2026-04-30",
+    "open": 7.28,
+    "high": 7.28,
+    "low": 6.55,
+    "close": 6.93,
+    "volume": 21184.0,
+    "delivery_vol": 17500.0,
+    "deliv_pct": 82.61
+  },
+  {
+    "time": "2026-05-01",
     "open": 7.28,
     "high": 7.28,
     "low": 6.55,
@@ -6125,6 +7121,16 @@
   },
   {
     "time": "2026-05-27",
+    "open": 6.54,
+    "high": 7.0,
+    "low": 6.5,
+    "close": 6.94,
+    "volume": 31072.0,
+    "delivery_vol": 20403.0,
+    "deliv_pct": 65.66
+  },
+  {
+    "time": "2026-05-28",
     "open": 6.54,
     "high": 7.0,
     "low": 6.5,
@@ -6325,6 +7331,16 @@
   },
   {
     "time": "2026-06-25",
+    "open": 6.6,
+    "high": 6.6,
+    "low": 6.1,
+    "close": 6.31,
+    "volume": 21341.0,
+    "delivery_vol": 13850.0,
+    "deliv_pct": 64.9
+  },
+  {
+    "time": "2026-06-26",
     "open": 6.6,
     "high": 6.6,
     "low": 6.1,
