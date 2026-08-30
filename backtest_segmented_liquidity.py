@@ -165,7 +165,7 @@ def prepare_stock_series(nifty_750_set):
     return stock_map
 
 # ==========================================
-# 4. TIER-ADAPTIVE SIMULATION
+# 4. ADAPTIVE EXIT SIMULATION
 # ==========================================
 def simulate_adaptive_exit(df, entry_idx, entry_price, initial_stop_loss, bucket_name, max_hold=180):
     opens = df["open"].values
@@ -201,14 +201,17 @@ def simulate_adaptive_exit(df, entry_idx, entry_price, initial_stop_loss, bucket
                 trail_low = float(np.min(lows[curr - 10 : curr]))
                 if trail_low > current_sl:
                     current_sl = trail_low
-        else:
-            # Buckets A & B: Wider Leeway (Breakeven at +15%, 20-Day Low Trail at +20%)
+        elif bucket_name == "Bucket B (5-30 Cr)":
+            # Bucket B: Breakeven at +15%, 20-Day Low Trail at +20%
             if max_gain >= 15.0 and current_sl < entry_price:
                 current_sl = entry_price
             if max_gain >= 20.0 and curr >= entry_idx + 20:
                 trail_low = float(np.min(lows[curr - 20 : curr]))
                 if trail_low > current_sl:
                     current_sl = trail_low
+        else:
+            # Bucket A: Unconstrained open trend riding (no trailing modifications)
+            pass
 
         # Stop Loss Trigger (Evaluated Intraday)
         if c_low <= current_sl:
@@ -237,9 +240,9 @@ def simulate_adaptive_exit(df, entry_idx, entry_price, initial_stop_loss, bucket
 # ==========================================
 def run_adaptive_backtest(stock_map):
     tier_config = {
-        "Bucket A (>30 Cr)": {"min_to": 30.0, "max_to": 1e9, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 3, "window": 15},
-        "Bucket B (5-30 Cr)": {"min_to": 5.0, "max_to": 30.0, "pct_mult": 1.2, "vol_mult": 1.0, "cluster": 2, "window": 15},
-        "Bucket C (<5 Cr)": {"min_to": 0.0, "max_to": 5.0, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 4, "window": 20}
+        "Bucket A (>30 Cr)": {"min_to": 30.0, "max_to": 1e9, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 3, "window": 15, "model_desc": "Open / Unconstrained Base SL"},
+        "Bucket B (5-30 Cr)": {"min_to": 5.0, "max_to": 30.0, "pct_mult": 1.2, "vol_mult": 1.0, "cluster": 2, "window": 15, "model_desc": "Breakeven (+15%) + Trail 20D Low (+20%)"},
+        "Bucket C (<5 Cr)": {"min_to": 0.0, "max_to": 5.0, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 4, "window": 20, "model_desc": "Trail 10D Low (+15%) + Climax Churn 2B"}
     }
 
     report_data = {}
@@ -251,6 +254,7 @@ def run_adaptive_backtest(stock_map):
         vol_mult = b_cfg["vol_mult"]
         min_cluster = b_cfg["cluster"]
         window = b_cfg["window"]
+        model_desc = b_cfg["model_desc"]
 
         trades_pnl = []
         trades_hold = []
@@ -324,7 +328,7 @@ def run_adaptive_backtest(stock_map):
             profit_factor = round(pos_sum / neg_sum, 2) if neg_sum > 0 else 99.0
 
             report_data[b_name] = [{
-                "Exit Model": "Tier-Adaptive Dynamic Trailing",
+                "Exit Model": model_desc,
                 "Total Trades": tot,
                 "Win Rate %": win_rate,
                 "Hit 20% Rally %": win_20pct,
