@@ -1,19 +1,19 @@
 {
   "Bucket A (>30 Cr)": [
     {
-      "Exit Model": "Tier-Adaptive Dynamic Trailing",
-      "Total Trades": 283,
-      "Win Rate %": 32.9,
-      "Hit 20% Rally %": 31.1,
-      "Avg Return %": "+0.85%",
-      "Profit Factor": 1.15,
-      "Avg Hold (Days)": 56.3,
-      "Score": 37.8
+      "Exit Model": "Open / Unconstrained Base SL",
+      "Total Trades": 270,
+      "Win Rate %": 33.7,
+      "Hit 20% Rally %": 35.2,
+      "Avg Return %": "+5.02%",
+      "Profit Factor": 1.75,
+      "Avg Hold (Days)": 87.1,
+      "Score": 59.0
     }
   ],
   "Bucket B (5-30 Cr)": [
     {
-      "Exit Model": "Tier-Adaptive Dynamic Trailing",
+      "Exit Model": "Breakeven (+15%) + Trail 20D Low (+20%)",
       "Total Trades": 1278,
       "Win Rate %": 40.5,
       "Hit 20% Rally %": 40.8,
@@ -25,7 +25,7 @@
   ],
   "Bucket C (<5 Cr)": [
     {
-      "Exit Model": "Tier-Adaptive Dynamic Trailing",
+      "Exit Model": "Trail 10D Low (+15%) + Climax Churn 2B",
       "Total Trades": 28,
       "Win Rate %": 71.4,
       "Hit 20% Rally %": 46.4,
