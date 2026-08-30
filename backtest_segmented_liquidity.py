@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
+OUTPUT_REPORT = os.path.join(DATA_DIR, "segmented_backtest_report.json")
 MAX_PE = 35.0
-OUTPUT_FILE = os.path.join(DATA_DIR, "scanA_results.json")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
@@ -141,12 +141,9 @@ def clean_and_prepare_dataset(raw_data):
 
     return clean
 
-def run_scan():
-    print("🚀 Running Daily scanA Engine (Synchronized Framework)...")
-    if not os.path.exists(DATA_DIR):
-        print(f"❌ '{DATA_DIR}' directory does not exist.")
-        return
-
+def run_segmented_backtest():
+    print("🚀 Starting Segmented Liquidity Strategy Backtest (Updated Bucket A Architecture)...")
+    
     nifty_750_set = get_nifty_750_universe()
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -162,13 +159,12 @@ def run_scan():
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json",
             "backtest_report.json", "segmented_backtest_report.json",
-            "wyckoff_screener_results.json", "nifty750.json",
-            "scanA_results.json"
+            "wyckoff_screener_results.json", "active_trade_plan.json",
+            "scanA_results.json", "nifty750.json"
         ]
     ]
 
-    print(f"📊 Scanning {len(stock_files)} stocks...")
-    candidates = []
+    all_trades = []
 
     for f_name in stock_files:
         sym = f_name.replace(".json", "").strip().upper()
@@ -176,7 +172,6 @@ def run_scan():
 
         stock_fund = fundamentals.get(sym, {})
         pe_val = stock_fund.get("pe", None)
-        pe_float = None
         if pe_val is not None:
             try:
                 pe_float = float(pe_val)
@@ -196,131 +191,208 @@ def run_scan():
             continue
 
         df = pd.DataFrame(clean_history)
+        df["deliv_sma"] = df["delivery_vol"].rolling(window=20, min_periods=1).mean()
+        df["gross_vol_sma20"] = df["volume"].rolling(window=20, min_periods=1).mean()
+        df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+        df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
+        df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
+
+        # True Demat Delivery OBV
+        cur_obv = 0
+        obvs = []
+        for i, row in df.iterrows():
+            dv = float(row["delivery_vol"])
+            if i > 0:
+                pc = float(df.at[i - 1, "close"])
+                cc = float(row["close"])
+                if cc > pc: cur_obv += dv
+                elif cc < pc: cur_obv -= dv
+            else:
+                cur_obv = dv
+            obvs.append(cur_obv)
+        df["deliv_obv"] = obvs
+
         closes = df["close"].values
-        opens = df["open"].values
         highs = df["high"].values
         lows = df["low"].values
-        vols = df["delivery_vol"].values
-        t_vols = df["volume"].values
+        opens = df["open"].values
         pcts = df["deliv_pct"].values
+        pct_50 = df["deliv_pct_50d"].values
+        d_vols = df["delivery_vol"].values
+        deliv_sma = df["deliv_sma"].values
+        gross_vols = df["volume"].values
+        gross_sma = df["gross_vol_sma20"].values
+        to_50 = df["turnover_50d"].values
+        times = df["time"].values
         N = len(closes)
-
-        turnovers = (closes * t_vols) / 1e7
-        turnover_50d = float(np.mean(turnovers[max(0, N - 50):]))
-        mean_deliv_50d = float(np.mean(pcts[max(0, N - 50):]))
-        if mean_deliv_50d <= 0:
-            continue
-
-        deliv_sma20 = float(np.mean(vols[max(0, N - 20):]))
-        gross_vol_sma20 = float(np.mean(t_vols[max(0, N - 20):]))
 
         is_n750 = sym in nifty_750_set
 
-        # Tier Parameters (Bucket A widened to 45d for multi-month bases)
-        if is_n750:
-            if turnover_50d >= 30.0:
-                tier_name = "Bucket A (>30 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 3, 45
-                trail_mode = "Open / Trend Riding (Base SL Only)"
-            elif turnover_50d >= 5.0:
-                tier_name = "Bucket B (5-30 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.2, 1.0, 2, 15
-                trail_mode = "Trail 20D Low (at +20% gain)"
+        in_trade = False
+        entry_price = 0.0
+        entry_idx = 0
+        entry_date = ""
+        active_sl = 0.0
+        active_bucket = ""
+        max_run_gain = 0.0
+        cooldown_until = 0
+
+        for i in range(50, N):
+            curr_to = to_50[i] if not np.isnan(to_50[i]) else 0.0
+
+            # Tier parameter mapping
+            if is_n750:
+                if curr_to >= 30.0:
+                    tier = "Bucket A (>30 Cr)"
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45  # 45-day lookback
+                elif curr_to >= 5.0:
+                    tier = "Bucket B (5-30 Cr)"
+                    pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
+                else:
+                    tier = "Bucket C (<5 Cr)"
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
             else:
-                tier_name = "Bucket C (<5 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
-                trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
-        else:
-            tier_name = "Non-Universe (Bucket C Rules)"
-            pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
-            trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
+                tier = "Bucket C (<5 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
-        # Continuous True Delivery OBV
-        cur_obv = 0
-        obvs = np.zeros(N)
-        for idx in range(N):
-            dv = vols[idx]
-            if idx > 0:
-                if closes[idx] > closes[idx - 1]:
-                    cur_obv += dv
-                elif closes[idx] < closes[idx - 1]:
-                    cur_obv -= dv
-            else:
-                cur_obv = dv
-            obvs[idx] = cur_obv
+            # 1. Exit Evaluation
+            if in_trade:
+                gain = ((highs[i] - entry_price) / entry_price) * 100
+                if gain > max_run_gain:
+                    max_run_gain = gain
 
-        # Accumulation Base Evaluation
-        base_start = max(0, N - 1 - base_window)
-        base_slice_pcts = pcts[base_start : N - 1]
-        base_slice_vols = vols[base_start : N - 1]
+                # Tier trailing rules
+                if "Bucket C" in active_bucket:
+                    if max_run_gain >= 10.0 and active_sl < entry_price:
+                        active_sl = entry_price
+                    if max_run_gain >= 15.0 and i >= entry_idx + 10:
+                        trail_10 = float(np.min(lows[i - 10 : i]))
+                        if trail_10 > active_sl:
+                            active_sl = trail_10
+                elif "Bucket B" in active_bucket:
+                    if max_run_gain >= 15.0 and active_sl < entry_price:
+                        active_sl = entry_price
+                    if max_run_gain >= 20.0 and i >= entry_idx + 20:
+                        trail_20 = float(np.min(lows[i - 20 : i]))
+                        if trail_20 > active_sl:
+                            active_sl = trail_20
+                else:
+                    # Bucket A: Initial Base SL remains active (open trend riding)
+                    pass
 
-        qualifying_days = (base_slice_pcts >= (pct_mult * mean_deliv_50d)) & (base_slice_vols >= (vol_mult * deliv_sma20))
-        cluster_count = int(np.sum(qualifying_days))
+                exit_triggered = False
+                exit_reason = ""
+                exit_price = closes[i]
 
-        if cluster_count < min_cluster:
-            continue
+                # Hard SL / Trailing Stop Trigger
+                if lows[i] <= active_sl:
+                    exit_triggered = True
+                    exit_reason = "Hard/Trailing Stop Loss"
+                    exit_price = min(closes[i], active_sl)
+                
+                # Model 2B Climax Churn Exit (Bucket C only)
+                elif "Bucket C" in active_bucket and i > entry_idx + 2:
+                    if gross_sma[i] > 0 and pct_50[i] > 0:
+                        if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= (opens[i] * 1.002):
+                            exit_triggered = True
+                            exit_reason = "Climax Churn Exit"
+                            exit_price = closes[i]
 
-        base_highs = highs[base_start : N - 1]
-        base_lows = lows[base_start : N - 1]
-        if len(base_highs) == 0:
-            continue
+                if exit_triggered:
+                    ret_pct = round(((exit_price - entry_price) / entry_price) * 100, 2)
+                    holding_days = i - entry_idx
+                    all_trades.append({
+                        "Symbol": sym,
+                        "Tier": active_bucket,
+                        "Entry Date": entry_date,
+                        "Entry Price": entry_price,
+                        "Exit Date": times[i],
+                        "Exit Price": round(exit_price, 2),
+                        "Return %": ret_pct,
+                        "Max Run Gain %": round(max_run_gain, 2),
+                        "Holding Days": holding_days,
+                        "Exit Reason": exit_reason,
+                        "Is Win": bool(ret_pct > 0)
+                    })
+                    in_trade = False
+                    cooldown_until = i + 5
+                    continue
 
-        swing_high_rel_idx = int(np.argmax(base_highs))
-        swing_high_abs_idx = base_start + swing_high_rel_idx
-        swing_high_price = float(base_highs[swing_high_rel_idx])
-        base_low_price = float(np.min(base_lows))
-        
-        obv_at_swing_high = obvs[swing_high_abs_idx]
-        current_close = float(closes[-1])
-        current_open = float(opens[-1])
-        current_obv = obvs[-1]
-        initial_sl = round(base_low_price * 0.995, 2)
-        risk_pct = round(((current_close - initial_sl) / current_close) * 100, 2) if current_close > 0 else 0
+            # 2. Breakout Entry Evaluation
+            if not in_trade and i > cooldown_until and i >= base_w:
+                base_start = i - base_w
+                qualifying = (pcts[base_start:i] >= (pct_m * pct_50[base_start:i])) & (d_vols[base_start:i] >= (vol_m * deliv_sma[base_start:i]))
+                if np.sum(qualifying) >= min_c:
+                    base_highs = highs[base_start:i]
+                    sw_idx = int(np.argmax(base_highs))
+                    sw_high = base_highs[sw_idx]
+                    sw_obv = obvs[base_start + sw_idx]
 
-        # Breakout Condition
-        is_breakout = bool((current_close >= swing_high_price) and (current_obv > obv_at_swing_high))
+                    if closes[i] > sw_high and closes[i - 1] <= sw_high and obvs[i] > sw_obv:
+                        entry_price = closes[i]
+                        base_low = float(np.min(lows[base_start:i]))
+                        active_sl = round(base_low * 0.995, 2)
+                        
+                        risk_pct = ((entry_price - active_sl) / entry_price) * 100
+                        if risk_pct <= 15.0:
+                            active_bucket = tier
+                            in_trade = True
+                            entry_idx = i
+                            entry_date = times[i]
+                            max_run_gain = 0.0
 
-        # Model 2B Climax Churn Check
-        is_climax_distribution = False
-        if "Bucket C" in tier_name and gross_vol_sma20 > 0:
-            is_climax_distribution = bool(
-                t_vols[-1] >= (1.5 * gross_vol_sma20) and 
-                pcts[-1] <= (0.70 * mean_deliv_50d) and 
-                current_close <= (current_open * 1.002)
-            )
+    print(f"\n📊 Total Trades Executed Across Strategy: {len(all_trades)}")
 
-        trail_10d_low = round(float(np.min(lows[max(0, N - 10):])), 2)
-        trail_20d_low = round(float(np.min(lows[max(0, N - 20):])), 2)
+    # Segmented Performance Analytics
+    df_trades = pd.DataFrame(all_trades)
+    summary = {}
 
-        if risk_pct > 15.0:
-            continue
+    if not df_trades.empty:
+        for bucket in ["Bucket A (>30 Cr)", "Bucket B (5-30 Cr)", "Bucket C (<5 Cr)"]:
+            b_df = df_trades[df_trades["Tier"] == bucket]
+            if b_df.empty:
+                continue
 
-        signal_type = "🟢 BUY BREAKOUT" if is_breakout else "🟡 ACCUMULATION BASE"
-        if is_climax_distribution:
-            signal_type = "🔴 CLIMAX DUMP ALERT"
+            total_t = len(b_df)
+            wins = len(b_df[b_df["Is Win"] == True])
+            losses = total_t - wins
+            win_rate = round((wins / total_t) * 100, 1)
+            
+            avg_ret = round(float(b_df["Return %"].mean()), 2)
+            avg_win = round(float(b_df[b_df["Is Win"] == True]["Return %"].mean()), 2) if wins > 0 else 0.0
+            avg_loss = round(float(b_df[b_df["Is Win"] == False]["Return %"].mean()), 2) if losses > 0 else 0.0
+            
+            pl_ratio = round(abs(avg_win / avg_loss), 2) if avg_loss != 0 else np.nan
+            max_gain = round(float(b_df["Return %"].max()), 2)
+            max_dd = round(float(b_df["Return %"].min()), 2)
+            avg_hold = round(float(b_df["Holding Days"].mean()), 1)
 
-        candidates.append({
-            "Symbol": sym,
-            "Signal": signal_type,
-            "Tier": tier_name,
-            "LTP (₹)": round(current_close, 2),
-            "P/E": f"{pe_float:.1f}" if pe_float is not None else "N/A",
-            "Swing High (₹)": round(swing_high_price, 2),
-            "Initial Base SL (₹)": initial_sl,
-            "Trail 10D Low (₹)": trail_10d_low,
-            "Trail 20D Low (₹)": trail_20d_low,
-            "Exit Management": trail_mode,
-            "Risk %": f"{risk_pct}%",
-            "Base Span": f"{base_window}d Base ({cluster_count} Dots)",
-            "Turnover (₹ Cr)": round(turnover_50d, 1)
-        })
+            summary[bucket] = {
+                "Total Trades": total_t,
+                "Win Rate %": f"{win_rate}%",
+                "Profit Factor / PL Ratio": pl_ratio,
+                "Avg Return %": f"{avg_ret}%",
+                "Avg Win %": f"{avg_win}%",
+                "Avg Loss %": f"{avg_loss}%",
+                "Max Single Gain %": f"{max_gain}%",
+                "Max Single Loss %": f"{max_dd}%",
+                "Avg Holding Period (Days)": avg_hold
+            }
 
-    candidates.sort(key=lambda x: (x["Signal"].startswith("🟢"), -float(x["Risk %"].replace("%", ""))), reverse=True)
+            print(f"\n🔹 {bucket.upper()} PERFORMANCE:")
+            print(f"   • Total Trades: {total_t} | Win Rate: {win_rate}%")
+            print(f"   • Avg Win: +{avg_win}% | Avg Loss: {avg_loss}% | P/L Ratio: {pl_ratio}")
+            print(f"   • Avg Trade Return: {avg_ret}% | Avg Holding: {avg_hold} days")
 
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(candidates, f, indent=2)
+    final_report = {
+        "Segmented Summary": summary,
+        "Trade Log": all_trades
+    }
 
-    print(f"🎉 scanA Complete! Saved {len(candidates)} candidate(s) to '{OUTPUT_FILE}'.")
+    with open(OUTPUT_REPORT, "w") as fp:
+        json.dump(final_report, fp, indent=2)
+
+    print(f"\n🎉 Segmented Backtest Complete! Saved full report to '{OUTPUT_REPORT}'.")
 
 if __name__ == "__main__":
-    run_scan()
+    run_segmented_backtest()
