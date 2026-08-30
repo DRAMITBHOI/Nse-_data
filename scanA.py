@@ -45,28 +45,53 @@ def get_nifty_750_universe():
             json.dump(sorted_list, fp, indent=2)
     return set(sorted_list)
 
-def full_corporate_action_adjustment(raw_data):
-    if not raw_data or len(raw_data) < 2:
-        return raw_data
-    clean = []
+def clean_and_prepare_dataset(raw_data):
+    if not raw_data:
+        return []
+    date_map = {}
     for r in raw_data:
+        if not isinstance(r, dict):
+            continue
+        raw_t = str(r.get("time", "")).strip()
+        if not raw_t:
+            continue
         try:
+            d_str = pd.to_datetime(raw_t).strftime("%Y-%m-%d")
             c = float(r.get("close", 0))
             if c <= 0:
                 continue
-            clean.append({
-                "time": str(r.get("time", "")),
+            
+            v = float(r.get("volume", 0) or 0)
+            dv = float(r.get("delivery_vol", 0) or 0)
+            pct = float(r.get("deliv_pct", 0) or 0)
+
+            entry = {
+                "time": d_str,
                 "open": float(r.get("open", c)),
                 "high": float(r.get("high", c)),
                 "low": float(r.get("low", c)),
                 "close": c,
-                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
-                "volume": float(r.get("volume", r.get("delivery_vol", 0)) or 0),
-                "deliv_pct": float(r.get("deliv_pct", 0) or 0)
-            })
+                "delivery_vol": dv,
+                "volume": v,
+                "deliv_pct": pct
+            }
+            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                date_map[d_str] = entry
         except Exception:
             continue
 
+    sorted_records = [date_map[k] for k in sorted(date_map.keys())]
+
+    clean = []
+    for r in sorted_records:
+        if clean:
+            prev = clean[-1]
+            if (r["open"] == prev["open"] and r["high"] == prev["high"] and 
+                r["low"] == prev["low"] and r["close"] == prev["close"] and r["volume"] == 0):
+                continue
+        clean.append(r)
+
+    # Corporate actions adjustment
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -93,10 +118,31 @@ def full_corporate_action_adjustment(raw_data):
                     clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
+
+    # Forward-fill missing delivery gaps
+    running_vol = 50000.0
+    for i in range(len(clean)):
+        v = clean[i]["volume"]
+        dv = clean[i]["delivery_vol"]
+        pct = clean[i]["deliv_pct"]
+
+        if v > 0:
+            running_vol = 0.9 * running_vol + 0.1 * v
+        else:
+            clean[i]["volume"] = running_vol
+            v = running_vol
+
+        if dv <= 0:
+            clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
+            clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
+        elif dv > v:
+            clean[i]["delivery_vol"] = v
+            clean[i]["deliv_pct"] = 100.0
+
     return clean
 
 def run_scan():
-    print("🚀 Running Daily scanA Engine (Nifty 750 Universe)...")
+    print("🚀 Running Daily scanA Engine (Synchronized Framework)...")
     if not os.path.exists(DATA_DIR):
         print(f"❌ '{DATA_DIR}' directory does not exist.")
         return
@@ -120,10 +166,6 @@ def run_scan():
             "scanA_results.json"
         ]
     ]
-
-    # Filter strictly to Nifty 750
-    if nifty_750_set:
-        stock_files = [f for f in stock_files if f.replace(".json", "").strip().upper() in nifty_750_set]
 
     print(f"📊 Scanning {len(stock_files)} stocks...")
     candidates = []
@@ -149,7 +191,7 @@ def run_scan():
         except Exception:
             continue
 
-        clean_history = full_corporate_action_adjustment(raw)
+        clean_history = clean_and_prepare_dataset(raw)
         if len(clean_history) < 60:
             continue
 
@@ -172,35 +214,42 @@ def run_scan():
         deliv_sma20 = float(np.mean(vols[max(0, N - 20):]))
         gross_vol_sma20 = float(np.mean(t_vols[max(0, N - 20):]))
 
-        # Parameters based on winning backtests
-        if turnover_50d >= 30.0:
-            tier_name = "Bucket A (>30 Cr)"
-            pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 3, 15
-            trail_mode = "Open / Trend Riding (Base SL Only)"
-        elif turnover_50d >= 5.0:
-            tier_name = "Bucket B (5-30 Cr)"
-            pct_mult, vol_mult, min_cluster, base_window = 1.2, 1.0, 2, 15
-            trail_mode = "Trail 20D Low (at +20% gain)"
+        is_n750 = sym in nifty_750_set
+
+        # Tier Parameters (Bucket A widened to 45d for multi-month bases)
+        if is_n750:
+            if turnover_50d >= 30.0:
+                tier_name = "Bucket A (>30 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 3, 45
+                trail_mode = "Open / Trend Riding (Base SL Only)"
+            elif turnover_50d >= 5.0:
+                tier_name = "Bucket B (5-30 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.2, 1.0, 2, 15
+                trail_mode = "Trail 20D Low (at +20% gain)"
+            else:
+                tier_name = "Bucket C (<5 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
+                trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
         else:
-            tier_name = "Bucket C (<5 Cr)"
+            tier_name = "Non-Universe (Bucket C Rules)"
             pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
             trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
 
-        # Compute True Demat Delivery OBV
-        obvs = np.zeros(N)
+        # Continuous True Delivery OBV
         cur_obv = 0
+        obvs = np.zeros(N)
         for idx in range(N):
-            d_v = min(vols[idx], t_vols[idx]) if t_vols[idx] > 0 else vols[idx]
+            dv = vols[idx]
             if idx > 0:
                 if closes[idx] > closes[idx - 1]:
-                    cur_obv += d_v
+                    cur_obv += dv
                 elif closes[idx] < closes[idx - 1]:
-                    cur_obv -= d_v
+                    cur_obv -= dv
             else:
-                cur_obv = d_v
+                cur_obv = dv
             obvs[idx] = cur_obv
 
-        # Check Accumulation Base
+        # Accumulation Base Evaluation
         base_start = max(0, N - 1 - base_window)
         base_slice_pcts = pcts[base_start : N - 1]
         base_slice_vols = vols[base_start : N - 1]
@@ -228,19 +277,18 @@ def run_scan():
         initial_sl = round(base_low_price * 0.995, 2)
         risk_pct = round(((current_close - initial_sl) / current_close) * 100, 2) if current_close > 0 else 0
 
-        # Breakout and Trailing Checks
+        # Breakout Condition
         is_breakout = bool((current_close >= swing_high_price) and (current_obv > obv_at_swing_high))
 
-        # Check Churn Exit only for Bucket C
+        # Model 2B Climax Churn Check
         is_climax_distribution = False
-        if turnover_50d < 5.0 and gross_vol_sma20 > 0:
+        if "Bucket C" in tier_name and gross_vol_sma20 > 0:
             is_climax_distribution = bool(
                 t_vols[-1] >= (1.5 * gross_vol_sma20) and 
                 pcts[-1] <= (0.70 * mean_deliv_50d) and 
                 current_close <= (current_open * 1.002)
             )
 
-        # Dynamic Trailing Reference Lows
         trail_10d_low = round(float(np.min(lows[max(0, N - 10):])), 2)
         trail_20d_low = round(float(np.min(lows[max(0, N - 20):])), 2)
 
