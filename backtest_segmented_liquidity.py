@@ -6,15 +6,14 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
+MAX_PE = 35.0
+OUTPUT_FILE = os.path.join(DATA_DIR, "scanA_results.json")
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 }
 
-# ==========================================
-# 1. LOAD NIFTY 750 UNIVERSE
-# ==========================================
 def get_nifty_750_universe():
-    os.makedirs(DATA_DIR, exist_ok=True)
     local_path = os.path.join(DATA_DIR, "nifty750.json")
     if os.path.exists(local_path):
         try:
@@ -31,46 +30,68 @@ def get_nifty_750_universe():
     for u in urls:
         try:
             req = urllib.request.Request(u, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 df = pd.read_csv(io.StringIO(resp.read().decode("utf-8")))
                 df.columns = df.columns.str.strip()
                 if "Symbol" in df.columns:
                     clean = df["Symbol"].dropna().astype(str).str.strip().str.upper()
                     symbols.update(clean.tolist())
         except Exception as e:
-            print(f"⚠️ Notice fetching {u}: {e}")
+            print(f"⚠️ Warning fetching {u}: {e}")
 
-    if symbols:
+    sorted_list = sorted(list(symbols))
+    if sorted_list:
         with open(local_path, "w") as fp:
-            json.dump(sorted(list(symbols)), fp, indent=2)
-            
-    return symbols
+            json.dump(sorted_list, fp, indent=2)
+    return set(sorted_list)
 
-# ==========================================
-# 2. SPLIT & CORPORATE ACTION CLEANER
-# ==========================================
-def full_corporate_action_adjustment(raw_data):
-    if not raw_data or len(raw_data) < 2:
-        return raw_data
-    clean = []
+def clean_and_prepare_dataset(raw_data):
+    if not raw_data:
+        return []
+    date_map = {}
     for r in raw_data:
+        if not isinstance(r, dict):
+            continue
+        raw_t = str(r.get("time", "")).strip()
+        if not raw_t:
+            continue
         try:
+            d_str = pd.to_datetime(raw_t).strftime("%Y-%m-%d")
             c = float(r.get("close", 0))
             if c <= 0:
                 continue
-            clean.append({
-                "time": str(r.get("time", "")),
+            
+            v = float(r.get("volume", 0) or 0)
+            dv = float(r.get("delivery_vol", 0) or 0)
+            pct = float(r.get("deliv_pct", 0) or 0)
+
+            entry = {
+                "time": d_str,
                 "open": float(r.get("open", c)),
                 "high": float(r.get("high", c)),
                 "low": float(r.get("low", c)),
                 "close": c,
-                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
-                "volume": float(r.get("volume", r.get("delivery_vol", 0)) or 0),
-                "deliv_pct": float(r.get("deliv_pct", 0) or 0)
-            })
+                "delivery_vol": dv,
+                "volume": v,
+                "deliv_pct": pct
+            }
+            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                date_map[d_str] = entry
         except Exception:
             continue
 
+    sorted_records = [date_map[k] for k in sorted(date_map.keys())]
+
+    clean = []
+    for r in sorted_records:
+        if clean:
+            prev = clean[-1]
+            if (r["open"] == prev["open"] and r["high"] == prev["high"] and 
+                r["low"] == prev["low"] and r["close"] == prev["close"] and r["volume"] == 0):
+                continue
+        clean.append(r)
+
+    # Corporate actions adjustment
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -97,273 +118,209 @@ def full_corporate_action_adjustment(raw_data):
                     clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
+
+    # Forward-fill missing delivery gaps
+    running_vol = 50000.0
+    for i in range(len(clean)):
+        v = clean[i]["volume"]
+        dv = clean[i]["delivery_vol"]
+        pct = clean[i]["deliv_pct"]
+
+        if v > 0:
+            running_vol = 0.9 * running_vol + 0.1 * v
+        else:
+            clean[i]["volume"] = running_vol
+            v = running_vol
+
+        if dv <= 0:
+            clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
+            clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
+        elif dv > v:
+            clean[i]["delivery_vol"] = v
+            clean[i]["deliv_pct"] = 100.0
+
     return clean
 
-# ==========================================
-# 3. PREPARE STOCK SERIES
-# ==========================================
-def prepare_stock_series(nifty_750_set):
-    stock_map = {}
+def run_scan():
+    print("🚀 Running Daily scanA Engine (Synchronized Framework)...")
     if not os.path.exists(DATA_DIR):
-        print(f"❌ Error: '{DATA_DIR}' directory does not exist.")
-        return stock_map
+        print(f"❌ '{DATA_DIR}' directory does not exist.")
+        return
 
-    files = [
+    nifty_750_set = get_nifty_750_universe()
+    fund_path = os.path.join(DATA_DIR, "fundamentals.json")
+    fundamentals = {}
+    if os.path.exists(fund_path):
+        try:
+            with open(fund_path, "r") as f:
+                fundamentals = json.load(f)
+        except Exception:
+            pass
+
+    stock_files = [
         f for f in os.listdir(DATA_DIR)
         if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", 
-            "nifty750.json", "backtest_report.json",
-            "segmented_backtest_report.json", "wyckoff_screener_results.json",
+            "fundamentals.json", "screener_results.json",
+            "backtest_report.json", "segmented_backtest_report.json",
+            "wyckoff_screener_results.json", "nifty750.json",
             "scanA_results.json"
         ]
     ]
-    if nifty_750_set:
-        files = [f for f in files if f.replace(".json", "").strip().upper() in nifty_750_set]
 
-    print(f"📂 Processing {len(files)} Nifty 750 stock files...")
+    print(f"📊 Scanning {len(stock_files)} stocks...")
+    candidates = []
 
-    for f in files:
-        sym = f.replace(".json", "").strip().upper()
+    for f_name in stock_files:
+        sym = f_name.replace(".json", "").strip().upper()
+        json_path = os.path.join(DATA_DIR, f_name)
+
+        stock_fund = fundamentals.get(sym, {})
+        pe_val = stock_fund.get("pe", None)
+        pe_float = None
+        if pe_val is not None:
+            try:
+                pe_float = float(pe_val)
+                if pe_float <= 0 or pe_float >= MAX_PE:
+                    continue
+            except (ValueError, TypeError):
+                pass
+
         try:
-            with open(os.path.join(DATA_DIR, f), "r") as fp:
-                raw = json.load(fp)
-            clean = full_corporate_action_adjustment(raw)
-            if len(clean) < 80:
-                continue
-
-            df = pd.DataFrame(clean)
-            df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
-            df["turnover_50d_avg"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
-            df["deliv_pct_50d_avg"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
-            df["deliv_vol_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
-            df["vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
-
-            # True Demat Delivery OBV
-            closes = df["close"].values
-            vols = df["delivery_vol"].values
-            t_vols = df["volume"].values
-            N = len(closes)
-            obvs = np.zeros(N)
-            cur_obv = 0
-            for idx in range(N):
-                d_v = min(vols[idx], t_vols[idx]) if t_vols[idx] > 0 else vols[idx]
-                if idx > 0:
-                    if closes[idx] > closes[idx - 1]:
-                        cur_obv += d_v
-                    elif closes[idx] < closes[idx - 1]:
-                        cur_obv -= d_v
-                else:
-                    cur_obv = d_v
-                obvs[idx] = cur_obv
-            df["deliv_obv"] = obvs
-
-            stock_map[sym] = df
+            with open(json_path, "r") as f:
+                raw = json.load(f)
         except Exception:
             continue
 
-    print(f"✅ Prepared {len(stock_map)} stocks for execution.\n")
-    return stock_map
+        clean_history = clean_and_prepare_dataset(raw)
+        if len(clean_history) < 60:
+            continue
 
-# ==========================================
-# 4. ADAPTIVE EXIT SIMULATION
-# ==========================================
-def simulate_adaptive_exit(df, entry_idx, entry_price, initial_stop_loss, bucket_name, max_hold=180):
-    opens = df["open"].values
-    highs = df["high"].values
-    lows = df["low"].values
-    closes = df["close"].values
-    vols = df["volume"].values
-    pcts = df["deliv_pct"].values
-    pct_50_avg = df["deliv_pct_50d_avg"].values
-    vol_sma20 = df["vol_sma20"].values
-    N = len(closes)
+        df = pd.DataFrame(clean_history)
+        closes = df["close"].values
+        opens = df["open"].values
+        highs = df["high"].values
+        lows = df["low"].values
+        vols = df["delivery_vol"].values
+        t_vols = df["volume"].values
+        pcts = df["deliv_pct"].values
+        N = len(closes)
 
-    end_idx = min(N - 1, entry_idx + max_hold)
-    max_gain = 0.0
-    current_sl = initial_stop_loss
+        turnovers = (closes * t_vols) / 1e7
+        turnover_50d = float(np.mean(turnovers[max(0, N - 50):]))
+        mean_deliv_50d = float(np.mean(pcts[max(0, N - 50):]))
+        if mean_deliv_50d <= 0:
+            continue
 
-    for curr in range(entry_idx, end_idx + 1):
-        c_open = opens[curr]
-        c_high = highs[curr]
-        c_low = lows[curr]
-        c_close = closes[curr]
+        deliv_sma20 = float(np.mean(vols[max(0, N - 20):]))
+        gross_vol_sma20 = float(np.mean(t_vols[max(0, N - 20):]))
 
-        gain = ((c_high - entry_price) / entry_price) * 100
-        if gain > max_gain:
-            max_gain = gain
+        is_n750 = sym in nifty_750_set
 
-        # --- A. Dynamic Trailing Rules per Tier ---
-        if bucket_name == "Bucket C (<5 Cr)":
-            # Bucket C: Tighter Trailing & Rapid Breakeven
-            if max_gain >= 10.0 and current_sl < entry_price:
-                current_sl = entry_price
-            if max_gain >= 15.0 and curr >= entry_idx + 10:
-                trail_low = float(np.min(lows[curr - 10 : curr]))
-                if trail_low > current_sl:
-                    current_sl = trail_low
-        elif bucket_name == "Bucket B (5-30 Cr)":
-            # Bucket B: Breakeven at +15%, 20-Day Low Trail at +20%
-            if max_gain >= 15.0 and current_sl < entry_price:
-                current_sl = entry_price
-            if max_gain >= 20.0 and curr >= entry_idx + 20:
-                trail_low = float(np.min(lows[curr - 20 : curr]))
-                if trail_low > current_sl:
-                    current_sl = trail_low
+        # Tier Parameters (Bucket A widened to 45d for multi-month bases)
+        if is_n750:
+            if turnover_50d >= 30.0:
+                tier_name = "Bucket A (>30 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 3, 45
+                trail_mode = "Open / Trend Riding (Base SL Only)"
+            elif turnover_50d >= 5.0:
+                tier_name = "Bucket B (5-30 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.2, 1.0, 2, 15
+                trail_mode = "Trail 20D Low (at +20% gain)"
+            else:
+                tier_name = "Bucket C (<5 Cr)"
+                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
+                trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
         else:
-            # Bucket A: Unconstrained open trend riding (no trailing modifications)
-            pass
+            tier_name = "Non-Universe (Bucket C Rules)"
+            pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
+            trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
 
-        # Stop Loss Trigger (Evaluated Intraday)
-        if c_low <= current_sl:
-            exit_price = min(c_open, current_sl)
-            pnl = ((exit_price - entry_price) / entry_price) * 100
-            return pnl, (curr - entry_idx + 1), (max_gain >= 20.0), max_gain, "Trailing/Base Stop"
+        # Continuous True Delivery OBV
+        cur_obv = 0
+        obvs = np.zeros(N)
+        for idx in range(N):
+            dv = vols[idx]
+            if idx > 0:
+                if closes[idx] > closes[idx - 1]:
+                    cur_obv += dv
+                elif closes[idx] < closes[idx - 1]:
+                    cur_obv -= dv
+            else:
+                cur_obv = dv
+            obvs[idx] = cur_obv
 
-        # --- B. Climax Churn Exit (Active ONLY for Bucket C) ---
-        if bucket_name == "Bucket C (<5 Cr)" and curr > entry_idx + 2 and curr < end_idx:
-            if vol_sma20[curr] > 0 and pct_50_avg[curr] > 0:
-                is_heavy_vol = vols[curr] >= (1.5 * vol_sma20[curr])
-                is_low_deliv = pcts[curr] <= (0.70 * pct_50_avg[curr])
-                is_red_or_doji = c_close <= (c_open * 1.002)
+        # Accumulation Base Evaluation
+        base_start = max(0, N - 1 - base_window)
+        base_slice_pcts = pcts[base_start : N - 1]
+        base_slice_vols = vols[base_start : N - 1]
 
-                if is_heavy_vol and is_low_deliv and is_red_or_doji:
-                    next_open = opens[curr + 1]
-                    pnl = ((next_open - entry_price) / entry_price) * 100
-                    return pnl, (curr - entry_idx + 2), (max_gain >= 20.0), max_gain, "Bucket C Climax Exit"
+        qualifying_days = (base_slice_pcts >= (pct_mult * mean_deliv_50d)) & (base_slice_vols >= (vol_mult * deliv_sma20))
+        cluster_count = int(np.sum(qualifying_days))
 
-    final_close = closes[end_idx]
-    pnl = ((final_close - entry_price) / entry_price) * 100
-    return pnl, (end_idx - entry_idx + 1), (max_gain >= 20.0), max_gain, "End of History"
+        if cluster_count < min_cluster:
+            continue
 
-# ==========================================
-# 5. BACKTEST ENGINE
-# ==========================================
-def run_adaptive_backtest(stock_map):
-    tier_config = {
-        "Bucket A (>30 Cr)": {"min_to": 30.0, "max_to": 1e9, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 3, "window": 15, "model_desc": "Open / Unconstrained Base SL"},
-        "Bucket B (5-30 Cr)": {"min_to": 5.0, "max_to": 30.0, "pct_mult": 1.2, "vol_mult": 1.0, "cluster": 2, "window": 15, "model_desc": "Breakeven (+15%) + Trail 20D Low (+20%)"},
-        "Bucket C (<5 Cr)": {"min_to": 0.0, "max_to": 5.0, "pct_mult": 1.4, "vol_mult": 1.0, "cluster": 4, "window": 20, "model_desc": "Trail 10D Low (+15%) + Climax Churn 2B"}
-    }
+        base_highs = highs[base_start : N - 1]
+        base_lows = lows[base_start : N - 1]
+        if len(base_highs) == 0:
+            continue
 
-    report_data = {}
-
-    for b_name, b_cfg in tier_config.items():
-        min_to = b_cfg["min_to"]
-        max_to = b_cfg["max_to"]
-        pct_mult = b_cfg["pct_mult"]
-        vol_mult = b_cfg["vol_mult"]
-        min_cluster = b_cfg["cluster"]
-        window = b_cfg["window"]
-        model_desc = b_cfg["model_desc"]
-
-        trades_pnl = []
-        trades_hold = []
-        trades_hit_20 = []
-        trades_win = []
-
-        for sym, df in stock_map.items():
-            opens = df["open"].values
-            closes = df["close"].values
-            highs = df["high"].values
-            lows = df["low"].values
-            pcts = df["deliv_pct"].values
-            pct_50_avg = df["deliv_pct_50d_avg"].values
-            d_vols = df["delivery_vol"].values
-            vol_sma20 = df["deliv_vol_sma20"].values
-            to_50_avg = df["turnover_50d_avg"].values
-            obvs = df["deliv_obv"].values
-            N = len(closes)
-
-            qualifying_days = (pct_50_avg > 0) & (pcts >= (pct_mult * pct_50_avg)) & (d_vols >= (vol_mult * vol_sma20))
-            last_exit = -1
-
-            for i in range(max(window + 20, 30), N - 30):
-                if i <= last_exit:
-                    continue
-
-                curr_to = to_50_avg[i]
-                if np.isnan(curr_to) or not (min_to <= curr_to < max_to):
-                    continue
-
-                if np.sum(qualifying_days[i - window : i]) < min_cluster:
-                    continue
-
-                base_highs = highs[i - window : i]
-                swing_high_rel_idx = np.argmax(base_highs)
-                swing_high_abs_idx = (i - window) + swing_high_rel_idx
-                swing_high = base_highs[swing_high_rel_idx]
-                base_low = np.min(lows[i - window : i])
-
-                if closes[i] > swing_high and closes[i - 1] <= swing_high:
-                    if obvs[i] <= obvs[swing_high_abs_idx]:
-                        continue
-
-                    entry_price = opens[i + 1] if opens[i + 1] > 0 else closes[i]
-                    stop_loss = round(base_low * 0.995, 2)
-                    risk = entry_price - stop_loss
-
-                    if risk <= 0 or (risk / entry_price) > 0.15:
-                        continue
-
-                    pnl, hold_days, hit_20, max_g, reason = simulate_adaptive_exit(
-                        df, i + 1, entry_price, stop_loss, b_name, max_hold=180
-                    )
-
-                    trades_pnl.append(pnl)
-                    trades_hold.append(hold_days)
-                    trades_hit_20.append(1 if hit_20 else 0)
-                    trades_win.append(1 if pnl > 0 else 0)
-
-                    last_exit = i + int(hold_days)
-
-        tot = len(trades_pnl)
-        if tot > 0:
-            win_rate = round((sum(trades_win) / tot) * 100, 1)
-            win_20pct = round((sum(trades_hit_20) / tot) * 100, 1)
-            avg_pnl = round(float(np.mean(trades_pnl)), 2)
-            avg_days = round(float(np.mean(trades_hold)), 1)
-            
-            neg_sum = abs(float(np.sum([p for p in trades_pnl if p < 0])))
-            pos_sum = float(np.sum([p for p in trades_pnl if p > 0]))
-            profit_factor = round(pos_sum / neg_sum, 2) if neg_sum > 0 else 99.0
-
-            report_data[b_name] = [{
-                "Exit Model": model_desc,
-                "Total Trades": tot,
-                "Win Rate %": win_rate,
-                "Hit 20% Rally %": win_20pct,
-                "Avg Return %": f"{avg_pnl:+0.2f}%",
-                "Profit Factor": profit_factor,
-                "Avg Hold (Days)": avg_days,
-                "Score": round(win_rate * profit_factor, 1)
-            }]
-
-    return report_data
-
-# ==========================================
-# 6. MAIN EXECUTION
-# ==========================================
-def main():
-    nifty750 = get_nifty_750_universe()
-    stock_map = prepare_stock_series(nifty750)
-
-    if stock_map:
-        report_data = run_adaptive_backtest(stock_map)
+        swing_high_rel_idx = int(np.argmax(base_highs))
+        swing_high_abs_idx = base_start + swing_high_rel_idx
+        swing_high_price = float(base_highs[swing_high_rel_idx])
+        base_low_price = float(np.min(base_lows))
         
-        for b_name, res in report_data.items():
-            print("\n" + "=" * 95)
-            print(f"🏆 BACKTEST RESULTS FOR: {b_name.upper()}")
-            print("=" * 95)
-            df_res = pd.DataFrame(res)
-            if not df_res.empty:
-                print(df_res.to_string(index=False))
+        obv_at_swing_high = obvs[swing_high_abs_idx]
+        current_close = float(closes[-1])
+        current_open = float(opens[-1])
+        current_obv = obvs[-1]
+        initial_sl = round(base_low_price * 0.995, 2)
+        risk_pct = round(((current_close - initial_sl) / current_close) * 100, 2) if current_close > 0 else 0
 
-        out_file = os.path.join(DATA_DIR, "segmented_backtest_report.json")
-        with open(out_file, "w") as fp:
-            json.dump(report_data, fp, indent=2)
-        print(f"\n💾 Backtest saved to '{out_file}'")
-    else:
-        print("⚠️ No stock files found.")
+        # Breakout Condition
+        is_breakout = bool((current_close >= swing_high_price) and (current_obv > obv_at_swing_high))
+
+        # Model 2B Climax Churn Check
+        is_climax_distribution = False
+        if "Bucket C" in tier_name and gross_vol_sma20 > 0:
+            is_climax_distribution = bool(
+                t_vols[-1] >= (1.5 * gross_vol_sma20) and 
+                pcts[-1] <= (0.70 * mean_deliv_50d) and 
+                current_close <= (current_open * 1.002)
+            )
+
+        trail_10d_low = round(float(np.min(lows[max(0, N - 10):])), 2)
+        trail_20d_low = round(float(np.min(lows[max(0, N - 20):])), 2)
+
+        if risk_pct > 15.0:
+            continue
+
+        signal_type = "🟢 BUY BREAKOUT" if is_breakout else "🟡 ACCUMULATION BASE"
+        if is_climax_distribution:
+            signal_type = "🔴 CLIMAX DUMP ALERT"
+
+        candidates.append({
+            "Symbol": sym,
+            "Signal": signal_type,
+            "Tier": tier_name,
+            "LTP (₹)": round(current_close, 2),
+            "P/E": f"{pe_float:.1f}" if pe_float is not None else "N/A",
+            "Swing High (₹)": round(swing_high_price, 2),
+            "Initial Base SL (₹)": initial_sl,
+            "Trail 10D Low (₹)": trail_10d_low,
+            "Trail 20D Low (₹)": trail_20d_low,
+            "Exit Management": trail_mode,
+            "Risk %": f"{risk_pct}%",
+            "Base Span": f"{base_window}d Base ({cluster_count} Dots)",
+            "Turnover (₹ Cr)": round(turnover_50d, 1)
+        })
+
+    candidates.sort(key=lambda x: (x["Signal"].startswith("🟢"), -float(x["Risk %"].replace("%", ""))), reverse=True)
+
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(candidates, f, indent=2)
+
+    print(f"🎉 scanA Complete! Saved {len(candidates)} candidate(s) to '{OUTPUT_FILE}'.")
 
 if __name__ == "__main__":
-    main()
+    run_scan()
