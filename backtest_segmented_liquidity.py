@@ -8,7 +8,7 @@ import pandas as pd
 DATA_DIR = "data"
 OUTPUT_REPORT = os.path.join(DATA_DIR, "segmented_backtest_report.json")
 MAX_PE = 35.0
-MAX_RISK_PCT = 10.0  # Strict 10% maximum risk cap
+MAX_RISK_PCT = 10.0
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
@@ -92,7 +92,7 @@ def clean_and_prepare_dataset(raw_data):
                 continue
         clean.append(r)
 
-    # Corporate actions multiplier
+    # Corporate actions adjustment
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -120,7 +120,7 @@ def clean_and_prepare_dataset(raw_data):
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
 
-    # Forward fill gaps
+    # Forward fill missing volume
     running_vol = 50000.0
     for i in range(len(clean)):
         v = clean[i]["volume"]
@@ -143,7 +143,6 @@ def clean_and_prepare_dataset(raw_data):
     return clean
 
 def build_nifty_regime_map():
-    """Builds a daily map indicating whether Nifty 50 is above its 50-day SMA."""
     nifty_path = os.path.join(DATA_DIR, "NIFTY50.json")
     if not os.path.exists(nifty_path):
         nifty_path = os.path.join(DATA_DIR, "NIFTY.json")
@@ -165,7 +164,6 @@ def build_nifty_regime_map():
         except Exception:
             pass
 
-    # Fallback: aggregate top liquid stock proxy if index JSON not standalone
     proxy_path = os.path.join(DATA_DIR, "RELIANCE.json")
     if os.path.exists(proxy_path):
         try:
@@ -183,7 +181,7 @@ def build_nifty_regime_map():
     return regime_map
 
 def run_segmented_backtest():
-    print("🚀 Running Nifty-Filtered Liquidity Strategy Backtest (Swing Low SL + <10% Risk)...")
+    print("🚀 Running Segmented Backtest: 50% Profit @ +15% & Breakeven across all Buckets...")
     
     nifty_750_set = get_nifty_750_universe()
     nifty_regime = build_nifty_regime_map()
@@ -280,6 +278,7 @@ def run_segmented_backtest():
         entry_nifty_regime = "Favourable"
         max_run_gain = 0.0
         partial_booked = False
+        partial_booked_date = ""
         cooldown_until = 0
 
         for i in range(50, N):
@@ -299,33 +298,31 @@ def run_segmented_backtest():
                 tier = "Bucket C (<5 Cr)"
                 pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
-            # 1. Exit Evaluation
+            # 1. Trade Management & Exits
             if in_trade:
                 gain = ((highs[i] - entry_price) / entry_price) * 100
                 if gain > max_run_gain:
                     max_run_gain = gain
 
-                # Exit Rules Per Bucket
+                # UNIVERSAL RULE: 50% Profit Booking @ +15% & Move SL to Breakeven
+                if max_run_gain >= 15.0 and not partial_booked:
+                    partial_booked = True
+                    partial_booked_date = times[i]
+                    active_sl = entry_price  # Breakeven for remaining 50%
+
+                # Trailing the remaining 50% position
                 if "Bucket C" in active_bucket:
-                    # Partial profit booking at +15%
-                    if max_run_gain >= 15.0 and not partial_booked:
-                        partial_booked = True
-                        active_sl = entry_price  # Breakeven
                     if max_run_gain >= 15.0 and i >= entry_idx + 10:
                         trail_15 = float(np.min(lows[i - 15 : i]))
                         if trail_15 > active_sl:
                             active_sl = trail_15
                 elif "Bucket B" in active_bucket:
-                    if max_run_gain >= 15.0 and active_sl < entry_price:
-                        active_sl = entry_price
                     if max_run_gain >= 20.0 and i >= entry_idx + 20:
                         trail_20 = float(np.min(lows[i - 20 : i]))
                         if trail_20 > active_sl:
                             active_sl = trail_20
                 else:
-                    # Bucket A: Breakeven at +15%, Trail 30D Low at +25%
-                    if max_run_gain >= 15.0 and active_sl < entry_price:
-                        active_sl = entry_price
+                    # Bucket A
                     if max_run_gain >= 25.0 and i >= entry_idx + 30:
                         trail_30 = float(np.min(lows[i - 30 : i]))
                         if trail_30 > active_sl:
@@ -335,13 +332,13 @@ def run_segmented_backtest():
                 exit_reason = ""
                 exit_price = closes[i]
 
-                # Stop Loss Trigger
+                # Stop Loss / Trailing Hit
                 if lows[i] <= active_sl:
                     exit_triggered = True
-                    exit_reason = "Trailing / Swing SL Hit"
+                    exit_reason = "Trailing / Breakeven SL Hit" if partial_booked else "Initial Swing SL Hit"
                     exit_price = min(closes[i], active_sl)
                 
-                # Model 2B Climax Churn Exit (Bucket C only)
+                # Bucket C Model 2B Climax Exit
                 elif "Bucket C" in active_bucket and i > entry_idx + 2:
                     if gross_sma[i] > 0 and pct_50[i] > 0:
                         if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= (opens[i] * 1.002):
@@ -349,7 +346,7 @@ def run_segmented_backtest():
                             exit_reason = "Climax Churn Exit"
                             exit_price = closes[i]
 
-                # Bucket A Time Fatigue Exit (Stagnant > 30 days without +8% move)
+                # Bucket A Stagnation Exit
                 elif "Bucket A" in active_bucket and (i - entry_idx) >= 30 and max_run_gain < 8.0:
                     exit_triggered = True
                     exit_reason = "Stagnation Time Exit (30D < 8%)"
@@ -357,16 +354,23 @@ def run_segmented_backtest():
 
                 if exit_triggered:
                     base_ret = ((exit_price - entry_price) / entry_price) * 100
-                    # If partial 50% booked at +15%
-                    final_ret = round((15.0 * 0.5 + base_ret * 0.5) if (partial_booked and base_ret < 15.0) else base_ret, 2)
-                    holding_days = i - entry_idx
+                    
+                    # Compute weighted blended return
+                    if partial_booked:
+                        # 50% booked at +15%, 50% at final exit
+                        final_ret = round((15.0 * 0.50) + (base_ret * 0.50), 2)
+                    else:
+                        final_ret = round(base_ret, 2)
 
+                    holding_days = i - entry_idx
                     all_trades.append({
                         "Symbol": sym,
                         "Tier": active_bucket,
                         "Nifty Regime": entry_nifty_regime,
                         "Entry Date": entry_date,
                         "Entry Price": entry_price,
+                        "Partial Booked (+15%)": partial_booked,
+                        "Partial Date": partial_booked_date if partial_booked else "-",
                         "Exit Date": times[i],
                         "Exit Price": round(exit_price, 2),
                         "Return %": final_ret,
@@ -380,7 +384,7 @@ def run_segmented_backtest():
                     cooldown_until = i + 5
                     continue
 
-            # 2. Breakout Entry Evaluation
+            # 2. Breakout Entry Logic
             if not in_trade and i > cooldown_until and i >= base_w:
                 base_start = i - base_w
                 qualifying = (pcts[base_start:i] >= (pct_m * pct_50[base_start:i])) & (d_vols[base_start:i] >= (vol_m * deliv_sma[base_start:i]))
@@ -392,16 +396,17 @@ def run_segmented_backtest():
 
                     if closes[i] > sw_high and closes[i - 1] <= sw_high and obvs[i] > sw_obv:
                         entry_price = closes[i]
-                        
-                        # Swing Low immediately prior to breakout (past 8-12 days)
                         pre_break_lookback = min(12, i - base_start)
                         recent_swing_low = float(np.min(lows[i - pre_break_lookback : i]))
                         active_sl = round(recent_swing_low * 0.995, 2)
                         
                         risk_pct = ((entry_price - active_sl) / entry_price) * 100
-                        
-                        # Strict Risk Guardrail <= 10.0%
+
                         if risk_pct <= MAX_RISK_PCT:
+                            # Bucket C entry protection: Price >= 20
+                            if "Bucket C" in tier and entry_price < 20.0:
+                                continue
+
                             active_bucket = tier
                             in_trade = True
                             entry_idx = i
@@ -409,10 +414,10 @@ def run_segmented_backtest():
                             entry_nifty_regime = nifty_regime.get(entry_date, "Favourable")
                             max_run_gain = 0.0
                             partial_booked = False
+                            partial_booked_date = ""
 
     print(f"📊 Total Trades Processed: {len(all_trades)}")
 
-    # 3-Way Summary Calculation: Favourable vs. Unfavourable vs. Combined
     df_trades = pd.DataFrame(all_trades)
     segmented_results = {}
 
@@ -444,7 +449,7 @@ def run_segmented_backtest():
     for bucket in ["Bucket A (>30 Cr)", "Bucket B (5-30 Cr)", "Bucket C (<5 Cr)"]:
         b_df = df_trades[df_trades["Tier"] == bucket] if not df_trades.empty else pd.DataFrame()
         segmented_results[bucket] = {
-            "Favourable (Nifty > 50 SMA)": compute_stats(b_df[b_df["Nifty Regime"] == "Favourable"]) if not b_df.empty else compute_stats(pd.DataFrame()),
+            "Favourable (Nifty >= 50 SMA)": compute_stats(b_df[b_df["Nifty Regime"] == "Favourable"]) if not b_df.empty else compute_stats(pd.DataFrame()),
             "Unfavourable (Nifty < 50 SMA)": compute_stats(b_df[b_df["Nifty Regime"] == "Unfavourable"]) if not b_df.empty else compute_stats(pd.DataFrame()),
             "Combined (All Market Regimes)": compute_stats(b_df)
         }
@@ -457,7 +462,7 @@ def run_segmented_backtest():
     with open(OUTPUT_REPORT, "w") as fp:
         json.dump(final_payload, fp, indent=2)
 
-    print(f"🎉 Backtest Report Generated! Saved to '{OUTPUT_REPORT}'.")
+    print(f"🎉 Updated Backtest Report Generated! Saved to '{OUTPUT_REPORT}'.")
 
 if __name__ == "__main__":
     run_segmented_backtest()
