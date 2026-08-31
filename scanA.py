@@ -1,13 +1,15 @@
 import os
 import io
 import json
+import time
 import urllib.request
 import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
-MAX_PE = 35.0
 OUTPUT_FILE = os.path.join(DATA_DIR, "scanA_results.json")
+MAX_PE = 35.0
+MAX_RISK_PCT = 10.0
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
@@ -37,7 +39,7 @@ def get_nifty_750_universe():
                     clean = df["Symbol"].dropna().astype(str).str.strip().str.upper()
                     symbols.update(clean.tolist())
         except Exception as e:
-            print(f"⚠️ Warning fetching {u}: {e}")
+            print(f"⚠️ Warning fetching universe from {u}: {e}")
 
     sorted_list = sorted(list(symbols))
     if sorted_list:
@@ -56,20 +58,26 @@ def clean_and_prepare_dataset(raw_data):
         if not raw_t:
             continue
         try:
-            d_str = pd.to_datetime(raw_t).strftime("%Y-%m-%d")
+            dt = pd.to_datetime(raw_t)
+            if dt.dayofweek >= 5:
+                continue
+            d_str = dt.strftime("%Y-%m-%d")
             c = float(r.get("close", 0))
             if c <= 0:
                 continue
             
+            o = float(r.get("open", c))
+            h = float(r.get("high", c))
+            l = float(r.get("low", c))
             v = float(r.get("volume", 0) or 0)
             dv = float(r.get("delivery_vol", 0) or 0)
             pct = float(r.get("deliv_pct", 0) or 0)
 
             entry = {
                 "time": d_str,
-                "open": float(r.get("open", c)),
-                "high": float(r.get("high", c)),
-                "low": float(r.get("low", c)),
+                "open": o,
+                "high": h,
+                "low": l,
                 "close": c,
                 "delivery_vol": dv,
                 "volume": v,
@@ -87,11 +95,14 @@ def clean_and_prepare_dataset(raw_data):
         if clean:
             prev = clean[-1]
             if (r["open"] == prev["open"] and r["high"] == prev["high"] and 
-                r["low"] == prev["low"] and r["close"] == prev["close"] and r["volume"] == 0):
-                continue
+                r["low"] == prev["low"] and r["close"] == prev["close"]):
+                if r["volume"] <= prev["volume"]:
+                    continue
+                else:
+                    clean.pop()
         clean.append(r)
 
-    # Corporate actions adjustment
+    # Corporate actions split adjustment
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -119,7 +130,6 @@ def clean_and_prepare_dataset(raw_data):
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
 
-    # Forward-fill missing delivery gaps
     running_vol = 50000.0
     for i in range(len(clean)):
         v = clean[i]["volume"]
@@ -141,13 +151,32 @@ def clean_and_prepare_dataset(raw_data):
 
     return clean
 
-def run_scan():
-    print("🚀 Running Daily scanA Engine (Synchronized Framework)...")
-    if not os.path.exists(DATA_DIR):
-        print(f"❌ '{DATA_DIR}' directory does not exist.")
-        return
+def get_nifty_regime():
+    nifty_path = os.path.join(DATA_DIR, "NIFTY50.json")
+    if not os.path.exists(nifty_path):
+        nifty_path = os.path.join(DATA_DIR, "NIFTY.json")
+    if not os.path.exists(nifty_path):
+        nifty_path = os.path.join(DATA_DIR, "RELIANCE.json")
+    
+    if os.path.exists(nifty_path):
+        try:
+            with open(nifty_path, "r") as f:
+                raw = json.load(f)
+            df = pd.DataFrame(clean_and_prepare_dataset(raw))
+            if not df.empty and "close" in df.columns and len(df) >= 50:
+                df["sma50"] = df["close"].rolling(50, min_periods=20).mean()
+                latest_c = df["close"].iloc[-1]
+                latest_sma = df["sma50"].iloc[-1]
+                return "FAVOURABLE (>= 50 SMA)" if latest_c >= latest_sma else "UNFAVOURABLE (< 50 SMA)"
+        except Exception:
+            pass
+    return "FAVOURABLE (>= 50 SMA)"
 
+def run_scan_a():
+    print("🚀 Running scanA: Daily Breakout & Position Tracker...")
     nifty_750_set = get_nifty_750_universe()
+    nifty_regime_str = get_nifty_regime()
+
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
     if os.path.exists(fund_path):
@@ -162,13 +191,12 @@ def run_scan():
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json",
             "backtest_report.json", "segmented_backtest_report.json",
-            "wyckoff_screener_results.json", "nifty750.json",
-            "scanA_results.json"
+            "wyckoff_screener_results.json", "active_trade_plan.json",
+            "scanA_results.json", "nifty750.json", "NIFTY50.json", "NIFTY.json"
         ]
     ]
 
-    print(f"📊 Scanning {len(stock_files)} stocks...")
-    candidates = []
+    results = []
 
     for f_name in stock_files:
         sym = f_name.replace(".json", "").strip().upper()
@@ -176,7 +204,6 @@ def run_scan():
 
         stock_fund = fundamentals.get(sym, {})
         pe_val = stock_fund.get("pe", None)
-        pe_float = None
         if pe_val is not None:
             try:
                 pe_float = float(pe_val)
@@ -196,131 +223,128 @@ def run_scan():
             continue
 
         df = pd.DataFrame(clean_history)
-        closes = df["close"].values
-        opens = df["open"].values
-        highs = df["high"].values
-        lows = df["low"].values
-        vols = df["delivery_vol"].values
-        t_vols = df["volume"].values
-        pcts = df["deliv_pct"].values
-        N = len(closes)
+        df["deliv_sma"] = df["delivery_vol"].rolling(window=20, min_periods=1).mean()
+        df["gross_vol_sma20"] = df["volume"].rolling(window=20, min_periods=1).mean()
+        df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+        df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
+        df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
 
-        turnovers = (closes * t_vols) / 1e7
-        turnover_50d = float(np.mean(turnovers[max(0, N - 50):]))
-        mean_deliv_50d = float(np.mean(pcts[max(0, N - 50):]))
-        if mean_deliv_50d <= 0:
-            continue
-
-        deliv_sma20 = float(np.mean(vols[max(0, N - 20):]))
-        gross_vol_sma20 = float(np.mean(t_vols[max(0, N - 20):]))
-
-        is_n750 = sym in nifty_750_set
-
-        # Tier Parameters (Bucket A widened to 45d for multi-month bases)
-        if is_n750:
-            if turnover_50d >= 30.0:
-                tier_name = "Bucket A (>30 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 3, 45
-                trail_mode = "Open / Trend Riding (Base SL Only)"
-            elif turnover_50d >= 5.0:
-                tier_name = "Bucket B (5-30 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.2, 1.0, 2, 15
-                trail_mode = "Trail 20D Low (at +20% gain)"
-            else:
-                tier_name = "Bucket C (<5 Cr)"
-                pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
-                trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
-        else:
-            tier_name = "Non-Universe (Bucket C Rules)"
-            pct_mult, vol_mult, min_cluster, base_window = 1.4, 1.0, 4, 20
-            trail_mode = "Trail 10D Low (at +15% gain) + Climax Exit"
-
-        # Continuous True Delivery OBV
         cur_obv = 0
-        obvs = np.zeros(N)
-        for idx in range(N):
-            dv = vols[idx]
-            if idx > 0:
-                if closes[idx] > closes[idx - 1]:
-                    cur_obv += dv
-                elif closes[idx] < closes[idx - 1]:
-                    cur_obv -= dv
+        obvs = []
+        for i, row in df.iterrows():
+            dv = float(row["delivery_vol"])
+            if i > 0:
+                pc = float(df.at[i - 1, "close"])
+                cc = float(row["close"])
+                if cc > pc: cur_obv += dv
+                elif cc < pc: cur_obv -= dv
             else:
                 cur_obv = dv
-            obvs[idx] = cur_obv
+            obvs.append(cur_obv)
+        df["deliv_obv"] = obvs
 
-        # Accumulation Base Evaluation
-        base_start = max(0, N - 1 - base_window)
-        base_slice_pcts = pcts[base_start : N - 1]
-        base_slice_vols = vols[base_start : N - 1]
+        closes = df["close"].values
+        highs = df["high"].values
+        lows = df["low"].values
+        pcts = df["deliv_pct"].values
+        pct_50 = df["deliv_pct_50d"].values
+        d_vols = df["delivery_vol"].values
+        deliv_sma = df["deliv_sma"].values
+        to_50 = df["turnover_50d"].values
+        N = len(closes)
+        last_i = N - 1
 
-        qualifying_days = (base_slice_pcts >= (pct_mult * mean_deliv_50d)) & (base_slice_vols >= (vol_mult * deliv_sma20))
-        cluster_count = int(np.sum(qualifying_days))
+        is_n750 = sym in nifty_750_set
+        curr_to = to_50[last_i] if not np.isnan(to_50[last_i]) else 0.0
 
-        if cluster_count < min_cluster:
+        if is_n750:
+            if curr_to >= 30.0:
+                tier = "Bucket A (>30 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
+            elif curr_to >= 5.0:
+                tier = "Bucket B (5-30 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
+            else:
+                tier = "Bucket C (<5 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
+        else:
+            tier = "Bucket C (<5 Cr)"
+            pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
+
+        if last_i < base_w:
             continue
 
-        base_highs = highs[base_start : N - 1]
-        base_lows = lows[base_start : N - 1]
-        if len(base_highs) == 0:
-            continue
+        base_start = last_i - base_w
+        qualifying = (pcts[base_start:last_i] >= (pct_m * pct_50[base_start:last_i])) & (d_vols[base_start:last_i] >= (vol_m * deliv_sma[base_start:last_i]))
+        dot_count = int(np.sum(qualifying))
 
-        swing_high_rel_idx = int(np.argmax(base_highs))
-        swing_high_abs_idx = base_start + swing_high_rel_idx
-        swing_high_price = float(base_highs[swing_high_rel_idx])
-        base_low_price = float(np.min(base_lows))
-        
-        obv_at_swing_high = obvs[swing_high_abs_idx]
-        current_close = float(closes[-1])
-        current_open = float(opens[-1])
-        current_obv = obvs[-1]
-        initial_sl = round(base_low_price * 0.995, 2)
-        risk_pct = round(((current_close - initial_sl) / current_close) * 100, 2) if current_close > 0 else 0
+        base_highs = highs[base_start:last_i]
+        sw_idx = int(np.argmax(base_highs))
+        sw_high = round(float(base_highs[sw_idx]), 2)
+        sw_obv = obvs[base_start + sw_idx]
 
-        # Breakout Condition
-        is_breakout = bool((current_close >= swing_high_price) and (current_obv > obv_at_swing_high))
+        # Prior swing low for SL
+        pre_lookback = min(12, last_i - base_start)
+        recent_swing_low = float(np.min(lows[last_i - pre_lookback : last_i]))
+        active_sl = round(recent_swing_low * 0.995, 2)
 
-        # Model 2B Climax Churn Check
-        is_climax_distribution = False
-        if "Bucket C" in tier_name and gross_vol_sma20 > 0:
-            is_climax_distribution = bool(
-                t_vols[-1] >= (1.5 * gross_vol_sma20) and 
-                pcts[-1] <= (0.70 * mean_deliv_50d) and 
-                current_close <= (current_open * 1.002)
-            )
+        ltp = round(float(closes[last_i]), 2)
+        prev_close = round(float(closes[last_i - 1]), 2)
+        risk_pct = round(((ltp - active_sl) / ltp) * 100, 1)
 
-        trail_10d_low = round(float(np.min(lows[max(0, N - 10):])), 2)
-        trail_20d_low = round(float(np.min(lows[max(0, N - 20):])), 2)
+        # Dynamic Trails
+        trail_10 = round(float(np.min(lows[last_i - 10 : last_i])), 2)
+        trail_20 = round(float(np.min(lows[last_i - 20 : last_i])), 2)
+        trail_30 = round(float(np.min(lows[last_i - 30 : last_i])), 2)
 
-        if risk_pct > 15.0:
-            continue
+        target_15 = round(sw_high * 1.15, 2)
 
-        signal_type = "🟢 BUY BREAKOUT" if is_breakout else "🟡 ACCUMULATION BASE"
-        if is_climax_distribution:
-            signal_type = "🔴 CLIMAX DUMP ALERT"
+        # Signal Evaluation
+        signal = ""
+        if dot_count >= min_c and ltp > sw_high and prev_close <= sw_high and obvs[last_i] > sw_obv:
+            if risk_pct <= MAX_RISK_PCT:
+                signal = "🟢 FRESH BUY BREAKOUT"
+        elif dot_count >= min_c and ltp >= (sw_high * 0.985) and ltp <= sw_high:
+            signal = "🟡 NEAR BREAKOUT"
+        elif ltp > sw_high and ltp > active_sl:
+            if ltp >= target_15:
+                signal = "🎯 50% BOOKED (TRAIL REST)"
+            else:
+                signal = "🔵 HOLDING POSITION"
 
-        candidates.append({
-            "Symbol": sym,
-            "Signal": signal_type,
-            "Tier": tier_name,
-            "LTP (₹)": round(current_close, 2),
-            "P/E": f"{pe_float:.1f}" if pe_float is not None else "N/A",
-            "Swing High (₹)": round(swing_high_price, 2),
-            "Initial Base SL (₹)": initial_sl,
-            "Trail 10D Low (₹)": trail_10d_low,
-            "Trail 20D Low (₹)": trail_20d_low,
-            "Exit Management": trail_mode,
-            "Risk %": f"{risk_pct}%",
-            "Base Span": f"{base_window}d Base ({cluster_count} Dots)",
-            "Turnover (₹ Cr)": round(turnover_50d, 1)
-        })
+        if signal:
+            results.append({
+                "Symbol": sym,
+                "Signal": signal,
+                "Tier": tier,
+                "LTP (₹)": ltp,
+                "Swing High (₹)": sw_high,
+                "Swing SL (₹)": active_sl,
+                "Target +15% (₹)": target_15,
+                "Trail 10D (₹)": trail_10,
+                "Trail 20D (₹)": trail_20,
+                "Trail 30D (₹)": trail_30,
+                "Risk %": f"{risk_pct}%",
+                "Dot Cluster": f"{dot_count}/{min_c}",
+                "Base Span": f"{base_w}D",
+                "Turnover (₹ Cr)": round(curr_to, 2)
+            })
 
-    candidates.sort(key=lambda x: (x["Signal"].startswith("🟢"), -float(x["Risk %"].replace("%", ""))), reverse=True)
+    # Sort priorities: Fresh Buys first, then Near Breakouts, then Holds
+    priority_map = {"🟢": 1, "🟡": 2, "🎯": 3, "🔵": 4}
+    results.sort(key=lambda x: (priority_map.get(x["Signal"][:1], 5), -x["Turnover (₹ Cr)"]))
 
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(candidates, f, indent=2)
+    final_payload = {
+        "Scan Timestamp": time.strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Nifty Regime": nifty_regime_str,
+        "Candidates Count": len(results),
+        "Candidates": results
+    }
 
-    print(f"🎉 scanA Complete! Saved {len(candidates)} candidate(s) to '{OUTPUT_FILE}'.")
+    with open(OUTPUT_FILE, "w") as fp:
+        json.dump(final_payload, fp, indent=2)
+
+    print(f"🎉 scanA Complete! {len(results)} active setups saved to '{OUTPUT_FILE}'.")
 
 if __name__ == "__main__":
-    run_scan()
+    run_scan_a()
