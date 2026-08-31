@@ -20,7 +20,9 @@ def get_nifty_750_universe():
     if os.path.exists(local_path):
         try:
             with open(local_path, "r") as fp:
-                return set(json.load(fp))
+                data = json.load(fp)
+                if data:
+                    return set(data)
         except Exception:
             pass
 
@@ -39,7 +41,7 @@ def get_nifty_750_universe():
                     clean = df["Symbol"].dropna().astype(str).str.strip().str.upper()
                     symbols.update(clean.tolist())
         except Exception as e:
-            print(f"⚠️ Warning fetching universe: {e}")
+            print(f"⚠️ Warning fetching universe from {u}: {e}")
 
     sorted_list = sorted(list(symbols))
     if sorted_list:
@@ -166,7 +168,7 @@ def get_nifty_regime():
     return "FAVOURABLE (>= 50 SMA)"
 
 def run_scan_a():
-    print("🚀 Running Synchronized scanA Screener...")
+    print("🚀 Running scanA: Breakout & Position Tracker (Strict Max Risk <= 10%)...")
     nifty_750_set = get_nifty_750_universe()
     nifty_regime_str = get_nifty_regime()
 
@@ -248,8 +250,6 @@ def run_scan_a():
         to_50 = df["turnover_50d"].values
         N = len(closes)
 
-        is_n750 = sym in nifty_750_set
-
         # True Historical Simulation Engine
         in_trade = False
         entry_idx = 0
@@ -264,18 +264,15 @@ def run_scan_a():
         for i in range(30, N):
             curr_to = to_50[i] if not np.isnan(to_50[i]) else 0.0
 
-            if is_n750:
-                if curr_to >= 30.0:
-                    tier = "Bucket A"
-                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
-                elif curr_to >= 5.0:
-                    tier = "Bucket B"
-                    pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
-                else:
-                    tier = "Bucket C"
-                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
+            # Dynamic Turnover Categorization
+            if curr_to >= 30.0:
+                tier = "Bucket A (>30 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
+            elif curr_to >= 5.0:
+                tier = "Bucket B (5-30 Cr)"
+                pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
             else:
-                tier = "Bucket C"
+                tier = "Bucket C (<5 Cr)"
                 pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
             # 1. Trade Lifecycle
@@ -284,6 +281,7 @@ def run_scan_a():
                 if gain > max_run_gain:
                     max_run_gain = gain
 
+                # 50% Profit Booking & Move SL to Breakeven
                 if max_run_gain >= 15.0 and not partial_booked:
                     partial_booked = True
                     active_sl = entry_price
@@ -347,16 +345,28 @@ def run_scan_a():
                             max_run_gain = 0.0
                             partial_booked = False
 
-        # Current Status on Today's Bar (last_i)
+        # Current Status on Today's Bar
         last_i = N - 1
         ltp = round(float(closes[last_i]), 2)
+        curr_to = to_50[last_i] if not np.isnan(to_50[last_i]) else 0.0
+
+        if curr_to >= 30.0:
+            tier_now = "Bucket A (>30 Cr)"
+            pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
+        elif curr_to >= 5.0:
+            tier_now = "Bucket B (5-30 Cr)"
+            pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
+        else:
+            tier_now = "Bucket C (<5 Cr)"
+            pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
+
         base_start = last_i - base_w
         qualifying = (pcts[base_start:last_i] >= (pct_m * pct_50[base_start:last_i])) & (d_vols[base_start:last_i] >= (vol_m * deliv_sma[base_start:last_i]))
         current_dots = int(np.sum(qualifying))
         base_highs = highs[base_start:last_i]
         sw_high = round(float(np.max(base_highs)), 2)
 
-        # Output Candidate ONLY if genuinely in an active trade or breaking out today
+        # Output Candidate: Active Trade OR Near Breakout WITH Risk <= 10%
         if in_trade:
             if partial_booked:
                 signal_type = "🎯 50% BOOKED (TRAIL REST)"
@@ -384,19 +394,21 @@ def run_scan_a():
             sl_cand = round(recent_swing_low * 0.995, 2)
             risk_pct = round(((ltp - sl_cand) / ltp) * 100, 1)
 
-            results.append({
-                "Symbol": sym,
-                "Signal": "🟡 NEAR BREAKOUT",
-                "Tier": tier,
-                "LTP (₹)": ltp,
-                "Swing High (₹)": sw_high,
-                "Swing SL (₹)": sl_cand,
-                "Target +15% (₹)": round(sw_high * 1.15, 2),
-                "Active Trail (₹)": sl_cand,
-                "Risk %": f"{risk_pct}%",
-                "Dot Cluster": f"{current_dots}/{min_c}",
-                "Turnover (₹ Cr)": round(curr_to, 2)
-            })
+            # Strict Filter: Only include Near Breakouts if Risk <= 10%
+            if risk_pct <= MAX_RISK_PCT:
+                results.append({
+                    "Symbol": sym,
+                    "Signal": "🟡 NEAR BREAKOUT",
+                    "Tier": tier_now,
+                    "LTP (₹)": ltp,
+                    "Swing High (₹)": sw_high,
+                    "Swing SL (₹)": sl_cand,
+                    "Target +15% (₹)": round(sw_high * 1.15, 2),
+                    "Active Trail (₹)": sl_cand,
+                    "Risk %": f"{risk_pct}%",
+                    "Dot Cluster": f"{current_dots}/{min_c}",
+                    "Turnover (₹ Cr)": round(curr_to, 2)
+                })
 
     priority_map = {"🟢": 1, "🟡": 2, "🎯": 3, "🔵": 4}
     results.sort(key=lambda x: (priority_map.get(x["Signal"][:1], 5), -x["Turnover (₹ Cr)"]))
@@ -411,7 +423,7 @@ def run_scan_a():
     with open(OUTPUT_FILE, "w") as fp:
         json.dump(final_payload, fp, indent=2)
 
-    print(f"🎉 Synchronized scanA Complete! {len(results)} valid active setups saved to '{OUTPUT_FILE}'.")
+    print(f"🎉 scanA Complete! {len(results)} valid active setups saved to '{OUTPUT_FILE}'.")
 
 if __name__ == "__main__":
     run_scan_a()
