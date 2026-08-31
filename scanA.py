@@ -39,7 +39,7 @@ def get_nifty_750_universe():
                     clean = df["Symbol"].dropna().astype(str).str.strip().str.upper()
                     symbols.update(clean.tolist())
         except Exception as e:
-            print(f"⚠️ Warning fetching universe from {u}: {e}")
+            print(f"⚠️ Warning fetching universe: {e}")
 
     sorted_list = sorted(list(symbols))
     if sorted_list:
@@ -66,22 +66,15 @@ def clean_and_prepare_dataset(raw_data):
             if c <= 0:
                 continue
             
-            o = float(r.get("open", c))
-            h = float(r.get("high", c))
-            l = float(r.get("low", c))
-            v = float(r.get("volume", 0) or 0)
-            dv = float(r.get("delivery_vol", 0) or 0)
-            pct = float(r.get("deliv_pct", 0) or 0)
-
             entry = {
                 "time": d_str,
-                "open": o,
-                "high": h,
-                "low": l,
+                "open": float(r.get("open", c)),
+                "high": float(r.get("high", c)),
+                "low": float(r.get("low", c)),
                 "close": c,
-                "delivery_vol": dv,
-                "volume": v,
-                "deliv_pct": pct
+                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                "volume": float(r.get("volume", 0) or 0),
+                "deliv_pct": float(r.get("deliv_pct", 0) or 0)
             }
             if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
                 date_map[d_str] = entry
@@ -173,7 +166,7 @@ def get_nifty_regime():
     return "FAVOURABLE (>= 50 SMA)"
 
 def run_scan_a():
-    print("🚀 Running scanA: Daily Breakout & Position Tracker...")
+    print("🚀 Running Synchronized scanA Screener...")
     nifty_750_set = get_nifty_750_universe()
     nifty_regime_str = get_nifty_regime()
 
@@ -250,80 +243,158 @@ def run_scan_a():
         pct_50 = df["deliv_pct_50d"].values
         d_vols = df["delivery_vol"].values
         deliv_sma = df["deliv_sma"].values
+        gross_vols = df["volume"].values
+        gross_sma = df["gross_vol_sma20"].values
         to_50 = df["turnover_50d"].values
         N = len(closes)
-        last_i = N - 1
 
         is_n750 = sym in nifty_750_set
-        curr_to = to_50[last_i] if not np.isnan(to_50[last_i]) else 0.0
 
-        if is_n750:
-            if curr_to >= 30.0:
-                tier = "Bucket A (>30 Cr)"
-                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
-            elif curr_to >= 5.0:
-                tier = "Bucket B (5-30 Cr)"
-                pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
+        # True Historical Simulation Engine
+        in_trade = False
+        entry_idx = 0
+        entry_price = 0.0
+        active_sl = 0.0
+        active_bucket = ""
+        max_run_gain = 0.0
+        partial_booked = False
+        target_15 = 0.0
+        cooldown_until = 0
+
+        for i in range(30, N):
+            curr_to = to_50[i] if not np.isnan(to_50[i]) else 0.0
+
+            if is_n750:
+                if curr_to >= 30.0:
+                    tier = "Bucket A"
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
+                elif curr_to >= 5.0:
+                    tier = "Bucket B"
+                    pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
+                else:
+                    tier = "Bucket C"
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
             else:
-                tier = "Bucket C (<5 Cr)"
+                tier = "Bucket C"
                 pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
-        else:
-            tier = "Bucket C (<5 Cr)"
-            pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
-        if last_i < base_w:
-            continue
+            # 1. Trade Lifecycle
+            if in_trade:
+                gain = ((highs[i] - entry_price) / entry_price) * 100
+                if gain > max_run_gain:
+                    max_run_gain = gain
 
+                if max_run_gain >= 15.0 and not partial_booked:
+                    partial_booked = True
+                    active_sl = entry_price
+
+                # Dynamic Trails
+                if "Bucket C" in active_bucket:
+                    if max_run_gain >= 15.0 and i >= entry_idx + 10:
+                        trail_15 = float(np.min(lows[i - 15 : i]))
+                        if trail_15 > active_sl:
+                            active_sl = trail_15
+                elif "Bucket B" in active_bucket:
+                    if max_run_gain >= 20.0 and i >= entry_idx + 20:
+                        trail_20 = float(np.min(lows[i - 20 : i]))
+                        if trail_20 > active_sl:
+                            active_sl = trail_20
+                else:
+                    if max_run_gain >= 25.0 and i >= entry_idx + 30:
+                        trail_30 = float(np.min(lows[i - 30 : i]))
+                        if trail_30 > active_sl:
+                            active_sl = trail_30
+
+                exit_triggered = False
+                if lows[i] <= active_sl:
+                    exit_triggered = True
+                elif "Bucket C" in active_bucket and i > entry_idx + 2:
+                    if gross_sma[i] > 0 and pct_50[i] > 0:
+                        if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= df.at[i, "open"]:
+                            exit_triggered = True
+                elif "Bucket A" in active_bucket and (i - entry_idx) >= 30 and max_run_gain < 8.0:
+                    exit_triggered = True
+
+                if exit_triggered:
+                    in_trade = False
+                    cooldown_until = i + 5
+                    continue
+
+            # 2. Breakout Evaluation
+            if not in_trade and i > cooldown_until and i >= base_w:
+                base_start = i - base_w
+                qualifying = (pcts[base_start:i] >= (pct_m * pct_50[base_start:i])) & (d_vols[base_start:i] >= (vol_m * deliv_sma[base_start:i]))
+                if np.sum(qualifying) >= min_c:
+                    base_highs = highs[base_start:i]
+                    sw_idx = int(np.argmax(base_highs))
+                    sw_high = base_highs[sw_idx]
+                    sw_obv = obvs[base_start + sw_idx]
+
+                    if closes[i] > sw_high and closes[i - 1] <= sw_high and obvs[i] > sw_obv:
+                        entry_cand = closes[i]
+                        pre_lookback = min(12, i - base_start)
+                        recent_swing_low = float(np.min(lows[i - pre_lookback : i]))
+                        sl_cand = round(recent_swing_low * 0.995, 2)
+                        risk = ((entry_cand - sl_cand) / entry_cand) * 100
+
+                        if risk <= MAX_RISK_PCT:
+                            active_bucket = tier
+                            in_trade = True
+                            entry_idx = i
+                            entry_price = entry_cand
+                            active_sl = sl_cand
+                            target_15 = round(entry_cand * 1.15, 2)
+                            max_run_gain = 0.0
+                            partial_booked = False
+
+        # Current Status on Today's Bar (last_i)
+        last_i = N - 1
+        ltp = round(float(closes[last_i]), 2)
         base_start = last_i - base_w
         qualifying = (pcts[base_start:last_i] >= (pct_m * pct_50[base_start:last_i])) & (d_vols[base_start:last_i] >= (vol_m * deliv_sma[base_start:last_i]))
-        dot_count = int(np.sum(qualifying))
-
+        current_dots = int(np.sum(qualifying))
         base_highs = highs[base_start:last_i]
-        sw_idx = int(np.argmax(base_highs))
-        sw_high = round(float(base_highs[sw_idx]), 2)
-        sw_obv = obvs[base_start + sw_idx]
+        sw_high = round(float(np.max(base_highs)), 2)
 
-        pre_lookback = min(12, last_i - base_start)
-        recent_swing_low = float(np.min(lows[last_i - pre_lookback : last_i]))
-        active_sl = round(recent_swing_low * 0.995, 2)
-
-        ltp = round(float(closes[last_i]), 2)
-        prev_close = round(float(closes[last_i - 1]), 2)
-        risk_pct = round(((ltp - active_sl) / ltp) * 100, 1)
-
-        trail_10 = round(float(np.min(lows[last_i - 10 : last_i])), 2)
-        trail_20 = round(float(np.min(lows[last_i - 20 : last_i])), 2)
-        trail_30 = round(float(np.min(lows[last_i - 30 : last_i])), 2)
-
-        target_15 = round(sw_high * 1.15, 2)
-
-        signal = ""
-        if dot_count >= min_c and ltp > sw_high and prev_close <= sw_high and obvs[last_i] > sw_obv:
-            if risk_pct <= MAX_RISK_PCT:
-                signal = "🟢 FRESH BUY BREAKOUT"
-        elif dot_count >= min_c and ltp >= (sw_high * 0.985) and ltp <= sw_high:
-            signal = "🟡 NEAR BREAKOUT"
-        elif ltp > sw_high and ltp > active_sl:
-            if ltp >= target_15:
-                signal = "🎯 50% BOOKED (TRAIL REST)"
+        # Output Candidate ONLY if genuinely in an active trade or breaking out today
+        if in_trade:
+            if partial_booked:
+                signal_type = "🎯 50% BOOKED (TRAIL REST)"
             else:
-                signal = "🔵 HOLDING POSITION"
+                signal_type = "🔵 ACTIVE HOLDING"
+            
+            risk_pct = round(((entry_price - active_sl) / entry_price) * 100, 1)
 
-        if signal:
             results.append({
                 "Symbol": sym,
-                "Signal": signal,
+                "Signal": signal_type,
+                "Tier": active_bucket,
+                "LTP (₹)": ltp,
+                "Swing High (₹)": round(entry_price, 2),
+                "Swing SL (₹)": round(active_sl, 2),
+                "Target +15% (₹)": target_15,
+                "Active Trail (₹)": round(active_sl, 2),
+                "Risk %": f"{risk_pct}%",
+                "Dot Cluster": f"{current_dots}/{min_c}",
+                "Turnover (₹ Cr)": round(curr_to, 2)
+            })
+        elif current_dots >= min_c and ltp >= (sw_high * 0.985) and ltp <= sw_high:
+            pre_lookback = min(12, last_i - base_start)
+            recent_swing_low = float(np.min(lows[last_i - pre_lookback : last_i]))
+            sl_cand = round(recent_swing_low * 0.995, 2)
+            risk_pct = round(((ltp - sl_cand) / ltp) * 100, 1)
+
+            results.append({
+                "Symbol": sym,
+                "Signal": "🟡 NEAR BREAKOUT",
                 "Tier": tier,
                 "LTP (₹)": ltp,
                 "Swing High (₹)": sw_high,
-                "Swing SL (₹)": active_sl,
-                "Target +15% (₹)": target_15,
-                "Trail 10D (₹)": trail_10,
-                "Trail 20D (₹)": trail_20,
-                "Trail 30D (₹)": trail_30,
+                "Swing SL (₹)": sl_cand,
+                "Target +15% (₹)": round(sw_high * 1.15, 2),
+                "Active Trail (₹)": sl_cand,
                 "Risk %": f"{risk_pct}%",
-                "Dot Cluster": f"{dot_count}/{min_c}",
-                "Base Span": f"{base_w}D",
+                "Dot Cluster": f"{current_dots}/{min_c}",
                 "Turnover (₹ Cr)": round(curr_to, 2)
             })
 
@@ -340,7 +411,7 @@ def run_scan_a():
     with open(OUTPUT_FILE, "w") as fp:
         json.dump(final_payload, fp, indent=2)
 
-    print(f"🎉 scanA Complete! {len(results)} active setups saved to '{OUTPUT_FILE}'.")
+    print(f"🎉 Synchronized scanA Complete! {len(results)} valid active setups saved to '{OUTPUT_FILE}'.")
 
 if __name__ == "__main__":
     run_scan_a()
