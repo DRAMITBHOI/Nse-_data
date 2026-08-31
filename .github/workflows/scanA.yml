@@ -2,7 +2,7 @@ name: Daily Market Data & ScanA Execution
 
 on:
   schedule:
-    - cron: '30 11 * * 1-5' # Runs at 5:00 PM IST (Mon-Fri)
+    - cron: '30 11 * * 1-5' # 5:00 PM IST (Mon-Fri)
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Fetch Daily Bhavcopy & Update Histories
         run: |
-          python daily_updater.py
+          python update_all_stocks.py
 
       - name: Run scanA Screener
         run: |
