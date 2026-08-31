@@ -283,7 +283,6 @@ def run_scan_a():
         sw_high = round(float(base_highs[sw_idx]), 2)
         sw_obv = obvs[base_start + sw_idx]
 
-        # Prior swing low for SL
         pre_lookback = min(12, last_i - base_start)
         recent_swing_low = float(np.min(lows[last_i - pre_lookback : last_i]))
         active_sl = round(recent_swing_low * 0.995, 2)
@@ -292,14 +291,12 @@ def run_scan_a():
         prev_close = round(float(closes[last_i - 1]), 2)
         risk_pct = round(((ltp - active_sl) / ltp) * 100, 1)
 
-        # Dynamic Trails
         trail_10 = round(float(np.min(lows[last_i - 10 : last_i])), 2)
         trail_20 = round(float(np.min(lows[last_i - 20 : last_i])), 2)
         trail_30 = round(float(np.min(lows[last_i - 30 : last_i])), 2)
 
         target_15 = round(sw_high * 1.15, 2)
 
-        # Signal Evaluation
         signal = ""
         if dot_count >= min_c and ltp > sw_high and prev_close <= sw_high and obvs[last_i] > sw_obv:
             if risk_pct <= MAX_RISK_PCT:
@@ -330,7 +327,6 @@ def run_scan_a():
                 "Turnover (₹ Cr)": round(curr_to, 2)
             })
 
-    # Sort priorities: Fresh Buys first, then Near Breakouts, then Holds
     priority_map = {"🟢": 1, "🟡": 2, "🎯": 3, "🔵": 4}
     results.sort(key=lambda x: (priority_map.get(x["Signal"][:1], 5), -x["Turnover (₹ Cr)"]))
 
