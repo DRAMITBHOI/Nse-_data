@@ -57,20 +57,26 @@ def clean_and_prepare_dataset(raw_data):
         if not raw_t:
             continue
         try:
-            d_str = pd.to_datetime(raw_t).strftime("%Y-%m-%d")
+            dt = pd.to_datetime(raw_t)
+            if dt.dayofweek >= 5:  # Remove weekends
+                continue
+            d_str = dt.strftime("%Y-%m-%d")
             c = float(r.get("close", 0))
             if c <= 0:
                 continue
             
+            o = float(r.get("open", c))
+            h = float(r.get("high", c))
+            l = float(r.get("low", c))
             v = float(r.get("volume", 0) or 0)
             dv = float(r.get("delivery_vol", 0) or 0)
             pct = float(r.get("deliv_pct", 0) or 0)
 
             entry = {
                 "time": d_str,
-                "open": float(r.get("open", c)),
-                "high": float(r.get("high", c)),
-                "low": float(r.get("low", c)),
+                "open": o,
+                "high": h,
+                "low": l,
                 "close": c,
                 "delivery_vol": dv,
                 "volume": v,
@@ -88,11 +94,14 @@ def clean_and_prepare_dataset(raw_data):
         if clean:
             prev = clean[-1]
             if (r["open"] == prev["open"] and r["high"] == prev["high"] and 
-                r["low"] == prev["low"] and r["close"] == prev["close"] and r["volume"] == 0):
-                continue
+                r["low"] == prev["low"] and r["close"] == prev["close"]):
+                if r["volume"] <= prev["volume"]:
+                    continue
+                else:
+                    clean.pop()
         clean.append(r)
 
-    # Corporate actions adjustment
+    # Corporate actions multiplier
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -120,7 +129,6 @@ def clean_and_prepare_dataset(raw_data):
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
 
-    # Forward fill missing delivery volume
     running_vol = 50000.0
     for i in range(len(clean)):
         v = clean[i]["volume"]
@@ -181,7 +189,7 @@ def build_nifty_regime_map():
     return regime_map
 
 def run_segmented_backtest():
-    print("🚀 Running Institutional Precision Backtest...")
+    print("🚀 Running Standard Robust Backtest...")
     
     nifty_750_set = get_nifty_750_universe()
     nifty_regime = build_nifty_regime_map()
@@ -237,7 +245,6 @@ def run_segmented_backtest():
         df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
         df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean()
         df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean()
-        df["ema50"] = df["close"].ewm(span=50, adjust=False).mean()
 
         cur_obv = 0
         obvs = []
@@ -256,7 +263,6 @@ def run_segmented_backtest():
         closes = df["close"].values
         highs = df["high"].values
         lows = df["low"].values
-        opens = df["open"].values
         pcts = df["deliv_pct"].values
         pct_50 = df["deliv_pct_50d"].values
         d_vols = df["delivery_vol"].values
@@ -264,7 +270,6 @@ def run_segmented_backtest():
         gross_vols = df["volume"].values
         gross_sma = df["gross_vol_sma20"].values
         to_50 = df["turnover_50d"].values
-        ema50 = df["ema50"].values
         times = df["time"].values
         N = len(closes)
 
@@ -279,7 +284,6 @@ def run_segmented_backtest():
         entry_nifty_regime = "Favourable"
         max_run_gain = 0.0
         partial_booked = False
-        partial_tp = 15.0
         cooldown_until = 0
 
         for i in range(50, N):
@@ -289,19 +293,15 @@ def run_segmented_backtest():
                 if curr_to >= 30.0:
                     tier = "Bucket A (>30 Cr)"
                     pct_m, vol_m, min_c, base_w = 1.4, 1.0, 3, 45
-                    tp_target = 15.0
                 elif curr_to >= 5.0:
                     tier = "Bucket B (5-30 Cr)"
                     pct_m, vol_m, min_c, base_w = 1.2, 1.0, 2, 15
-                    tp_target = 15.0
                 else:
                     tier = "Bucket C (<5 Cr)"
-                    pct_m, vol_m, min_c, base_w = 1.5, 1.0, 4, 20
-                    tp_target = 12.0
+                    pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
             else:
                 tier = "Bucket C (<5 Cr)"
-                pct_m, vol_m, min_c, base_w = 1.5, 1.0, 4, 20
-                tp_target = 12.0
+                pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
             # 1. Trade Management & Exits
             if in_trade:
@@ -309,17 +309,17 @@ def run_segmented_backtest():
                 if gain > max_run_gain:
                     max_run_gain = gain
 
-                # 50% Profit Booking & Move SL to Breakeven
-                if max_run_gain >= partial_tp and not partial_booked:
+                # UNIVERSAL: 50% Profit Booking @ +15% & Move SL to Breakeven
+                if max_run_gain >= 15.0 and not partial_booked:
                     partial_booked = True
                     active_sl = entry_price
 
                 # Trailing logic on remainder
                 if "Bucket C" in active_bucket:
-                    if max_run_gain >= 12.0 and i >= entry_idx + 6:
-                        trail_10 = float(np.min(lows[i - 10 : i]))
-                        if trail_10 > active_sl:
-                            active_sl = trail_10
+                    if max_run_gain >= 15.0 and i >= entry_idx + 10:
+                        trail_15 = float(np.min(lows[i - 15 : i]))
+                        if trail_15 > active_sl:
+                            active_sl = trail_15
                 elif "Bucket B" in active_bucket:
                     if max_run_gain >= 20.0 and i >= entry_idx + 20:
                         trail_20 = float(np.min(lows[i - 20 : i]))
@@ -341,10 +341,10 @@ def run_segmented_backtest():
                     exit_reason = "Trailing / Breakeven SL Hit" if partial_booked else "Initial Swing SL Hit"
                     exit_price = min(closes[i], active_sl)
                 
-                # Model 2B Climax Churn Exit
+                # Bucket C Climax Exit
                 elif "Bucket C" in active_bucket and i > entry_idx + 2:
                     if gross_sma[i] > 0 and pct_50[i] > 0:
-                        if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= (opens[i] * 1.002):
+                        if gross_vols[i] >= (1.5 * gross_sma[i]) and pcts[i] <= (0.70 * pct_50[i]) and closes[i] <= df.at[i, "open"]:
                             exit_triggered = True
                             exit_reason = "Climax Churn Exit"
                             exit_price = closes[i]
@@ -357,7 +357,7 @@ def run_segmented_backtest():
 
                 if exit_triggered:
                     base_ret = ((exit_price - entry_price) / entry_price) * 100
-                    final_ret = round((partial_tp * 0.50) + (base_ret * 0.50), 2) if partial_booked else round(base_ret, 2)
+                    final_ret = round((15.0 * 0.50) + (base_ret * 0.50), 2) if partial_booked else round(base_ret, 2)
                     holding_days = i - entry_idx
 
                     all_trades.append({
@@ -366,7 +366,7 @@ def run_segmented_backtest():
                         "Nifty Regime": entry_nifty_regime,
                         "Entry Date": entry_date,
                         "Entry Price": entry_price,
-                        "Partial Booked": partial_booked,
+                        "Partial Booked (+15%)": partial_booked,
                         "Exit Date": times[i],
                         "Exit Price": round(exit_price, 2),
                         "Return %": final_ret,
@@ -382,19 +382,6 @@ def run_segmented_backtest():
 
             # 2. Breakout Entry Logic
             if not in_trade and i > cooldown_until and i >= base_w:
-                regime_now = nifty_regime.get(times[i], "Favourable")
-                
-                # Strict Institutional Gates for Bucket C
-                if "Bucket C" in tier:
-                    if regime_now == "Unfavourable":
-                        continue
-                    if closes[i] < ema50[i] or closes[i] < 25.0:
-                        continue
-                    if gross_sma[i] > 0 and gross_vols[i] < (1.5 * gross_sma[i]):
-                        continue
-                    if pcts[i] < 45.0:
-                        continue
-
                 base_start = i - base_w
                 qualifying = (pcts[base_start:i] >= (pct_m * pct_50[base_start:i])) & (d_vols[base_start:i] >= (vol_m * deliv_sma[base_start:i]))
                 if np.sum(qualifying) >= min_c:
@@ -416,10 +403,9 @@ def run_segmented_backtest():
                             in_trade = True
                             entry_idx = i
                             entry_date = times[i]
-                            entry_nifty_regime = regime_now
+                            entry_nifty_regime = nifty_regime.get(entry_date, "Favourable")
                             max_run_gain = 0.0
                             partial_booked = False
-                            partial_tp = tp_target
 
     print(f"📊 Total Trades Processed: {len(all_trades)}")
 
@@ -467,7 +453,7 @@ def run_segmented_backtest():
     with open(OUTPUT_REPORT, "w") as fp:
         json.dump(final_payload, fp, indent=2)
 
-    print(f"🎉 Backtest Report Generated! Saved to '{OUTPUT_REPORT}'.")
+    print(f"🎉 Robust Backtest Report Saved to '{OUTPUT_REPORT}'.")
 
 if __name__ == "__main__":
     run_segmented_backtest()
