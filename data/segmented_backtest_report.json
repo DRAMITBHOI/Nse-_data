@@ -11,22 +11,22 @@
         "Score": 84.6
       },
       "Unfavourable (Nifty < 50 SMA)": {
-        "Trades": 108,
-        "Win Rate %": "45.4%",
-        "+20% Rally %": "22.2%",
-        "Avg Return %": "+0.94%",
-        "Profit Factor": 1.23,
-        "Avg Hold": "47.1 d",
-        "Score": 55.8
+        "Trades": 109,
+        "Win Rate %": "45.0%",
+        "+20% Rally %": "22.0%",
+        "Avg Return %": "+0.88%",
+        "Profit Factor": 1.21,
+        "Avg Hold": "46.7 d",
+        "Score": 54.4
       },
       "Combined (All Market Regimes)": {
-        "Trades": 415,
-        "Win Rate %": "48.2%",
+        "Trades": 416,
+        "Win Rate %": "48.1%",
         "+20% Rally %": "29.6%",
-        "Avg Return %": "+2.35%",
+        "Avg Return %": "+2.33%",
         "Profit Factor": 1.58,
-        "Avg Hold": "53.2 d",
-        "Score": 76.2
+        "Avg Hold": "53.1 d",
+        "Score": 76.0
       }
     },
     "Bucket B (5-30 Cr)": {
@@ -3448,6 +3448,22 @@
       "Holding Days": 111,
       "Exit Reason": "Trailing / Breakeven SL Hit",
       "Is Win": true
+    },
+    {
+      "Symbol": "MAZDOCK",
+      "Tier": "Bucket A (>30 Cr)",
+      "Nifty Regime": "Unfavourable",
+      "Entry Date": "2026-08-26",
+      "Entry Price": 2625.0,
+      "Partial Booked (+15%)": false,
+      "Exit Date": "2026-09-01",
+      "Exit Price": 2473.47,
+      "Return %": -5.77,
+      "Max Run Gain %": 0.34,
+      "Rally 20%": false,
+      "Holding Days": 4,
+      "Exit Reason": "Initial Swing SL Hit",
+      "Is Win": false
     },
     {
       "Symbol": "BIRLACORPN",
