@@ -7,6 +7,7 @@ import pandas as pd
 
 DATA_DIR = "data"
 OUTPUT_REPORT = os.path.join(DATA_DIR, "integrated_institutional_report.json")
+FNO_STORE = os.path.join(DATA_DIR, "fno_history.json")
 MAX_PE = 35.0
 MAX_RISK_PCT = 10.0
 
@@ -142,6 +143,41 @@ def clean_data_fast(raw_data):
 
     return filtered
 
+def load_fno_database():
+    """Loads historical F&O Open Interest and Basis metrics."""
+    if os.path.exists(FNO_STORE):
+        try:
+            with open(FNO_STORE, "r") as fp:
+                data = json.load(fp)
+                if data:
+                    print(f"📦 Loaded F&O derivatives data across {len(data)} trading sessions.")
+                    return data
+        except Exception:
+            pass
+    return {}
+
+def check_fno_buildup(fno_data, sym, cur_date, past_date, spot_price):
+    """Evaluates whether Open Interest expanded by >= 8% with positive Cost of Carry."""
+    if not fno_data:
+        return False
+    cur_fno = fno_data.get(cur_date, {}).get(sym)
+    past_fno = fno_data.get(past_date, {}).get(sym)
+    if not cur_fno or not past_fno:
+        return False
+
+    cur_oi = cur_fno.get("total_oi", 0)
+    past_oi = past_fno.get("total_oi", 0)
+    fut_close = cur_fno.get("fut_close", 0)
+
+    if past_oi <= 0 or spot_price <= 0:
+        return False
+
+    oi_growth = ((cur_oi - past_oi) / past_oi) * 100.0
+    basis_pct = ((fut_close - spot_price) / spot_price) * 100.0
+
+    # True institutional long accumulation in F&O: expanding OI + futures trading at a premium
+    return (oi_growth >= 8.0) and (basis_pct >= 0.10)
+
 def load_benchmark_and_regime():
     for f_name in ["NIFTY50.json", "NIFTY.json", "RELIANCE.json"]:
         path = os.path.join(DATA_DIR, f_name)
@@ -177,9 +213,10 @@ def fast_rolling_mean(arr, window):
     return result
 
 def run_integrated_backtest():
-    print("🚀 Running Dual Institutional Backtest Engine...")
+    print("🚀 Running Upgraded Dual Institutional Engine (with F&O derivatives cross-referencing)...")
     nifty_750_set = get_nifty_750_universe()
     benchmark_map, nifty_regime = load_benchmark_and_regime()
+    fno_data = load_fno_database()
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -198,7 +235,7 @@ def run_integrated_backtest():
             "scanB_backtest_report.json", "integrated_institutional_report.json",
             "stealth_backtest_report.json", "wyckoff_screener_results.json",
             "active_trade_plan.json", "scanA_results.json",
-            "nifty750.json", "NIFTY50.json", "NIFTY.json"
+            "fno_history.json", "nifty750.json", "NIFTY50.json", "NIFTY.json"
         ]
     ]
 
@@ -208,7 +245,7 @@ def run_integrated_backtest():
     for f_name in stock_files:
         processed += 1
         if processed % 500 == 0:
-            print(f"⏳ Processed {processed}/{len(stock_files)} stocks...")
+            print(f"⏳ Evaluated {processed}/{len(stock_files)} stocks...")
 
         sym = f_name.replace(".json", "").strip().upper()
         json_path = os.path.join(DATA_DIR, f_name)
@@ -307,15 +344,18 @@ def run_integrated_backtest():
                 tier = "Bucket C (<5 Cr)"
                 pct_m, vol_m, min_c, base_w = 1.4, 1.0, 4, 20
 
+            # 1. Active Trade Management
             if in_trade:
                 gain = ((highs[i] - entry_price) / entry_price) * 100.0
                 if gain > max_run_gain:
                     max_run_gain = gain
 
+                # Milestone: 50% Profit Booking @ +15% & SL shifted to Breakeven
                 if max_run_gain >= 15.0 and not partial_booked:
                     partial_booked = True
                     active_sl = entry_price
 
+                # Trailing stops on remainder
                 if "Bucket C" in active_bucket:
                     if max_run_gain >= 15.0 and i >= entry_idx + 10:
                         trail_15 = float(np.min(lows[i - 15 : i]))
@@ -365,13 +405,16 @@ def run_integrated_backtest():
                     cooldown_until = i + 5
                     continue
 
+            # 2. Breakout Evaluation
             if not in_trade and i > cooldown_until and i >= base_w:
                 base_start = i - base_w
                 
+                # Check 1: Delivery Cluster
                 qualifying_dots = (pcts[base_start:i] >= (pct_m * pct_50[base_start:i])) & \
                                   (d_vols[base_start:i] >= (vol_m * deliv_sma20[base_start:i]))
                 is_delivery_cluster = bool(np.sum(qualifying_dots) >= min_c)
 
+                # Check 2: Price Stealth (VCP & Wick Absorption)
                 vcp_contracted = (natr50[i] > 0 and (natr10[i] / natr50[i]) <= 0.72) and \
                                  (vol_sma50[i] > 0 and vol_sma10[i] <= (0.85 * vol_sma50[i]))
                 wick_absorption_present = bool(rolling_absorption_count[i] >= 3.0)
@@ -387,9 +430,12 @@ def run_integrated_backtest():
                 prior_20_low = np.min(lows[i - 20 : i])
                 prior_20_high = np.max(highs[i - 20 : i])
                 range_tight = (((prior_20_high - prior_20_low) / max(prior_20_low, 1e-4)) * 100.0) <= 12.0
-                is_stealth_setup = vcp_contracted and wick_absorption_present and rs_divergent and range_tight
+                is_price_stealth = vcp_contracted and wick_absorption_present and rs_divergent and range_tight
 
-                if is_delivery_cluster or is_stealth_setup:
+                # Check 3: F&O Derivatives Stealth Long Buildup
+                is_fno_buildup = check_fno_buildup(fno_data, sym, d_now, d_past, closes[i])
+
+                if is_delivery_cluster or is_price_stealth or is_fno_buildup:
                     base_highs = highs[base_start:i]
                     sw_idx = int(np.argmax(base_highs))
                     sw_high = base_highs[sw_idx]
@@ -402,6 +448,7 @@ def run_integrated_backtest():
                         sl_cand = round(recent_swing_low * 0.995, 2)
                         risk_pct = ((entry_cand - sl_cand) / entry_cand) * 100.0
 
+                        # STRICT RISK FILTER: Avoid entry if SL > 10%
                         if 0 < risk_pct <= MAX_RISK_PCT:
                             active_bucket = tier
                             in_trade = True
@@ -412,15 +459,17 @@ def run_integrated_backtest():
                             max_run_gain = 0.0
                             partial_booked = False
                             
-                            if is_delivery_cluster and is_stealth_setup:
+                            if is_fno_buildup:
+                                setup_type = "F&O Stealth Buildup"
+                            elif is_delivery_cluster and is_price_stealth:
                                 setup_type = "Dual (Cluster + Stealth)"
                             elif is_delivery_cluster:
                                 setup_type = "Delivery Cluster"
                             else:
-                                setup_type = "Stealth Absorption"
+                                setup_type = "Price Stealth (VCP)"
 
     df_trades = pd.DataFrame(all_trades)
-    print(f"📊 Total Dual Strategy Trades: {len(df_trades)}")
+    print(f"📊 Completed! Total Evaluated Trades: {len(df_trades)}")
 
     def compute_stats(df_sub):
         if df_sub.empty:
@@ -451,7 +500,7 @@ def run_integrated_backtest():
         tier_summary[b] = compute_stats(sub)
 
     setup_summary = {}
-    for st in ["Delivery Cluster", "Stealth Absorption", "Dual (Cluster + Stealth)"]:
+    for st in ["Delivery Cluster", "F&O Stealth Buildup", "Price Stealth (VCP)", "Dual (Cluster + Stealth)"]:
         sub = df_trades[df_trades["Setup Type"] == st] if not df_trades.empty else pd.DataFrame()
         setup_summary[st] = compute_stats(sub)
 
