@@ -31,13 +31,13 @@
     },
     "Bucket B (5-30 Cr)": {
       "Favourable (Nifty >= 50 SMA)": {
-        "Trades": 297,
-        "Win Rate %": "55.2%",
-        "+20% Rally %": "45.5%",
-        "Avg Return %": "+7.26%",
-        "Profit Factor": 3.01,
-        "Avg Hold": "55.7 d",
-        "Score": 166.2
+        "Trades": 298,
+        "Win Rate %": "55.4%",
+        "+20% Rally %": "45.6%",
+        "Avg Return %": "+7.28%",
+        "Profit Factor": 3.03,
+        "Avg Hold": "55.8 d",
+        "Score": 167.9
       },
       "Unfavourable (Nifty < 50 SMA)": {
         "Trades": 202,
@@ -49,13 +49,13 @@
         "Score": 96.0
       },
       "Combined (All Market Regimes)": {
-        "Trades": 499,
-        "Win Rate %": "52.7%",
-        "+20% Rally %": "43.5%",
-        "Avg Return %": "+6.06%",
-        "Profit Factor": 2.53,
+        "Trades": 500,
+        "Win Rate %": "52.8%",
+        "+20% Rally %": "43.6%",
+        "Avg Return %": "+6.07%",
+        "Profit Factor": 2.54,
         "Avg Hold": "55.5 d",
-        "Score": 133.3
+        "Score": 134.1
       }
     },
     "Bucket C (<5 Cr)": {
@@ -854,6 +854,22 @@
       "Max Run Gain %": 56.4,
       "Rally 20%": true,
       "Holding Days": 56,
+      "Exit Reason": "Trailing / Breakeven SL Hit",
+      "Is Win": true
+    },
+    {
+      "Symbol": "ENDURANCE",
+      "Tier": "Bucket B (5-30 Cr)",
+      "Nifty Regime": "Favourable",
+      "Entry Date": "2026-05-07",
+      "Entry Price": 2536.2,
+      "Partial Booked (+15%)": true,
+      "Exit Date": "2026-09-02",
+      "Exit Price": 2755.9,
+      "Return %": 11.83,
+      "Max Run Gain %": 21.13,
+      "Rally 20%": true,
+      "Holding Days": 82,
       "Exit Reason": "Trailing / Breakeven SL Hit",
       "Is Win": true
     },
