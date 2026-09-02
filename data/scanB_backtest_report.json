@@ -1,16 +1,9 @@
 {
-  "Strategy Name": "Scan B: 20D Cluster (1.2x SMA Vol & %) + 5% OBV Surge Breakout",
-  "Parameters": {
-    "Lookback Base": "20 Days",
-    "Delivery Cluster Requirement": ">= 3 Days (Delivery Vol >= 1.2x SMA20 AND Deliv % >= 1.2x SMA20)",
-    "OBV Breakout Surge Requirement": ">= 5% above Swing High OBV",
-    "Stop Loss": "10% Random / Flat",
-    "Max Forward Holding Period": "60 Trading Days"
-  },
+  "Strategy Name": "Scan B: 20D Base (1.2x SMA Vol & %) + 5% OBV Breakout",
   "Primary Target Metrics": {
     "1. % Trades Reaching +15% (All Categories)": "42.96% (1868/4348)",
     "2. % Trades Reaching +20% (Excluding Category A)": "36.17% (1172/3240)",
-    "3. % Trades Reaching +25% (Excluding Category A & B)": "30.15% (868/2879)",
+    "3. % Trades Reaching +25% (Excluding Category A & B)": "30.18% (869/2879)",
     "4. % Trades Reaching +30%+ (Excluding Category A, B & C)": "25.03% (714/2853)"
   },
   "Category Breakdown": {
@@ -306,7 +299,7 @@
       "Hit +25%": false,
       "Hit +30%+": false,
       "Stopped Out (-10%)": false,
-      "Evaluated Days": 26
+      "Evaluated Days": 27
     },
     {
       "Symbol": "HNDFDS",
