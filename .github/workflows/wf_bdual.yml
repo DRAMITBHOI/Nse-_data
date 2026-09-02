@@ -6,7 +6,7 @@ on:
 jobs:
   run-dual-backtest:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -20,12 +20,21 @@ jobs:
         run: pip install pandas numpy requests
 
       - name: Execute Dual Backtest Engine
-        run: python backtest_dual_institutional.py
+        run: |
+          if [ -f "backtest_dual_institutional.py" ]; then
+            python backtest_dual_institutional.py
+          elif [ -f "backtest_integrated_institutional.py" ]; then
+            python backtest_integrated_institutional.py
+          else
+            echo "❌ File not found! Available Python files:"
+            ls -la *.py
+            exit 1
+          fi
 
       - name: Commit & Push Report
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/dual_institutional_report.json
-          git commit -m "Auto-update Dual Institutional Backtest Report [skip ci]" || echo "No changes"
+          git add data/*.json
+          git commit -m "Auto-update Dual Strategy Backtest Report [skip ci]" || echo "No changes to commit"
           git push
