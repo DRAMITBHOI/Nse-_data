@@ -1,7 +1,5 @@
 import os
-import io
 import json
-import urllib.request
 import numpy as np
 import pandas as pd
 
@@ -11,84 +9,84 @@ MAX_RISK_PCT = 10.0
 MAX_HOLD_DAYS = 60
 MAX_PE = 35.0
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
-}
-
-def clean_and_prepare_dataset(raw_data):
+def clean_data_fast(raw_data):
+    """Blazing-fast string-based data extraction without slow pd.to_datetime overhead."""
     if not raw_data or not isinstance(raw_data, list):
         return []
+    
     date_map = {}
     for r in raw_data:
         if not isinstance(r, dict):
             continue
-        raw_t = str(r.get("time", "")).strip()
+        raw_t = r.get("time", "")
         if not raw_t:
             continue
-        try:
-            dt = pd.to_datetime(raw_t)
-            if dt.dayofweek >= 5:
-                continue
-            d_str = dt.strftime("%Y-%m-%d")
-            c = float(r.get("close", 0))
-            if c <= 0:
-                continue
-            
-            entry = {
-                "time": d_str,
-                "open": float(r.get("open", c)),
-                "high": float(r.get("high", c)),
-                "low": float(r.get("low", c)),
-                "close": c,
-                "volume": float(r.get("volume", 0) or 0)
-            }
-            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
-                date_map[d_str] = entry
-        except Exception:
+        
+        # Pure string slice 'YYYY-MM-DD' (0.01 microsecond vs 50 microseconds for pd.to_datetime)
+        d_str = str(raw_t)[:10]
+        c = float(r.get("close", 0) or 0)
+        if c <= 0:
             continue
 
-    clean = [date_map[k] for k in sorted(date_map.keys())]
-    if len(clean) < 40:
+        v = float(r.get("volume", 0) or 0)
+        o = float(r.get("open", c) or c)
+        h = float(r.get("high", c) or c)
+        l = float(r.get("low", c) or c)
+
+        if d_str not in date_map or v > date_map[d_str]["volume"]:
+            date_map[d_str] = {
+                "time": d_str,
+                "open": o,
+                "high": h,
+                "low": l,
+                "close": c,
+                "volume": v
+            }
+
+    sorted_dates = sorted(date_map.keys())
+    if len(sorted_dates) < 50:
         return []
 
-    # Filter duplicate holiday candles
-    filtered = []
+    clean = [date_map[k] for k in sorted_dates]
+
+    # Holiday twin candle deduplication
+    deduped = []
     for r in clean:
-        if filtered:
-            prev = filtered[-1]
+        if deduped:
+            prev = deduped[-1]
             if (r["open"] == prev["open"] and r["high"] == prev["high"] and 
                 r["low"] == prev["low"] and r["close"] == prev["close"]):
                 if r["volume"] <= prev["volume"]:
                     continue
                 else:
-                    filtered.pop()
-        filtered.append(r)
+                    deduped.pop()
+        deduped.append(r)
 
-    # Corporate split multiplier adjustment
+    # Split adjustments
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
-    for i in range(len(filtered) - 1, 0, -1):
-        prev_c = filtered[i - 1]["close"]
-        curr_o = filtered[i]["open"]
+    for i in range(len(deduped) - 1, 0, -1):
+        prev_c = deduped[i - 1]["close"]
+        curr_o = deduped[i]["open"]
         if prev_c > 0 and curr_o > 0:
             ratio = prev_c / curr_o
-            adj_factor = None
+            adj = None
             if ratio >= 1.35:
                 for k in known_multipliers:
                     if abs(ratio - k) / k < 0.15:
-                        adj_factor = k
+                        adj = k
                         break
-                if not adj_factor and 1.70 <= ratio <= 2.30: adj_factor = 2.0
-                elif not adj_factor and 4.30 <= ratio <= 5.50: adj_factor = 5.0
-                elif not adj_factor and 8.50 <= ratio <= 11.50: adj_factor = 10.0
-            if adj_factor:
+                if not adj and 1.70 <= ratio <= 2.30: adj = 2.0
+                elif not adj and 4.30 <= ratio <= 5.50: adj = 5.0
+                elif not adj and 8.50 <= ratio <= 11.50: adj = 10.0
+            if adj:
                 for j in range(0, i):
-                    filtered[j]["open"] = round(filtered[j]["open"] / adj_factor, 2)
-                    filtered[j]["high"] = round(filtered[j]["high"] / adj_factor, 2)
-                    filtered[j]["low"] = round(filtered[j]["low"] / adj_factor, 2)
-                    filtered[j]["close"] = round(filtered[j]["close"] / adj_factor, 2)
-                    filtered[j]["volume"] = filtered[j]["volume"] * adj_factor
+                    deduped[j]["open"] = round(deduped[j]["open"] / adj, 2)
+                    deduped[j]["high"] = round(deduped[j]["high"] / adj, 2)
+                    deduped[j]["low"] = round(deduped[j]["low"] / adj, 2)
+                    deduped[j]["close"] = round(deduped[j]["close"] / adj, 2)
+                    deduped[j]["volume"] = deduped[j]["volume"] * adj
 
-    return filtered
+    return deduped
 
 def load_benchmark():
     for f_name in ["NIFTY50.json", "NIFTY.json", "RELIANCE.json"]:
@@ -97,24 +95,29 @@ def load_benchmark():
             try:
                 with open(path, "r") as f:
                     raw = json.load(f)
-                df = pd.DataFrame(clean_and_prepare_dataset(raw))
-                if not df.empty and "close" in df.columns:
-                    return df.set_index("time")["close"].to_dict()
+                c = clean_data_fast(raw)
+                if c:
+                    return {r["time"]: r["close"] for r in c}
             except Exception:
                 pass
     return {}
 
-def compute_atr(high, low, close, period=14):
-    tr1 = high - low
-    tr2 = np.abs(high - np.roll(close, 1))
-    tr3 = np.abs(low - np.roll(close, 1))
-    tr = np.maximum(tr1, np.maximum(tr2, tr3))
-    tr[0] = tr1[0]
-    return pd.Series(tr).rolling(period, min_periods=1).mean().values
+def fast_rolling_mean(arr, window):
+    ret = np.cumsum(arr, dtype=float)
+    ret[window:] = ret[window:] - ret[:-window]
+    result = np.empty_like(arr, dtype=float)
+    result[:window-1] = np.nan
+    result[window-1:] = ret[window-1:] / window
+    # Forward fill the initial nan values for safe division
+    first_val = result[window-1] if len(result) >= window else 1.0
+    result[:window-1] = first_val
+    return result
 
 def run_backtest():
-    print("🚀 Running Pure Stealth Accumulation Backtest (Swing Low SL <= 10%)...")
+    print("🚀 Running High-Speed Stealth Accumulation Backtest...")
     benchmark_map = load_benchmark()
+    if benchmark_map:
+        print(f"✅ Loaded {len(benchmark_map)} benchmark dates for RS comparison.")
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
     fundamentals = {}
@@ -139,7 +142,7 @@ def run_backtest():
 
     for f_name in stock_files:
         processed += 1
-        if processed % 300 == 0:
+        if processed % 500 == 0:
             print(f"⏳ Processed {processed}/{len(stock_files)} stocks...")
 
         sym = f_name.replace(".json", "").strip().upper()
@@ -161,33 +164,41 @@ def run_backtest():
         except Exception:
             continue
 
-        clean = clean_and_prepare_dataset(raw)
+        clean = clean_data_fast(raw)
         if len(clean) < 65:
             continue
 
-        df = pd.DataFrame(clean)
-        closes = df["close"].values
-        highs = df["high"].values
-        lows = df["low"].values
-        opens = df["open"].values
-        volumes = df["volume"].values
-        times = df["time"].values
+        closes = np.array([r["close"] for r in clean], dtype=float)
+        highs = np.array([r["high"] for r in clean], dtype=float)
+        lows = np.array([r["low"] for r in clean], dtype=float)
+        opens = np.array([r["open"] for r in clean], dtype=float)
+        volumes = np.array([r["volume"] for r in clean], dtype=float)
+        times = [r["time"] for r in clean]
         N = len(closes)
 
-        # 1. Volatility Contraction Indicators
-        atr10 = compute_atr(highs, lows, closes, 10)
-        atr50 = compute_atr(highs, lows, closes, 50)
+        # 1. Vectorized ATR Computation
+        tr1 = highs - lows
+        tr2 = np.abs(highs - np.roll(closes, 1))
+        tr3 = np.abs(lows - np.roll(closes, 1))
+        tr = np.maximum(tr1, np.maximum(tr2, tr3))
+        tr[0] = tr1[0]
+
+        atr10 = fast_rolling_mean(tr, 10)
+        atr50 = fast_rolling_mean(tr, 50)
         natr10 = (atr10 / np.maximum(closes, 1e-4)) * 100.0
         natr50 = (atr50 / np.maximum(closes, 1e-4)) * 100.0
-        vol_sma10 = pd.Series(volumes).rolling(10, min_periods=1).mean().values
-        vol_sma20 = pd.Series(volumes).rolling(20, min_periods=1).mean().values
-        vol_sma50 = pd.Series(volumes).rolling(50, min_periods=1).mean().values
 
-        # 2. Lower Wick Absorption Candles
+        # 2. Vectorized Volume SMAs
+        vol_sma10 = fast_rolling_mean(volumes, 10)
+        vol_sma20 = fast_rolling_mean(volumes, 20)
+        vol_sma50 = fast_rolling_mean(volumes, 50)
+
+        # 3. Vectorized Lower Wick Absorption
         candle_ranges = np.maximum(highs - lows, 1e-4)
         lower_wicks = np.minimum(opens, closes) - lows
         wick_absorption = ((lower_wicks / candle_ranges) >= 0.45) & (closes >= opens)
-        rolling_wick_count = pd.Series(wick_absorption.astype(int)).rolling(15, min_periods=1).sum().values
+        wick_abs_int = wick_absorption.astype(float)
+        rolling_wick_count = fast_rolling_mean(wick_abs_int, 15) * 15.0
 
         cooldown_idx = 0
 
@@ -195,15 +206,12 @@ def run_backtest():
             if i < cooldown_idx:
                 continue
 
-            # Stealth Criteria over 20 sessions
-            # A. VCP contraction & supply dry up
+            # Criteria Checks
             vcp_ok = (natr50[i] > 0 and (natr10[i] / natr50[i]) <= 0.72) and \
                      (vol_sma50[i] > 0 and vol_sma10[i] <= (0.85 * vol_sma50[i]))
+            
+            wicks_ok = rolling_wick_count[i] >= 3.0
 
-            # B. Passive Lower Shadow Absorption
-            wicks_ok = rolling_wick_count[i] >= 3
-
-            # C. Relative Strength Divergence vs Nifty 50
             d_now = times[i]
             d_past = times[i - 20]
             rs_ok = True
@@ -212,33 +220,30 @@ def run_backtest():
                 idx_chg = (benchmark_map[d_now] - benchmark_map[d_past]) / benchmark_map[d_past]
                 rs_ok = stk_chg >= (idx_chg + 0.025)
 
-            # D. Range Tightness <= 12%
             prior_20_low = np.min(lows[i - 20 : i])
             prior_20_high = np.max(highs[i - 20 : i])
             tightness = ((prior_20_high - prior_20_low) / max(prior_20_low, 1e-4)) * 100.0
-            tight_ok = tightness <= 12.0
 
-            if vcp_ok and wicks_ok and rs_ok and tight_ok:
-                # Breakout Trigger: Price crosses prior 20D high with volume expansion
+            if vcp_ok and wicks_ok and rs_ok and (tightness <= 12.0):
+                # Breakout Trigger
                 if closes[i] > prior_20_high and closes[i - 1] <= prior_20_high:
                     if vol_sma20[i] > 0 and volumes[i] >= (1.40 * vol_sma20[i]):
                         entry_price = closes[i]
                         entry_date = times[i]
 
-                        # Swing low stop: lowest low of pre-break base (lookback 12 bars)
+                        # Swing low anchor (prior 12 bars)
                         recent_swing_low = float(np.min(lows[i - 12 : i]))
                         sl_price = round(recent_swing_low * 0.995, 2)
                         risk_pct = ((entry_price - sl_price) / entry_price) * 100.0
 
-                        # STRICT RISK FILTER: Avoid entry if SL > 10%
+                        # STRICT RISK FILTER: Skip if > 10%
                         if risk_pct > MAX_RISK_PCT or risk_pct <= 0:
                             continue
 
-                        # Forward 60-day performance tracking
+                        # 60-Day Forward Performance
                         fwd_end = min(N, i + 1 + MAX_HOLD_DAYS)
                         fwd_highs = highs[i + 1 : fwd_end]
                         fwd_lows = lows[i + 1 : fwd_end]
-                        fwd_closes = closes[i + 1 : fwd_end]
 
                         max_gain = 0.0
                         hit_15 = False
@@ -263,18 +268,17 @@ def run_backtest():
                             if max_gain >= 25.0: hit_25 = True
                             if max_gain >= 30.0: hit_30 = True
 
-                            # 50% Profit Booking & Move SL to Breakeven
+                            # 50% partial book at +15% & SL to BE
                             if max_gain >= 15.0 and not partial_booked:
                                 partial_booked = True
                                 active_sl = entry_price
 
-                            # Dynamic 15D Trailing Stop after +15%
+                            # Trailing stop on remainder
                             if partial_booked and d_idx >= 10:
-                                trail_15 = float(np.min(lows[i + 1 + d_idx - 10 : i + 1 + d_idx]))
-                                if trail_15 > active_sl:
-                                    active_sl = trail_15
+                                trail = float(np.min(lows[i + 1 + d_idx - 10 : i + 1 + d_idx]))
+                                if trail > active_sl:
+                                    active_sl = trail
 
-                            # Stop hit
                             if l_bar <= active_sl:
                                 stopped_out = True
                                 days_held = d_idx + 1
@@ -293,17 +297,16 @@ def run_backtest():
                             "Hit +25%": hit_25,
                             "Hit +30%+": hit_30,
                             "Stopped Out": stopped_out,
-                            "Partial Booked": partial_booked,
                             "Evaluated Days": days_held
                         })
                         cooldown_idx = i + max(10, days_held)
 
     df_res = pd.DataFrame(all_trades)
     total = len(df_res)
-    print(f"\n📊 Backtest Complete! Total Qualified Stealth Trades: {total}")
+    print(f"\n📊 Total Stealth Setups Found: {total}")
 
     if total == 0:
-        print("⚠️ No trades matched.")
+        print("⚠️ No trades found matching criteria.")
         return
 
     m15 = round((df_res["Hit +15%"].sum() / total) * 100, 2)
@@ -321,7 +324,7 @@ def run_backtest():
         "+20% Target Hit Rate": f"{m20}% ({df_res['Hit +20%'].sum()}/{total})",
         "+25% Target Hit Rate": f"{m25}% ({df_res['Hit +25%'].sum()}/{total})",
         "+30%+ Target Hit Rate": f"{m30}% ({df_res['Hit +30%+'].sum()}/{total})",
-        "Stop Out Rate (Initial or Trail)": f"{stop_rate}%",
+        "Stop Out Rate (Initial / Trail)": f"{stop_rate}%",
         "Average 60-Day Forward Expansion": f"+{avg_gain}%"
     }
 
@@ -333,12 +336,10 @@ def run_backtest():
     with open(OUTPUT_REPORT, "w") as fp:
         json.dump(report_payload, fp, indent=2)
 
-    print("\n" + "="*65)
-    print("🎯 PURE STEALTH ACCUMULATION BACKTEST RESULTS")
-    print("="*65)
+    print("="*60)
     for k, v in summary.items():
         print(f"{k:<35}: {v}")
-    print("="*65)
+    print("="*60)
     print(f"📁 Report saved to: {OUTPUT_REPORT}")
 
 if __name__ == "__main__":
