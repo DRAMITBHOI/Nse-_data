@@ -20,7 +20,10 @@ jobs:
           python-version: '3.10'
 
       - name: Install Dependencies
-        run: pip install pandas numpy
+        run: pip install pandas numpy requests
+
+      - name: Ensure Directory Exists
+        run: mkdir -p data
 
       - name: Execute Gap Margin Screener
         run: python scan_gap_margins.py
@@ -30,5 +33,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/gap_margin_candidates.json
-          git commit -m "Auto-update Gap Margin Candidates [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto-update F&O Gap Margin Candidates (>=2% gaps) [skip ci]" || echo "No changes to commit"
           git push
