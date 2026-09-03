@@ -1,6 +1,19 @@
 {
-  "Scan Timestamp": "2026-09-03 02:49:13 IST",
-  "Universe": "Official NSE F&O (178 available)",
-  "Total Candidates": 0,
-  "Candidates": []
+  "Scan Timestamp": "2026-09-03 02:59:12 IST",
+  "Universe": "Official NSE F&O (178 stocks scanned)",
+  "Total Candidates": 1,
+  "Candidates": [
+    {
+      "Symbol": "IDFCFIRSTB",
+      "Setup": "\ud83d\udfe2 Bullish Extension (Upper Margin Test)",
+      "LTP": 85.09,
+      "Target Margin": 84.7,
+      "Gap Upper": 84.7,
+      "Gap Lower": 81.09,
+      "Gap Size %": "+4.45%",
+      "Gap Created": "2026-07-27",
+      "Margin Distance %": "0.46%",
+      "Days Since Gap": 27
+    }
+  ]
 }
