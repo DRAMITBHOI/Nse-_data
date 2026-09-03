@@ -7,14 +7,15 @@ import pandas as pd
 
 DATA_DIR = "data"
 OUTPUT_REPORT = os.path.join(DATA_DIR, "obv_backtest_report.json")
-MAX_PE = 30.0
-MAX_RISK_PCT = 8.0          # Avoid trade if SL > 8%
+MAX_PE = 35.0
+MAX_RISK_PCT = 8.0          # Hard cap at 8% risk
 PARTIAL_TARGET_PCT = 15.0   # Book 50% at +15%
-MIN_AVG_VOLUME_9D = 100000
+MIN_AVG_VOLUME_9D = 50000
 MIN_PRICE_DROP_PCT = -7.5
 MIN_OBV_GAIN_PCT = 8.0
 MIN_LOOKBACK_BARS = 5
 MAX_LOOKBACK_BARS = 40
+BREAKOUT_WINDOW_BARS = 20   # Breakout must occur within 4 weeks (20 trading days) after Point B
 MAX_HOLD_DAYS = 90
 
 HEADERS = {
@@ -37,10 +38,10 @@ def get_nifty_750_universe():
         "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv"
     ]
     symbols = set()
-    for url in index_urls:
+    for url in urls:
         try:
             req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=12) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 df = pd.read_csv(io.StringIO(resp.read().decode("utf-8")))
                 df.columns = df.columns.str.strip()
                 if "Symbol" in df.columns:
@@ -56,7 +57,8 @@ def get_nifty_750_universe():
                 json.dump(sorted_universe, fp, indent=2)
         except Exception:
             pass
-    return set(sorted_universe)
+        return set(sorted_universe)
+    return set()
 
 def clean_data_fast(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -91,7 +93,6 @@ def clean_data_fast(raw_data):
 
     clean = [date_map[k] for k in sorted_dates]
 
-    # Deduplicate holiday candles
     deduped = []
     for r in clean:
         if deduped:
@@ -104,7 +105,6 @@ def clean_data_fast(raw_data):
                     deduped.pop()
         deduped.append(r)
 
-    # Corporate action split adjusters
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(deduped) - 1, 0, -1):
         prev_c = deduped[i - 1]["close"]
@@ -155,7 +155,7 @@ def fast_rolling_mean(arr, window):
     return res
 
 def run_backtest():
-    print("🚀 Running OBV Divergence Backtest with Swing High & OBV Cross Filter...")
+    print("🚀 Running OBV Divergence Backtest (Pattern 1 & Pattern 2)...")
     nifty_750_set = get_nifty_750_universe()
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
@@ -176,7 +176,7 @@ def run_backtest():
         ]
     ]
 
-    if nifty_750_set:
+    if nifty_750_set and len(nifty_750_set) > 100:
         stock_files = [f for f in stock_files if f.replace(".json", "").strip().upper() in nifty_750_set]
 
     print(f"📦 Evaluating across {len(stock_files)} stocks...")
@@ -187,8 +187,8 @@ def run_backtest():
 
     for f_name in stock_files:
         processed += 1
-        if processed % 200 == 0:
-            print(f"⏳ Processed {processed}/{len(stock_files)} stocks...")
+        if processed % 300 == 0:
+            print(f"⏳ Evaluated {processed}/{len(stock_files)} stocks...")
 
         sym = f_name.replace(".json", "").strip().upper()
         json_path = os.path.join(DATA_DIR, f_name)
@@ -221,7 +221,6 @@ def run_backtest():
         times = [r["time"] for r in clean]
         N = len(closes)
 
-        # 9-Day Average Traded Volume
         vol_sma9 = fast_rolling_mean(traded_vols, 9)
 
         # True Demat Delivery OBV
@@ -237,8 +236,6 @@ def run_backtest():
             obvs[idx] = cur_obv
 
         obv_sma20 = fast_rolling_mean(obvs, 20)
-
-        # Swing lows on OBV
         obv_lows = find_swing_lows_fast(obvs, 3, 3)
 
         cooldown_idx = 0
@@ -250,15 +247,18 @@ def run_backtest():
             if vol_sma9[i] < MIN_AVG_VOLUME_9D:
                 continue
 
-            # Check recent swing lows on OBV
-            valid_lows = [idx for idx in obv_lows if (i - idx) <= 45 and (i - idx) >= 2]
+            # Need valid OBV swing lows
+            valid_lows = [idx for idx in obv_lows if (i - idx) <= (MAX_LOOKBACK_BARS + BREAKOUT_WINDOW_BARS) and (i - idx) >= 2]
             if len(valid_lows) < 2:
                 continue
 
             found_setup = False
             for idx_b in reversed(valid_lows):
-                if (i - idx_b) > 15:
+                # Breakout must happen within 4 weeks (20 sessions) after Point B
+                bars_since_b = i - idx_b
+                if bars_since_b > BREAKOUT_WINDOW_BARS or bars_since_b < 1:
                     continue
+
                 for idx_a in reversed(valid_lows):
                     span = idx_b - idx_a
                     if MIN_LOOKBACK_BARS <= span <= MAX_LOOKBACK_BARS:
@@ -269,135 +269,157 @@ def run_backtest():
                         o_gain = ((obvs[idx_b] - obvs[idx_a]) / abs(obvs[idx_a])) * 100.0
 
                         if p_drop <= MIN_PRICE_DROP_PCT and o_gain >= MIN_OBV_GAIN_PCT:
-                            # Major Swing High of the divergence base
-                            base_high_idx = idx_a + int(np.argmax(highs[idx_a : idx_b + 1]))
-                            swing_high_price = highs[base_high_idx]
-                            swing_high_obv = obvs[base_high_idx]
+                            target_swing_high = None
+                            target_swing_obv = None
+                            sl_price = None
+                            pattern_name = ""
 
-                            # Base Swing Low for SL
-                            base_low = float(np.min(lows[idx_a : idx_b + 1]))
-                            sl_price = round(base_low * 0.995, 2)
+                            # -----------------------------------------------------------------
+                            # CANDIDATE 1: Pattern ① (Breakout of Major Swing High between A & B)
+                            # -----------------------------------------------------------------
+                            mid_high_idx = idx_a + int(np.argmax(highs[idx_a : idx_b + 1]))
+                            sh1_price = highs[mid_high_idx]
+                            sh1_obv = obvs[mid_high_idx]
 
-                            # Trigger Condition: Close crosses swing high AND OBV > OBV at swing high
-                            if (closes[i] > swing_high_price and closes[i - 1] <= swing_high_price) and (obvs[i] > swing_high_obv):
-                                entry_price = closes[i]
-                                entry_date = times[i]
-                                risk_pct = round(((entry_price - sl_price) / entry_price) * 100.0, 2)
+                            if (closes[i] > sh1_price and closes[i - 1] <= sh1_price) and (obvs[i] > sh1_obv):
+                                target_swing_high = sh1_price
+                                target_swing_obv = sh1_obv
+                                # Stop loss is the immediate swing low prior to breakout (Point B)
+                                sl_price = round(lows[idx_b] * 0.995, 2)
+                                pattern_name = "Pattern 1 (Base Breakout)"
 
-                                # STRICT RISK FILTER: Avoid entry if SL > 8%
-                                if risk_pct > MAX_RISK_PCT or risk_pct <= 0:
-                                    continue
+                            # -----------------------------------------------------------------
+                            # CANDIDATE 2: Pattern ② (Breakout of Right-Side Swing High after Point B)
+                            # -----------------------------------------------------------------
+                            elif bars_since_b >= 4:
+                                # Look for a swing high formed after Point B
+                                post_b_high_idx = idx_b + int(np.argmax(highs[idx_b : i]))
+                                sh2_price = highs[post_b_high_idx]
+                                sh2_obv = obvs[post_b_high_idx]
 
-                                # Forward simulation
-                                fwd_end = min(N, i + 1 + MAX_HOLD_DAYS)
-                                fwd_highs = highs[i + 1 : fwd_end]
-                                fwd_lows = lows[i + 1 : fwd_end]
-                                fwd_closes = closes[i + 1 : fwd_end]
-                                fwd_obvs = obvs[i + 1 : fwd_end]
-                                fwd_obv_sma = obv_sma20[i + 1 : fwd_end]
+                                if post_b_high_idx > idx_b and (closes[i] > sh2_price and closes[i - 1] <= sh2_price) and (obvs[i] > sh2_obv):
+                                    # SL is the immediate swing low formed between the right-side high and entry
+                                    recent_pullback_low = float(np.min(lows[post_b_high_idx : i]))
+                                    target_swing_high = sh2_price
+                                    target_swing_obv = sh2_obv
+                                    sl_price = round(recent_pullback_low * 0.995, 2)
+                                    pattern_name = "Pattern 2 (Right-Side Pivot Breakout)"
 
-                                if len(fwd_highs) < 2:
-                                    continue
+                            if not target_swing_high or not sl_price:
+                                continue
 
-                                # -------------------------------------------------------------
-                                # SIMULATION 1: Exit by Breakdown Below Previous Swing Low
-                                # -------------------------------------------------------------
-                                max_run_1 = 0.0
-                                active_sl_1 = sl_price
-                                booked_15_1 = False
-                                exit_p_1 = fwd_closes[-1]
-                                days_1 = len(fwd_highs)
+                            entry_price = closes[i]
+                            entry_date = times[i]
+                            risk_pct = round(((entry_price - sl_price) / entry_price) * 100.0, 2)
 
-                                for d_idx in range(len(fwd_highs)):
-                                    h_bar = fwd_highs[d_idx]
-                                    l_bar = fwd_lows[d_idx]
-                                    gain = ((h_bar - entry_price) / entry_price) * 100.0
-                                    if gain > max_run_1:
-                                        max_run_1 = gain
+                            # STRICT RISK FILTER: Must be <= 8%
+                            if risk_pct > MAX_RISK_PCT or risk_pct <= 0:
+                                continue
 
-                                    # 50% Profit Booked at +15% & Move SL to Breakeven
-                                    if max_run_1 >= PARTIAL_TARGET_PCT and not booked_15_1:
-                                        booked_15_1 = True
-                                        active_sl_1 = entry_price
+                            # Forward simulation
+                            fwd_end = min(N, i + 1 + MAX_HOLD_DAYS)
+                            fwd_highs = highs[i + 1 : fwd_end]
+                            fwd_lows = lows[i + 1 : fwd_end]
+                            fwd_closes = closes[i + 1 : fwd_end]
+                            fwd_obvs = obvs[i + 1 : fwd_end]
+                            fwd_obv_sma = obv_sma20[i + 1 : fwd_end]
 
-                                    # Trail below rolling swing lows (recent 10-day low)
-                                    if booked_15_1 and d_idx >= 10:
-                                        trail_low = float(np.min(lows[i + 1 + d_idx - 10 : i + 1 + d_idx]))
-                                        if trail_low > active_sl_1:
-                                            active_sl_1 = trail_low
+                            if len(fwd_highs) < 2:
+                                continue
 
-                                    if l_bar <= active_sl_1:
-                                        exit_p_1 = min(fwd_closes[d_idx], active_sl_1)
-                                        days_1 = d_idx + 1
-                                        break
+                            # Mode 1: Swing Low Trailing SL
+                            max_run_1 = 0.0
+                            active_sl_1 = sl_price
+                            booked_15_1 = False
+                            exit_p_1 = fwd_closes[-1]
+                            days_1 = len(fwd_highs)
 
-                                raw_ret_1 = ((exit_p_1 - entry_price) / entry_price) * 100.0
-                                ret_1 = round((PARTIAL_TARGET_PCT * 0.50) + (raw_ret_1 * 0.50), 2) if booked_15_1 else round(raw_ret_1, 2)
+                            for d_idx in range(len(fwd_highs)):
+                                h_bar = fwd_highs[d_idx]
+                                l_bar = fwd_lows[d_idx]
+                                gain = ((h_bar - entry_price) / entry_price) * 100.0
+                                if gain > max_run_1:
+                                    max_run_1 = gain
 
-                                trades_swing_mode.append({
-                                    "Symbol": sym,
-                                    "Entry Date": entry_date,
-                                    "Entry Price": entry_price,
-                                    "Exit Price": round(exit_p_1, 2),
-                                    "Risk %": risk_pct,
-                                    "Return %": ret_1,
-                                    "Max Run %": round(max_run_1, 2),
-                                    "Rally 20%": bool(max_run_1 >= 20.0),
-                                    "Days Held": days_1,
-                                    "Is Win": bool(ret_1 > 0)
-                                })
+                                if max_run_1 >= PARTIAL_TARGET_PCT and not booked_15_1:
+                                    booked_15_1 = True
+                                    active_sl_1 = entry_price
 
-                                # -------------------------------------------------------------
-                                # SIMULATION 2: Exit by OBV Breakdown Criteria
-                                # -------------------------------------------------------------
-                                max_run_2 = 0.0
-                                active_sl_2 = sl_price
-                                booked_15_2 = False
-                                exit_p_2 = fwd_closes[-1]
-                                days_2 = len(fwd_highs)
+                                if booked_15_1 and d_idx >= 10:
+                                    trail_low = float(np.min(lows[i + 1 + d_idx - 10 : i + 1 + d_idx]))
+                                    if trail_low > active_sl_1:
+                                        active_sl_1 = trail_low
 
-                                for d_idx in range(len(fwd_highs)):
-                                    h_bar = fwd_highs[d_idx]
-                                    l_bar = fwd_lows[d_idx]
-                                    gain = ((h_bar - entry_price) / entry_price) * 100.0
-                                    if gain > max_run_2:
-                                        max_run_2 = gain
+                                if l_bar <= active_sl_1:
+                                    exit_p_1 = min(fwd_closes[d_idx], active_sl_1)
+                                    days_1 = d_idx + 1
+                                    break
 
-                                    if max_run_2 >= PARTIAL_TARGET_PCT and not booked_15_2:
-                                        booked_15_2 = True
-                                        active_sl_2 = entry_price
+                            raw_ret_1 = ((exit_p_1 - entry_price) / entry_price) * 100.0
+                            ret_1 = round((PARTIAL_TARGET_PCT * 0.50) + (raw_ret_1 * 0.50), 2) if booked_15_1 else round(raw_ret_1, 2)
 
-                                    # Catastrophic Stop Protection
-                                    if l_bar <= active_sl_2:
-                                        exit_p_2 = min(fwd_closes[d_idx], active_sl_2)
-                                        days_2 = d_idx + 1
-                                        break
+                            trades_swing_mode.append({
+                                "Symbol": sym,
+                                "Pattern": pattern_name,
+                                "Entry Date": entry_date,
+                                "Entry Price": entry_price,
+                                "Exit Price": round(exit_p_1, 2),
+                                "Risk %": risk_pct,
+                                "Return %": ret_1,
+                                "Max Run %": round(max_run_1, 2),
+                                "Rally 20%": bool(max_run_1 >= 20.0),
+                                "Days Held": days_1,
+                                "Is Win": bool(ret_1 > 0)
+                            })
 
-                                    # OBV Breakdown: OBV drops below 20-day OBV SMA or rolls over sharply
-                                    if d_idx >= 5 and fwd_obvs[d_idx] < fwd_obv_sma[d_idx]:
-                                        exit_p_2 = fwd_closes[d_idx]
-                                        days_2 = d_idx + 1
-                                        break
+                            # Mode 2: OBV Breakdown Exit
+                            max_run_2 = 0.0
+                            active_sl_2 = sl_price
+                            booked_15_2 = False
+                            exit_p_2 = fwd_closes[-1]
+                            days_2 = len(fwd_highs)
 
-                                raw_ret_2 = ((exit_p_2 - entry_price) / entry_price) * 100.0
-                                ret_2 = round((PARTIAL_TARGET_PCT * 0.50) + (raw_ret_2 * 0.50), 2) if booked_15_2 else round(raw_ret_2, 2)
+                            for d_idx in range(len(fwd_highs)):
+                                h_bar = fwd_highs[d_idx]
+                                l_bar = fwd_lows[d_idx]
+                                gain = ((h_bar - entry_price) / entry_price) * 100.0
+                                if gain > max_run_2:
+                                    max_run_2 = gain
 
-                                trades_obv_mode.append({
-                                    "Symbol": sym,
-                                    "Entry Date": entry_date,
-                                    "Entry Price": entry_price,
-                                    "Exit Price": round(exit_p_2, 2),
-                                    "Risk %": risk_pct,
-                                    "Return %": ret_2,
-                                    "Max Run %": round(max_run_2, 2),
-                                    "Rally 20%": bool(max_run_2 >= 20.0),
-                                    "Days Held": days_2,
-                                    "Is Win": bool(ret_2 > 0)
-                                })
+                                if max_run_2 >= PARTIAL_TARGET_PCT and not booked_15_2:
+                                    booked_15_2 = True
+                                    active_sl_2 = entry_price
 
-                                cooldown_idx = i + max(days_1, 10)
-                                found_setup = True
-                                break
+                                if l_bar <= active_sl_2:
+                                    exit_p_2 = min(fwd_closes[d_idx], active_sl_2)
+                                    days_2 = d_idx + 1
+                                    break
+
+                                if d_idx >= 5 and fwd_obvs[d_idx] < fwd_obv_sma[d_idx]:
+                                    exit_p_2 = fwd_closes[d_idx]
+                                    days_2 = d_idx + 1
+                                    break
+
+                            raw_ret_2 = ((exit_p_2 - entry_price) / entry_price) * 100.0
+                            ret_2 = round((PARTIAL_TARGET_PCT * 0.50) + (raw_ret_2 * 0.50), 2) if booked_15_2 else round(raw_ret_2, 2)
+
+                            trades_obv_mode.append({
+                                "Symbol": sym,
+                                "Pattern": pattern_name,
+                                "Entry Date": entry_date,
+                                "Entry Price": entry_price,
+                                "Exit Price": round(exit_p_2, 2),
+                                "Risk %": risk_pct,
+                                "Return %": ret_2,
+                                "Max Run %": round(max_run_2, 2),
+                                "Rally 20%": bool(max_run_2 >= 20.0),
+                                "Days Held": days_2,
+                                "Is Win": bool(ret_2 > 0)
+                            })
+
+                            cooldown_idx = i + max(days_1, 10)
+                            found_setup = True
+                            break
                     if found_setup:
                         break
 
@@ -430,10 +452,10 @@ def run_backtest():
     stats_obv = calc_stats(trades_obv_mode)
 
     print("\n" + "="*70)
-    print("🎯 EXIT COMPARISON RESULTS (OBV Divergence + Swing High Breakout)")
+    print("🎯 RESULTS (OBV Divergence Pattern 1 & 2)")
     print("="*70)
-    print(f"Mode 1 (Swing Low Trailing SL) : Win Rate {stats_swing['Win Rate %']} | Return {stats_swing['Avg Return %']} | PF {stats_swing['Profit Factor']}")
-    print(f"Mode 2 (OBV Breakdown Exit)    : Win Rate {stats_obv['Win Rate %']} | Return {stats_obv['Avg Return %']} | PF {stats_obv['Profit Factor']}")
+    print(f"Mode 1 (Swing Low Trailing SL) : {stats_swing['Trades']} Trades | Win Rate {stats_swing['Win Rate %']} | Return {stats_swing['Avg Return %']} | PF {stats_swing['Profit Factor']}")
+    print(f"Mode 2 (OBV Breakdown Exit)    : {stats_obv['Trades']} Trades | Win Rate {stats_obv['Win Rate %']} | Return {stats_obv['Avg Return %']} | PF {stats_obv['Profit Factor']}")
     print("="*70)
 
     payload = {
