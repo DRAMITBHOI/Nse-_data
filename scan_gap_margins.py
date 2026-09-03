@@ -1,20 +1,42 @@
 import os
-import io
 import json
 import time
-import urllib.request
-import pandas as pd
 
 DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "gap_margin_candidates.json")
-FNO_STORE = os.path.join(DATA_DIR, "fno_history.json")
 
-MIN_GAP_PCT = 2.0        # Updated threshold: >= 2.0% gap
-MARGIN_PROXIMITY = 1.0   # Current price within <= 1.0% of gap boundary
-LOOKBACK_DAYS = 20       # Active gap lookback window
+MIN_GAP_PCT = 2.0        # Gap size >= 2.0%
+MARGIN_PROXIMITY = 2.0   # Current price within <= 2.0% of the active margin
+LOOKBACK_DAYS = 25       # Lookback window for active unfilled gaps
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+# OFFICIAL NSE F&O UNDERLYING STOCK UNIVERSE
+ACTIVE_FNO_SYMBOLS = {
+    "AARTIIND", "ABB", "ABBOTINDIA", "ABCAPITAL", "ABFRL", "ACC", "ADANIENT",
+    "ADANIPORTS", "ALKEM", "AMBUJACEM", "APOLLOHOSP", "APOLLOTYRE", "ASHOKLEY",
+    "ASIANPAINT", "ASTRAL", "ATUL", "AUBANK", "AUROPHARMA", "AXISBANK", "BAJAJ-AUTO",
+    "BAJAJFINSV", "BAJFINANCE", "BALKRISIND", "BALRAMCHIN", "BANDHANBNK", "BANKBARODA",
+    "BATAINDIA", "BEL", "BERGEPAINT", "BHARATFORG", "BHARTIARTL", "BHEL", "BIOCON",
+    "BOSCHLTD", "BPCL", "BRITANNIA", "BSOFT", "CANBK", "CANFINHOME", "CHAMBLFERT",
+    "CHOLAFIN", "CIPLA", "COALINDIA", "COFORGE", "COLPAL", "CONCOR", "COROMANDEL",
+    "CROMPTON", "CUB", "CUMMINSIND", "DABUR", "DALBHARAT", "DEEPAKNTR", "DIVISLAB",
+    "DIXON", "DLF", "DRREDDY", "EICHERMOT", "ESCORTS", "EXIDEIND", "FEDERALBNK",
+    "GAIL", "GLENMARK", "GMRINFRA", "GNFC", "GODREJCP", "GODREJPROP", "GRANULES",
+    "GRASIM", "GUJGASLTD", "HAL", "HAVELLS", "HCLTECH", "HDFCAMC", "HDFCBANK",
+    "HDFCLIFE", "HEROMOTOCO", "HINDALCO", "HINDCOPPER", "HINDPETRO", "HINDUNILVR",
+    "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDEA", "IDFCFIRSTB", "IEX", "IGL",
+    "INDHOTEL", "INDIACEM", "INDIAMART", "INDIGO", "INDUSINDBK", "INDUSTOWER",
+    "INFY", "IOC", "IPCALAB", "IRCTC", "ITC", "JINDALSTEL", "JKCEMENT", "JSWSTEEL",
+    "JUBLFOOD", "KOTAKBANK", "LALPATHLAB", "LAURUSLABS", "LICHSGFIN", "LT", "LTIM",
+    "LTTS", "LUPIN", "M&M", "M&MFIN", "MANAPPURAM", "MARICO", "MARUTI", "MCX",
+    "METROPOLIS", "MFSL", "MGL", "MOTHERSON", "MPHASIS", "MRF", "MUTHOOTFIN",
+    "NATIONALUM", "NAUKRI", "NAVINFLUOR", "NESTLEIND", "NMDC", "NTPC", "OBEROIRLTY",
+    "OFSS", "ONGC", "PAGEIND", "PEL", "PERSISTENT", "PETRONET", "PFC", "PIDILITIND",
+    "PIIND", "PNB", "POLYCAB", "PVRINOX", "RAMCOCEM", "RBLBANK", "RECLTD", "RELIANCE",
+    "SAIL", "SBICARD", "SBILIFE", "SBIN", "SHREECEM", "SHRIRAMFIN", "SIEMENS",
+    "SRF", "SUNPHARMA", "SUNTV", "SYNGENE", "TATACHEM", "TATACOMM", "TATACONSUM",
+    "TATAMOTORS", "TATAPOWER", "TATASTEEL", "TCS", "TECHM", "TITAN", "TORNTPHARM",
+    "TORNTPOWER", "TRENT", "TVSMOTOR", "UBL", "ULTRACEMCO", "UPL", "VEDL", "VOLTAS",
+    "WIPRO", "ZYDUSLIFE"
 }
 
 def clean_data_fast(raw_data):
@@ -50,69 +72,19 @@ def clean_data_fast(raw_data):
         return []
     return [date_map[k] for k in sorted_dates]
 
-def load_fno_symbols():
-    """Load active F&O constituent symbols from local store or official NSE feed."""
-    # 1. From local fno_history.json
-    if os.path.exists(FNO_STORE):
-        try:
-            with open(FNO_STORE, "r") as fp:
-                fno_data = json.load(fp)
-                if fno_data:
-                    latest_day = sorted(fno_data.keys())[-1]
-                    syms = set(fno_data[latest_day].keys())
-                    if len(syms) >= 50:
-                        return syms
-        except Exception:
-            pass
-
-    # 2. Direct fallback to official NSE F&O list
-    try:
-        url = "https://archives.nseindia.com/content/fo/fo_mktlots.csv"
-        req = urllib.request.Request(url, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            df = pd.read_csv(io.StringIO(resp.read().decode("utf-8")))
-            df.columns = df.columns.str.strip().str.upper()
-            if "SYMBOL" in df.columns:
-                clean_syms = set(df["SYMBOL"].dropna().astype(str).str.strip().str.upper())
-                clean_syms.discard("NIFTY")
-                clean_syms.discard("BANKNIFTY")
-                clean_syms.discard("FINNIFTY")
-                clean_syms.discard("MIDCPNIFTY")
-                if clean_syms:
-                    return clean_syms
-    except Exception:
-        pass
-
-    return set()
-
 def scan_gap_stocks():
-    print("🚀 Scanning F&O Universe for Gap Margin Retests (≥ 2.0% Gaps)...")
+    print(f"🚀 Scanning {len(ACTIVE_FNO_SYMBOLS)} F&O stocks for >= 2% Gaps within 2% margin proximity...")
     
-    fno_symbols = load_fno_symbols()
-    if fno_symbols:
-        print(f"🎯 Target Universe Locked: {len(fno_symbols)} active F&O securities.")
-    else:
-        print("ℹ️ Scanning full available universe in data directory.")
-
-    stock_files = [
-        f for f in os.listdir(DATA_DIR)
-        if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", "nifty750.json",
-            "NIFTY50.json", "NIFTY.json", "fno_history.json",
-            "gap_margin_candidates.json", "integrated_institutional_report.json"
-        ]
-    ]
-
     candidates = []
+    scanned_count = 0
 
-    for f_name in stock_files:
-        sym = f_name.replace(".json", "").strip().upper()
-        
-        # Enforce strict F&O universe inclusion if active list exists
-        if fno_symbols and sym not in fno_symbols:
+    for sym in sorted(ACTIVE_FNO_SYMBOLS):
+        f_name = f"{sym}.json"
+        json_path = os.path.join(DATA_DIR, f_name)
+        if not os.path.exists(json_path):
             continue
 
-        json_path = os.path.join(DATA_DIR, f_name)
+        scanned_count += 1
         try:
             with open(json_path, "r") as fp:
                 raw = json.load(fp)
@@ -130,13 +102,13 @@ def scan_gap_stocks():
         N = len(closes)
         curr_price = closes[-1]
 
-        # Scan for bullish gaps created within the last LOOKBACK_DAYS
+        # Scan for gaps in the recent LOOKBACK_DAYS
         start_idx = max(1, N - LOOKBACK_DAYS)
         for i in range(start_idx, N):
             prior_high = highs[i - 1]
             gap_day_low = lows[i]
 
-            # Bullish Gap: gap_day_low > prior_high
+            # 1. Bullish Void: Day's low > Prior day's high
             if gap_day_low > prior_high:
                 gap_size_pct = round(((gap_day_low - prior_high) / prior_high) * 100.0, 2)
                 
@@ -145,56 +117,64 @@ def scan_gap_stocks():
                     gap_lower = prior_high
                     gap_date = times[i]
 
-                    # Filter out gaps that collapsed decisively beneath the lower boundary
+                    # Filter out gaps that collapsed below lower boundary by > 1.5%
                     if i < N - 1:
                         post_min_low = min(lows[i + 1 :])
                         if post_min_low < (gap_lower * 0.985):
                             continue
 
-                    # Proximity measurements
+                    # Evaluate post-gap move: Did price trend higher (bullish) or retrace down (bearish)?
+                    post_high = max(highs[i:])
                     dist_to_upper_pct = round(abs(curr_price - gap_upper) / gap_upper * 100.0, 2)
                     dist_to_lower_pct = round(abs(curr_price - gap_lower) / gap_lower * 100.0, 2)
 
-                    action_zone = None
-                    proximity_val = None
-
-                    # 1. Upper Gap Margin (Top of Gap / Support Bounce Zone)
-                    if dist_to_upper_pct <= MARGIN_PROXIMITY:
-                        action_zone = "🟢 Upper Margin (Bounce Retest)"
-                        proximity_val = dist_to_upper_pct
-
-                    # 2. Lower Gap Margin (Bottom of Gap / Base Defense Zone)
-                    elif dist_to_lower_pct <= MARGIN_PROXIMITY:
-                        action_zone = "🟡 Lower Margin (Fill Base Defense)"
-                        proximity_val = dist_to_lower_pct
-
-                    if action_zone:
+                    # Condition A: Bullish Move after gap -> test re-entry near UPPER margin (<= 2%)
+                    if curr_price >= gap_upper and dist_to_upper_pct <= MARGIN_PROXIMITY:
                         candidates.append({
                             "Symbol": sym,
-                            "Setup": action_zone,
+                            "Setup": "🟢 Bullish Extension (Upper Margin Test)",
                             "LTP": round(curr_price, 2),
+                            "Target Margin": round(gap_upper, 2),
                             "Gap Upper": round(gap_upper, 2),
                             "Gap Lower": round(gap_lower, 2),
                             "Gap Size %": f"+{gap_size_pct}%",
                             "Gap Created": gap_date,
-                            "Margin Distance %": f"{proximity_val}%",
+                            "Margin Distance %": f"{dist_to_upper_pct}%",
                             "Days Since Gap": N - 1 - i
                         })
                         break
 
-    # Sort by nearest proximity to the margin
+                    # Condition B: Bearish Retrace after gap -> test re-entry near LOWER margin (<= 2%)
+                    elif curr_price < gap_upper and curr_price >= (gap_lower * 0.98) and dist_to_lower_pct <= MARGIN_PROXIMITY:
+                        candidates.append({
+                            "Symbol": sym,
+                            "Setup": "🟡 Bearish Retrace (Lower Margin Defense)",
+                            "LTP": round(curr_price, 2),
+                            "Target Margin": round(gap_lower, 2),
+                            "Gap Upper": round(gap_upper, 2),
+                            "Gap Lower": round(gap_lower, 2),
+                            "Gap Size %": f"+{gap_size_pct}%",
+                            "Gap Created": gap_date,
+                            "Margin Distance %": f"{dist_to_lower_pct}%",
+                            "Days Since Gap": N - 1 - i
+                        })
+                        break
+
+    # Sort closest to the margin first
     candidates.sort(key=lambda x: float(x["Margin Distance %"].replace("%", "")))
 
     payload = {
         "Scan Timestamp": time.strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Universe": f"Official NSE F&O ({scanned_count} available)",
         "Total Candidates": len(candidates),
         "Candidates": candidates
     }
 
+    os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT_FILE, "w") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"🎯 Complete: Found {len(candidates)} F&O setups near ≥2.0% gap margins. Saved to {OUTPUT_FILE}.")
+    print(f"🎯 Done: Found {len(candidates)} F&O setups. Saved to {OUTPUT_FILE}.")
 
 if __name__ == "__main__":
     scan_gap_stocks()
