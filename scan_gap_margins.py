@@ -5,9 +5,9 @@ import time
 DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "gap_margin_candidates.json")
 
-MIN_GAP_PCT = 2.0        # Gap size >= 2.0%
-MARGIN_PROXIMITY = 2.0   # Current price within <= 2.0% of the active margin
-LOOKBACK_DAYS = 25       # Lookback window for active unfilled gaps
+MIN_GAP_PCT = 2.0        # Gap magnitude >= 2.0%
+MARGIN_PROXIMITY = 4.0   # Current price within <= 4.0% of the active margin
+LOOKBACK_DAYS = 30       # Active gap lookback window
 
 # OFFICIAL NSE F&O UNDERLYING STOCK UNIVERSE
 ACTIVE_FNO_SYMBOLS = {
@@ -73,7 +73,7 @@ def clean_data_fast(raw_data):
     return [date_map[k] for k in sorted_dates]
 
 def scan_gap_stocks():
-    print(f"🚀 Scanning {len(ACTIVE_FNO_SYMBOLS)} F&O stocks for >= 2% Gaps within 2% margin proximity...")
+    print(f"🚀 Scanning {len(ACTIVE_FNO_SYMBOLS)} F&O stocks for >= 2% Gaps within 4% margin proximity...")
     
     candidates = []
     scanned_count = 0
@@ -117,18 +117,16 @@ def scan_gap_stocks():
                     gap_lower = prior_high
                     gap_date = times[i]
 
-                    # Filter out gaps that collapsed below lower boundary by > 1.5%
+                    # Filter out gaps that collapsed below lower boundary by > 2.0%
                     if i < N - 1:
                         post_min_low = min(lows[i + 1 :])
-                        if post_min_low < (gap_lower * 0.985):
+                        if post_min_low < (gap_lower * 0.980):
                             continue
 
-                    # Evaluate post-gap move: Did price trend higher (bullish) or retrace down (bearish)?
-                    post_high = max(highs[i:])
                     dist_to_upper_pct = round(abs(curr_price - gap_upper) / gap_upper * 100.0, 2)
                     dist_to_lower_pct = round(abs(curr_price - gap_lower) / gap_lower * 100.0, 2)
 
-                    # Condition A: Bullish Move after gap -> test re-entry near UPPER margin (<= 2%)
+                    # Condition A: Bullish Move after gap -> test re-entry near UPPER margin (<= 4%)
                     if curr_price >= gap_upper and dist_to_upper_pct <= MARGIN_PROXIMITY:
                         candidates.append({
                             "Symbol": sym,
@@ -144,8 +142,8 @@ def scan_gap_stocks():
                         })
                         break
 
-                    # Condition B: Bearish Retrace after gap -> test re-entry near LOWER margin (<= 2%)
-                    elif curr_price < gap_upper and curr_price >= (gap_lower * 0.98) and dist_to_lower_pct <= MARGIN_PROXIMITY:
+                    # Condition B: Bearish Retrace after gap -> test re-entry near LOWER margin (<= 4%)
+                    elif curr_price < gap_upper and curr_price >= (gap_lower * 0.96) and dist_to_lower_pct <= MARGIN_PROXIMITY:
                         candidates.append({
                             "Symbol": sym,
                             "Setup": "🟡 Bearish Retrace (Lower Margin Defense)",
@@ -165,7 +163,7 @@ def scan_gap_stocks():
 
     payload = {
         "Scan Timestamp": time.strftime("%Y-%m-%d %H:%M:%S IST"),
-        "Universe": f"Official NSE F&O ({scanned_count} available)",
+        "Universe": f"Official NSE F&O ({scanned_count} stocks scanned)",
         "Total Candidates": len(candidates),
         "Candidates": candidates
     }
@@ -174,7 +172,7 @@ def scan_gap_stocks():
     with open(OUTPUT_FILE, "w") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"🎯 Done: Found {len(candidates)} F&O setups. Saved to {OUTPUT_FILE}.")
+    print(f"🎯 Complete: Found {len(candidates)} F&O setups near gap margins. Saved to {OUTPUT_FILE}.")
 
 if __name__ == "__main__":
     scan_gap_stocks()
