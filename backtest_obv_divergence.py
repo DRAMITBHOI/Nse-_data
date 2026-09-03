@@ -8,15 +8,15 @@ import pandas as pd
 DATA_DIR = "data"
 OUTPUT_REPORT = os.path.join(DATA_DIR, "obv_backtest_report.json")
 MAX_PE = 35.0
-MAX_RISK_PCT = 8.0          # Stop loss <= 8%
+MAX_RISK_PCT = 8.0          # Stop loss strictly <= 8%
 PARTIAL_TARGET_PCT = 15.0   # Book 50% at +15%
-BREAKEVEN_TRIGGER_PCT = 9.0 # Move SL to Breakeven once gain reaches +9%
+BREAKEVEN_TRIGGER_PCT = 9.0 # Move SL to Cost once gain touches +9%
 MIN_AVG_VOLUME_9D = 50000
 MIN_PRICE_DROP_PCT = -7.5
 MIN_OBV_GAIN_PCT = 8.0
 MIN_LOOKBACK_BARS = 5
 MAX_LOOKBACK_BARS = 40
-BREAKOUT_WINDOW_BARS = 30   # Expanded to 6 weeks (30 trading days) after Point B
+BREAKOUT_WINDOW_BARS = 30   # 6 weeks (30 sessions) after Point B
 MAX_HOLD_DAYS = 90
 
 HEADERS = {
@@ -156,7 +156,7 @@ def fast_rolling_mean(arr, window):
     return res
 
 def run_backtest():
-    print("🚀 Running Enhanced OBV Divergence Backtest Engine (6-Week Breakout Window)...")
+    print("🚀 Running Upgraded OBV Strategy Backtest (50 SMA + Delivery Confirmation)...")
     nifty_750_set = get_nifty_750_universe()
 
     fund_path = os.path.join(DATA_DIR, "fundamentals.json")
@@ -222,8 +222,10 @@ def run_backtest():
         times = [r["time"] for r in clean]
         N = len(closes)
 
+        # Indicator Calculations
         vol_sma9 = fast_rolling_mean(traded_vols, 9)
-        vol_sma20 = fast_rolling_mean(traded_vols, 20)
+        deliv_sma20 = fast_rolling_mean(deliv_vols, 20)
+        sma_50 = fast_rolling_mean(closes, 50)
 
         # True Demat Delivery OBV
         obvs = np.zeros(N, dtype=float)
@@ -242,14 +244,17 @@ def run_backtest():
 
         cooldown_idx = 0
 
-        for i in range(45, N - 1):
+        for i in range(50, N - 1):
             if i < cooldown_idx:
+                continue
+
+            # 1. Broad Trend Filter: Price must trade above 50 SMA
+            if closes[i] < sma_50[i]:
                 continue
 
             if vol_sma9[i] < MIN_AVG_VOLUME_9D:
                 continue
 
-            # Need valid OBV swing lows
             valid_lows = [idx for idx in obv_lows if (i - idx) <= (MAX_LOOKBACK_BARS + BREAKOUT_WINDOW_BARS) and (i - idx) >= 2]
             if len(valid_lows) < 2:
                 continue
@@ -257,8 +262,12 @@ def run_backtest():
             found_setup = False
             for idx_b in reversed(valid_lows):
                 bars_since_b = i - idx_b
-                # Up to 6 weeks (30 sessions) after Point B
                 if bars_since_b > BREAKOUT_WINDOW_BARS or bars_since_b < 1:
+                    continue
+
+                # 2. Base Quality Filter: Reject divergence happening at fresh 52-week lows
+                low_200 = np.min(lows[max(0, idx_b - 150) : idx_b + 1])
+                if lows[idx_b] <= (low_200 * 1.01):
                     continue
 
                 for idx_a in reversed(valid_lows):
@@ -276,7 +285,7 @@ def run_backtest():
                             sl_price = None
                             pattern_name = ""
 
-                            # Check Pattern 1: Breakout above intermediate peak between A & B
+                            # Pattern 1: Breakout above intermediate peak between A & B
                             mid_high_idx = idx_a + int(np.argmax(highs[idx_a : idx_b + 1]))
                             sh1_price = highs[mid_high_idx]
                             sh1_obv = obvs[mid_high_idx]
@@ -287,7 +296,7 @@ def run_backtest():
                                 sl_price = round(lows[idx_b] * 0.995, 2)
                                 pattern_name = "Pattern 1 (Base Breakout)"
 
-                            # Check Pattern 2: Right-Side Pivot Breakout after Point B
+                            # Pattern 2: Right-Side Pivot Breakout after Point B
                             elif bars_since_b >= 4:
                                 post_b_high_idx = idx_b + int(np.argmax(highs[idx_b : i]))
                                 sh2_price = highs[post_b_high_idx]
@@ -303,8 +312,8 @@ def run_backtest():
                             if not target_swing_high or not sl_price:
                                 continue
 
-                            # Institutional Volume Expansion Qualifier on Breakout Day
-                            if traded_vols[i] < (1.2 * vol_sma20[i]):
+                            # 3. Institutional Delivery Expansion Gate on Breakout Day
+                            if deliv_vols[i] < (1.25 * deliv_sma20[i]):
                                 continue
 
                             entry_price = closes[i]
@@ -342,7 +351,7 @@ def run_backtest():
                                 if gain > max_run_1:
                                     max_run_1 = gain
 
-                                # Move SL to Breakeven once gain reaches +9%
+                                # Shift SL to Breakeven at +9%
                                 if max_run_1 >= BREAKEVEN_TRIGGER_PCT and active_sl_1 < entry_price:
                                     active_sl_1 = entry_price
 
@@ -394,7 +403,6 @@ def run_backtest():
                                 if gain > max_run_2:
                                     max_run_2 = gain
 
-                                # Move SL to Breakeven once gain reaches +9%
                                 if max_run_2 >= BREAKEVEN_TRIGGER_PCT and active_sl_2 < entry_price:
                                     active_sl_2 = entry_price
 
@@ -402,7 +410,6 @@ def run_backtest():
                                     booked_15_2 = True
                                     active_sl_2 = entry_price
 
-                                # Structural Stop
                                 if l_bar <= active_sl_2:
                                     exit_p_2 = min(fwd_closes[d_idx], active_sl_2)
                                     days_2 = d_idx + 1
@@ -466,7 +473,7 @@ def run_backtest():
     stats_obv = calc_stats(trades_obv_mode)
 
     print("\n" + "="*70)
-    print("🎯 RESULTS (6-WEEK WINDOW + VOLUME EXPANSION FILTER)")
+    print("🎯 RESULTS (UPGRADED OBV DIVERGENCE ENGINE)")
     print("="*70)
     print(f"Mode 1 (Swing Low Trailing SL) : {stats_swing['Trades']} Trades | Win Rate {stats_swing['Win Rate %']} | Return {stats_swing['Avg Return %']} | PF {stats_swing['Profit Factor']}")
     print(f"Mode 2 (OBV Breakdown Exit)    : {stats_obv['Trades']} Trades | Win Rate {stats_obv['Win Rate %']} | Return {stats_obv['Avg Return %']} | PF {stats_obv['Profit Factor']}")
