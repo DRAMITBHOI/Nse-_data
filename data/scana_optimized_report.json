@@ -1,0 +1,57 @@
+{
+  "Timestamp": "2026-09-04 06:46:59 IST",
+  "Optimal Configuration": {
+    "base_w": 40,
+    "vol_m": 1.5,
+    "pct_m": 1.4,
+    "min_dots": 5,
+    "max_risk": 5.0,
+    "target_pct": 18.0,
+    "be_trigger": 15.0
+  },
+  "Baseline Configuration": {
+    "base_w": 25,
+    "vol_m": 1.2,
+    "pct_m": 1.2,
+    "min_dots": 2,
+    "max_risk": 8.0,
+    "target_pct": 15.0,
+    "be_trigger": 8.0
+  },
+  "Summary": {
+    "Original Baseline": {
+      "Trades": 952,
+      "Win Rate %": "36.0%",
+      "+20% Expansion": "20.2%",
+      "Avg Return %": "+1.98%",
+      "Profit Factor": 1.57,
+      "Avg Risk %": "6.81%",
+      "Avg Hold": "34.6 d",
+      "Score": 5.93
+    },
+    "Combined Optimal Model": {
+      "Trades": 1,
+      "Win Rate %": "100.0%",
+      "+20% Expansion": "100.0%",
+      "Avg Return %": "+16.99%",
+      "Profit Factor": 99.0,
+      "Avg Risk %": "4.8%",
+      "Avg Hold": "42.0 d",
+      "Score": 211.5
+    }
+  },
+  "Recent Optimal Trades": [
+    {
+      "Symbol": "SUPREMEIND",
+      "Entry Date": "2023-05-30",
+      "Entry": 2847.95,
+      "Exit": 3303.05,
+      "Risk %": 4.8,
+      "Realized %": 16.99,
+      "Max Run %": 33.96,
+      "Rally 20%": true,
+      "Hold Days": 42,
+      "Is Win": true
+    }
+  ]
+}
