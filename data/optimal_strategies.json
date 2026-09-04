@@ -1,0 +1,267 @@
+{
+  "Optimizer Timestamp": "2026-09-04 05:34:24 IST",
+  "Total Models Tested": 648,
+  "Valid Candidates": 498,
+  "Top 10 Optimal Strategies": [
+    {
+      "Score": 5.07,
+      "Params": {
+        "Base Window": "15d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+14.0%",
+        "BE Shift Trigger %": "+6.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 70,
+        "win_rate": 31.4,
+        "pf": 1.75,
+        "avg_ret": 2.06,
+        "r20": 17.1
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 20,
+        "win_rate": 35.0,
+        "pf": 1.43,
+        "avg_ret": 1.29,
+        "r20": 20.0
+      }
+    },
+    {
+      "Score": 5.07,
+      "Params": {
+        "Base Window": "25d",
+        "Vol Spike Multiplier": "1.15x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+14.0%",
+        "BE Shift Trigger %": "+6.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 105,
+        "win_rate": 36.2,
+        "pf": 2.13,
+        "avg_ret": 3.12,
+        "r20": 21.9
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 28,
+        "win_rate": 32.1,
+        "pf": 1.49,
+        "avg_ret": 1.38,
+        "r20": 14.3
+      }
+    },
+    {
+      "Score": 4.98,
+      "Params": {
+        "Base Window": "15d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+10.0%",
+        "BE Shift Trigger %": "+6.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 70,
+        "win_rate": 40.0,
+        "pf": 1.76,
+        "avg_ret": 2.07,
+        "r20": 17.1
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 20,
+        "win_rate": 40.0,
+        "pf": 1.28,
+        "avg_ret": 0.84,
+        "r20": 20.0
+      }
+    },
+    {
+      "Score": 4.8,
+      "Params": {
+        "Base Window": "15d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+14.0%",
+        "BE Shift Trigger %": "+8.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 70,
+        "win_rate": 37.1,
+        "pf": 1.87,
+        "avg_ret": 2.53,
+        "r20": 18.6
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 20,
+        "win_rate": 35.0,
+        "pf": 1.32,
+        "avg_ret": 1.03,
+        "r20": 20.0
+      }
+    },
+    {
+      "Score": 4.54,
+      "Params": {
+        "Base Window": "25d",
+        "Vol Spike Multiplier": "1.5x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 2,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+18.0%",
+        "BE Shift Trigger %": "+8.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 102,
+        "win_rate": 36.3,
+        "pf": 2.21,
+        "avg_ret": 3.35,
+        "r20": 26.5
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 44,
+        "win_rate": 31.8,
+        "pf": 1.3,
+        "avg_ret": 1.15,
+        "r20": 20.5
+      }
+    },
+    {
+      "Score": 4.5,
+      "Params": {
+        "Base Window": "25d",
+        "Vol Spike Multiplier": "1.5x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "8.0%",
+        "50% Book Target %": "+10.0%",
+        "BE Shift Trigger %": "+6.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 153,
+        "win_rate": 48.4,
+        "pf": 1.99,
+        "avg_ret": 2.53,
+        "r20": 17.6
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 52,
+        "win_rate": 44.2,
+        "pf": 1.13,
+        "avg_ret": 0.48,
+        "r20": 17.3
+      }
+    },
+    {
+      "Score": 4.42,
+      "Params": {
+        "Base Window": "15d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "8.0%",
+        "50% Book Target %": "+14.0%",
+        "BE Shift Trigger %": "+8.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 179,
+        "win_rate": 44.1,
+        "pf": 2.22,
+        "avg_ret": 3.53,
+        "r20": 22.3
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 72,
+        "win_rate": 36.1,
+        "pf": 1.25,
+        "avg_ret": 1.04,
+        "r20": 23.6
+      }
+    },
+    {
+      "Score": 4.39,
+      "Params": {
+        "Base Window": "25d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 2,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+18.0%",
+        "BE Shift Trigger %": "+6.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 133,
+        "win_rate": 30.8,
+        "pf": 2.03,
+        "avg_ret": 2.87,
+        "r20": 24.8
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 52,
+        "win_rate": 26.9,
+        "pf": 1.35,
+        "avg_ret": 1.08,
+        "r20": 15.4
+      }
+    },
+    {
+      "Score": 4.36,
+      "Params": {
+        "Base Window": "15d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 3,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+10.0%",
+        "BE Shift Trigger %": "+8.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 70,
+        "win_rate": 45.7,
+        "pf": 1.85,
+        "avg_ret": 2.43,
+        "r20": 18.6
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 20,
+        "win_rate": 40.0,
+        "pf": 1.18,
+        "avg_ret": 0.58,
+        "r20": 20.0
+      }
+    },
+    {
+      "Score": 4.34,
+      "Params": {
+        "Base Window": "25d",
+        "Vol Spike Multiplier": "1.3x",
+        "Deliv Pct Multiplier": "1.3x",
+        "Min Clustered Dots": 2,
+        "Max SL Risk %": "6.5%",
+        "50% Book Target %": "+18.0%",
+        "BE Shift Trigger %": "+8.0%"
+      },
+      "In_Sample_Pre2024": {
+        "trades": 133,
+        "win_rate": 34.6,
+        "pf": 2.05,
+        "avg_ret": 3.04,
+        "r20": 25.6
+      },
+      "Out_Sample_Live2024_26": {
+        "trades": 52,
+        "win_rate": 30.8,
+        "pf": 1.26,
+        "avg_ret": 0.93,
+        "r20": 17.3
+      }
+    }
+  ]
+}
