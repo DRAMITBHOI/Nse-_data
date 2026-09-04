@@ -1,0 +1,49 @@
+name: Scan HP3 Daily Production Screener (Outside Nifty 750)
+
+on:
+  schedule:
+    # 7:30 PM IST (Mon-Fri) = 2:00 PM UTC
+    - cron: '0 14 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-hp3-scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install pandas numpy requests
+
+      - name: Ensure Data Directory Exists
+        run: mkdir -p data
+
+      - name: Execute HP3 Scanner Engine
+        run: python scan_hp3.py
+
+      - name: Commit & Push HP3 Watchlist
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/scan_hp3_results.json
+          if git diff --staged --quiet; then
+            echo "No screener changes detected."
+          else
+            git commit -m "Auto-update Scan HP3 Watchlist [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
