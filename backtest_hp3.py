@@ -32,7 +32,7 @@ def get_nifty_750_universe():
             with open(local_path, "r") as fp:
                 data = json.load(fp)
                 if data:
-                    return set(data)
+                    return set(str(x).strip().upper() for x in data)
         except Exception:
             pass
 
@@ -74,20 +74,27 @@ def clean_data_fast(raw_data):
         if not raw_t:
             continue
         d_str = str(raw_t)[:10]
-        c = float(r.get("close", 0) or 0)
+        try:
+            c = float(r.get("close", 0) or 0)
+        except (ValueError, TypeError):
+            continue
         if c <= 0:
             continue
         
-        entry = {
-            "time": d_str,
-            "open": float(r.get("open", c) or c),
-            "high": float(r.get("high", c) or c),
-            "low": float(r.get("low", c) or c),
-            "close": c,
-            "delivery_vol": float(r.get("delivery_vol", 0) or 0),
-            "volume": float(r.get("volume", 0) or 0),
-            "deliv_pct": float(r.get("deliv_pct", 0) or 0)
-        }
+        try:
+            entry = {
+                "time": d_str,
+                "open": float(r.get("open", c) or c),
+                "high": float(r.get("high", c) or c),
+                "low": float(r.get("low", c) or c),
+                "close": c,
+                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                "volume": float(r.get("volume", 0) or 0),
+                "deliv_pct": float(r.get("deliv_pct", 0) or 0)
+            }
+        except Exception:
+            continue
+
         if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
             date_map[d_str] = entry
 
@@ -152,18 +159,18 @@ def clean_data_fast(raw_data):
     return deduped
 
 def fast_rolling_mean(arr, window):
+    if len(arr) < window:
+        return np.full_like(arr, fill_value=np.nan, dtype=float)
     ret = np.cumsum(arr, dtype=float)
     ret[window:] = ret[window:] - ret[:-window]
     res = np.empty_like(arr, dtype=float)
     res[:window-1] = np.nan
     res[window-1:] = ret[window-1:] / window
-    res[:window-1] = res[window-1] if len(res) >= window else 1.0
-    return res
+    res[:window-1] = res[window-1]
+    return np.nan_to_num(res, nan=1.0)
 
 def run_backtest():
-    print(f"🚀 Initializing HP3 Backtest (From 2021 to Present)...")
-    print(f"⚙️ Target Universe: Strictly Outside Nifty 750 | Base: {BASE_W}d | Max Risk: {MAX_RISK}%")
-
+    print("🚀 Initializing HP3 Backtest (From 2021 to Present)...")
     nifty_750 = get_nifty_750_universe()
     print(f"📦 Loaded {len(nifty_750)} Nifty 750 symbols to exclude.")
 
@@ -176,18 +183,20 @@ def run_backtest():
         except Exception:
             pass
 
+    reserved_names = {
+        "fundamentals.json", "screener_results.json", "nifty750.json",
+        "NIFTY50.json", "NIFTY.json", "fno_history.json",
+        "wyckoff_screener_results.json", "obv_backtest_report.json",
+        "scana_vs_absorption_report.json", "scana_candidates.json",
+        "optimal_strategies.json", "scana_sensitivity_report.json",
+        "scana_optimized_report.json", "scana_combo_winrate_leaderboard.json",
+        "scan_hp1_results.json", "scan_hp2_results.json", "scan_hp3_results.json",
+        "backtest_hp3_report.json", "scan_macro_results.json"
+    }
+
     all_stock_files = [
         f for f in os.listdir(DATA_DIR)
-        if f.endswith(".json") and f not in [
-            "fundamentals.json", "screener_results.json", "nifty750.json",
-            "NIFTY50.json", "NIFTY.json", "fno_history.json",
-            "wyckoff_screener_results.json", "obv_backtest_report.json",
-            "scana_vs_absorption_report.json", "scana_candidates.json",
-            "optimal_strategies.json", "scana_sensitivity_report.json",
-            "scana_optimized_report.json", "scana_combo_winrate_leaderboard.json",
-            "scan_hp1_results.json", "scan_hp2_results.json", "scan_hp3_results.json",
-            "backtest_hp3_report.json"
-        ]
+        if f.endswith(".json") and f not in reserved_names
     ]
 
     stock_files = [f for f in all_stock_files if f.replace(".json", "").strip().upper() not in nifty_750]
@@ -264,6 +273,8 @@ def run_backtest():
                 continue
 
             base_highs = highs[i - BASE_W : i]
+            if len(base_highs) == 0:
+                continue
             sw_idx = int(np.argmax(base_highs))
             swing_high = base_highs[sw_idx]
             swing_obv = obvs[i - BASE_W + sw_idx]
@@ -300,17 +311,14 @@ def run_backtest():
                     if gain > max_run:
                         max_run = gain
 
-                    # BE Shift at +10%
                     if max_run >= BE_TRIGGER and not be_shifted and active_sl < entry_p:
                         active_sl = entry_p
                         be_shifted = True
 
-                    # Book 50% at +15%
                     if max_run >= TARGET_PCT and not booked_partial:
                         booked_partial = True
                         active_sl = entry_p
 
-                    # Trail 10-day lows
                     if booked_partial and bar_idx >= 10:
                         t_low = float(np.min(lows[curr_bar - 10 : curr_bar]))
                         if t_low > active_sl:
@@ -344,27 +352,21 @@ def run_backtest():
                 cooldown = i + max(hold_days, 8)
 
     total_trades = len(all_trades)
-    print(f"\n📊 Backtest Execution Complete! Simulated {total_trades} trades since 2021.")
-
-    if total_trades == 0:
-        print("❌ No trades triggered. Verify dataset depth and pathing.")
-        return
+    print(f"📊 Backtest Execution Complete! Evaluated {total_trades} trades since 2021.")
 
     wins = sum(1 for t in all_trades if t["win"])
     losses = total_trades - wins
-    win_rate = round((wins / total_trades) * 100.0, 2)
+    win_rate = round((wins / total_trades) * 100.0, 2) if total_trades > 0 else 0.0
     returns = [t["realized_return"] for t in all_trades]
-    avg_return = round(float(np.mean(returns)), 2)
+    avg_return = round(float(np.mean(returns)), 2) if total_trades > 0 else 0.0
     
     pos_sum = sum(r for r in returns if r > 0)
     neg_sum = abs(sum(r for r in returns if r < 0))
-    pf = round(pos_sum / neg_sum, 2) if neg_sum > 0 else 99.0
-    r20_pct = round((sum(1 for t in all_trades if t["r20"]) / total_trades) * 100.0, 2)
+    pf = round(pos_sum / neg_sum, 2) if neg_sum > 0 else (99.0 if pos_sum > 0 else 0.0)
+    r20_pct = round((sum(1 for t in all_trades if t["r20"]) / total_trades) * 100.0, 2) if total_trades > 0 else 0.0
 
-    # Sort trades chronologically
     all_trades.sort(key=lambda x: x["entry_date"], reverse=True)
 
-    # Annual breakdown
     yearly_breakdown = {}
     for t in all_trades:
         yr = t["entry_date"][:4]
