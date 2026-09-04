@@ -1,0 +1,511 @@
+{
+  "Sensitivity Run Time": "2026-09-04 06:05:39 IST",
+  "Baseline Definition": {
+    "base_w": 25,
+    "vol_m": 1.2,
+    "pct_m": 1.2,
+    "min_dots": 2,
+    "max_risk": 8.0,
+    "target_pct": 15.0,
+    "be_trigger": 8.0
+  },
+  "Factors Analyzed": {
+    "1. Base Window": {
+      "Best Preset": "40d",
+      "Evaluations": [
+        {
+          "Value": "40d",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 839,
+            "win_rate": "37.5%",
+            "pf": 1.65,
+            "avg_ret": "+2.17%",
+            "r20": "19.8%",
+            "avg_risk": "6.81%",
+            "avg_hold": "35.8d",
+            "score": 6.26
+          }
+        },
+        {
+          "Value": "35d",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 889,
+            "win_rate": "37.0%",
+            "pf": 1.64,
+            "avg_ret": "+2.17%",
+            "r20": "20.8%",
+            "avg_risk": "6.78%",
+            "avg_hold": "35.0d",
+            "score": 6.22
+          }
+        },
+        {
+          "Value": "25d",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "30d",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 915,
+            "win_rate": "36.2%",
+            "pf": 1.55,
+            "avg_ret": "+1.93%",
+            "r20": "20.5%",
+            "avg_risk": "6.82%",
+            "avg_hold": "34.6d",
+            "score": 5.88
+          }
+        },
+        {
+          "Value": "15d",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 1026,
+            "win_rate": "35.3%",
+            "pf": 1.54,
+            "avg_ret": "+1.85%",
+            "r20": "19.5%",
+            "avg_risk": "6.68%",
+            "avg_hold": "33.6d",
+            "score": 5.77
+          }
+        },
+        {
+          "Value": "20d",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 976,
+            "win_rate": "34.8%",
+            "pf": 1.51,
+            "avg_ret": "+1.73%",
+            "r20": "18.5%",
+            "avg_risk": "6.75%",
+            "avg_hold": "33.6d",
+            "score": 5.62
+          }
+        }
+      ]
+    },
+    "2. Delivery Vol Multiplier": {
+      "Best Preset": "1.5x",
+      "Evaluations": [
+        {
+          "Value": "1.5x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 687,
+            "win_rate": "37.4%",
+            "pf": 1.63,
+            "avg_ret": "+2.19%",
+            "r20": "20.2%",
+            "avg_risk": "6.84%",
+            "avg_hold": "35.3d",
+            "score": 6.22
+          }
+        },
+        {
+          "Value": "1.3x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 867,
+            "win_rate": "36.4%",
+            "pf": 1.61,
+            "avg_ret": "+2.11%",
+            "r20": "20.3%",
+            "avg_risk": "6.83%",
+            "avg_hold": "34.9d",
+            "score": 6.1
+          }
+        },
+        {
+          "Value": "1.4x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 775,
+            "win_rate": "36.6%",
+            "pf": 1.58,
+            "avg_ret": "+2.04%",
+            "r20": "19.7%",
+            "avg_risk": "6.83%",
+            "avg_hold": "35.0d",
+            "score": 6.01
+          }
+        },
+        {
+          "Value": "1.2x",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "1.15x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 990,
+            "win_rate": "35.4%",
+            "pf": 1.51,
+            "avg_ret": "+1.79%",
+            "r20": "19.5%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.1d",
+            "score": 5.68
+          }
+        }
+      ]
+    },
+    "3. Delivery Pct Multiplier": {
+      "Best Preset": "1.4x",
+      "Evaluations": [
+        {
+          "Value": "1.4x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 326,
+            "win_rate": "39.3%",
+            "pf": 1.71,
+            "avg_ret": "+2.36%",
+            "r20": "21.8%",
+            "avg_risk": "6.89%",
+            "avg_hold": "33.3d",
+            "score": 6.56
+          }
+        },
+        {
+          "Value": "1.3x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 599,
+            "win_rate": "37.6%",
+            "pf": 1.69,
+            "avg_ret": "+2.27%",
+            "r20": "20.7%",
+            "avg_risk": "6.88%",
+            "avg_hold": "33.7d",
+            "score": 6.4
+          }
+        },
+        {
+          "Value": "1.2x",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "1.5x",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 171,
+            "win_rate": "38.0%",
+            "pf": 1.47,
+            "avg_ret": "+1.73%",
+            "r20": "21.1%",
+            "avg_risk": "6.9%",
+            "avg_hold": "31.3d",
+            "score": 5.7
+          }
+        }
+      ]
+    },
+    "4. Clustered Dots in Base": {
+      "Best Preset": "5 dots",
+      "Evaluations": [
+        {
+          "Value": "5 dots",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 249,
+            "win_rate": "41.8%",
+            "pf": 1.9,
+            "avg_ret": "+2.84%",
+            "r20": "19.3%",
+            "avg_risk": "6.83%",
+            "avg_hold": "35.3d",
+            "score": 7.31
+          }
+        },
+        {
+          "Value": "4 dots",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 416,
+            "win_rate": "38.7%",
+            "pf": 1.76,
+            "avg_ret": "+2.53%",
+            "r20": "21.4%",
+            "avg_risk": "6.82%",
+            "avg_hold": "35.5d",
+            "score": 6.72
+          }
+        },
+        {
+          "Value": "3 dots",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 654,
+            "win_rate": "37.8%",
+            "pf": 1.71,
+            "avg_ret": "+2.42%",
+            "r20": "20.8%",
+            "avg_risk": "6.84%",
+            "avg_hold": "35.3d",
+            "score": 6.52
+          }
+        },
+        {
+          "Value": "2 dots",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        }
+      ]
+    },
+    "5. Initial Stop Loss Cap": {
+      "Best Preset": "5.0%",
+      "Evaluations": [
+        {
+          "Value": "5.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 79,
+            "win_rate": "43.0%",
+            "pf": 3.01,
+            "avg_ret": "+4.24%",
+            "r20": "21.5%",
+            "avg_risk": "4.51%",
+            "avg_hold": "40.4d",
+            "score": 10.29
+          }
+        },
+        {
+          "Value": "8.0%",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "7.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 534,
+            "win_rate": "33.7%",
+            "pf": 1.58,
+            "avg_ret": "+1.93%",
+            "r20": "19.3%",
+            "avg_risk": "6.07%",
+            "avg_hold": "35.0d",
+            "score": 5.81
+          }
+        },
+        {
+          "Value": "9.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 1433,
+            "win_rate": "36.5%",
+            "pf": 1.5,
+            "avg_ret": "+1.8%",
+            "r20": "20.1%",
+            "avg_risk": "7.5%",
+            "avg_hold": "34.4d",
+            "score": 5.72
+          }
+        },
+        {
+          "Value": "10.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 1897,
+            "win_rate": "36.6%",
+            "pf": 1.48,
+            "avg_ret": "+1.78%",
+            "r20": "20.8%",
+            "avg_risk": "8.12%",
+            "avg_hold": "34.1d",
+            "score": 5.68
+          }
+        }
+      ]
+    },
+    "6. Partial Target (+15% Book)": {
+      "Best Preset": "18.0%",
+      "Evaluations": [
+        {
+          "Value": "18.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 948,
+            "win_rate": "34.2%",
+            "pf": 1.68,
+            "avg_ret": "+2.36%",
+            "r20": "23.5%",
+            "avg_risk": "6.81%",
+            "avg_hold": "36.6d",
+            "score": 6.25
+          }
+        },
+        {
+          "Value": "15.0%",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "10.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 973,
+            "win_rate": "45.9%",
+            "pf": 1.44,
+            "avg_ret": "+1.49%",
+            "r20": "16.8%",
+            "avg_risk": "6.81%",
+            "avg_hold": "31.0d",
+            "score": 5.92
+          }
+        },
+        {
+          "Value": "12.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 967,
+            "win_rate": "40.0%",
+            "pf": 1.46,
+            "avg_ret": "+1.58%",
+            "r20": "17.6%",
+            "avg_risk": "6.81%",
+            "avg_hold": "32.1d",
+            "score": 5.71
+          }
+        }
+      ]
+    },
+    "7. Breakeven Shift Trigger": {
+      "Best Preset": "15.0%",
+      "Evaluations": [
+        {
+          "Value": "15.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 937,
+            "win_rate": "45.0%",
+            "pf": 1.66,
+            "avg_ret": "+2.56%",
+            "r20": "23.6%",
+            "avg_risk": "6.82%",
+            "avg_hold": "39.8d",
+            "score": 6.85
+          }
+        },
+        {
+          "Value": "13.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 940,
+            "win_rate": "43.7%",
+            "pf": 1.64,
+            "avg_ret": "+2.44%",
+            "r20": "23.0%",
+            "avg_risk": "6.82%",
+            "avg_hold": "39.1d",
+            "score": 6.68
+          }
+        },
+        {
+          "Value": "10.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 947,
+            "win_rate": "39.8%",
+            "pf": 1.62,
+            "avg_ret": "+2.25%",
+            "r20": "21.6%",
+            "avg_risk": "6.82%",
+            "avg_hold": "36.9d",
+            "score": 6.36
+          }
+        },
+        {
+          "Value": "8.0%",
+          "Is_Baseline": true,
+          "Metrics": {
+            "trades": 952,
+            "win_rate": "36.0%",
+            "pf": 1.57,
+            "avg_ret": "+1.98%",
+            "r20": "20.2%",
+            "avg_risk": "6.81%",
+            "avg_hold": "34.6d",
+            "score": 5.93
+          }
+        },
+        {
+          "Value": "6.0%",
+          "Is_Baseline": false,
+          "Metrics": {
+            "trades": 965,
+            "win_rate": "31.4%",
+            "pf": 1.52,
+            "avg_ret": "+1.63%",
+            "r20": "17.6%",
+            "avg_risk": "6.81%",
+            "avg_hold": "31.1d",
+            "score": 5.42
+          }
+        }
+      ]
+    }
+  }
+}
