@@ -1,0 +1,46 @@
+name: Scan A Combinatorial Win Rate Search
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-combo-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install pandas numpy requests
+
+      - name: Ensure Data Directory Exists
+        run: mkdir -p data
+
+      - name: Execute Combinatorial Search Engine
+        run: python backtest_scana_combo_search.py
+
+      - name: Commit & Push Leaderboard
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/scana_combo_winrate_leaderboard.json
+          if git diff --staged --quiet; then
+            echo "No changes detected."
+          else
+            git commit -m "Auto-update Scan A Win Rate Leaderboard [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
