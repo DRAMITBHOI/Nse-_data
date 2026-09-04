@@ -1,0 +1,387 @@
+{
+  "Timestamp": "2026-09-04 07:12:56 IST",
+  "Total Combinations Tested": 972,
+  "Valid Candidates": 552,
+  "Top 20 Win Rate Presets": [
+    {
+      "Params": {
+        "Base": "30d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 67.9,
+        "win_rate": "67.9%",
+        "pf": 3.46,
+        "avg_ret": "+5.94%",
+        "r20": "28.6%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 67.9,
+        "win_rate": "67.9%",
+        "pf": 3.36,
+        "avg_ret": "+5.5%",
+        "r20": "25.0%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 46,
+        "win_rate_val": 65.2,
+        "win_rate": "65.2%",
+        "pf": 3.56,
+        "avg_ret": "+5.75%",
+        "r20": "26.1%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "30d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 64.3,
+        "win_rate": "64.3%",
+        "pf": 3.99,
+        "avg_ret": "+7.23%",
+        "r20": "39.3%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 64.3,
+        "win_rate": "64.3%",
+        "pf": 3.75,
+        "avg_ret": "+6.4%",
+        "r20": "35.7%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "30d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 64.3,
+        "win_rate": "64.3%",
+        "pf": 3.35,
+        "avg_ret": "+5.68%",
+        "r20": "28.6%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 64.3,
+        "win_rate": "64.3%",
+        "pf": 3.17,
+        "avg_ret": "+5.1%",
+        "r20": "25.0%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 46,
+        "win_rate_val": 63.0,
+        "win_rate": "63.0%",
+        "pf": 3.44,
+        "avg_ret": "+5.5%",
+        "r20": "26.1%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.3x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 56,
+        "win_rate_val": 62.5,
+        "win_rate": "62.5%",
+        "pf": 3.06,
+        "avg_ret": "+5.35%",
+        "r20": "26.8%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 46,
+        "win_rate_val": 60.9,
+        "win_rate": "60.9%",
+        "pf": 3.71,
+        "avg_ret": "+6.28%",
+        "r20": "32.6%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "30d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 60.7,
+        "win_rate": "60.7%",
+        "pf": 3.89,
+        "avg_ret": "+6.96%",
+        "r20": "39.3%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 60.7,
+        "win_rate": "60.7%",
+        "pf": 3.55,
+        "avg_ret": "+6.0%",
+        "r20": "35.7%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "30d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+10.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 60.7,
+        "win_rate": "60.7%",
+        "pf": 3.53,
+        "avg_ret": "+5.46%",
+        "r20": "25.0%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.4x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+10.0%"
+      },
+      "Metrics": {
+        "trades": 28,
+        "win_rate_val": 60.7,
+        "win_rate": "60.7%",
+        "pf": 3.14,
+        "avg_ret": "+5.03%",
+        "r20": "25.0%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.3x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 56,
+        "win_rate_val": 60.7,
+        "win_rate": "60.7%",
+        "pf": 2.97,
+        "avg_ret": "+5.15%",
+        "r20": "26.8%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.3x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 121,
+        "win_rate_val": 60.3,
+        "win_rate": "60.3%",
+        "pf": 2.83,
+        "avg_ret": "+5.1%",
+        "r20": "28.1%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.3x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 55,
+        "win_rate_val": 60.0,
+        "win_rate": "60.0%",
+        "pf": 3.42,
+        "avg_ret": "+6.27%",
+        "r20": "34.5%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+18.0%",
+        "BE Shift": "+13.0%"
+      },
+      "Metrics": {
+        "trades": 46,
+        "win_rate_val": 58.7,
+        "win_rate": "58.7%",
+        "pf": 3.59,
+        "avg_ret": "+6.04%",
+        "r20": "32.6%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.5x",
+        "Deliv Multiplier": "1.4x",
+        "Cluster Dots": "4 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+10.0%"
+      },
+      "Metrics": {
+        "trades": 46,
+        "win_rate_val": 58.7,
+        "win_rate": "58.7%",
+        "pf": 3.32,
+        "avg_ret": "+5.19%",
+        "r20": "26.1%"
+      }
+    },
+    {
+      "Params": {
+        "Base": "40d",
+        "Vol Multiplier": "1.3x",
+        "Deliv Multiplier": "1.3x",
+        "Cluster Dots": "5 dots",
+        "Max SL": "8.0%",
+        "Partial Book": "+15.0%",
+        "BE Shift": "+15.0%"
+      },
+      "Metrics": {
+        "trades": 118,
+        "win_rate_val": 58.5,
+        "win_rate": "58.5%",
+        "pf": 2.58,
+        "avg_ret": "+4.6%",
+        "r20": "27.1%"
+      }
+    }
+  ]
+}
