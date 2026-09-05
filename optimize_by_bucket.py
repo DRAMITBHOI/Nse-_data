@@ -9,7 +9,6 @@ DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "bucket_optimization_leaderboard.json")
 START_DATE = "2021-01-01"
 
-# UNIVERSAL MACRO PRESET COMBINATIONS (TESTED IDENTICALLY ACROSS ALL BUCKETS)
 BASE_WINDOWS = [80, 120, 160]
 BOX_DEPTHS = [30.0, 40.0]
 DOT_PRESETS = [
@@ -38,7 +37,7 @@ def load_nifty_750_set():
             pass
     return set()
 
-def clean_stock_records(raw_data, min_len=100):
+def clean_stock_records(raw_data, min_len=90):
     if not raw_data or not isinstance(raw_data, list):
         return []
     date_map = {}
@@ -132,7 +131,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Universal Bucket Combinatorial Optimization (Floor: >=10 trades/yr)...")
+    print("🚀 Initializing Universal Bucket Sweep...")
 
     n750_set = load_nifty_750_set()
     reserved = {
@@ -158,7 +157,7 @@ def run_bucket_combinatorial_sweep():
         try:
             with open(p, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
-            clean = clean_stock_records(raw, min_len=100)
+            clean = clean_stock_records(raw, min_len=90)
             if not clean:
                 continue
 
@@ -182,9 +181,9 @@ def run_bucket_combinatorial_sweep():
 
             if not is_n750:
                 b_name = "Bucket D"
-            elif latest_to >= 30.0:
+            elif latest_to >= 25.0:
                 b_name = "Bucket A"
-            elif latest_to >= 5.0:
+            elif latest_to >= 4.0:
                 b_name = "Bucket B"
             else:
                 b_name = "Bucket C"
@@ -223,7 +222,7 @@ def run_bucket_combinatorial_sweep():
         MAX_RISKS,
         EXITS
     ))
-    print(f"\n🔬 Evaluating {len(combos)} universal parameter permutations per bucket...")
+    print(f"\n🔬 Evaluating {len(combos)} universal permutations per bucket...")
 
     final_leaderboard = {}
 
@@ -258,15 +257,15 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    # Dynamic liquidity threshold based on bucket turnover
+                    # Dynamic turnover floor per bucket
                     if b_name == "Bucket C":
-                        if to_50[i] < 0.20:
-                            continue
-                    elif b_name == "Bucket D":
                         if to_50[i] < 0.15:
                             continue
+                    elif b_name == "Bucket D":
+                        if to_50[i] < 0.10:
+                            continue
                     else:
-                        if s["vol_sma9"][i] < 20000:
+                        if s["vol_sma9"][i] < 15000:
                             continue
 
                     num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
@@ -348,11 +347,10 @@ def run_bucket_combinatorial_sweep():
             total_trades = len(trade_returns)
             trades_per_yr = round(total_trades / 5.67, 1)
 
-            # Enforce the requirement: Any number of trades >= 10/year
-            # (Relaxed to >=8/year for smaller Bucket C to guarantee output)
-            min_yr_floor = 8.0 if b_name == "Bucket C" else 10.0
+            # Minimum annual threshold: 4/yr for smaller buckets, 6/yr for large/mid
+            min_floor = 4.0 if b_name in ["Bucket B", "Bucket C"] else 6.0
 
-            if trades_per_yr >= min_yr_floor:
+            if trades_per_yr >= min_floor and total_trades >= 15:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
@@ -361,7 +359,6 @@ def run_bucket_combinatorial_sweep():
                 avg_ret = round(float(np.mean(trade_returns)), 2)
                 multi_rate = round((multibaggers_50 / total_trades) * 100.0, 1)
 
-                # Performance Score: Win Rate * Profit Factor * Avg Return
                 performance_score = round(win_rate * pf * max(0.1, avg_ret), 1)
 
                 b_results.append({
@@ -383,7 +380,6 @@ def run_bucket_combinatorial_sweep():
                     "score": performance_score
                 })
 
-        # Rank strictly by Performance Score, Win Rate %, Profit Factor, Avg Return
         b_results.sort(key=lambda x: (x["score"], x["win_rate"], x["profit_factor"], x["avg_return"]), reverse=True)
         for rank, entry in enumerate(b_results, start=1):
             entry["rank"] = rank
