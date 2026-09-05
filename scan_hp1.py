@@ -19,7 +19,7 @@ CONFIG = {
     "max_risk": 8.0,
     "book_pct": 15.0,
     "be_trig": 15.0,
-    "min_turnover_cr": 1.0  # ₹1 Cr/d turnover floor instead of fragile n750 file check
+    "min_turnover_cr": 1.0  # Dynamic turnover floor: ₹1 Cr/d
 }
 
 def clean_stock_records(raw_data, min_len=60):
@@ -34,12 +34,9 @@ def clean_stock_records(raw_data, min_len=60):
             continue
         try:
             c = float(r.get("close", 0) or 0)
-        except Exception:
-            continue
-        if c <= 0 or np.isnan(c):
-            continue
-        
-        try:
+            if c <= 0 or np.isnan(c):
+                continue
+            
             entry = {
                 "time": t_val,
                 "open": float(r.get("open", c) or c),
@@ -50,11 +47,10 @@ def clean_stock_records(raw_data, min_len=60):
                 "volume": float(r.get("volume", 0) or 0),
                 "deliv_pct": float(r.get("deliv_pct", 0) or 0)
             }
+            if t_val not in date_map or entry["volume"] > date_map[t_val]["volume"]:
+                date_map[t_val] = entry
         except Exception:
             continue
-
-        if t_val not in date_map or entry["volume"] > date_map[t_val]["volume"]:
-            date_map[t_val] = entry
 
     sorted_dates = sorted(date_map.keys())
     if len(sorted_dates) < min_len:
@@ -126,7 +122,7 @@ def load_fundamentals():
 
 def run_hp1_screener():
     t0 = time.time()
-    print("🚀 Initializing SCAN_HP1 Production Screener (Robust Turnover-Based Engine)...")
+    print("🚀 Initializing SCAN_HP1 Engine...")
 
     fundamentals = load_fundamentals()
 
@@ -144,7 +140,7 @@ def run_hp1_screener():
     }
 
     stock_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f not in reserved]
-    print(f"📦 Evaluating {len(stock_files)} stocks across all liquidity tiers...")
+    print(f"📦 Evaluating {len(stock_files)} stocks...")
 
     candidates = []
 
@@ -154,7 +150,6 @@ def run_hp1_screener():
     pct_m = CONFIG["pct_m"]
     min_dots = CONFIG["min_dots"]
     max_risk = CONFIG["max_risk"]
-    book_pct = CONFIG["book_pct"]
     min_to = CONFIG["min_turnover_cr"]
 
     for f in stock_files:
@@ -179,7 +174,6 @@ def run_hp1_screener():
             if N < (base_w + 15):
                 continue
 
-            # Check 50-day turnover floor
             turnover_cr = (closes * volumes) / 1e7
             to_50 = fast_rolling(turnover_cr, 50)
             if float(to_50[-1]) < min_to:
@@ -188,11 +182,9 @@ def run_hp1_screener():
             deliv_sma20 = fast_rolling(d_vols, 20)
             pct_sma50 = fast_rolling(pcts, 50)
 
-            # Accumulation dot mask
             dots = (pcts >= (pct_m * pct_sma50)) & (d_vols >= (vol_m * deliv_sma20))
             dot_cumsum = np.cumsum(dots.astype(int))
 
-            # OBV Series
             obvs = np.zeros(N, dtype=float)
             cur_obv = 0.0
             for idx in range(N):
@@ -204,7 +196,6 @@ def run_hp1_screener():
                     cur_obv = dv
                 obvs[idx] = cur_obv
 
-            # Check current setup against recent base
             i = N - 1
             num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
             if num_dots < min_dots:
@@ -229,7 +220,6 @@ def run_hp1_screener():
             cmp_val = float(closes[-1])
             dist_pct = ((macro_high - cmp_val) / macro_high) * 100.0
 
-            # Determine Stage: TRIGGERED, READY, or DEEP
             status = None
             if closes[i] > macro_high and closes[i - 1] <= macro_high and obvs[i] > obvs[obv_pos]:
                 status = "🟢 TRIGGERED TODAY"
@@ -271,7 +261,6 @@ def run_hp1_screener():
         except Exception:
             continue
 
-    # Sort order: Triggered first, then Ready by nearest distance, then Deep
     candidates.sort(key=lambda x: (x["_is_trig"], x["_dist"]))
     for c in candidates:
         del c["_dist"]
