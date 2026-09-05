@@ -11,32 +11,31 @@ START_DATE = "2021-01-01"
 
 # UNIVERSAL DOT MULTIPLIER REGISTRY
 DOT_SPECS = [
-    {"id": "soft_3d", "vol_m": 1.30, "pct_m": 1.20, "min_dots": 3},
-    {"id": "soft_4d", "vol_m": 1.30, "pct_m": 1.20, "min_dots": 4},
-    {"id": "std_4d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 4},
     {"id": "std_6d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 6},
     {"id": "std_8d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 8},
     {"id": "high_8d", "vol_m": 1.50, "pct_m": 1.40, "min_dots": 8}
 ]
 
-# PRIORITIZED COMBINATORIAL SEARCH PER BUCKET
+# EXACT COMBINATORIAL SEARCH GRIDS
 BUCKET_SWEEP_CONFIGS = {
     "Bucket A": {
+        "desc": "Turnover >= 30 Cr/d",
         "base_windows": [80, 120, 160],
         "box_depths": [30.0, 40.0],
-        "dot_indices": [3, 4, 5], # 6d std, 8d std, 8d high
+        "dot_indices": [0, 1, 2],
         "max_risks": [10.0, 12.0],
         "exits": [
             {"book": 35.0, "be": 15.0, "trail": 20},
             {"book": 50.0, "be": 20.0, "trail": 20}
         ],
-        "min_trades_floor": 10,
+        "min_trades_floor": 8,
         "min_vol_bar": 15000
     },
     "Bucket B": {
-        "base_windows": [90, 120, 160],
+        "desc": "Turnover 5 to 30 Cr/d",
+        "base_windows": [80, 120, 160],
         "box_depths": [30.0, 40.0],
-        "dot_indices": [3, 4, 5], # 6d std, 8d std (Video 2 Rank 1), 8d high
+        "dot_indices": [0, 1, 2],
         "max_risks": [10.0, 12.0],
         "exits": [
             {"book": 20.0, "be": 12.0, "trail": 12},
@@ -47,46 +46,33 @@ BUCKET_SWEEP_CONFIGS = {
         "min_vol_bar": 10000
     },
     "Bucket C": {
-        "base_windows": [60, 80, 120],
-        "box_depths": [25.0, 30.0, 35.0],
-        "dot_indices": [0, 1, 2], # 3d soft, 4d soft, 4d std (Adaptive for low turnover)
+        "desc": "Turnover 1 to 5 Cr/d",
+        "base_windows": [80, 120, 160],
+        "box_depths": [30.0, 40.0],
+        "dot_indices": [0, 1, 2],
         "max_risks": [10.0, 12.0],
         "exits": [
             {"book": 20.0, "be": 12.0, "trail": 12},
             {"book": 35.0, "be": 15.0, "trail": 15},
             {"book": 50.0, "be": 20.0, "trail": 20}
         ],
-        "min_trades_floor": 2, # Guarantees non-empty display for small N750 low-turnover pool
-        "min_vol_bar": 2500
+        "min_trades_floor": 6,
+        "min_vol_bar": 5000
     },
     "Bucket D": {
+        "desc": "Turnover < 1 Cr/d / Microcaps",
         "base_windows": [80, 120, 160],
         "box_depths": [30.0, 40.0],
-        "dot_indices": [3, 4, 5], # 6d std, 8d std (Video 3 Rank 1), 8d high
+        "dot_indices": [0, 1, 2],
         "max_risks": [10.0, 12.0],
         "exits": [
             {"book": 35.0, "be": 15.0, "trail": 20},
             {"book": 50.0, "be": 20.0, "trail": 20}
         ],
-        "min_trades_floor": 10,
-        "min_vol_bar": 5000
+        "min_trades_floor": 8,
+        "min_vol_bar": 4000
     }
 }
-
-def load_nifty_750_set():
-    paths = [os.path.join(DATA_DIR, "nifty750.json"), "nifty750.json"]
-    for p in paths:
-        if os.path.exists(p):
-            try:
-                with open(p, "r", encoding="utf-8") as fp:
-                    raw = json.load(fp)
-                    if isinstance(raw, list):
-                        return set(str(x).strip().upper() for x in raw)
-                    elif isinstance(raw, dict):
-                        return set(str(x).strip().upper() for x in raw.keys())
-            except Exception:
-                pass
-    return set()
 
 def clean_stock_records(raw_data, min_len=70):
     if not raw_data or not isinstance(raw_data, list):
@@ -182,10 +168,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Prioritized Multi-Bucket Sweep...")
-
-    n750_set = load_nifty_750_set()
-    print(f"📋 Loaded {len(n750_set)} Nifty 750 constituents.")
+    print("🚀 Initializing Turnover-Segmented Multi-Bucket Sweep...")
 
     reserved = {
         "fundamentals.json", "screener_results.json", "nifty750.json",
@@ -230,17 +213,16 @@ def run_bucket_combinatorial_sweep():
             to_50 = fast_rolling(turnover_cr, 50)
 
             latest_to = float(to_50[-1])
-            is_n750 = sym in n750_set
 
-            # UNBIASED TURNOVER ALLOCATION
-            if not is_n750 and len(n750_set) > 100:
-                b_name = "Bucket D"
-            elif latest_to >= 30.0:
+            # TURNOVER-BASED BUCKET SEGREGATION
+            if latest_to >= 30.0:
                 b_name = "Bucket A"
             elif latest_to >= 5.0:
                 b_name = "Bucket B"
+            elif latest_to >= 1.0:
+                b_name = "Bucket C" # Fixed: 1 Cr to 5 Cr provides an active constituent pool
             else:
-                b_name = "Bucket C"
+                b_name = "Bucket D" # Microcaps < 1 Cr turnover
 
             obvs = np.zeros(N, dtype=float)
             cur_obv = 0.0
@@ -261,13 +243,13 @@ def run_bucket_combinatorial_sweep():
             buckets_data[b_name].append({
                 "sym": sym, "closes": closes, "highs": highs, "lows": lows,
                 "times": times, "obvs": obvs, "vol_sma9": vol_sma9,
-                "to_50": to_50, "dot_cumsums": dot_cumsums, "N": N
+                "dot_cumsums": dot_cumsums, "N": N
             })
         except Exception:
             continue
 
     for b, items in buckets_data.items():
-        print(f"  • {b}: {len(items)} verified series")
+        print(f"  • {b}: {len(items)} confirmed stocks")
 
     final_leaderboard = {}
 
@@ -314,7 +296,6 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    # Volume check
                     if vol_9[i] < min_vol_bar:
                         continue
 
