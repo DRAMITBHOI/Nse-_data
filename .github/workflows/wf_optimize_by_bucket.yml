@@ -1,4 +1,4 @@
-name: Execute Bucket-Wise 5-Year Backtest
+name: Execute Multi-Bucket Combinatorial Optimization
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  run-bucket-backtest:
+  run-bucket-optimizer:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -29,18 +29,18 @@ jobs:
       - name: Ensure Data Directory Exists
         run: mkdir -p data
 
-      - name: Run Bucket-Wise Backtest Engine
-        run: python backtest_by_bucket.py
+      - name: Run Bucket Combinatorial Optimization
+        run: python optimize_by_bucket.py
 
-      - name: Commit & Push Bucket Backtest Report
+      - name: Commit & Push Leaderboard Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/backtest_bucket_report.json
+          git add data/bucket_optimization_leaderboard.json
           if git diff --staged --quiet; then
-            echo "No changes in bucket backtest report."
+            echo "No changes in bucket leaderboard."
           else
-            git commit -m "Update Bucket-Wise Backtest Report (2021-Present) [skip ci]"
+            git commit -m "Update Multi-Bucket Combinatorial Leaderboard [skip ci]"
             git pull --rebase origin main
             git push origin main
           fi
