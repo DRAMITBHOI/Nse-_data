@@ -1,16 +1,15 @@
-name: Scan HP2 Daily Production Screener
+name: Execute SCAN_HP2 Screener
 
 on:
-  schedule:
-    # 7:15 PM IST (Mon-Fri) = 1:45 PM UTC (runs cleanly after daily delivery reconciliation)
-    - cron: '45 13 * * 1-5'
   workflow_dispatch:
+  schedule:
+    - cron: '30 13 * * *' # 13:30 UTC = 7:00 PM IST (Daily)
 
 permissions:
   contents: write
 
 jobs:
-  run-hp2-scanner:
+  run-scan-hp2:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -32,18 +31,18 @@ jobs:
       - name: Ensure Data Directory Exists
         run: mkdir -p data
 
-      - name: Execute HP2 Scanner Engine
+      - name: Run HP2 Engine
         run: python scan_hp2.py
 
-      - name: Commit & Push HP2 Watchlist
+      - name: Commit & Push HP2 Results
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/scan_hp2_results.json
           if git diff --staged --quiet; then
-            echo "No screener changes detected."
+            echo "No changes in HP2 signals."
           else
-            git commit -m "Auto-update Scan HP2 Watchlist [skip ci]"
+            git commit -m "Update SCAN_HP2 Results [skip ci]"
             git pull --rebase origin main
             git push origin main
           fi
