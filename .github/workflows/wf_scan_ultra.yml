@@ -1,0 +1,45 @@
+name: Execute SCAN_ULTRA Screener
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 13 * * 1-5' # 13:30 UTC = 7:00 PM IST (Monday to Friday)
+
+permissions:
+  contents: write
+
+jobs:
+  run-scan-ultra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install pandas numpy requests
+
+      - name: Run SCAN_ULTRA Engine
+        run: python scan_ultra.py
+
+      - name: Commit & Push SCAN_ULTRA Signals
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/scan_ultra_results.json
+          if git diff --staged --quiet; then
+            echo "No new signals today."
+          else
+            git commit -m "Update SCAN_ULTRA Signals [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
