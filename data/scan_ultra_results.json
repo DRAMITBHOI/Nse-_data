@@ -1,0 +1,30 @@
+{
+  "Generated Timestamp": "2026-09-05 18:14:00 IST",
+  "Execution Duration Sec": 16.6,
+  "Summary": {
+    "Total Scanned": 3489,
+    "Total Signals": 1
+  },
+  "Alerts": {
+    "Bucket A": [
+      {
+        "symbol": "RBLBANK",
+        "bucket": "Bucket A",
+        "trigger_date": "2026-09-03",
+        "is_fresh": false,
+        "current_price": 414.35,
+        "breakout_price": 408.1,
+        "stop_loss": 372.0,
+        "risk_pct": 8.85,
+        "macro_high": 394.5,
+        "box_depth": 23.9,
+        "dots_count": 8,
+        "avg_turnover_cr": 188.88,
+        "target_rule": "+50% Rally / Trailing 20d"
+      }
+    ],
+    "Bucket B": [],
+    "Bucket C": [],
+    "Bucket D": []
+  }
+}
