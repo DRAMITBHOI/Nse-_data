@@ -117,7 +117,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Full Bucket-Wise Combinatorial Optimization...")
+    print("🚀 Initializing Optimized Multi-Bucket Sweep...")
 
     n750_set = load_nifty_750_set()
     reserved = {
@@ -133,15 +133,15 @@ def run_bucket_combinatorial_sweep():
     }
 
     stock_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f not in reserved]
-    print(f"📦 Pre-loading & Classifying {len(stock_files)} stocks into Buckets...")
-
-    buckets_data = {"Bucket A": [], "Bucket B": [], "Bucket C": [], "Bucket D": []}
+    print(f"📦 Processing {len(stock_files)} stocks into memory...")
 
     DOT_PRESETS = [
         {"vol_m": 1.40, "pct_m": 1.30},
         {"vol_m": 1.50, "pct_m": 1.30},
         {"vol_m": 1.50, "pct_m": 1.40}
     ]
+
+    buckets_data = {"Bucket A": [], "Bucket B": [], "Bucket C": [], "Bucket D": []}
 
     for f in stock_files:
         sym = f.replace(".json", "").strip().upper()
@@ -204,46 +204,49 @@ def run_bucket_combinatorial_sweep():
             continue
 
     for b, items in buckets_data.items():
-        print(f"  • {b}: {len(items)} stocks ready")
+        print(f"  • {b}: {len(items)} stocks")
 
-    # Tailored Combinatorial Search Space per Bucket
-    BUCKET_PARAM_SPACES = {
+    # High-Impact Parametric Sweep Grids (Streamlined to 12-16 optimal combos per bucket)
+    BUCKET_SPACES = {
         "Bucket A": {
-            "base_windows": [40, 60, 90],
-            "box_depths": [25.0, 35.0],
-            "min_dots": [3, 4, 5],
-            "max_risks": [8.0, 10.0],
+            "base_windows": [40, 60],
+            "box_depths": [30.0],
+            "dot_indices": [0, 1],
+            "min_dots": [3, 4],
+            "max_risks": [8.0],
             "exits": [
                 {"book": 15.0, "be": 10.0, "trail": 10},
                 {"book": 20.0, "be": 12.0, "trail": 12}
             ]
         },
         "Bucket B": {
-            "base_windows": [60, 90, 120],
-            "box_depths": [30.0, 40.0],
-            "min_dots": [4, 5, 6],
-            "max_risks": [8.0, 10.0],
+            "base_windows": [60, 90],
+            "box_depths": [35.0],
+            "dot_indices": [1, 2],
+            "min_dots": [4, 5],
+            "max_risks": [10.0],
             "exits": [
                 {"book": 20.0, "be": 12.0, "trail": 12},
                 {"book": 25.0, "be": 15.0, "trail": 15}
             ]
         },
         "Bucket C": {
-            "base_windows": [80, 120, 150],
-            "box_depths": [30.0, 45.0],
-            "min_dots": [5, 6, 8],
-            "max_risks": [10.0, 12.0],
+            "base_windows": [90, 120],
+            "box_depths": [35.0, 45.0],
+            "dot_indices": [1, 2],
+            "min_dots": [5, 6],
+            "max_risks": [12.0],
             "exits": [
-                {"book": 20.0, "be": 12.0, "trail": 12},
                 {"book": 25.0, "be": 15.0, "trail": 15},
                 {"book": 35.0, "be": 15.0, "trail": 15}
             ]
         },
         "Bucket D": {
-            "base_windows": [120, 160, 200],
+            "base_windows": [140, 180],
             "box_depths": [35.0, 45.0],
-            "min_dots": [6, 8, 10],
-            "max_risks": [12.0, 15.0],
+            "dot_indices": [1, 2],
+            "min_dots": [6, 8],
+            "max_risks": [12.0],
             "exits": [
                 {"book": 35.0, "be": 15.0, "trail": 20},
                 {"book": 50.0, "be": 20.0, "trail": 20}
@@ -254,16 +257,16 @@ def run_bucket_combinatorial_sweep():
     final_leaderboard = {}
 
     for b_name, b_stocks in buckets_data.items():
-        space = BUCKET_PARAM_SPACES[b_name]
+        space = BUCKET_SPACES[b_name]
         combos = list(itertools.product(
             space["base_windows"],
             space["box_depths"],
-            range(len(DOT_PRESETS)),
+            space["dot_indices"],
             space["min_dots"],
             space["max_risks"],
             space["exits"]
         ))
-        print(f"\n🔬 Optimizing {b_name} across {len(combos)} permutations...")
+        print(f"\n🔬 Testing {len(combos)} setups for {b_name}...")
 
         b_results = []
 
@@ -294,7 +297,7 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    if vol_9[i] < (30000 if b_name in ["Bucket A", "Bucket B"] else 15000):
+                    if vol_9[i] < (25000 if b_name in ["Bucket A", "Bucket B"] else 12000):
                         continue
 
                     num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
@@ -374,8 +377,7 @@ def run_bucket_combinatorial_sweep():
                         cooldown = i + max(hold_days, 10)
 
             total_trades = len(trade_returns)
-            # Minimum statistical significance threshold
-            if total_trades >= (10 if b_name in ["Bucket A", "Bucket C"] else 15):
+            if total_trades >= 10:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
@@ -402,7 +404,6 @@ def run_bucket_combinatorial_sweep():
                     "multi50_rate": multi_rate
                 })
 
-        # Rank strictly by Win Rate % DESC, then Profit Factor DESC
         b_results.sort(key=lambda x: (x["win_rate"], x["profit_factor"]), reverse=True)
         for rank, entry in enumerate(b_results, start=1):
             entry["rank"] = rank
