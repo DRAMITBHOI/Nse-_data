@@ -12,8 +12,8 @@ START_DATE = "2021-01-01"
 BASE_WINDOWS = [80, 120, 160]
 BOX_DEPTHS = [30.0, 40.0]
 DOT_PRESETS = [
+    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 4},
     {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 6},
-    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 8},
     {"vol_m": 1.50, "pct_m": 1.40, "min_dots": 8}
 ]
 MAX_RISKS = [10.0, 12.0]
@@ -131,7 +131,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Universal Bucket Sweep...")
+    print("🚀 Initializing Universal Bucket Optimization Engine...")
 
     n750_set = load_nifty_750_set()
     reserved = {
@@ -179,11 +179,12 @@ def run_bucket_combinatorial_sweep():
             latest_to = to_50[-1]
             is_n750 = sym in n750_set
 
+            # Turnovers: A >= 30 Cr, B: 5 to 30 Cr, C: < 5 Cr (Nifty 750), D: Non-Nifty 750
             if not is_n750:
                 b_name = "Bucket D"
-            elif latest_to >= 25.0:
+            elif latest_to >= 30.0:
                 b_name = "Bucket A"
-            elif latest_to >= 4.0:
+            elif latest_to >= 5.0:
                 b_name = "Bucket B"
             else:
                 b_name = "Bucket C"
@@ -213,7 +214,7 @@ def run_bucket_combinatorial_sweep():
             continue
 
     for b, items in buckets_data.items():
-        print(f"  • {b}: {len(items)} verified series")
+        print(f"  • {b}: {len(items)} verified stocks")
 
     combos = list(itertools.product(
         BASE_WINDOWS,
@@ -222,7 +223,7 @@ def run_bucket_combinatorial_sweep():
         MAX_RISKS,
         EXITS
     ))
-    print(f"\n🔬 Evaluating {len(combos)} universal permutations per bucket...")
+    print(f"\n🔬 Evaluating {len(combos)} universal parameter permutations per bucket...")
 
     final_leaderboard = {}
 
@@ -257,9 +258,9 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    # Dynamic turnover floor per bucket
+                    # Dynamic turnover floor
                     if b_name == "Bucket C":
-                        if to_50[i] < 0.15:
+                        if to_50[i] < 0.10:
                             continue
                     elif b_name == "Bucket D":
                         if to_50[i] < 0.10:
@@ -347,10 +348,10 @@ def run_bucket_combinatorial_sweep():
             total_trades = len(trade_returns)
             trades_per_yr = round(total_trades / 5.67, 1)
 
-            # Minimum annual threshold: 4/yr for smaller buckets, 6/yr for large/mid
-            min_floor = 4.0 if b_name in ["Bucket B", "Bucket C"] else 6.0
+            # Sample size gate: Bucket C has fewer stocks, so floor is lowered to >= 6 total trades
+            min_count_floor = 6 if b_name == "Bucket C" else 15
 
-            if trades_per_yr >= min_floor and total_trades >= 15:
+            if total_trades >= min_count_floor:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
