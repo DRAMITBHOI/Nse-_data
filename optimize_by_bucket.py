@@ -24,20 +24,24 @@ EXITS = [
 ]
 
 def load_nifty_750_set():
-    local_path = os.path.join(DATA_DIR, "nifty750.json")
-    if os.path.exists(local_path):
-        try:
-            with open(local_path, "r", encoding="utf-8") as fp:
-                raw = json.load(fp)
-                if isinstance(raw, list):
-                    return set(str(x).strip().upper() for x in raw)
-                elif isinstance(raw, dict):
-                    return set(str(x).strip().upper() for x in raw.keys())
-        except Exception:
-            pass
+    paths = [
+        os.path.join(DATA_DIR, "nifty750.json"),
+        "nifty750.json"
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    raw = json.load(fp)
+                    if isinstance(raw, list):
+                        return set(str(x).strip().upper() for x in raw)
+                    elif isinstance(raw, dict):
+                        return set(str(x).strip().upper() for x in raw.keys())
+            except Exception:
+                pass
     return set()
 
-def clean_stock_records(raw_data, min_len=90):
+def clean_stock_records(raw_data, min_len=80):
     if not raw_data or not isinstance(raw_data, list):
         return []
     date_map = {}
@@ -131,9 +135,11 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Ultra-Fast Vectorized Bucket Sweep...")
+    print("🚀 Initializing Precision Multi-Bucket Optimization...")
 
     n750_set = load_nifty_750_set()
+    print(f"📋 Loaded {len(n750_set)} Nifty 750 constituents.")
+
     reserved = {
         "fundamentals.json", "screener_results.json", "nifty750.json",
         "NIFTY50.json", "NIFTY.json", "fno_history.json",
@@ -147,7 +153,7 @@ def run_bucket_combinatorial_sweep():
     }
 
     stock_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f not in reserved]
-    print(f"📦 Pre-loading and classifying {len(stock_files)} stocks into memory...")
+    print(f"📦 Pre-loading and classifying {len(stock_files)} stocks...")
 
     buckets_data = {"Bucket A": [], "Bucket B": [], "Bucket C": [], "Bucket D": []}
 
@@ -157,7 +163,7 @@ def run_bucket_combinatorial_sweep():
         try:
             with open(p, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
-            clean = clean_stock_records(raw, min_len=90)
+            clean = clean_stock_records(raw, min_len=80)
             if not clean:
                 continue
 
@@ -176,10 +182,11 @@ def run_bucket_combinatorial_sweep():
             turnover_cr = (closes * volumes) / 1e7
             to_50 = fast_rolling(turnover_cr, 50)
 
-            latest_to = to_50[-1]
+            latest_to = float(to_50[-1])
             is_n750 = sym in n750_set
 
-            if not is_n750:
+            # Robust classification
+            if not is_n750 and len(n750_set) > 100:
                 b_name = "Bucket D"
             elif latest_to >= 30.0:
                 b_name = "Bucket A"
@@ -215,12 +222,11 @@ def run_bucket_combinatorial_sweep():
     for b, items in buckets_data.items():
         print(f"  • {b}: {len(items)} stocks ready")
 
-    # High-leverage permutations (streamlined from 108 down to 24 targeted combos per bucket)
     TARGETED_COMBOS = [
         # (base_w, max_box, dot_idx, max_risk, exit_idx)
-        (80, 30.0, 1, 10.0, 0),
-        (80, 30.0, 1, 12.0, 1),
-        (80, 30.0, 2, 12.0, 2),
+        (80, 30.0, 0, 10.0, 0),  # 4 dots, book 25
+        (80, 30.0, 1, 10.0, 1),  # 6 dots, book 35
+        (80, 30.0, 2, 12.0, 2),  # 8 dots, book 50
         (80, 40.0, 0, 10.0, 0),
         (80, 40.0, 1, 12.0, 1),
         (80, 40.0, 2, 12.0, 2),
@@ -261,7 +267,6 @@ def run_bucket_combinatorial_sweep():
                 times = s["times"]
                 obvs = s["obvs"]
                 dot_cumsum = s["dot_cumsums"][dot_idx]
-                to_50 = s["to_50"]
                 N = s["N"]
 
                 if N < (base_w + 15):
@@ -272,13 +277,9 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    # Liquidity check
-                    if b_name == "Bucket C":
-                        if to_50[i] < 0.10: continue
-                    elif b_name == "Bucket D":
-                        if to_50[i] < 0.10: continue
-                    else:
-                        if s["vol_sma9"][i] < 15000: continue
+                    # Liquidity floor: Only enforce share-volume floor on Buckets A and B
+                    if b_name in ["Bucket A", "Bucket B"] and s["vol_sma9"][i] < 15000:
+                        continue
 
                     num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
                     if num_dots < min_dots:
@@ -359,10 +360,10 @@ def run_bucket_combinatorial_sweep():
             total_trades = len(trade_returns)
             trades_per_yr = round(total_trades / 5.67, 1)
 
-            # Sample floor: relaxed to 5 trades for small-universe Bucket C
-            min_count_floor = 5 if b_name == "Bucket C" else 15
+            # Minimum trade count threshold: Bucket C has fewer stocks, so floor is >= 4 total trades
+            min_floor = 4 if b_name == "Bucket C" else 12
 
-            if total_trades >= min_count_floor:
+            if total_trades >= min_floor:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
