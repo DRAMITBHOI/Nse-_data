@@ -9,25 +9,72 @@ DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "bucket_optimization_leaderboard.json")
 START_DATE = "2021-01-01"
 
-BASE_WINDOWS = [80, 120, 160]
-BOX_DEPTHS = [30.0, 40.0]
-DOT_PRESETS = [
-    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 4},
-    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 6},
-    {"vol_m": 1.50, "pct_m": 1.40, "min_dots": 8}
-]
-MAX_RISKS = [10.0, 12.0]
-EXITS = [
-    {"book": 25.0, "be": 15.0, "trail": 15},
-    {"book": 35.0, "be": 15.0, "trail": 20},
-    {"book": 50.0, "be": 20.0, "trail": 20}
+# UNIVERSAL DOT MULTIPLIER REGISTRY
+DOT_SPECS = [
+    {"id": "soft_3d", "vol_m": 1.30, "pct_m": 1.20, "min_dots": 3},
+    {"id": "soft_4d", "vol_m": 1.30, "pct_m": 1.20, "min_dots": 4},
+    {"id": "std_4d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 4},
+    {"id": "std_6d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 6},
+    {"id": "std_8d",  "vol_m": 1.40, "pct_m": 1.30, "min_dots": 8},
+    {"id": "high_8d", "vol_m": 1.50, "pct_m": 1.40, "min_dots": 8}
 ]
 
+# PRIORITIZED COMBINATORIAL SEARCH PER BUCKET
+BUCKET_SWEEP_CONFIGS = {
+    "Bucket A": {
+        "base_windows": [80, 120, 160],
+        "box_depths": [30.0, 40.0],
+        "dot_indices": [3, 4, 5], # 6d std, 8d std, 8d high
+        "max_risks": [10.0, 12.0],
+        "exits": [
+            {"book": 35.0, "be": 15.0, "trail": 20},
+            {"book": 50.0, "be": 20.0, "trail": 20}
+        ],
+        "min_trades_floor": 10,
+        "min_vol_bar": 15000
+    },
+    "Bucket B": {
+        "base_windows": [90, 120, 160],
+        "box_depths": [30.0, 40.0],
+        "dot_indices": [3, 4, 5], # 6d std, 8d std (Video 2 Rank 1), 8d high
+        "max_risks": [10.0, 12.0],
+        "exits": [
+            {"book": 20.0, "be": 12.0, "trail": 12},
+            {"book": 35.0, "be": 15.0, "trail": 20},
+            {"book": 50.0, "be": 20.0, "trail": 20}
+        ],
+        "min_trades_floor": 8,
+        "min_vol_bar": 10000
+    },
+    "Bucket C": {
+        "base_windows": [60, 80, 120],
+        "box_depths": [25.0, 30.0, 35.0],
+        "dot_indices": [0, 1, 2], # 3d soft, 4d soft, 4d std (Adaptive for low turnover)
+        "max_risks": [10.0, 12.0],
+        "exits": [
+            {"book": 20.0, "be": 12.0, "trail": 12},
+            {"book": 35.0, "be": 15.0, "trail": 15},
+            {"book": 50.0, "be": 20.0, "trail": 20}
+        ],
+        "min_trades_floor": 2, # Guarantees non-empty display for small N750 low-turnover pool
+        "min_vol_bar": 2500
+    },
+    "Bucket D": {
+        "base_windows": [80, 120, 160],
+        "box_depths": [30.0, 40.0],
+        "dot_indices": [3, 4, 5], # 6d std, 8d std (Video 3 Rank 1), 8d high
+        "max_risks": [10.0, 12.0],
+        "exits": [
+            {"book": 35.0, "be": 15.0, "trail": 20},
+            {"book": 50.0, "be": 20.0, "trail": 20}
+        ],
+        "min_trades_floor": 10,
+        "min_vol_bar": 5000
+    }
+}
+
 def load_nifty_750_set():
-    paths = [
-        os.path.join(DATA_DIR, "nifty750.json"),
-        "nifty750.json"
-    ]
+    paths = [os.path.join(DATA_DIR, "nifty750.json"), "nifty750.json"]
     for p in paths:
         if os.path.exists(p):
             try:
@@ -41,7 +88,7 @@ def load_nifty_750_set():
                 pass
     return set()
 
-def clean_stock_records(raw_data, min_len=80):
+def clean_stock_records(raw_data, min_len=70):
     if not raw_data or not isinstance(raw_data, list):
         return []
     date_map = {}
@@ -135,7 +182,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Precision Multi-Bucket Optimization...")
+    print("🚀 Initializing Prioritized Multi-Bucket Sweep...")
 
     n750_set = load_nifty_750_set()
     print(f"📋 Loaded {len(n750_set)} Nifty 750 constituents.")
@@ -163,7 +210,7 @@ def run_bucket_combinatorial_sweep():
         try:
             with open(p, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
-            clean = clean_stock_records(raw, min_len=80)
+            clean = clean_stock_records(raw, min_len=70)
             if not clean:
                 continue
 
@@ -185,7 +232,7 @@ def run_bucket_combinatorial_sweep():
             latest_to = float(to_50[-1])
             is_n750 = sym in n750_set
 
-            # Robust classification
+            # UNBIASED TURNOVER ALLOCATION
             if not is_n750 and len(n750_set) > 100:
                 b_name = "Bucket D"
             elif latest_to >= 30.0:
@@ -207,7 +254,7 @@ def run_bucket_combinatorial_sweep():
                 obvs[idx] = cur_obv
 
             dot_cumsums = {}
-            for d_idx, d_p in enumerate(DOT_PRESETS):
+            for d_idx, d_p in enumerate(DOT_SPECS):
                 mask = (pcts >= (d_p["pct_m"] * pct_sma50)) & (d_vols >= (d_p["vol_m"] * deliv_sma20))
                 dot_cumsums[d_idx] = np.cumsum(mask.astype(int))
 
@@ -220,39 +267,28 @@ def run_bucket_combinatorial_sweep():
             continue
 
     for b, items in buckets_data.items():
-        print(f"  • {b}: {len(items)} stocks ready")
-
-    TARGETED_COMBOS = [
-        # (base_w, max_box, dot_idx, max_risk, exit_idx)
-        (80, 30.0, 0, 10.0, 0),  # 4 dots, book 25
-        (80, 30.0, 1, 10.0, 1),  # 6 dots, book 35
-        (80, 30.0, 2, 12.0, 2),  # 8 dots, book 50
-        (80, 40.0, 0, 10.0, 0),
-        (80, 40.0, 1, 12.0, 1),
-        (80, 40.0, 2, 12.0, 2),
-        (120, 30.0, 0, 10.0, 0),
-        (120, 30.0, 1, 12.0, 1),
-        (120, 30.0, 2, 12.0, 2),
-        (120, 40.0, 0, 10.0, 0),
-        (120, 40.0, 1, 12.0, 1),
-        (120, 40.0, 2, 12.0, 2),
-        (160, 30.0, 1, 10.0, 1),
-        (160, 30.0, 2, 12.0, 2),
-        (160, 40.0, 0, 10.0, 0),
-        (160, 40.0, 1, 12.0, 1),
-        (160, 40.0, 2, 12.0, 2),
-    ]
+        print(f"  • {b}: {len(items)} verified series")
 
     final_leaderboard = {}
 
     for b_name, b_stocks in buckets_data.items():
-        print(f"\n🔬 Simulating {b_name} across {len(TARGETED_COMBOS)} high-impact permutations...")
-        b_results = []
+        cfg = BUCKET_SWEEP_CONFIGS[b_name]
+        combos = list(itertools.product(
+            cfg["base_windows"],
+            cfg["box_depths"],
+            cfg["dot_indices"],
+            cfg["max_risks"],
+            cfg["exits"]
+        ))
+        print(f"\n🔬 Evaluating {b_name} across {len(combos)} permutations...")
 
-        for base_w, max_box, dot_idx, max_risk, exit_idx in TARGETED_COMBOS:
-            dot_spec = DOT_PRESETS[dot_idx]
+        b_results = []
+        min_vol_bar = cfg["min_vol_bar"]
+        min_trades_floor = cfg["min_trades_floor"]
+
+        for base_w, max_box, dot_idx, max_risk, exit_rule in combos:
+            dot_spec = DOT_SPECS[dot_idx]
             min_dots = dot_spec["min_dots"]
-            exit_rule = EXITS[exit_idx]
             book_pct = exit_rule["book"]
             be_trig = exit_rule["be"]
             trail_w = exit_rule["trail"]
@@ -266,6 +302,7 @@ def run_bucket_combinatorial_sweep():
                 lows = s["lows"]
                 times = s["times"]
                 obvs = s["obvs"]
+                vol_9 = s["vol_sma9"]
                 dot_cumsum = s["dot_cumsums"][dot_idx]
                 N = s["N"]
 
@@ -277,8 +314,8 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    # Liquidity floor: Only enforce share-volume floor on Buckets A and B
-                    if b_name in ["Bucket A", "Bucket B"] and s["vol_sma9"][i] < 15000:
+                    # Volume check
+                    if vol_9[i] < min_vol_bar:
                         continue
 
                     num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
@@ -360,10 +397,7 @@ def run_bucket_combinatorial_sweep():
             total_trades = len(trade_returns)
             trades_per_yr = round(total_trades / 5.67, 1)
 
-            # Minimum trade count threshold: Bucket C has fewer stocks, so floor is >= 4 total trades
-            min_floor = 4 if b_name == "Bucket C" else 12
-
-            if total_trades >= min_floor:
+            if total_trades >= min_trades_floor:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
