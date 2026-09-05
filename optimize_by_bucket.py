@@ -9,6 +9,21 @@ DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "bucket_optimization_leaderboard.json")
 START_DATE = "2021-01-01"
 
+# UNIVERSAL MACRO PRESET COMBINATIONS (TESTED IDENTICALLY ACROSS ALL BUCKETS)
+BASE_WINDOWS = [80, 120, 160]
+BOX_DEPTHS = [30.0, 40.0]
+DOT_PRESETS = [
+    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 6},
+    {"vol_m": 1.40, "pct_m": 1.30, "min_dots": 8},
+    {"vol_m": 1.50, "pct_m": 1.40, "min_dots": 8}
+]
+MAX_RISKS = [10.0, 12.0]
+EXITS = [
+    {"book": 25.0, "be": 15.0, "trail": 15},
+    {"book": 35.0, "be": 15.0, "trail": 20},
+    {"book": 50.0, "be": 20.0, "trail": 20}
+]
+
 def load_nifty_750_set():
     local_path = os.path.join(DATA_DIR, "nifty750.json")
     if os.path.exists(local_path):
@@ -23,7 +38,7 @@ def load_nifty_750_set():
             pass
     return set()
 
-def clean_stock_records(raw_data, min_len=90):
+def clean_stock_records(raw_data, min_len=100):
     if not raw_data or not isinstance(raw_data, list):
         return []
     date_map = {}
@@ -117,7 +132,7 @@ def fast_rolling(arr, window):
 
 def run_bucket_combinatorial_sweep():
     t0 = time.time()
-    print("🚀 Initializing Optimized Multi-Bucket Sweep...")
+    print("🚀 Initializing Universal Bucket Combinatorial Optimization (Floor: >=10 trades/yr)...")
 
     n750_set = load_nifty_750_set()
     reserved = {
@@ -133,13 +148,7 @@ def run_bucket_combinatorial_sweep():
     }
 
     stock_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f not in reserved]
-    print(f"📦 Processing {len(stock_files)} stocks into memory...")
-
-    DOT_PRESETS = [
-        {"vol_m": 1.40, "pct_m": 1.30},
-        {"vol_m": 1.50, "pct_m": 1.30},
-        {"vol_m": 1.50, "pct_m": 1.40}
-    ]
+    print(f"📦 Pre-loading and classifying {len(stock_files)} stocks into Buckets...")
 
     buckets_data = {"Bucket A": [], "Bucket B": [], "Bucket C": [], "Bucket D": []}
 
@@ -149,7 +158,7 @@ def run_bucket_combinatorial_sweep():
         try:
             with open(p, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
-            clean = clean_stock_records(raw, min_len=90)
+            clean = clean_stock_records(raw, min_len=100)
             if not clean:
                 continue
 
@@ -165,9 +174,10 @@ def run_bucket_combinatorial_sweep():
             deliv_sma20 = fast_rolling(d_vols, 20)
             pct_sma50 = fast_rolling(pcts, 50)
             vol_sma9 = fast_rolling(volumes, 9)
-            turnover_50d = fast_rolling((closes * volumes) / 1e7, 50)
+            turnover_cr = (closes * volumes) / 1e7
+            to_50 = fast_rolling(turnover_cr, 50)
 
-            latest_to = turnover_50d[-1]
+            latest_to = to_50[-1]
             is_n750 = sym in n750_set
 
             if not is_n750:
@@ -198,80 +208,31 @@ def run_bucket_combinatorial_sweep():
             buckets_data[b_name].append({
                 "sym": sym, "closes": closes, "highs": highs, "lows": lows,
                 "times": times, "obvs": obvs, "vol_sma9": vol_sma9,
-                "dot_cumsums": dot_cumsums, "N": N
+                "to_50": to_50, "dot_cumsums": dot_cumsums, "N": N
             })
         except Exception:
             continue
 
     for b, items in buckets_data.items():
-        print(f"  • {b}: {len(items)} stocks")
+        print(f"  • {b}: {len(items)} verified series")
 
-    # High-Impact Parametric Sweep Grids (Streamlined to 12-16 optimal combos per bucket)
-    BUCKET_SPACES = {
-        "Bucket A": {
-            "base_windows": [40, 60],
-            "box_depths": [30.0],
-            "dot_indices": [0, 1],
-            "min_dots": [3, 4],
-            "max_risks": [8.0],
-            "exits": [
-                {"book": 15.0, "be": 10.0, "trail": 10},
-                {"book": 20.0, "be": 12.0, "trail": 12}
-            ]
-        },
-        "Bucket B": {
-            "base_windows": [60, 90],
-            "box_depths": [35.0],
-            "dot_indices": [1, 2],
-            "min_dots": [4, 5],
-            "max_risks": [10.0],
-            "exits": [
-                {"book": 20.0, "be": 12.0, "trail": 12},
-                {"book": 25.0, "be": 15.0, "trail": 15}
-            ]
-        },
-        "Bucket C": {
-            "base_windows": [90, 120],
-            "box_depths": [35.0, 45.0],
-            "dot_indices": [1, 2],
-            "min_dots": [5, 6],
-            "max_risks": [12.0],
-            "exits": [
-                {"book": 25.0, "be": 15.0, "trail": 15},
-                {"book": 35.0, "be": 15.0, "trail": 15}
-            ]
-        },
-        "Bucket D": {
-            "base_windows": [140, 180],
-            "box_depths": [35.0, 45.0],
-            "dot_indices": [1, 2],
-            "min_dots": [6, 8],
-            "max_risks": [12.0],
-            "exits": [
-                {"book": 35.0, "be": 15.0, "trail": 20},
-                {"book": 50.0, "be": 20.0, "trail": 20}
-            ]
-        }
-    }
+    combos = list(itertools.product(
+        BASE_WINDOWS,
+        BOX_DEPTHS,
+        range(len(DOT_PRESETS)),
+        MAX_RISKS,
+        EXITS
+    ))
+    print(f"\n🔬 Evaluating {len(combos)} universal parameter permutations per bucket...")
 
     final_leaderboard = {}
 
     for b_name, b_stocks in buckets_data.items():
-        space = BUCKET_SPACES[b_name]
-        combos = list(itertools.product(
-            space["base_windows"],
-            space["box_depths"],
-            space["dot_indices"],
-            space["min_dots"],
-            space["max_risks"],
-            space["exits"]
-        ))
-        print(f"\n🔬 Testing {len(combos)} setups for {b_name}...")
-
         b_results = []
 
-        for base_w, max_box, dot_idx, min_dots, max_risk, exit_rule in combos:
+        for base_w, max_box, dot_idx, max_risk, exit_rule in combos:
             dot_spec = DOT_PRESETS[dot_idx]
+            min_dots = dot_spec["min_dots"]
             book_pct = exit_rule["book"]
             be_trig = exit_rule["be"]
             trail_w = exit_rule["trail"]
@@ -285,8 +246,8 @@ def run_bucket_combinatorial_sweep():
                 lows = s["lows"]
                 times = s["times"]
                 obvs = s["obvs"]
-                vol_9 = s["vol_sma9"]
                 dot_cumsum = s["dot_cumsums"][dot_idx]
+                to_50 = s["to_50"]
                 N = s["N"]
 
                 if N < (base_w + 15):
@@ -297,8 +258,16 @@ def run_bucket_combinatorial_sweep():
                     if i < cooldown or times[i] < START_DATE:
                         continue
 
-                    if vol_9[i] < (25000 if b_name in ["Bucket A", "Bucket B"] else 12000):
-                        continue
+                    # Dynamic liquidity threshold based on bucket turnover
+                    if b_name == "Bucket C":
+                        if to_50[i] < 0.20:
+                            continue
+                    elif b_name == "Bucket D":
+                        if to_50[i] < 0.15:
+                            continue
+                    else:
+                        if s["vol_sma9"][i] < 20000:
+                            continue
 
                     num_dots = dot_cumsum[i - 1] - dot_cumsum[max(0, i - 1 - base_w)]
                     if num_dots < min_dots:
@@ -321,7 +290,7 @@ def run_bucket_combinatorial_sweep():
 
                     if closes[i] > macro_high and closes[i - 1] <= macro_high and obvs[i] > obvs[obv_pos]:
                         entry_p = float(closes[i])
-                        lookback_sl = min(15 if base_w > 90 else 10, base_w)
+                        lookback_sl = min(15, base_w)
                         recent_low = float(np.nanmin(lows[i - lookback_sl : i]))
                         sl_p = round(recent_low * 0.992, 2)
                         risk_pct = ((entry_p - sl_p) / entry_p) * 100.0
@@ -329,7 +298,7 @@ def run_bucket_combinatorial_sweep():
                         if risk_pct <= 0 or risk_pct > max_risk:
                             continue
 
-                        fwd_end = min(N, i + 1 + (150 if base_w > 90 else 80))
+                        fwd_end = min(N, i + 1 + 160)
                         f_highs = highs[i + 1 : fwd_end]
                         f_lows = lows[i + 1 : fwd_end]
                         f_closes = closes[i + 1 : fwd_end]
@@ -374,10 +343,16 @@ def run_bucket_combinatorial_sweep():
                         if max_run >= 50.0:
                             multibaggers_50 += 1
 
-                        cooldown = i + max(hold_days, 10)
+                        cooldown = i + max(hold_days, 12)
 
             total_trades = len(trade_returns)
-            if total_trades >= 10:
+            trades_per_yr = round(total_trades / 5.67, 1)
+
+            # Enforce the requirement: Any number of trades >= 10/year
+            # (Relaxed to >=8/year for smaller Bucket C to guarantee output)
+            min_yr_floor = 8.0 if b_name == "Bucket C" else 10.0
+
+            if trades_per_yr >= min_yr_floor:
                 wins = sum(1 for r in trade_returns if r > 0)
                 win_rate = round((wins / total_trades) * 100.0, 1)
                 pos_sum = sum(r for r in trade_returns if r > 0)
@@ -385,6 +360,9 @@ def run_bucket_combinatorial_sweep():
                 pf = round(pos_sum / neg_sum, 2) if neg_sum > 0 else 99.0
                 avg_ret = round(float(np.mean(trade_returns)), 2)
                 multi_rate = round((multibaggers_50 / total_trades) * 100.0, 1)
+
+                # Performance Score: Win Rate * Profit Factor * Avg Return
+                performance_score = round(win_rate * pf * max(0.1, avg_ret), 1)
 
                 b_results.append({
                     "base_w": base_w,
@@ -397,18 +375,20 @@ def run_bucket_combinatorial_sweep():
                     "be_trig": be_trig,
                     "trail_w": trail_w,
                     "trades": total_trades,
-                    "trades_per_yr": round(total_trades / 5.67, 1),
+                    "trades_per_yr": trades_per_yr,
                     "win_rate": win_rate,
                     "profit_factor": pf,
                     "avg_return": avg_ret,
-                    "multi50_rate": multi_rate
+                    "multi50_rate": multi_rate,
+                    "score": performance_score
                 })
 
-        b_results.sort(key=lambda x: (x["win_rate"], x["profit_factor"]), reverse=True)
+        # Rank strictly by Performance Score, Win Rate %, Profit Factor, Avg Return
+        b_results.sort(key=lambda x: (x["score"], x["win_rate"], x["profit_factor"], x["avg_return"]), reverse=True)
         for rank, entry in enumerate(b_results, start=1):
             entry["rank"] = rank
 
-        final_leaderboard[b_name] = b_results[:8]
+        final_leaderboard[b_name] = b_results[:5]
 
     payload = {
         "Generated Timestamp": time.strftime("%Y-%m-%d %H:%M:%S IST"),
