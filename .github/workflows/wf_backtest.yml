@@ -24,7 +24,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install pandas numpy
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy
+
+      - name: Ensure Directories Exist
+        run: mkdir -p data
 
       - name: Execute Backtest Engine
         run: python backtest_universe.py
