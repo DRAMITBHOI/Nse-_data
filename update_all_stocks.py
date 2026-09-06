@@ -24,7 +24,8 @@ def get_latest_recorded_date():
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json", 
             "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
+            "backtest_report.json", "init_progress.json", "scan_ultra_results.json",
+            "scan_hp1_results.json", "scan_hp2_results.json"
         ]
     ]
     if not files:
@@ -46,7 +47,7 @@ def get_latest_recorded_date():
     return datetime.date.today() - datetime.timedelta(days=15)
 
 def download_nse_session_data(session, target_date):
-    """Downloads official daily NSE Bhavcopy & Deliverable stats from official endpoints."""
+    """Downloads official daily NSE Bhavcopy & Deliverable stats."""
     d_mto = target_date.strftime("%d%m%Y")
     d_udiff = target_date.strftime("%Y%m%d")
     
@@ -84,7 +85,7 @@ def download_nse_session_data(session, target_date):
                     continue
 
                 if srs_col:
-                    df = df[df[srs_col].astype(str).str.strip().isin(["EQ", "BE", "BZ", "SM", "ST", "E1", "IL"])]
+                    df = df[df[srs_col].astype(str).str.strip().isin(["EQ", "BE", "BZ", "SM", "ST"])]
 
                 day_records = {}
                 for _, row in df.iterrows():
@@ -104,16 +105,15 @@ def download_nse_session_data(session, target_date):
 
                         entry = {
                             "time": target_date.strftime("%Y-%m-%d"),
-                            "open": o,
-                            "high": h,
-                            "low": l,
-                            "close": c,
-                            "volume": tot_vol,
-                            "delivery_vol": d_vol,
-                            "deliv_pct": d_pct
+                            "open": round(o, 2),
+                            "high": round(h, 2),
+                            "low": round(l, 2),
+                            "close": round(c, 2),
+                            "volume": round(tot_vol),
+                            "delivery_vol": round(d_vol),
+                            "deliv_pct": round(d_pct, 1)
                         }
 
-                        # If multi-series entries exist on the same date, preserve highest traded volume
                         if sym not in day_records or entry["volume"] > day_records[sym]["volume"]:
                             day_records[sym] = entry
                     except Exception:
@@ -129,7 +129,6 @@ def update_all_stocks():
     session = requests.Session()
     session.headers.update(HEADERS)
 
-    # Handshake with NSE to register cookies
     try:
         session.get("https://www.nseindia.com", timeout=15)
         time.sleep(1)
@@ -147,62 +146,76 @@ def update_all_stocks():
     missing_dates = []
     curr = last_date + datetime.timedelta(days=1)
     while curr <= today:
-        if curr.weekday() < 5:  # Monday to Friday
+        if curr.weekday() < 5:
             missing_dates.append(curr)
         curr += datetime.timedelta(days=1)
 
     daily_updates = {}
+    all_symbols_in_updates = set()
+
     if missing_dates:
         for d in missing_dates:
             print(f"📥 Fetching official NSE data for {d}...")
             records = download_nse_session_data(session, d)
             if records:
                 daily_updates[d.strftime("%Y-%m-%d")] = records
-                print(f"   -> ✅ SUCCESS: Extracted {len(records)} stocks for {d}")
+                all_symbols_in_updates.update(records.keys())
+                print(f"   -> ✅ Extracted {len(records)} stocks for {d}")
             else:
                 print(f"   -> ℹ️ No session data returned for {d}")
             time.sleep(1)
 
-    stock_files = [
-        f for f in os.listdir(DATA_DIR) 
+    # Collect all existing stock files PLUS any new symbols found in the daily updates
+    existing_symbols = set(
+        f.replace(".json", "").strip().upper() 
+        for f in os.listdir(DATA_DIR) 
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json", 
             "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
+            "backtest_report.json", "init_progress.json"
         ]
-    ]
+    )
+    
+    combined_symbols = sorted(list(existing_symbols.union(all_symbols_in_updates)))
+    print(f"📦 Updating & Syncing across {len(combined_symbols)} total stock entities...")
 
     updated_count = 0
-    for f_name in stock_files:
-        sym = f_name.replace(".json", "").strip().upper()
-        json_path = os.path.join(DATA_DIR, f_name)
+    for sym in combined_symbols:
+        json_path = os.path.join(DATA_DIR, f"{sym}.json")
+        stock_data = []
 
-        try:
-            with open(json_path, "r") as fp:
-                stock_data = json.load(fp)
-        except Exception:
-            continue
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r", encoding="utf-8") as fp:
+                    stock_data = json.load(fp)
+            except Exception:
+                stock_data = []
 
         if not isinstance(stock_data, list):
-            continue
+            stock_data = []
 
-        # 1. Deduplicate by date (eliminate duplicate timestamps)
+        # Deduplicate existing candles
         date_map = {}
         for r in stock_data:
             if isinstance(r, dict) and "time" in r:
-                t = str(r["time"]).split(" ")[0].split("T")[0]
+                t = str(r["time"])[:10]
                 r["time"] = t
                 if t not in date_map or float(r.get("volume", 0)) > float(date_map[t].get("volume", 0)):
                     date_map[t] = r
 
-        # 2. Append newly downloaded dates
+        # Append new candles from daily updates
+        has_new = False
         for d_str, records in daily_updates.items():
             if sym in records:
                 date_map[d_str] = records[sym]
+                has_new = True
+
+        if not has_new and not stock_data:
+            continue
 
         sorted_list = [date_map[k] for k in sorted(date_map.keys())]
 
-        # 3. Purge consecutive identical holiday ghost candles
+        # Purge consecutive ghost candles
         final_clean_list = []
         for item in sorted_list:
             if final_clean_list:
@@ -210,26 +223,31 @@ def update_all_stocks():
                 if (item.get("open") == prev.get("open") and 
                     item.get("high") == prev.get("high") and 
                     item.get("low") == prev.get("low") and 
-                    item.get("close") == prev.get("close")):
+                    item.get("close") == prev.get("close") and
+                    item.get("volume", 0) == 0):
                     continue
             final_clean_list.append(item)
 
-        with open(json_path, "w") as fp:
-            json.dump(final_clean_list, fp, indent=2)
-        updated_count += 1
+        try:
+            with open(json_path, "w", encoding="utf-8") as fp:
+                json.dump(final_clean_list, fp, indent=2)
+            updated_count += 1
+        except Exception:
+            continue
 
-    print(f"🎉 Successfully cleaned and updated {updated_count} stock files!")
-    update_fundamentals(session)
+    print(f"🎉 Successfully cleaned and synchronized {updated_count} stock files!")
+    update_fundamentals_sync(session)
 
-def update_fundamentals(session):
-    print("📡 Updating index constituents & fundamentals.json...")
+def update_fundamentals_sync(session):
+    print("📡 Updating full universe metadata & fundamentals.json...")
     index_urls = [
-        "https://archives.nseindia.com/content/indices/ind_nifty500list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
-        "https://archives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv"
+        ("https://archives.nseindia.com/content/indices/ind_nifty500list.csv", "Nifty 500"),
+        ("https://archives.nseindia.com/content/indices/ind_niftysmallcap250list.csv", "Nifty Smallcap 250"),
+        ("https://archives.nseindia.com/content/indices/ind_niftymidcap150list.csv", "Nifty Midcap 150"),
+        ("https://archives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv", "Nifty Microcap 250")
     ]
     verified_symbols = {}
-    for url in index_urls:
+    for url, cat in index_urls:
         try:
             resp = session.get(url, timeout=15)
             if resp.status_code == 200:
@@ -237,21 +255,22 @@ def update_fundamentals(session):
                 df.columns = df.columns.str.strip()
                 for _, row in df.iterrows():
                     sym = str(row.get("Symbol", "")).strip().upper()
-                    industry = str(row.get("Industry", "General"))
+                    ind = str(row.get("Industry", cat))
                     if sym and sym != "NAN":
-                        verified_symbols[sym] = {"industry": industry, "is_nse_tracked": True}
-        except Exception as e:
-            print(f"⚠️ Could not load index file {url}: {e}")
+                        verified_symbols[sym] = {"industry": ind, "category": cat}
+        except Exception:
+            pass
 
-    fundamentals = {}
     stock_files = [
         f for f in os.listdir(DATA_DIR) 
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json", 
             "wyckoff_screener_results.json", "active_trade_plan.json", 
-            "backtest_report.json"
+            "backtest_report.json", "init_progress.json"
         ]
     ]
+
+    fundamentals = {}
     for f_name in stock_files:
         sym = f_name.replace(".json", "").strip().upper()
         json_path = os.path.join(DATA_DIR, f_name)
@@ -260,19 +279,20 @@ def update_fundamentals(session):
                 raw_data = json.load(fp)
             if not raw_data:
                 continue
-            latest_close = float(raw_data[-1]["close"])
+            latest_c = float(raw_data[-1]["close"])
         except Exception:
             continue
 
+        info = verified_symbols.get(sym, {})
         fundamentals[sym] = {
-            "market_cap_status": "Verified Listed Equity" if sym in verified_symbols else "NSE Equity",
-            "industry": verified_symbols.get(sym, {}).get("industry", "NSE Listed"),
-            "price": latest_close,
-            "is_qualified": True if (sym in verified_symbols or latest_close >= 20.0) else False
+            "category": info.get("category", "NSE Equity"),
+            "industry": info.get("industry", "NSE Listed"),
+            "price": latest_c,
+            "qualified": True
         }
 
     out_file = os.path.join(DATA_DIR, "fundamentals.json")
-    with open(out_file, "w") as fp:
+    with open(out_file, "w", encoding="utf-8") as fp:
         json.dump(fundamentals, fp, indent=2)
     print(f"🎉 Saved {len(fundamentals)} records into {out_file}!")
 
