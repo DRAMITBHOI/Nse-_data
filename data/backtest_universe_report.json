@@ -1,0 +1,67 @@
+{
+  "Backtest Timestamp": "2026-09-06 20:21:38 IST",
+  "Execution Duration Sec": 19.3,
+  "Total Universe Tested": 2729,
+  "Results": [
+    {
+      "Strategy ID": "ULTRA_C",
+      "Strategy Name": "SCAN_ULTRA: Bucket C (1-5 Cr/d)",
+      "Base Window": "80d",
+      "Max Box": "<=40%",
+      "Total Trades": 77,
+      "Win Rate %": 50.6,
+      "Profit Factor": 2.29,
+      "Avg Return %": 4.88
+    },
+    {
+      "Strategy ID": "HP1",
+      "Strategy Name": "HP1 (Rank #3 Baseline)",
+      "Base Window": "40d",
+      "Max Box": "<=35%",
+      "Total Trades": 46,
+      "Win Rate %": 50.0,
+      "Profit Factor": 1.36,
+      "Avg Return %": 1.8
+    },
+    {
+      "Strategy ID": "ULTRA_D",
+      "Strategy Name": "SCAN_ULTRA: Bucket D (<1 Cr/d)",
+      "Base Window": "80d",
+      "Max Box": "<=40%",
+      "Total Trades": 26,
+      "Win Rate %": 50.0,
+      "Profit Factor": 0.63,
+      "Avg Return %": -4.16
+    },
+    {
+      "Strategy ID": "ULTRA_A",
+      "Strategy Name": "SCAN_ULTRA: Bucket A (>=30 Cr/d)",
+      "Base Window": "80d",
+      "Max Box": "<=40%",
+      "Total Trades": 90,
+      "Win Rate %": 47.8,
+      "Profit Factor": 2.08,
+      "Avg Return %": 4.98
+    },
+    {
+      "Strategy ID": "ULTRA_B",
+      "Strategy Name": "SCAN_ULTRA: Bucket B (5-30 Cr/d)",
+      "Base Window": "120d",
+      "Max Box": "<=40%",
+      "Total Trades": 77,
+      "Win Rate %": 42.9,
+      "Profit Factor": 1.47,
+      "Avg Return %": 3.0
+    },
+    {
+      "Strategy ID": "HP2",
+      "Strategy Name": "HP2 (Rank #16 Baseline)",
+      "Base Window": "40d",
+      "Max Box": "<=35%",
+      "Total Trades": 264,
+      "Win Rate %": 41.7,
+      "Profit Factor": 1.33,
+      "Avg Return %": 1.29
+    }
+  ]
+}
