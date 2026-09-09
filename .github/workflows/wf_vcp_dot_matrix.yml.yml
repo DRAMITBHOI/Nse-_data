@@ -1,4 +1,4 @@
-name: Run Dynamic Base Sweep
+name: Run VCP Dot Matrix Sweep
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  run-dynamic-sweep:
+  run-matrix:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -28,21 +28,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy
 
-      - name: Ensure Directories Exist
+      - name: Ensure Directory Structure
         run: mkdir -p data
 
-      - name: Run Dynamic Base Sweep
-        run: python test_dynamic_base_sweep.py
+      - name: Execute Matrix Backtest
+        run: python test_vcp_dot_matrix.py
 
       - name: Commit Report
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/dynamic_base_report.json
+          git add data/vcp_dot_matrix_report.json
           if git diff --staged --quiet; then
             echo "No changes to report."
           else
-            git commit -m "Update Dynamic Base Sweep Report [skip ci]"
+            git commit -m "Update VCP Dot Matrix Sweep Report [skip ci]"
             git pull --rebase origin main
             git push origin main
           fi
