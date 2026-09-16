@@ -1,6 +1,43 @@
 {
-  "Scan Timestamp": "2026-09-15 10:25:16 IST",
+  "Scan Timestamp": "2026-09-16 10:25:48 IST",
   "Universe": "Official NSE F&O (175 stocks scanned)",
-  "Total Candidates": 0,
-  "Candidates": []
+  "Total Candidates": 3,
+  "Candidates": [
+    {
+      "Symbol": "TATACHEM",
+      "Setup": "\ud83d\udfe2 Bullish Extension (Upper Margin Test)",
+      "LTP": 734.9,
+      "Target Margin": 734.9,
+      "Gap Upper": 734.9,
+      "Gap Lower": 616.25,
+      "Gap Size %": "+19.25%",
+      "Gap Created": "2026-09-15",
+      "Margin Distance %": "0.0%",
+      "Days Since Gap": 0
+    },
+    {
+      "Symbol": "HCLTECH",
+      "Setup": "\ud83d\udfe2 Bullish Extension (Upper Margin Test)",
+      "LTP": 1253.7,
+      "Target Margin": 1250.0,
+      "Gap Upper": 1250.0,
+      "Gap Lower": 1223.4,
+      "Gap Size %": "+2.17%",
+      "Gap Created": "2026-09-15",
+      "Margin Distance %": "0.3%",
+      "Days Since Gap": 0
+    },
+    {
+      "Symbol": "INFY",
+      "Setup": "\ud83d\udfe2 Bullish Extension (Upper Margin Test)",
+      "LTP": 1077.0,
+      "Target Margin": 1071.7,
+      "Gap Upper": 1071.7,
+      "Gap Lower": 1047.3,
+      "Gap Size %": "+2.33%",
+      "Gap Created": "2026-09-15",
+      "Margin Distance %": "0.49%",
+      "Days Since Gap": 0
+    }
+  ]
 }
