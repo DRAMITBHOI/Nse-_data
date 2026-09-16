@@ -5,9 +5,10 @@ import time
 DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "gap_margin_candidates.json")
 
-MIN_GAP_PCT = 2.0  # Gap magnitude >= 2.0% (Previous Close to Open)
-MARGIN_PROXIMITY = 4.0  # Current price within <= 4.0% of the unfilled gap margin
-LOOKBACK_DAYS = 30  # Active gap lookback window
+MIN_GAP_PCT = 2.0  # Initial Close-to-Open gap >= 2.0%
+MIN_UNFILLED_PCT = 1.5  # Remaining unfilled gap buffer >= 1.5%
+MARGIN_PROXIMITY = 4.0  # LTP within 4.0% of the gap target
+LOOKBACK_DAYS = 30  # Search window
 
 ACTIVE_FNO_SYMBOLS = {
     "AARTIIND",
@@ -226,8 +227,8 @@ def clean_data_fast(raw_data):
 
 def scan_gap_stocks():
   print(
-      f"🚀 Scanning {len(ACTIVE_FNO_SYMBOLS)} F&O stocks for UNFILLED Close-to-Open"
-      f" Gaps (>= {MIN_GAP_PCT}%)..."
+      f"🚀 Scanning {len(ACTIVE_FNO_SYMBOLS)} F&O stocks (Gap >= {MIN_GAP_PCT}%"
+      f" & Remaining Unfilled >= {MIN_UNFILLED_PCT}%)..."
   )
 
   candidates = []
@@ -257,53 +258,62 @@ def scan_gap_stocks():
     N = len(closes)
     curr_price = closes[-1]
 
-    # Search backwards from the most recent session to the lookback limit
     start_idx = max(1, N - LOOKBACK_DAYS)
+    # Check most recent gaps first
     for i in range(N - 1, start_idx - 1, -1):
       prior_close = closes[i - 1]
       gap_open = opens[i]
 
-      # Must be a bullish opening gap >= MIN_GAP_PCT
+      # Bullish gap open condition
       if gap_open <= prior_close:
         continue
 
-      gap_size_pct = round(
+      initial_gap_pct = round(
           ((gap_open - prior_close) / prior_close) * 100.0, 2
       )
-      if gap_size_pct < MIN_GAP_PCT:
+      if initial_gap_pct < MIN_GAP_PCT:
         continue
 
-      gap_upper = gap_open  # Top border of opening gap
-      gap_lower = prior_close  # Gap fill target line
+      gap_lower = prior_close
 
-      # STRICT UNFILLED CHECK:
-      # If low of ANY day from gap day up to current day touched or breached prior_close, gap was filled.
-      min_low_since_gap = min(lows[i:])
-      if min_low_since_gap <= gap_lower:
-        continue  # Already closed (e.g., IGL on Aug 20-21) -> EXCLUDE
+      # Lowest price reached across all bars from gap creation up to current day
+      lowest_post_gap = min(lows[i:])
 
-      # VICINITY TEST:
-      # Price is above the lower gap margin and within <= 4% proximity of the gap fill level
-      dist_to_gap_close_pct = round(
+      # 1. Full fill check: price reached or breached the fill line
+      if lowest_post_gap <= gap_lower:
+        continue
+
+      # 2. Dynamic unfilled calculation:
+      # If previous sessions dipped into the gap, the ceiling of the unfilled area drops to that lowest wick
+      unfilled_upper = min(gap_open, lowest_post_gap)
+      remaining_gap_pct = round(
+          ((unfilled_upper - gap_lower) / gap_lower) * 100.0, 2
+      )
+
+      # Discard if partial fills reduced tradable gap to < 1.5% (e.g. PFC case)
+      if remaining_gap_pct < MIN_UNFILLED_PCT:
+        continue
+
+      # 3. Proximity to gap target (prior_close)
+      dist_to_target_pct = round(
           ((curr_price - gap_lower) / gap_lower) * 100.0, 2
       )
 
-      if 0 <= dist_to_gap_close_pct <= MARGIN_PROXIMITY:
+      if 0 <= dist_to_target_pct <= MARGIN_PROXIMITY:
         candidates.append({
             "Symbol": sym,
-            "Setup": "🎯 Unfilled Gap Margin Retest",
+            "Setup": "🎯 Tradeable Gap Close",
             "LTP": round(curr_price, 2),
-            "Target Margin": round(gap_lower, 2),  # Target level to close
-            "Gap Upper": round(gap_upper, 2),
-            "Gap Lower": round(gap_lower, 2),
-            "Gap Size %": f"+{gap_size_pct}%",
+            "Target Margin": round(gap_lower, 2),  # Target fill price
+            "Gap Upper": round(unfilled_upper, 2),  # Top of current open space
+            "Gap Lower": round(gap_lower, 2),  # Gap origin/close
+            "Gap Size %": f"+{remaining_gap_pct}% (Init: {initial_gap_pct}%)",
             "Gap Created": times[i],
-            "Margin Distance %": f"{dist_to_gap_close_pct}%",
+            "Margin Distance %": f"{dist_to_target_pct}%",
             "Days Since Gap": N - 1 - i,
         })
         break
 
-  # Sort with closest to the gap fill target on top
   candidates.sort(key=lambda x: float(x["Margin Distance %"].replace("%", "")))
 
   payload = {
@@ -318,8 +328,8 @@ def scan_gap_stocks():
     json.dump(payload, fp, indent=2)
 
   print(
-      f"🎯 Done: {len(candidates)} valid UNFILLED gap retest candidates found."
-      f" Saved to {OUTPUT_FILE}."
+      f"🎯 Found {len(candidates)} high-potential unfilled gap setups. Saved to"
+      f" {OUTPUT_FILE}."
   )
 
 
