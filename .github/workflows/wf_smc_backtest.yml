@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,7 +27,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas numpy pyarrow fastparquet
+          pip install pandas numpy yfinance pyarrow fastparquet
 
       - name: Run SMC Backtest
         run: python smc_backtest.py
@@ -38,5 +41,5 @@ jobs:
             echo "No changes detected in backtest outputs."
           else
             git commit -m "Auto-update: SMC backtest trade results [skip ci]"
-            git push
+            git push origin HEAD:${{ github.ref_name }}
           fi
