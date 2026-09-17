@@ -1,10 +1,9 @@
 import os
 import json
-import glob
 import pandas as pd
 import numpy as np
+import yfinance as yf
 
-DATA_DIR = "data"
 OUTPUT_DIR = "backtest_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -14,72 +13,52 @@ TRADE_COLUMNS = [
     "sl_pct", "outcome", "pnl_pct"
 ]
 
-def load_stock_df(file_path):
-    """Loads a ticker's local JSON file from data/{sym}.json into a clean DataFrame."""
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            raw = json.load(f)
-        
-        if not raw:
-            return None
+def load_universe():
+    json_path = "data/nifty750.json"
+    if os.path.exists(json_path):
+        with open(json_path, "r") as f:
+            symbols = json.load(f)
+    else:
+        symbols = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "TATAMOTORS"]
 
-        if isinstance(raw, list):
-            df = pd.DataFrame(raw)
-        elif isinstance(raw, dict):
-            # If stored as {"data": [...]} or dict of series
-            if "data" in raw and isinstance(raw["data"], list):
-                df = pd.DataFrame(raw["data"])
-            else:
-                df = pd.DataFrame(raw)
-        else:
-            return None
-
-        # Clean column names (handles 'date', 'CH_TIMESTAMP', 'open', 'close', etc.)
-        col_map = {}
-        for c in df.columns:
-            clean = str(c).strip().lower().replace("_", "").replace(" ", "")
-            if clean in ["date", "timestamp", "chtimestamp", "time", "t"]:
-                col_map[c] = "Date"
-            elif clean in ["open", "openprice", "chopenprice", "o"]:
-                col_map[c] = "Open"
-            elif clean in ["high", "highprice", "chhighprice", "h"]:
-                col_map[c] = "High"
-            elif clean in ["low", "lowprice", "chlowprice", "l"]:
-                col_map[c] = "Low"
-            elif clean in ["close", "closeprice", "chcloseprice", "c"]:
-                col_map[c] = "Close"
-
-        df = df.rename(columns=col_map)
-        required = {"Date", "Open", "High", "Low", "Close"}
-        if not required.issubset(set(df.columns)):
-            return None
-
-        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-        df = df.dropna(subset=["Date", "Open", "High", "Low", "Close"])
-        df = df.sort_values("Date").reset_index(drop=True)
-
-        for col in ["Open", "High", "Low", "Close"]:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-
-        df = df.dropna().reset_index(drop=True)
-        # Backtest from 2021 onwards
-        df = df[df["Date"] >= "2021-01-01"].reset_index(drop=True)
-        return df if len(df) >= 40 else None
-    except Exception:
-        return None
+    tickers = []
+    for s in symbols:
+        clean = str(s).strip().replace("&", "%26")
+        if not clean.endswith(".NS"):
+            clean += ".NS"
+        tickers.append(clean)
+    return tickers
 
 def run_smc_backtest(df, ticker):
-    trades = []
-    n = len(df)
+    if df is None or len(df) < 40:
+        return []
+
+    df = df.copy()
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
     
+    df.columns = [str(c).capitalize() for c in df.columns]
+    df = df.reset_index()
+
+    date_col = next((c for c in df.columns if c.lower() in ['date', 'timestamp', 'index']), None)
+    if not date_col:
+        return []
+    
+    df['Date'] = pd.to_datetime(df[date_col], errors='coerce')
+    df = df.dropna(subset=['Date', 'Open', 'High', 'Low', 'Close']).reset_index(drop=True)
+    if len(df) < 40:
+        return []
+
     # 3-bar swing pivots
     df['swing_high'] = (df['High'] > df['High'].shift(1)) & (df['High'] > df['High'].shift(-1))
     df['swing_low'] = (df['Low'] < df['Low'].shift(1)) & (df['Low'] < df['Low'].shift(-1))
     df['is_green'] = df['Close'] >= df['Open']
 
+    trades = []
+    n = len(df)
     i = 15
+
     while i < n - 15:
-        # 1 & 2: Sweep of prior swing low (fake breakdown)
         prior_lows = df.loc[:i-2].loc[df['swing_low'], 'Low']
         if prior_lows.empty:
             i += 1
@@ -94,14 +73,13 @@ def run_smc_backtest(df, ticker):
             i += 1
             continue
 
-        # 3: Prior swing high before the sweep
         prior_highs = df.loc[:i-1].loc[df['swing_high'], 'High']
         if prior_highs.empty:
             i += 1
             continue
         major_high = prior_highs.iloc[-1]
 
-        # 4: CHoCH Expansion rally breaking swing high
+        # CHoCH Expansion rally breaking swing high
         choch_idx = None
         for j in range(i + 1, min(i + 12, n)):
             if df.loc[j, 'Close'] > major_high:
@@ -115,7 +93,7 @@ def run_smc_backtest(df, ticker):
         high_idx = df.loc[i+1:min(choch_idx + 6, n - 1), 'High'].idxmax()
         displacement_high = df.loc[high_idx, 'High']
 
-        # 5: Bullish FVG detection in displacement leg
+        # Bullish FVG detection in displacement leg
         fvg_entry, fvg_sl = None, None
         for k in range(i + 1, high_idx):
             if k + 1 >= n:
@@ -129,14 +107,14 @@ def run_smc_backtest(df, ticker):
                 target_entry = (c1_high + fvg_mid) / 2.0
                 stop_loss = c1_low
 
-                # If candle 1 low is further than 5%, use FVG bottom buffer to protect the trade
+                # If candle 1 low exceeds 5%, set stop to FVG bottom buffer
                 if (target_entry - stop_loss) / target_entry > 0.05:
                     stop_loss = c1_high * 0.99
 
                 target_pct = (displacement_high - target_entry) / target_entry
                 sl_pct = (target_entry - stop_loss) / target_entry
 
-                # Rule 8: Target >= 10-15% and SL <= 5-6%
+                # Rule 8: Target >= 10% and SL <= 6%
                 if target_pct >= 0.10 and sl_pct <= 0.06:
                     fvg_entry = target_entry
                     fvg_sl = stop_loss
@@ -146,7 +124,7 @@ def run_smc_backtest(df, ticker):
             i = choch_idx + 1
             continue
 
-        # 6: Retracement to entry zone
+        # Retracement into entry zone
         entry_idx = None
         for r in range(high_idx + 1, min(high_idx + 35, n)):
             if df.loc[r, 'Low'] <= fvg_entry:
@@ -177,7 +155,7 @@ def run_smc_backtest(df, ticker):
         pnl_pct = ((exit_price - fvg_entry) / fvg_entry * 100) if exit_price else 0.0
 
         trades.append({
-            "ticker": ticker,
+            "ticker": ticker.replace(".NS", ""),
             "entry_date": str(df.loc[entry_idx, 'Date'])[:10],
             "entry_price": round(float(fvg_entry), 2),
             "sl_price": round(float(fvg_sl), 2),
@@ -195,30 +173,46 @@ def run_smc_backtest(df, ticker):
     return trades
 
 def main():
-    # Discover all stock JSON files in data/
-    stock_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
-    
-    # Exclude metadata/report JSON files
-    excluded = {"nifty750.json", "fundamentals.json", "backtest_hp3_report.json"}
-    valid_files = [f for f in stock_files if os.path.basename(f) not in excluded]
-
-    print(f"Discovered {len(valid_files)} stock JSON files in '{DATA_DIR}/'. Starting SMC backtest...")
+    tickers = load_universe()
+    print(f"Loaded {len(tickers)} tickers. Starting download and SMC backtest...")
 
     all_trades = []
-    processed = 0
-    for file_path in valid_files:
-        ticker = os.path.basename(file_path).replace(".json", "")
-        df = load_stock_df(file_path)
-        if df is not None:
-            t = run_smc_backtest(df, ticker)
-            all_trades.extend(t)
-            processed += 1
+    # Test across universe in batches
+    batch_size = 40
+    for b in range(0, len(tickers), batch_size):
+        batch = tickers[b:b+batch_size]
+        try:
+            data = yf.download(
+                batch, 
+                start="2021-01-01", 
+                interval="1d", 
+                auto_adjust=True, 
+                progress=False
+            )
+            if data.empty:
+                continue
+
+            for sym in batch:
+                try:
+                    if len(batch) == 1:
+                        df_stock = data.copy()
+                    else:
+                        df_stock = data.xs(sym, level='Ticker', axis=1) if 'Ticker' in data.columns.names else data[sym]
+                    
+                    df_stock = df_stock.dropna()
+                    if len(df_stock) >= 40:
+                        t = run_smc_backtest(df_stock, sym)
+                        all_trades.extend(t)
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"Batch {b} failed: {e}")
+            continue
 
     trades_df = pd.DataFrame(all_trades, columns=TRADE_COLUMNS)
     trades_df.to_csv(f"{OUTPUT_DIR}/smc_trades.csv", index=False)
 
     metrics = {
-        "stocks_evaluated": processed,
         "total_signals": int(len(trades_df)),
         "closed_trades": 0,
         "win_rate": 0,
@@ -231,7 +225,6 @@ def main():
         losses = closed[closed['outcome'] == 'LOSS']
         if len(closed) > 0:
             metrics = {
-                "stocks_evaluated": processed,
                 "total_signals": int(len(trades_df)),
                 "closed_trades": int(len(closed)),
                 "win_rate": round(len(wins) / len(closed) * 100, 2),
@@ -244,7 +237,7 @@ def main():
     with open(f"{OUTPUT_DIR}/smc_metrics.json", "w") as f:
         json.dump(metrics, f, indent=4)
 
-    print(f"Backtest complete. Evaluated {processed} stocks, generated {len(all_trades)} trades.")
+    print(f"Backtest complete. Generated {len(all_trades)} trades.")
     print(json.dumps(metrics, indent=4))
 
 if __name__ == "__main__":
