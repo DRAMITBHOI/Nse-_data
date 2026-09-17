@@ -2,7 +2,6 @@ name: SMC Swing Strategy Backtest
 
 on:
   workflow_dispatch:
-  # Run directly after your evening sync completes (e.g. 19:00 UTC / ~00:30 IST)
   schedule:
     - cron: '0 19 * * 1-5'
 
@@ -28,17 +27,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy pyarrow fastparquet
 
-      - name: Run SMC Backtest on Local Archive
+      - name: Run SMC Backtest
         run: python smc_backtest.py
 
       - name: Commit & Push Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add backtest_results/
-          if git status --porcelain | grep -q "backtest_results"; then
+          git add -A backtest_results/
+          if git diff --staged --quiet; then
+            echo "No changes detected in backtest outputs."
+          else
             git commit -m "Auto-update: SMC backtest trade results [skip ci]"
             git push
-          else
-            echo "No changes in backtest output files."
           fi
