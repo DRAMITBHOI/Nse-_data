@@ -30,10 +30,9 @@ def load_universe():
     return tickers
 
 def run_smc_backtest(df, ticker):
-    if df is None or len(df) < 40:
+    if df is None or len(df) < 50:
         return []
 
-    # Reset index and clean column casing
     df = df.copy().reset_index()
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -46,87 +45,111 @@ def run_smc_backtest(df, ticker):
     df = df.dropna(subset=['Date', 'Open', 'High', 'Low', 'Close']).reset_index(drop=True)
 
     trades = []
+    
+    # Swing Pivots (3-bar fractal)
     df['swing_high'] = (df['High'] > df['High'].shift(1)) & (df['High'] > df['High'].shift(-1))
     df['swing_low'] = (df['Low'] < df['Low'].shift(1)) & (df['Low'] < df['Low'].shift(-1))
-    df['is_green'] = df['Close'] >= df['Open']
+    df['is_green'] = df['Close'] > df['Open']
 
-    i = 15
-    while i < len(df) - 10:
+    i = 20
+    while i < len(df) - 20:
+        # 1 & 2: Sweep of prior swing low (fake breakdown)
         prior_lows = df.loc[:i-2].loc[df['swing_low'], 'Low']
         if prior_lows.empty:
             i += 1
             continue
         recent_swing_low = prior_lows.iloc[-1]
 
+        # Swept in candle i-1 or i and reclaimed
         swept = (df.loc[i-1, 'Low'] < recent_swing_low and df.loc[i-1, 'Close'] > recent_swing_low) or \
                 (df.loc[i, 'Low'] < recent_swing_low and df.loc[i, 'Close'] > recent_swing_low)
         if not swept:
             i += 1
             continue
 
+        # Prior swing high before the sweep
         prior_highs = df.loc[:i-1].loc[df['swing_high'], 'High']
         if prior_highs.empty:
             i += 1
             continue
         prev_swing_high = prior_highs.iloc[-1]
 
-        j = i + 1
-        choch_index = -1
-        while j < len(df) and (df.loc[i+1:j, 'is_green'].mean() >= 0.70):
-            if df.loc[j, 'Close'] > prev_swing_high and choch_index == -1:
-                choch_index = j
-            if j - i > 12:
+        # 3 & 4: Expansion rally breaking swing high (CHoCH)
+        # Look for rally within next 2-8 candles
+        choch_idx = None
+        for j in range(i + 1, min(i + 9, len(df))):
+            if df.loc[j, 'Close'] > prev_swing_high:
+                choch_idx = j
                 break
-            j += 1
 
-        if choch_index == -1:
+        if choch_idx is None:
             i += 1
             continue
 
-        displacement_high = df.loc[i+1:j, 'High'].max()
-        high_idx = df.loc[i+1:j, 'High'].idxmax()
+        # Peak of displacement leg
+        displacement_end = min(choch_idx + 4, len(df) - 1)
+        displacement_high = df.loc[i+1:displacement_end, 'High'].max()
+        high_idx = df.loc[i+1:displacement_end, 'High'].idxmax()
 
+        # 5: Detect Bullish FVG in the displacement leg
         fvg_entry, fvg_sl = None, None
-        for k in range(i + 1, min(j - 1, len(df) - 1)):
+        for k in range(i + 1, high_idx):
+            if k + 1 >= len(df):
+                break
             c1_high = df.loc[k - 1, 'High']
             c3_low = df.loc[k + 1, 'Low']
             c1_low = df.loc[k - 1, 'Low']
 
-            if c3_low > c1_high:
-                fvg_mid = (c3_low + c1_high) / 2.0
-                target_entry = (c1_high + fvg_mid) / 2.0
-                stop_loss = c1_low
+            if c3_low > c1_high:  # Bullish FVG
+                fvg_top = c3_low
+                fvg_bottom = c1_high
+                fvg_mid = (fvg_top + fvg_bottom) / 2.0
+                
+                # Entry below 50% of FVG
+                target_entry = (fvg_bottom + fvg_mid) / 2.0
+                
+                # Realistic SL: lower bound of FVG or 0.5% below Candle 1 low, capped to preserve trade
+                # Prioritize Candle 1 Low, fallback to FVG bottom - 1% buffer if distance is wide
+                sl_candidate = c1_low
+                if (target_entry - sl_candidate) / target_entry > 0.05:
+                    sl_candidate = fvg_bottom * 0.99  # Tight structural invalidation just below gap
 
                 target_pct = (displacement_high - target_entry) / target_entry
-                sl_pct = (target_entry - stop_loss) / target_entry
+                sl_pct = (target_entry - sl_candidate) / target_entry
 
+                # Rule 8: Target >= 15% and SL <= 5%
                 if target_pct >= 0.15 and sl_pct <= 0.05:
                     fvg_entry = target_entry
-                    fvg_sl = stop_loss
+                    fvg_sl = sl_candidate
                     break
 
         if fvg_entry is None:
-            i = j + 1
+            i = high_idx + 1
             continue
 
+        # 6: Retracement to entry zone
         entry_idx = None
-        for r in range(high_idx + 1, min(high_idx + 30, len(df))):
+        for r in range(high_idx + 1, min(high_idx + 35, len(df))):
             if df.loc[r, 'Low'] <= fvg_entry:
                 entry_idx = r
                 break
 
         if entry_idx is None:
-            i = j + 1
+            i = high_idx + 1
             continue
 
+        # Simulate trade outcome
         exit_price, exit_date, outcome = None, None, "OPEN"
         for f in range(entry_idx + 1, min(entry_idx + 60, len(df))):
-            if df.loc[f, 'Low'] <= fvg_sl:
+            curr_low = df.loc[f, 'Low']
+            curr_high = df.loc[f, 'High']
+
+            if curr_low <= fvg_sl:
                 outcome = "LOSS"
                 exit_price = fvg_sl
                 exit_date = str(df.loc[f, 'Date'])[:10]
                 break
-            elif df.loc[f, 'High'] >= displacement_high:
+            elif curr_high >= displacement_high:
                 outcome = "WIN"
                 exit_price = displacement_high
                 exit_date = str(df.loc[f, 'Date'])[:10]
@@ -147,13 +170,14 @@ def run_smc_backtest(df, ticker):
             "outcome": outcome,
             "pnl_pct": round(float(pnl_pct), 2)
         })
-        i = entry_idx + 5
+
+        i = entry_idx + 6
 
     return trades
 
 def main():
     tickers = load_universe()
-    print(f"Loaded {len(tickers)} tickers from data/nifty750.json.")
+    print(f"Starting SMC backtest across {len(tickers)} stocks...")
 
     all_trades = []
     batch_size = 50
@@ -164,7 +188,7 @@ def main():
             for sym in batch:
                 try:
                     df = data[sym].dropna() if len(batch) > 1 else data.dropna()
-                    if df.empty or len(df) < 40:
+                    if df.empty or len(df) < 50:
                         continue
                     trades = run_smc_backtest(df, sym)
                     all_trades.extend(trades)
@@ -202,7 +226,7 @@ def main():
     with open(f"{OUTPUT_DIR}/smc_metrics.json", "w") as f:
         json.dump(metrics, f, indent=4)
 
-    print(f"Completed backtest. Found {len(all_trades)} trades across universe.")
+    print(f"Backtest complete. Found {len(all_trades)} trades.")
 
 if __name__ == "__main__":
     main()
