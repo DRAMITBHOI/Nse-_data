@@ -3,7 +3,7 @@ name: SMC Swing Strategy Backtest
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 19 * * 1-5'
+    - cron: '30 14 * * 1-5' # 20:00 IST every weekday, right after your evening update
 
 permissions:
   contents: write
@@ -27,9 +27,9 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas numpy yfinance pyarrow fastparquet
+          pip install pandas numpy
 
-      - name: Run SMC Backtest
+      - name: Run SMC Backtest on Local Data
         run: python smc_backtest.py
 
       - name: Commit & Push Results
