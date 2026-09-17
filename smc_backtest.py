@@ -14,7 +14,6 @@ TRADE_COLUMNS = [
 ]
 
 def load_universe():
-    # Read tickers from your JSON list
     json_path = "data/nifty750.json"
     if os.path.exists(json_path):
         with open(json_path, "r") as f:
@@ -31,22 +30,28 @@ def load_universe():
     return tickers
 
 def run_smc_backtest(df, ticker):
-    if len(df) < 40:
+    if df is None or len(df) < 40:
         return []
 
+    # Reset index and clean column casing
     df = df.copy().reset_index()
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+    df.columns = [str(c).capitalize() for c in df.columns]
+
+    date_col = next((c for c in df.columns if c.lower() in ['date', 'timestamp', 'index']), None)
+    if not date_col:
+        return []
+    df['Date'] = pd.to_datetime(df[date_col], errors='coerce')
+    df = df.dropna(subset=['Date', 'Open', 'High', 'Low', 'Close']).reset_index(drop=True)
+
     trades = []
-    
-    # Standardize column headers
-    df.columns = [c.capitalize() for c in df.columns]
-    
     df['swing_high'] = (df['High'] > df['High'].shift(1)) & (df['High'] > df['High'].shift(-1))
     df['swing_low'] = (df['Low'] < df['Low'].shift(1)) & (df['Low'] < df['Low'].shift(-1))
     df['is_green'] = df['Close'] >= df['Open']
 
     i = 15
     while i < len(df) - 10:
-        # 1 & 2: Sweep prior swing low (fake breakdown)
         prior_lows = df.loc[:i-2].loc[df['swing_low'], 'Low']
         if prior_lows.empty:
             i += 1
@@ -65,7 +70,6 @@ def run_smc_backtest(df, ticker):
             continue
         prev_swing_high = prior_highs.iloc[-1]
 
-        # 3 & 4: Expansion rally breaking swing high
         j = i + 1
         choch_index = -1
         while j < len(df) and (df.loc[i+1:j, 'is_green'].mean() >= 0.70):
@@ -82,7 +86,6 @@ def run_smc_backtest(df, ticker):
         displacement_high = df.loc[i+1:j, 'High'].max()
         high_idx = df.loc[i+1:j, 'High'].idxmax()
 
-        # 5: Bullish FVG
         fvg_entry, fvg_sl = None, None
         for k in range(i + 1, min(j - 1, len(df) - 1)):
             c1_high = df.loc[k - 1, 'High']
@@ -97,7 +100,6 @@ def run_smc_backtest(df, ticker):
                 target_pct = (displacement_high - target_entry) / target_entry
                 sl_pct = (target_entry - stop_loss) / target_entry
 
-                # Rule 8: Target >= 15% and SL <= 5%
                 if target_pct >= 0.15 and sl_pct <= 0.05:
                     fvg_entry = target_entry
                     fvg_sl = stop_loss
@@ -107,7 +109,6 @@ def run_smc_backtest(df, ticker):
             i = j + 1
             continue
 
-        # 6: Retracement to entry
         entry_idx = None
         for r in range(high_idx + 1, min(high_idx + 30, len(df))):
             if df.loc[r, 'Low'] <= fvg_entry:
@@ -118,7 +119,6 @@ def run_smc_backtest(df, ticker):
             i = j + 1
             continue
 
-        # Trade forward outcome
         exit_price, exit_date, outcome = None, None, "OPEN"
         for f in range(entry_idx + 1, min(entry_idx + 60, len(df))):
             if df.loc[f, 'Low'] <= fvg_sl:
@@ -137,15 +137,15 @@ def run_smc_backtest(df, ticker):
         trades.append({
             "ticker": ticker.replace(".NS", ""),
             "entry_date": str(df.loc[entry_idx, 'Date'])[:10],
-            "entry_price": round(fvg_entry, 2),
-            "sl_price": round(fvg_sl, 2),
-            "tp_price": round(displacement_high, 2),
+            "entry_price": round(float(fvg_entry), 2),
+            "sl_price": round(float(fvg_sl), 2),
+            "tp_price": round(float(displacement_high), 2),
             "exit_date": exit_date,
-            "exit_price": round(exit_price, 2) if exit_price else None,
-            "target_pct": round(target_pct * 100, 2),
-            "sl_pct": round(sl_pct * 100, 2),
+            "exit_price": round(float(exit_price), 2) if exit_price else None,
+            "target_pct": round(float(target_pct) * 100, 2),
+            "sl_pct": round(float(sl_pct) * 100, 2),
             "outcome": outcome,
-            "pnl_pct": round(pnl_pct, 2)
+            "pnl_pct": round(float(pnl_pct), 2)
         })
         i = entry_idx + 5
 
@@ -171,7 +171,7 @@ def main():
                 except Exception:
                     continue
         except Exception as e:
-            print(f"Error in batch {b}: {e}")
+            print(f"Batch {b} failed: {e}")
             continue
 
     trades_df = pd.DataFrame(all_trades, columns=TRADE_COLUMNS)
@@ -202,7 +202,7 @@ def main():
     with open(f"{OUTPUT_DIR}/smc_metrics.json", "w") as f:
         json.dump(metrics, f, indent=4)
 
-    print(f"Completed backtest. Found {len(all_trades)} trades across the universe.")
+    print(f"Completed backtest. Found {len(all_trades)} trades across universe.")
 
 if __name__ == "__main__":
     main()
