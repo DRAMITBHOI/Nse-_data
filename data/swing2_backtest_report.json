@@ -1,0 +1,910 @@
+{
+  "report_generated": "2026-09-19 14:14 UTC",
+  "total_trades": 785,
+  "win_rate_pct": 37.2,
+  "avg_gain_pct": 12.97,
+  "avg_loss_pct": -5.42,
+  "profit_factor": 1.42,
+  "recent_trades": [
+    {
+      "symbol": "INDHOTEL",
+      "entry_date": "2024-05-27",
+      "exit_date": "2024-05-30",
+      "entry_price": 581.1,
+      "exit_price": 563.31,
+      "pnl_pct": -3.06,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "NATCOPHARM",
+      "entry_date": "2022-08-01",
+      "exit_date": "2022-08-10",
+      "entry_price": 705.0,
+      "exit_price": 706.41,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "NATCOPHARM",
+      "entry_date": "2025-06-11",
+      "exit_date": "2025-06-17",
+      "entry_price": 934.1,
+      "exit_price": 872.04,
+      "pnl_pct": -6.64,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "BPCL",
+      "entry_date": "2025-07-04",
+      "exit_date": "2025-07-31",
+      "entry_price": 346.2,
+      "exit_price": 328.58,
+      "pnl_pct": -5.09,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "PTC",
+      "entry_date": "2025-07-11",
+      "exit_date": "2025-08-01",
+      "entry_price": 185.3,
+      "exit_price": 185.6706,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "JWL",
+      "entry_date": "2023-11-17",
+      "exit_date": "2023-12-08",
+      "entry_price": 329.35,
+      "exit_price": 310.96,
+      "pnl_pct": -5.58,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GANESHHOU",
+      "entry_date": "2026-07-03",
+      "exit_date": "2026-07-28",
+      "entry_price": 810.5,
+      "exit_price": 767.4,
+      "pnl_pct": -5.32,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "VTL",
+      "entry_date": "2023-08-29",
+      "exit_date": "2023-09-12",
+      "entry_price": 397.3,
+      "exit_price": 373.43,
+      "pnl_pct": -6.01,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "MIDHANI",
+      "entry_date": "2022-01-17",
+      "exit_date": "2022-01-24",
+      "entry_price": 187.7,
+      "exit_price": 180.87,
+      "pnl_pct": -3.64,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GICRE",
+      "entry_date": "2025-03-18",
+      "exit_date": "2025-04-04",
+      "entry_price": 403.1,
+      "exit_price": 403.9062,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "UFLEX",
+      "entry_date": "2025-03-24",
+      "exit_date": "2025-04-07",
+      "entry_price": 501.45,
+      "exit_price": 485.1,
+      "pnl_pct": -3.26,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "MAANALU",
+      "entry_date": "2021-07-12",
+      "exit_date": "2021-08-02",
+      "entry_price": 367.1,
+      "exit_price": 332.14,
+      "pnl_pct": -9.52,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "CEWATER",
+      "entry_date": "2025-05-15",
+      "exit_date": "2025-06-12",
+      "entry_price": 543.5,
+      "exit_price": 580.1,
+      "pnl_pct": 6.73,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "IKIO",
+      "entry_date": "2023-12-11",
+      "exit_date": "2023-12-20",
+      "entry_price": 357.45,
+      "exit_price": 339.57,
+      "pnl_pct": -5.0,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "NURECA",
+      "entry_date": "2021-06-14",
+      "exit_date": "2021-06-17",
+      "entry_price": 1589.1,
+      "exit_price": 1482.08,
+      "pnl_pct": -6.73,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ROUTE",
+      "entry_date": "2026-05-05",
+      "exit_date": "2026-05-11",
+      "entry_price": 559.2,
+      "exit_price": 538.56,
+      "pnl_pct": -3.69,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "HAL",
+      "entry_date": "2024-04-12",
+      "exit_date": "2024-05-07",
+      "entry_price": 3638.1,
+      "exit_price": 3715.0,
+      "pnl_pct": 2.11,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "NLCINDIA",
+      "entry_date": "2022-08-02",
+      "exit_date": "2022-08-23",
+      "entry_price": 71.85,
+      "exit_price": 68.11,
+      "pnl_pct": -5.21,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "NLCINDIA",
+      "entry_date": "2023-04-12",
+      "exit_date": "2023-04-21",
+      "entry_price": 80.15,
+      "exit_price": 77.57,
+      "pnl_pct": -3.22,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SOBHA",
+      "entry_date": "2023-11-30",
+      "exit_date": "2024-02-12",
+      "entry_price": 907.25,
+      "exit_price": 1348.55,
+      "pnl_pct": 48.64,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "SOBHA",
+      "entry_date": "2024-04-23",
+      "exit_date": "2024-05-10",
+      "entry_price": 1715.6,
+      "exit_price": 1719.0312,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "KPRMILL",
+      "entry_date": "2021-07-05",
+      "exit_date": "2021-08-10",
+      "entry_price": 1638.55,
+      "exit_price": 1814.95,
+      "pnl_pct": 10.77,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "EMAMILTD",
+      "entry_date": "2023-07-26",
+      "exit_date": "2023-09-21",
+      "entry_price": 434.55,
+      "exit_price": 524.9,
+      "pnl_pct": 20.79,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "SURYODAY",
+      "entry_date": "2023-07-31",
+      "exit_date": "2023-08-02",
+      "entry_price": 186.6,
+      "exit_price": 175.43,
+      "pnl_pct": -5.99,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SURYODAY",
+      "entry_date": "2025-12-23",
+      "exit_date": "2026-01-23",
+      "entry_price": 144.31,
+      "exit_price": 131.87,
+      "pnl_pct": -8.62,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ARVINDFASN",
+      "entry_date": "2021-11-09",
+      "exit_date": "2021-11-22",
+      "entry_price": 342.3,
+      "exit_price": 297.0,
+      "pnl_pct": -13.23,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "DHAMPURSUG",
+      "entry_date": "2023-05-03",
+      "exit_date": "2023-06-30",
+      "entry_price": 252.75,
+      "exit_price": 269.8,
+      "pnl_pct": 6.75,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "BALKRISIND",
+      "entry_date": "2022-11-25",
+      "exit_date": "2022-12-23",
+      "entry_price": 2026.35,
+      "exit_price": 2073.7,
+      "pnl_pct": 2.34,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "BPL",
+      "entry_date": "2023-11-13",
+      "exit_date": "2023-11-23",
+      "entry_price": 94.15,
+      "exit_price": 87.52,
+      "pnl_pct": -7.04,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SAKAR",
+      "entry_date": "2026-04-09",
+      "exit_date": "2026-05-06",
+      "entry_price": 572.35,
+      "exit_price": 573.4947000000001,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "TECHNOE",
+      "entry_date": "2023-04-18",
+      "exit_date": "2023-04-25",
+      "entry_price": 359.5,
+      "exit_price": 339.27,
+      "pnl_pct": -5.63,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "HEMIPROP",
+      "entry_date": "2024-07-05",
+      "exit_date": "2024-08-01",
+      "entry_price": 201.83,
+      "exit_price": 211.15,
+      "pnl_pct": 4.62,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ULTRACEMCO",
+      "entry_date": "2022-11-30",
+      "exit_date": "2023-01-23",
+      "entry_price": 7077.0,
+      "exit_price": 6836.0,
+      "pnl_pct": -3.41,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "HERITGFOOD",
+      "entry_date": "2022-12-02",
+      "exit_date": "2023-01-20",
+      "entry_price": 345.45,
+      "exit_price": 317.84,
+      "pnl_pct": -7.99,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "HERITGFOOD",
+      "entry_date": "2026-05-11",
+      "exit_date": "2026-05-12",
+      "entry_price": 378.3,
+      "exit_price": 355.76,
+      "pnl_pct": -5.96,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "PPLPHARMA",
+      "entry_date": "2023-07-17",
+      "exit_date": "2023-10-25",
+      "entry_price": 101.1,
+      "exit_price": 91.58,
+      "pnl_pct": -9.42,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "VENKEYS",
+      "entry_date": "2023-10-06",
+      "exit_date": "2023-10-23",
+      "entry_price": 2051.0,
+      "exit_price": 1950.3,
+      "pnl_pct": -4.91,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "VENKEYS",
+      "entry_date": "2026-05-11",
+      "exit_date": "2026-05-14",
+      "entry_price": 1686.5,
+      "exit_price": 1620.73,
+      "pnl_pct": -3.9,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "HGINFRA",
+      "entry_date": "2024-01-11",
+      "exit_date": "2024-02-12",
+      "entry_price": 885.25,
+      "exit_price": 887.0205,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "TNPETRO",
+      "entry_date": "2022-09-12",
+      "exit_date": "2022-09-14",
+      "entry_price": 109.6,
+      "exit_price": 106.28,
+      "pnl_pct": -3.03,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "BALAMINES",
+      "entry_date": "2024-09-10",
+      "exit_date": "2024-10-04",
+      "entry_price": 2298.1,
+      "exit_price": 2206.76,
+      "pnl_pct": -3.97,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SRM",
+      "entry_date": "2026-08-06",
+      "exit_date": "2026-08-13",
+      "entry_price": 529.05,
+      "exit_price": 505.89,
+      "pnl_pct": -4.38,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "AYMSYNTEX",
+      "entry_date": "2024-09-02",
+      "exit_date": "2024-10-28",
+      "entry_price": 142.55,
+      "exit_price": 222.07,
+      "pnl_pct": 55.78,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ANUP",
+      "entry_date": "2024-04-22",
+      "exit_date": "2024-04-23",
+      "entry_price": 3596.4,
+      "exit_price": 3330.11,
+      "pnl_pct": -7.4,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GUJALKALI",
+      "entry_date": "2021-06-10",
+      "exit_date": "2021-06-14",
+      "entry_price": 428.95,
+      "exit_price": 414.07,
+      "pnl_pct": -3.47,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "PRICOLLTD",
+      "entry_date": "2022-03-29",
+      "exit_date": "2022-04-25",
+      "entry_price": 128.2,
+      "exit_price": 135.0,
+      "pnl_pct": 5.3,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "RPSGVENT",
+      "entry_date": "2025-06-02",
+      "exit_date": "2025-08-29",
+      "entry_price": 957.85,
+      "exit_price": 861.35,
+      "pnl_pct": -10.07,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SHRIRAMPPS",
+      "entry_date": "2023-07-14",
+      "exit_date": "2023-09-12",
+      "entry_price": 69.9,
+      "exit_price": 82.1,
+      "pnl_pct": 17.45,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "FINOPB",
+      "entry_date": "2024-03-07",
+      "exit_date": "2024-03-12",
+      "entry_price": 325.65,
+      "exit_price": 302.0,
+      "pnl_pct": -7.26,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "VISHNU",
+      "entry_date": "2022-10-28",
+      "exit_date": "2022-11-01",
+      "entry_price": 2000.3,
+      "exit_price": 1894.86,
+      "pnl_pct": -5.27,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SIGACHI",
+      "entry_date": "2023-07-31",
+      "exit_date": "2023-08-02",
+      "entry_price": 313.85,
+      "exit_price": 297.5,
+      "pnl_pct": -5.21,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SIGACHI",
+      "entry_date": "2024-01-02",
+      "exit_date": "2024-02-12",
+      "entry_price": 59.55,
+      "exit_price": 70.9,
+      "pnl_pct": 19.06,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "VETO",
+      "entry_date": "2024-06-24",
+      "exit_date": "2024-08-14",
+      "entry_price": 135.47,
+      "exit_price": 158.5,
+      "pnl_pct": 17.0,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "GODREJAGRO",
+      "entry_date": "2024-12-10",
+      "exit_date": "2024-12-13",
+      "entry_price": 789.1,
+      "exit_price": 755.47,
+      "pnl_pct": -4.26,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ESILVER",
+      "entry_date": "2025-11-12",
+      "exit_date": "2025-11-18",
+      "entry_price": 157.12,
+      "exit_price": 152.58,
+      "pnl_pct": -2.89,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GLENMARK",
+      "entry_date": "2023-04-27",
+      "exit_date": "2023-06-22",
+      "entry_price": 551.15,
+      "exit_price": 627.7,
+      "pnl_pct": 13.89,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ORIENTCEM",
+      "entry_date": "2021-05-03",
+      "exit_date": "2021-06-15",
+      "entry_price": 111.55,
+      "exit_price": 133.75,
+      "pnl_pct": 19.9,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ORIENTCEM",
+      "entry_date": "2021-07-05",
+      "exit_date": "2021-08-11",
+      "entry_price": 143.8,
+      "exit_price": 154.4,
+      "pnl_pct": 7.37,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ORIENTCEM",
+      "entry_date": "2022-08-18",
+      "exit_date": "2023-01-20",
+      "entry_price": 124.15,
+      "exit_price": 131.8,
+      "pnl_pct": 6.16,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "SKIPPER",
+      "entry_date": "2025-06-09",
+      "exit_date": "2025-06-19",
+      "entry_price": 523.9,
+      "exit_price": 483.1,
+      "pnl_pct": -7.79,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SILVER",
+      "entry_date": "2024-10-04",
+      "exit_date": "2024-10-08",
+      "entry_price": 93.24,
+      "exit_price": 91.22,
+      "pnl_pct": -2.17,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "CEATLTD",
+      "entry_date": "2023-12-01",
+      "exit_date": "2024-01-17",
+      "entry_price": 2171.9,
+      "exit_price": 2423.0,
+      "pnl_pct": 11.56,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "VINDHYATEL",
+      "entry_date": "2023-07-19",
+      "exit_date": "2023-08-14",
+      "entry_price": 1979.25,
+      "exit_price": 2010.15,
+      "pnl_pct": 1.56,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "MBAPL",
+      "entry_date": "2025-12-24",
+      "exit_date": "2026-01-08",
+      "entry_price": 414.9,
+      "exit_price": 415.72979999999995,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_OR_TRAIL_HIT"
+    },
+    {
+      "symbol": "KALYANKJIL",
+      "entry_date": "2021-09-15",
+      "exit_date": "2021-10-25",
+      "entry_price": 71.3,
+      "exit_price": 74.15,
+      "pnl_pct": 4.0,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "KALYANKJIL",
+      "entry_date": "2023-05-12",
+      "exit_date": "2023-05-15",
+      "entry_price": 108.55,
+      "exit_price": 105.04,
+      "pnl_pct": -3.23,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GICHSGFIN",
+      "entry_date": "2023-09-08",
+      "exit_date": "2023-09-12",
+      "entry_price": 194.0,
+      "exit_price": 185.67,
+      "pnl_pct": -4.29,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "GICHSGFIN",
+      "entry_date": "2025-06-06",
+      "exit_date": "2025-06-13",
+      "entry_price": 195.59,
+      "exit_price": 188.12,
+      "pnl_pct": -3.82,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "entry_date": "2023-01-04",
+      "exit_date": "2023-02-01",
+      "entry_price": 716.05,
+      "exit_price": 798.5,
+      "pnl_pct": 11.51,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "entry_date": "2023-06-09",
+      "exit_date": "2023-09-11",
+      "entry_price": 871.05,
+      "exit_price": 1370.9,
+      "pnl_pct": 57.38,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "VGUARD",
+      "entry_date": "2021-05-19",
+      "exit_date": "2021-06-17",
+      "entry_price": 233.8,
+      "exit_price": 255.75,
+      "pnl_pct": 9.39,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "VGUARD",
+      "entry_date": "2023-11-28",
+      "exit_date": "2023-12-21",
+      "entry_price": 300.55,
+      "exit_price": 285.27,
+      "pnl_pct": -5.08,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "BHARATRAS",
+      "entry_date": "2024-08-09",
+      "exit_date": "2024-08-13",
+      "entry_price": 12815.15,
+      "exit_price": 11880.0,
+      "pnl_pct": -7.3,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ELECTCAST",
+      "entry_date": "2021-09-08",
+      "exit_date": "2021-10-20",
+      "entry_price": 38.7,
+      "exit_price": 35.34,
+      "pnl_pct": -8.68,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "TATATECH",
+      "entry_date": "2024-07-12",
+      "exit_date": "2024-07-19",
+      "entry_price": 1033.4,
+      "exit_price": 1004.85,
+      "pnl_pct": -2.76,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "IXIGO",
+      "entry_date": "2024-12-11",
+      "exit_date": "2025-01-13",
+      "entry_price": 156.91,
+      "exit_price": 141.68,
+      "pnl_pct": -9.71,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "TBOTEK",
+      "entry_date": "2024-07-31",
+      "exit_date": "2024-08-05",
+      "entry_price": 1836.25,
+      "exit_price": 1705.47,
+      "pnl_pct": -7.12,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SUNTECK",
+      "entry_date": "2021-09-13",
+      "exit_date": "2021-10-20",
+      "entry_price": 394.65,
+      "exit_price": 468.4,
+      "pnl_pct": 18.69,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "SUNDARMFIN",
+      "entry_date": "2025-10-24",
+      "exit_date": "2025-10-30",
+      "entry_price": 4647.0,
+      "exit_price": 4554.5,
+      "pnl_pct": -1.99,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "KRISHNADEF",
+      "entry_date": "2026-05-07",
+      "exit_date": "2026-05-18",
+      "entry_price": 1146.6,
+      "exit_price": 1054.55,
+      "pnl_pct": -8.03,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "BERGEPAINT",
+      "entry_date": "2025-10-17",
+      "exit_date": "2025-11-28",
+      "entry_price": 544.9,
+      "exit_price": 564.6,
+      "pnl_pct": 3.62,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "CDSL",
+      "entry_date": "2021-09-09",
+      "exit_date": "2021-09-21",
+      "entry_price": 1321.45,
+      "exit_price": 1262.25,
+      "pnl_pct": -4.48,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "CDSL",
+      "entry_date": "2021-10-11",
+      "exit_date": "2021-10-20",
+      "entry_price": 1385.65,
+      "exit_price": 1299.87,
+      "pnl_pct": -6.19,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "CDSL",
+      "entry_date": "2022-01-13",
+      "exit_date": "2022-01-24",
+      "entry_price": 1608.6,
+      "exit_price": 1524.65,
+      "pnl_pct": -5.22,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "NOCIL",
+      "entry_date": "2023-05-02",
+      "exit_date": "2023-07-07",
+      "entry_price": 221.35,
+      "exit_price": 211.7,
+      "pnl_pct": -4.36,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SUBEXLTD",
+      "entry_date": "2023-06-20",
+      "exit_date": "2023-06-23",
+      "entry_price": 30.15,
+      "exit_price": 28.02,
+      "pnl_pct": -7.06,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SBIN",
+      "entry_date": "2021-09-15",
+      "exit_date": "2021-11-15",
+      "entry_price": 443.85,
+      "exit_price": 506.55,
+      "pnl_pct": 14.13,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "ARVSMART",
+      "entry_date": "2025-09-15",
+      "exit_date": "2025-10-07",
+      "entry_price": 631.5,
+      "exit_price": 610.63,
+      "pnl_pct": -3.3,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "THANGAMAYL",
+      "entry_date": "2023-09-06",
+      "exit_date": "2023-09-12",
+      "entry_price": 1333.8,
+      "exit_price": 1268.44,
+      "pnl_pct": -4.9,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SAFARI",
+      "entry_date": "2024-08-30",
+      "exit_date": "2024-09-25",
+      "entry_price": 2476.2,
+      "exit_price": 2339.42,
+      "pnl_pct": -5.52,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "MANINDS",
+      "entry_date": "2025-09-19",
+      "exit_date": "2025-09-25",
+      "entry_price": 443.1,
+      "exit_price": 424.26,
+      "pnl_pct": -4.25,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "WEBELSOLAR",
+      "entry_date": "2023-12-05",
+      "exit_date": "2024-02-26",
+      "entry_price": 214.85,
+      "exit_price": 394.65,
+      "pnl_pct": 83.69,
+      "exit_reason": "EMA20_TRAIL_EXIT"
+    },
+    {
+      "symbol": "BOMDYEING",
+      "entry_date": "2024-05-03",
+      "exit_date": "2024-05-07",
+      "entry_price": 178.5,
+      "exit_price": 170.82,
+      "pnl_pct": -4.3,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "BAJAJHLDNG",
+      "entry_date": "2022-11-09",
+      "exit_date": "2022-11-10",
+      "entry_price": 6874.2,
+      "exit_price": 6715.17,
+      "pnl_pct": -2.31,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "JAGRAN",
+      "entry_date": "2022-12-05",
+      "exit_date": "2022-12-22",
+      "entry_price": 74.95,
+      "exit_price": 71.03,
+      "pnl_pct": -5.23,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ICICIGI",
+      "entry_date": "2025-06-06",
+      "exit_date": "2025-08-07",
+      "entry_price": 2006.2,
+      "exit_price": 1852.29,
+      "pnl_pct": -7.67,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "TRITURBINE",
+      "entry_date": "2022-12-01",
+      "exit_date": "2022-12-06",
+      "entry_price": 293.5,
+      "exit_price": 284.13,
+      "pnl_pct": -3.19,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "TRITURBINE",
+      "entry_date": "2023-11-30",
+      "exit_date": "2023-12-12",
+      "entry_price": 430.85,
+      "exit_price": 401.55,
+      "pnl_pct": -6.8,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "SANSERA",
+      "entry_date": "2025-07-02",
+      "exit_date": "2025-07-11",
+      "entry_price": 1403.5,
+      "exit_price": 1370.16,
+      "pnl_pct": -2.38,
+      "exit_reason": "SL_HIT"
+    },
+    {
+      "symbol": "ZYDUSLIFE",
+      "entry_date": "2025-06-05",
+      "exit_date": "2025-08-07",
+      "entry_price": 955.7,
+      "exit_price": 923.67,
+      "pnl_pct": -3.35,
+      "exit_reason": "SL_HIT"
+    }
+  ]
+}
