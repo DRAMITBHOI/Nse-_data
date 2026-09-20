@@ -1,910 +1,1869 @@
 {
-  "report_generated": "2026-09-19 14:14 UTC",
-  "total_trades": 785,
-  "win_rate_pct": 37.2,
-  "avg_gain_pct": 12.97,
-  "avg_loss_pct": -5.42,
-  "profit_factor": 1.42,
+  "report_generated": "2026-09-20 09:33 UTC",
+  "cooldown_days": 10,
+  "be_threshold_r": 1.5,
+  "exit_rule_comparison": {
+    "EMA20_Exit": {
+      "trades": 788,
+      "win_rate": 44.92,
+      "profit_factor": 1.38,
+      "avg_gain": 9.28,
+      "avg_loss": -5.48
+    },
+    "Swing_Low_Exit": {
+      "trades": 788,
+      "win_rate": 44.92,
+      "profit_factor": 1.36,
+      "avg_gain": 9.14,
+      "avg_loss": -5.48
+    }
+  },
+  "nifty_regime_breakdown": {
+    "All_Time": {
+      "trades": 788,
+      "win_rate": 44.92,
+      "profit_factor": 1.38,
+      "avg_gain": 9.28,
+      "avg_loss": -5.48
+    },
+    "When_Nifty_Above_50SMA": {
+      "trades": 788,
+      "win_rate": 44.92,
+      "profit_factor": 1.38,
+      "avg_gain": 9.28,
+      "avg_loss": -5.48
+    },
+    "When_Nifty_Below_50SMA": {
+      "trades": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "avg_gain": 0,
+      "avg_loss": 0
+    }
+  },
+  "market_cap_breakdown": {
+    "Large_Cap": {
+      "trades": 51,
+      "win_rate": 47.06,
+      "profit_factor": 1.9,
+      "avg_gain": 8.53,
+      "avg_loss": -3.98
+    },
+    "Mid_Cap": {
+      "trades": 90,
+      "win_rate": 43.33,
+      "profit_factor": 1.64,
+      "avg_gain": 9.64,
+      "avg_loss": -4.51
+    },
+    "Small_Micro_Cap": {
+      "trades": 267,
+      "win_rate": 50.56,
+      "profit_factor": 2.15,
+      "avg_gain": 11.23,
+      "avg_loss": -5.35
+    }
+  },
   "recent_trades": [
     {
+      "symbol": "HERANBA",
+      "category": "NSE Equity",
+      "entry_date": "2021-06-02",
+      "exit_date": "2021-06-18",
+      "entry_price": 772.9,
+      "exit_price": 721.26,
+      "pnl_pct": -6.68,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "HERANBA",
+      "category": "NSE Equity",
+      "entry_date": "2021-07-19",
+      "exit_date": "2021-08-18",
+      "entry_price": 769.0,
+      "exit_price": 797.75,
+      "pnl_pct": 3.74,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SULA",
+      "category": "NSE Equity",
+      "entry_date": "2024-12-10",
+      "exit_date": "2024-12-13",
+      "entry_price": 446.15,
+      "exit_price": 424.91,
+      "pnl_pct": -4.76,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "FLFL",
+      "category": "NSE Equity",
+      "entry_date": "2021-12-20",
+      "exit_date": "2021-12-21",
+      "entry_price": 59.8,
+      "exit_price": 56.58,
+      "pnl_pct": -5.38,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "BOROLTD",
+      "category": "NSE Equity",
+      "entry_date": "2023-07-26",
+      "exit_date": "2023-08-14",
+      "entry_price": 455.05,
+      "exit_price": 421.79,
+      "pnl_pct": -7.31,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "DREAMFOLKS",
+      "category": "NSE Equity",
+      "entry_date": "2022-12-19",
+      "exit_date": "2022-12-22",
+      "entry_price": 407.0,
+      "exit_price": 376.3,
+      "pnl_pct": -7.54,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "DREAMFOLKS",
+      "category": "NSE Equity",
+      "entry_date": "2023-11-16",
+      "exit_date": "2024-02-12",
+      "entry_price": 550.85,
+      "exit_price": 500.2,
+      "pnl_pct": -9.19,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "NAVA",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2023-04-20",
+      "exit_date": "2023-05-08",
+      "entry_price": 240.85,
+      "exit_price": 229.04,
+      "pnl_pct": -4.9,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GROWWGOLD",
+      "category": "NSE Equity",
+      "entry_date": "2025-12-01",
+      "exit_date": "2025-12-05",
+      "entry_price": 126.26,
+      "exit_price": 123.24,
+      "pnl_pct": -2.39,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GROWWGOLD",
+      "category": "NSE Equity",
+      "entry_date": "2025-12-23",
+      "exit_date": "2025-12-29",
+      "entry_price": 134.55,
+      "exit_price": 131.71,
+      "pnl_pct": -2.11,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "HEIDELBERG",
+      "category": "NSE Equity",
+      "entry_date": "2021-04-30",
+      "exit_date": "2021-05-14",
+      "entry_price": 237.1,
+      "exit_price": 237.57,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "HEIDELBERG",
+      "category": "NSE Equity",
+      "entry_date": "2021-09-15",
+      "exit_date": "2021-09-17",
+      "entry_price": 274.25,
+      "exit_price": 265.17,
+      "pnl_pct": -3.31,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GOLDBEES",
+      "category": "NSE Equity",
+      "entry_date": "2022-11-16",
+      "exit_date": "2023-02-10",
+      "entry_price": 45.35,
+      "exit_price": 48.66,
+      "pnl_pct": 7.3,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GOLDBEES",
+      "category": "NSE Equity",
+      "entry_date": "2026-08-06",
+      "exit_date": "2026-09-01",
+      "entry_price": 122.48,
+      "exit_price": 125.34,
+      "pnl_pct": 2.34,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "MAHSCOOTER",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2021-05-26",
+      "exit_date": "2021-08-09",
+      "entry_price": 3779.3,
+      "exit_price": 4042.85,
+      "pnl_pct": 6.97,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "MAHSCOOTER",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2023-12-07",
+      "exit_date": "2023-12-19",
+      "entry_price": 8353.8,
+      "exit_price": 7931.98,
+      "pnl_pct": -5.05,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "DOLLAR",
+      "category": "NSE Equity",
+      "entry_date": "2024-10-01",
+      "exit_date": "2024-10-07",
+      "entry_price": 533.35,
+      "exit_price": 501.73,
+      "pnl_pct": -5.93,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "CHEMPLASTS",
+      "category": "NSE Equity",
+      "entry_date": "2023-05-05",
+      "exit_date": "2023-05-16",
+      "entry_price": 457.55,
+      "exit_price": 431.79,
+      "pnl_pct": -5.63,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "JAMNAAUTO",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2022-09-05",
+      "exit_date": "2022-09-16",
+      "entry_price": 124.1,
+      "exit_price": 117.07,
+      "pnl_pct": -5.66,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "JAMNAAUTO",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2026-08-03",
+      "exit_date": "2026-08-10",
+      "entry_price": 140.86,
+      "exit_price": 131.17,
+      "pnl_pct": -6.88,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ERIS",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2021-09-02",
+      "exit_date": "2021-10-28",
+      "entry_price": 757.1,
+      "exit_price": 783.9,
+      "pnl_pct": 3.54,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "MOM30IETF",
+      "category": "NSE Equity",
+      "entry_date": "2024-09-27",
+      "exit_date": "2024-09-30",
+      "entry_price": 38.72,
+      "exit_price": 38.07,
+      "pnl_pct": -1.68,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "TEAMLEASE",
+      "category": "NSE Equity",
+      "entry_date": "2024-08-23",
+      "exit_date": "2024-08-27",
+      "entry_price": 3239.8,
+      "exit_price": 3123.94,
+      "pnl_pct": -3.58,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GARFIBRES",
+      "category": "NSE Equity",
+      "entry_date": "2021-04-09",
+      "exit_date": "2021-04-19",
+      "entry_price": 2697.7,
+      "exit_price": 2539.99,
+      "pnl_pct": -5.85,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PENINLAND",
+      "category": "NSE Equity",
+      "entry_date": "2023-10-10",
+      "exit_date": "2023-10-26",
+      "entry_price": 36.05,
+      "exit_price": 36.12,
+      "pnl_pct": 0.19,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GRAVITA",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2023-08-31",
+      "exit_date": "2023-09-13",
+      "entry_price": 782.05,
+      "exit_price": 744.03,
+      "pnl_pct": -4.86,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ANURAS",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2023-11-29",
+      "exit_date": "2023-12-22",
+      "entry_price": 964.15,
+      "exit_price": 1008.5,
+      "pnl_pct": 4.6,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PATANJALI",
+      "category": "Nifty Midcap 150",
+      "entry_date": "2023-05-15",
+      "exit_date": "2023-07-13",
+      "entry_price": 952.95,
+      "exit_price": 1165.1,
+      "pnl_pct": 22.26,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PATANJALI",
+      "category": "Nifty Midcap 150",
+      "entry_date": "2024-07-31",
+      "exit_date": "2024-08-05",
+      "entry_price": 1720.1,
+      "exit_price": 1677.06,
+      "pnl_pct": -2.5,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "EBBETF0430",
+      "category": "NSE Equity",
+      "entry_date": "2021-04-01",
+      "exit_date": "2021-06-07",
+      "entry_price": 1136.75,
+      "exit_price": 1139.02,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ONESOURCE",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2025-05-26",
+      "exit_date": "2025-06-23",
+      "entry_price": 1764.5,
+      "exit_price": 1947.5,
+      "pnl_pct": 10.37,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SURYAROSNI",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2023-12-18",
+      "exit_date": "2024-02-01",
+      "entry_price": 557.05,
+      "exit_price": 763.55,
+      "pnl_pct": 37.07,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SURYAROSNI",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2025-03-24",
+      "exit_date": "2025-03-26",
+      "entry_price": 259.64,
+      "exit_price": 247.0,
+      "pnl_pct": -4.87,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SRF",
+      "category": "Nifty Midcap 150",
+      "entry_date": "2025-10-10",
+      "exit_date": "2025-10-27",
+      "entry_price": 3024.5,
+      "exit_price": 3030.55,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SHK",
+      "category": "NSE Equity",
+      "entry_date": "2025-07-16",
+      "exit_date": "2025-08-05",
+      "entry_price": 242.07,
+      "exit_price": 245.5,
+      "pnl_pct": 1.42,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GNFC",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2024-09-02",
+      "exit_date": "2024-09-06",
+      "entry_price": 694.15,
+      "exit_price": 675.77,
+      "pnl_pct": -2.65,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "MSUMI",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2025-10-23",
+      "exit_date": "2025-11-07",
+      "entry_price": 47.67,
+      "exit_price": 46.03,
+      "pnl_pct": -3.44,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GPTHEALTH",
+      "category": "NSE Equity",
+      "entry_date": "2024-07-03",
+      "exit_date": "2024-07-23",
+      "entry_price": 162.07,
+      "exit_price": 162.39,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PSUBNKBEES",
+      "category": "NSE Equity",
+      "entry_date": "2023-12-04",
+      "exit_date": "2024-03-13",
+      "entry_price": 59.21,
+      "exit_price": 74.54,
+      "pnl_pct": 25.89,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PSUBNKBEES",
+      "category": "NSE Equity",
+      "entry_date": "2024-04-03",
+      "exit_date": "2024-04-15",
+      "entry_price": 80.91,
+      "exit_price": 77.93,
+      "pnl_pct": -3.68,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PSUBNKBEES",
+      "category": "NSE Equity",
+      "entry_date": "2024-12-04",
+      "exit_date": "2024-12-13",
+      "entry_price": 79.51,
+      "exit_price": 76.43,
+      "pnl_pct": -3.87,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "PSUBNKBEES",
+      "category": "NSE Equity",
+      "entry_date": "2026-08-06",
+      "exit_date": "2026-09-02",
+      "entry_price": 97.35,
+      "exit_price": 94.4,
+      "pnl_pct": -3.03,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "KPIL",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2025-06-03",
+      "exit_date": "2025-07-07",
+      "entry_price": 1178.6,
+      "exit_price": 1180.96,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SETFNIFBK",
+      "category": "NSE Equity",
+      "entry_date": "2022-11-24",
+      "exit_date": "2022-11-28",
+      "entry_price": 431.67,
+      "exit_price": 432.53,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SETFNIFBK",
+      "category": "NSE Equity",
+      "entry_date": "2023-04-27",
+      "exit_date": "2023-06-15",
+      "entry_price": 431.93,
+      "exit_price": 438.46,
+      "pnl_pct": 1.51,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "FMGOETZE",
+      "category": "NSE Equity",
+      "entry_date": "2022-04-08",
+      "exit_date": "2022-05-12",
+      "entry_price": 278.2,
+      "exit_price": 265.52,
+      "pnl_pct": -4.56,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "OPTIEMUS",
+      "category": "Nifty Microcap 250",
+      "entry_date": "2022-04-12",
+      "exit_date": "2022-05-04",
+      "entry_price": 351.65,
+      "exit_price": 367.9,
+      "pnl_pct": 4.62,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
       "symbol": "INDHOTEL",
+      "category": "Nifty 500",
       "entry_date": "2024-05-27",
       "exit_date": "2024-05-30",
       "entry_price": 581.1,
       "exit_price": 563.31,
       "pnl_pct": -3.06,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NATCOPHARM",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2022-08-01",
       "exit_date": "2022-08-10",
       "entry_price": 705.0,
       "exit_price": 706.41,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NATCOPHARM",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2025-06-11",
       "exit_date": "2025-06-17",
       "entry_price": 934.1,
       "exit_price": 872.04,
       "pnl_pct": -6.64,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BPCL",
+      "category": "Nifty 500",
       "entry_date": "2025-07-04",
       "exit_date": "2025-07-31",
       "entry_price": 346.2,
       "exit_price": 328.58,
       "pnl_pct": -5.09,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "PTC",
+      "category": "Nifty Microcap 250",
       "entry_date": "2025-07-11",
       "exit_date": "2025-08-01",
       "entry_price": 185.3,
-      "exit_price": 185.6706,
+      "exit_price": 185.67,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "JWL",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-11-17",
-      "exit_date": "2023-12-08",
+      "exit_date": "2023-11-22",
       "entry_price": 329.35,
-      "exit_price": 310.96,
-      "pnl_pct": -5.58,
-      "exit_reason": "SL_HIT"
+      "exit_price": 330.01,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GANESHHOU",
+      "category": "NSE Equity",
       "entry_date": "2026-07-03",
-      "exit_date": "2026-07-28",
+      "exit_date": "2026-07-08",
       "entry_price": 810.5,
-      "exit_price": 767.4,
-      "pnl_pct": -5.32,
-      "exit_reason": "SL_HIT"
+      "exit_price": 812.12,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VTL",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-08-29",
       "exit_date": "2023-09-12",
       "entry_price": 397.3,
       "exit_price": 373.43,
       "pnl_pct": -6.01,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "MIDHANI",
+      "category": "Nifty Microcap 250",
       "entry_date": "2022-01-17",
       "exit_date": "2022-01-24",
       "entry_price": 187.7,
       "exit_price": 180.87,
       "pnl_pct": -3.64,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GICRE",
+      "category": "Nifty Midcap 150",
       "entry_date": "2025-03-18",
       "exit_date": "2025-04-04",
       "entry_price": 403.1,
-      "exit_price": 403.9062,
+      "exit_price": 403.91,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "UFLEX",
+      "category": "NSE Equity",
       "entry_date": "2025-03-24",
-      "exit_date": "2025-04-07",
+      "exit_date": "2025-03-27",
       "entry_price": 501.45,
-      "exit_price": 485.1,
-      "pnl_pct": -3.26,
-      "exit_reason": "SL_HIT"
+      "exit_price": 502.45,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "MAANALU",
+      "category": "NSE Equity",
       "entry_date": "2021-07-12",
       "exit_date": "2021-08-02",
       "entry_price": 367.1,
       "exit_price": 332.14,
       "pnl_pct": -9.52,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "CEWATER",
+      "category": "NSE Equity",
       "entry_date": "2025-05-15",
       "exit_date": "2025-06-12",
       "entry_price": 543.5,
       "exit_price": 580.1,
       "pnl_pct": 6.73,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "IKIO",
+      "category": "NSE Equity",
       "entry_date": "2023-12-11",
       "exit_date": "2023-12-20",
       "entry_price": 357.45,
       "exit_price": 339.57,
       "pnl_pct": -5.0,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NURECA",
+      "category": "NSE Equity",
       "entry_date": "2021-06-14",
       "exit_date": "2021-06-17",
       "entry_price": 1589.1,
       "exit_price": 1482.08,
       "pnl_pct": -6.73,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ROUTE",
+      "category": "Nifty Microcap 250",
       "entry_date": "2026-05-05",
       "exit_date": "2026-05-11",
       "entry_price": 559.2,
       "exit_price": 538.56,
       "pnl_pct": -3.69,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "HAL",
+      "category": "Nifty 500",
       "entry_date": "2024-04-12",
       "exit_date": "2024-05-07",
       "entry_price": 3638.1,
       "exit_price": 3715.0,
       "pnl_pct": 2.11,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NLCINDIA",
+      "category": "Nifty Midcap 150",
       "entry_date": "2022-08-02",
       "exit_date": "2022-08-23",
       "entry_price": 71.85,
       "exit_price": 68.11,
       "pnl_pct": -5.21,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NLCINDIA",
+      "category": "Nifty Midcap 150",
       "entry_date": "2023-04-12",
       "exit_date": "2023-04-21",
       "entry_price": 80.15,
       "exit_price": 77.57,
       "pnl_pct": -3.22,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SOBHA",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-11-30",
       "exit_date": "2024-02-12",
       "entry_price": 907.25,
       "exit_price": 1348.55,
       "pnl_pct": 48.64,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SOBHA",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2024-04-23",
       "exit_date": "2024-05-10",
       "entry_price": 1715.6,
-      "exit_price": 1719.0312,
+      "exit_price": 1719.03,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "KPRMILL",
+      "category": "Nifty Midcap 150",
       "entry_date": "2021-07-05",
       "exit_date": "2021-08-10",
       "entry_price": 1638.55,
       "exit_price": 1814.95,
       "pnl_pct": 10.77,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "EMAMILTD",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-07-26",
       "exit_date": "2023-09-21",
       "entry_price": 434.55,
       "exit_price": 524.9,
       "pnl_pct": 20.79,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SURYODAY",
+      "category": "NSE Equity",
       "entry_date": "2023-07-31",
       "exit_date": "2023-08-02",
       "entry_price": 186.6,
       "exit_price": 175.43,
       "pnl_pct": -5.99,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SURYODAY",
+      "category": "NSE Equity",
       "entry_date": "2025-12-23",
       "exit_date": "2026-01-23",
       "entry_price": 144.31,
       "exit_price": 131.87,
       "pnl_pct": -8.62,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ARVINDFASN",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-11-09",
       "exit_date": "2021-11-22",
       "entry_price": 342.3,
       "exit_price": 297.0,
       "pnl_pct": -13.23,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "DHAMPURSUG",
+      "category": "NSE Equity",
       "entry_date": "2023-05-03",
       "exit_date": "2023-06-30",
       "entry_price": 252.75,
       "exit_price": 269.8,
       "pnl_pct": 6.75,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BALKRISIND",
+      "category": "Nifty Midcap 150",
       "entry_date": "2022-11-25",
       "exit_date": "2022-12-23",
       "entry_price": 2026.35,
       "exit_price": 2073.7,
       "pnl_pct": 2.34,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BPL",
+      "category": "NSE Equity",
       "entry_date": "2023-11-13",
       "exit_date": "2023-11-23",
       "entry_price": 94.15,
       "exit_price": 87.52,
       "pnl_pct": -7.04,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SAKAR",
+      "category": "NSE Equity",
       "entry_date": "2026-04-09",
-      "exit_date": "2026-05-06",
+      "exit_date": "2026-04-16",
       "entry_price": 572.35,
-      "exit_price": 573.4947000000001,
+      "exit_price": 573.49,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TECHNOE",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-04-18",
       "exit_date": "2023-04-25",
       "entry_price": 359.5,
       "exit_price": 339.27,
       "pnl_pct": -5.63,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "HEMIPROP",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-07-05",
       "exit_date": "2024-08-01",
       "entry_price": 201.83,
       "exit_price": 211.15,
       "pnl_pct": 4.62,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ULTRACEMCO",
+      "category": "Nifty 500",
       "entry_date": "2022-11-30",
       "exit_date": "2023-01-23",
       "entry_price": 7077.0,
       "exit_price": 6836.0,
       "pnl_pct": -3.41,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "HERITGFOOD",
+      "category": "Nifty Microcap 250",
       "entry_date": "2022-12-02",
       "exit_date": "2023-01-20",
       "entry_price": 345.45,
       "exit_price": 317.84,
       "pnl_pct": -7.99,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "HERITGFOOD",
+      "category": "Nifty Microcap 250",
       "entry_date": "2026-05-11",
       "exit_date": "2026-05-12",
       "entry_price": 378.3,
       "exit_price": 355.76,
       "pnl_pct": -5.96,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "LIQGRWBEES",
+      "category": "NSE Equity",
+      "entry_date": "2026-08-06",
+      "exit_date": "2026-09-11",
+      "entry_price": 1050.52,
+      "exit_price": 1052.62,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "PPLPHARMA",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-07-17",
       "exit_date": "2023-10-25",
       "entry_price": 101.1,
       "exit_price": 91.58,
       "pnl_pct": -9.42,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VENKEYS",
+      "category": "NSE Equity",
       "entry_date": "2023-10-06",
       "exit_date": "2023-10-23",
       "entry_price": 2051.0,
       "exit_price": 1950.3,
       "pnl_pct": -4.91,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VENKEYS",
+      "category": "NSE Equity",
       "entry_date": "2026-05-11",
       "exit_date": "2026-05-14",
       "entry_price": 1686.5,
-      "exit_price": 1620.73,
-      "pnl_pct": -3.9,
-      "exit_reason": "SL_HIT"
+      "exit_price": 1689.87,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "HGINFRA",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-01-11",
-      "exit_date": "2024-02-12",
+      "exit_date": "2024-01-17",
       "entry_price": 885.25,
-      "exit_price": 887.0205,
+      "exit_price": 887.02,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TNPETRO",
+      "category": "NSE Equity",
       "entry_date": "2022-09-12",
       "exit_date": "2022-09-14",
       "entry_price": 109.6,
       "exit_price": 106.28,
       "pnl_pct": -3.03,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BALAMINES",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-09-10",
       "exit_date": "2024-10-04",
       "entry_price": 2298.1,
       "exit_price": 2206.76,
       "pnl_pct": -3.97,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SRM",
+      "category": "NSE Equity",
       "entry_date": "2026-08-06",
       "exit_date": "2026-08-13",
       "entry_price": 529.05,
       "exit_price": 505.89,
       "pnl_pct": -4.38,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "AYMSYNTEX",
+      "category": "NSE Equity",
       "entry_date": "2024-09-02",
       "exit_date": "2024-10-28",
       "entry_price": 142.55,
       "exit_price": 222.07,
       "pnl_pct": 55.78,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ANUP",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-04-22",
       "exit_date": "2024-04-23",
       "entry_price": 3596.4,
       "exit_price": 3330.11,
       "pnl_pct": -7.4,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GUJALKALI",
+      "category": "NSE Equity",
       "entry_date": "2021-06-10",
       "exit_date": "2021-06-14",
       "entry_price": 428.95,
       "exit_price": 414.07,
       "pnl_pct": -3.47,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "PRICOLLTD",
+      "category": "Nifty Microcap 250",
       "entry_date": "2022-03-29",
       "exit_date": "2022-04-25",
       "entry_price": 128.2,
       "exit_price": 135.0,
       "pnl_pct": 5.3,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "RPSGVENT",
+      "category": "NSE Equity",
       "entry_date": "2025-06-02",
       "exit_date": "2025-08-29",
       "entry_price": 957.85,
       "exit_price": 861.35,
       "pnl_pct": -10.07,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SHRIRAMPPS",
+      "category": "NSE Equity",
       "entry_date": "2023-07-14",
       "exit_date": "2023-09-12",
       "entry_price": 69.9,
       "exit_price": 82.1,
       "pnl_pct": 17.45,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "FINOPB",
+      "category": "NSE Equity",
       "entry_date": "2024-03-07",
       "exit_date": "2024-03-12",
       "entry_price": 325.65,
       "exit_price": 302.0,
       "pnl_pct": -7.26,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VISHNU",
+      "category": "NSE Equity",
       "entry_date": "2022-10-28",
       "exit_date": "2022-11-01",
       "entry_price": 2000.3,
       "exit_price": 1894.86,
       "pnl_pct": -5.27,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SIGACHI",
+      "category": "NSE Equity",
       "entry_date": "2023-07-31",
       "exit_date": "2023-08-02",
       "entry_price": 313.85,
       "exit_price": 297.5,
       "pnl_pct": -5.21,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SIGACHI",
+      "category": "NSE Equity",
       "entry_date": "2024-01-02",
       "exit_date": "2024-02-12",
       "entry_price": 59.55,
       "exit_price": 70.9,
       "pnl_pct": 19.06,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VETO",
+      "category": "NSE Equity",
       "entry_date": "2024-06-24",
       "exit_date": "2024-08-14",
       "entry_price": 135.47,
       "exit_price": 158.5,
       "pnl_pct": 17.0,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GODREJAGRO",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-12-10",
       "exit_date": "2024-12-13",
       "entry_price": 789.1,
       "exit_price": 755.47,
       "pnl_pct": -4.26,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ESILVER",
+      "category": "NSE Equity",
       "entry_date": "2025-11-12",
-      "exit_date": "2025-11-18",
+      "exit_date": "2025-11-17",
       "entry_price": 157.12,
-      "exit_price": 152.58,
-      "pnl_pct": -2.89,
-      "exit_reason": "SL_HIT"
+      "exit_price": 157.43,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GLENMARK",
+      "category": "Nifty Midcap 150",
       "entry_date": "2023-04-27",
       "exit_date": "2023-06-22",
       "entry_price": 551.15,
       "exit_price": 627.7,
       "pnl_pct": 13.89,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ORIENTCEM",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-05-03",
       "exit_date": "2021-06-15",
       "entry_price": 111.55,
       "exit_price": 133.75,
       "pnl_pct": 19.9,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ORIENTCEM",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-07-05",
       "exit_date": "2021-08-11",
       "entry_price": 143.8,
       "exit_price": 154.4,
       "pnl_pct": 7.37,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ORIENTCEM",
+      "category": "Nifty Microcap 250",
       "entry_date": "2022-08-18",
-      "exit_date": "2023-01-20",
+      "exit_date": "2022-09-26",
       "entry_price": 124.15,
-      "exit_price": 131.8,
-      "pnl_pct": 6.16,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_price": 124.4,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SKIPPER",
+      "category": "Nifty Microcap 250",
       "entry_date": "2025-06-09",
       "exit_date": "2025-06-19",
       "entry_price": 523.9,
       "exit_price": 483.1,
       "pnl_pct": -7.79,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SILVER",
+      "category": "NSE Equity",
       "entry_date": "2024-10-04",
       "exit_date": "2024-10-08",
       "entry_price": 93.24,
       "exit_price": 91.22,
       "pnl_pct": -2.17,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "SILVER",
+      "category": "NSE Equity",
+      "entry_date": "2026-08-07",
+      "exit_date": "2026-09-01",
+      "entry_price": 230.03,
+      "exit_price": 230.49,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "CEATLTD",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-12-01",
       "exit_date": "2024-01-17",
       "entry_price": 2171.9,
       "exit_price": 2423.0,
       "pnl_pct": 11.56,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VINDHYATEL",
+      "category": "NSE Equity",
       "entry_date": "2023-07-19",
-      "exit_date": "2023-08-14",
+      "exit_date": "2023-08-02",
       "entry_price": 1979.25,
-      "exit_price": 2010.15,
-      "pnl_pct": 1.56,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_price": 1983.21,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "MBAPL",
+      "category": "NSE Equity",
       "entry_date": "2025-12-24",
       "exit_date": "2026-01-08",
       "entry_price": 414.9,
-      "exit_price": 415.72979999999995,
+      "exit_price": 415.73,
       "pnl_pct": 0.2,
-      "exit_reason": "BE_OR_TRAIL_HIT"
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "KALYANKJIL",
+      "category": "Nifty Midcap 150",
       "entry_date": "2021-09-15",
       "exit_date": "2021-10-25",
       "entry_price": 71.3,
       "exit_price": 74.15,
       "pnl_pct": 4.0,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "KALYANKJIL",
+      "category": "Nifty Midcap 150",
       "entry_date": "2023-05-12",
       "exit_date": "2023-05-15",
       "entry_price": 108.55,
       "exit_price": 105.04,
       "pnl_pct": -3.23,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GICHSGFIN",
+      "category": "NSE Equity",
       "entry_date": "2023-09-08",
       "exit_date": "2023-09-12",
       "entry_price": 194.0,
       "exit_price": 185.67,
       "pnl_pct": -4.29,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "GICHSGFIN",
+      "category": "NSE Equity",
       "entry_date": "2025-06-06",
       "exit_date": "2025-06-13",
       "entry_price": 195.59,
       "exit_price": 188.12,
       "pnl_pct": -3.82,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ANANDRATHI",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-01-04",
       "exit_date": "2023-02-01",
       "entry_price": 716.05,
       "exit_price": 798.5,
       "pnl_pct": 11.51,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ANANDRATHI",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-06-09",
       "exit_date": "2023-09-11",
       "entry_price": 871.05,
       "exit_price": 1370.9,
       "pnl_pct": 57.38,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "category": "Nifty Smallcap 250",
+      "entry_date": "2026-08-10",
+      "exit_date": "2026-09-09",
+      "entry_price": 2131.5,
+      "exit_price": 2180.6,
+      "pnl_pct": 2.3,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VGUARD",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-05-19",
       "exit_date": "2021-06-17",
       "entry_price": 233.8,
       "exit_price": 255.75,
       "pnl_pct": 9.39,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "VGUARD",
+      "category": "Nifty Microcap 250",
       "entry_date": "2023-11-28",
       "exit_date": "2023-12-21",
       "entry_price": 300.55,
       "exit_price": 285.27,
       "pnl_pct": -5.08,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BHARATRAS",
+      "category": "NSE Equity",
       "entry_date": "2024-08-09",
       "exit_date": "2024-08-13",
       "entry_price": 12815.15,
       "exit_price": 11880.0,
       "pnl_pct": -7.3,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ELECTCAST",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-09-08",
-      "exit_date": "2021-10-20",
+      "exit_date": "2021-09-17",
       "entry_price": 38.7,
-      "exit_price": 35.34,
-      "pnl_pct": -8.68,
-      "exit_reason": "SL_HIT"
+      "exit_price": 38.78,
+      "pnl_pct": 0.21,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TATATECH",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2024-07-12",
       "exit_date": "2024-07-19",
       "entry_price": 1033.4,
       "exit_price": 1004.85,
       "pnl_pct": -2.76,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "IXIGO",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-12-11",
-      "exit_date": "2025-01-13",
+      "exit_date": "2025-01-06",
       "entry_price": 156.91,
-      "exit_price": 141.68,
-      "pnl_pct": -9.71,
-      "exit_reason": "SL_HIT"
+      "exit_price": 164.77,
+      "pnl_pct": 5.01,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TBOTEK",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2024-07-31",
       "exit_date": "2024-08-05",
       "entry_price": 1836.25,
       "exit_price": 1705.47,
       "pnl_pct": -7.12,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SUNTECK",
+      "category": "Nifty Microcap 250",
       "entry_date": "2021-09-13",
       "exit_date": "2021-10-20",
       "entry_price": 394.65,
       "exit_price": 468.4,
       "pnl_pct": 18.69,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SUNDARMFIN",
+      "category": "Nifty Midcap 150",
       "entry_date": "2025-10-24",
       "exit_date": "2025-10-30",
       "entry_price": 4647.0,
       "exit_price": 4554.5,
       "pnl_pct": -1.99,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "KRISHNADEF",
+      "category": "NSE Equity",
       "entry_date": "2026-05-07",
-      "exit_date": "2026-05-18",
+      "exit_date": "2026-05-12",
       "entry_price": 1146.6,
-      "exit_price": 1054.55,
-      "pnl_pct": -8.03,
-      "exit_reason": "SL_HIT"
+      "exit_price": 1148.89,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BERGEPAINT",
+      "category": "Nifty Midcap 150",
       "entry_date": "2025-10-17",
       "exit_date": "2025-11-28",
       "entry_price": 544.9,
       "exit_price": 564.6,
       "pnl_pct": 3.62,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "CDSL",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2021-09-09",
-      "exit_date": "2021-09-21",
+      "exit_date": "2021-09-15",
       "entry_price": 1321.45,
-      "exit_price": 1262.25,
-      "pnl_pct": -4.48,
-      "exit_reason": "SL_HIT"
+      "exit_price": 1324.09,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "CDSL",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2021-10-11",
       "exit_date": "2021-10-20",
       "entry_price": 1385.65,
       "exit_price": 1299.87,
       "pnl_pct": -6.19,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "CDSL",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2022-01-13",
       "exit_date": "2022-01-24",
       "entry_price": 1608.6,
       "exit_price": 1524.65,
       "pnl_pct": -5.22,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "NOCIL",
+      "category": "NSE Equity",
       "entry_date": "2023-05-02",
-      "exit_date": "2023-07-07",
+      "exit_date": "2023-05-18",
       "entry_price": 221.35,
-      "exit_price": 211.7,
-      "pnl_pct": -4.36,
-      "exit_reason": "SL_HIT"
+      "exit_price": 224.0,
+      "pnl_pct": 1.2,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SUBEXLTD",
+      "category": "NSE Equity",
       "entry_date": "2023-06-20",
       "exit_date": "2023-06-23",
       "entry_price": 30.15,
       "exit_price": 28.02,
       "pnl_pct": -7.06,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SBIN",
+      "category": "Nifty 500",
       "entry_date": "2021-09-15",
-      "exit_date": "2021-11-15",
+      "exit_date": "2021-09-20",
       "entry_price": 443.85,
-      "exit_price": 506.55,
-      "pnl_pct": 14.13,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_price": 444.74,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ARVSMART",
+      "category": "NSE Equity",
       "entry_date": "2025-09-15",
       "exit_date": "2025-10-07",
       "entry_price": 631.5,
-      "exit_price": 610.63,
-      "pnl_pct": -3.3,
-      "exit_reason": "SL_HIT"
+      "exit_price": 632.76,
+      "pnl_pct": 0.2,
+      "exit_reason": "BE_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "THANGAMAYL",
+      "category": "Nifty Microcap 250",
       "entry_date": "2023-09-06",
       "exit_date": "2023-09-12",
       "entry_price": 1333.8,
       "exit_price": 1268.44,
       "pnl_pct": -4.9,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SAFARI",
+      "category": "Nifty Microcap 250",
       "entry_date": "2024-08-30",
       "exit_date": "2024-09-25",
       "entry_price": 2476.2,
       "exit_price": 2339.42,
       "pnl_pct": -5.52,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "MANINDS",
+      "category": "NSE Equity",
       "entry_date": "2025-09-19",
       "exit_date": "2025-09-25",
       "entry_price": 443.1,
       "exit_price": 424.26,
       "pnl_pct": -4.25,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "WEBELSOLAR",
+      "category": "Nifty Microcap 250",
       "entry_date": "2023-12-05",
       "exit_date": "2024-02-26",
       "entry_price": 214.85,
       "exit_price": 394.65,
       "pnl_pct": 83.69,
-      "exit_reason": "EMA20_TRAIL_EXIT"
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BOMDYEING",
+      "category": "NSE Equity",
       "entry_date": "2024-05-03",
       "exit_date": "2024-05-07",
       "entry_price": 178.5,
       "exit_price": 170.82,
       "pnl_pct": -4.3,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "BAJAJHLDNG",
+      "category": "Nifty 500",
       "entry_date": "2022-11-09",
       "exit_date": "2022-11-10",
       "entry_price": 6874.2,
       "exit_price": 6715.17,
       "pnl_pct": -2.31,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "JAGRAN",
+      "category": "NSE Equity",
       "entry_date": "2022-12-05",
       "exit_date": "2022-12-22",
       "entry_price": 74.95,
       "exit_price": 71.03,
       "pnl_pct": -5.23,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ICICIGI",
+      "category": "Nifty Midcap 150",
       "entry_date": "2025-06-06",
       "exit_date": "2025-08-07",
       "entry_price": 2006.2,
       "exit_price": 1852.29,
       "pnl_pct": -7.67,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TRITURBINE",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2022-12-01",
       "exit_date": "2022-12-06",
       "entry_price": 293.5,
       "exit_price": 284.13,
       "pnl_pct": -3.19,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "TRITURBINE",
+      "category": "Nifty Smallcap 250",
       "entry_date": "2023-11-30",
       "exit_date": "2023-12-12",
       "entry_price": 430.85,
       "exit_price": 401.55,
       "pnl_pct": -6.8,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "SANSERA",
+      "category": "Nifty Microcap 250",
       "entry_date": "2025-07-02",
       "exit_date": "2025-07-11",
       "entry_price": 1403.5,
       "exit_price": 1370.16,
       "pnl_pct": -2.38,
-      "exit_reason": "SL_HIT"
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     },
     {
       "symbol": "ZYDUSLIFE",
+      "category": "Nifty 500",
       "entry_date": "2025-06-05",
-      "exit_date": "2025-08-07",
+      "exit_date": "2025-07-10",
       "entry_price": 955.7,
-      "exit_price": 923.67,
-      "pnl_pct": -3.35,
-      "exit_reason": "SL_HIT"
+      "exit_price": 972.95,
+      "pnl_pct": 1.8,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
     }
   ]
 }
