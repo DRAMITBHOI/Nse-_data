@@ -1,9 +1,9 @@
 import os
 import io
 import json
+import urllib.request
 import numpy as np
 import pandas as pd
-import requests
 from datetime import datetime
 
 DATA_DIR = "data"
@@ -13,26 +13,33 @@ MIN_TURNOVER_CR = 2.0  # ₹2 Crore turnover baseline
 COOLDOWN_DAYS = 10     # Ticker cooldown after stop-out
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 }
 
 def load_nifty500_regime():
-    """Fetches Nifty 500 benchmark history to calculate rolling SMA 50."""
-    url = "https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/nifty750.json"
+    """Loads Nifty benchmark history from local repo or remote fallback."""
+    local_p = os.path.join(DATA_DIR, "nifty750.json")
     nifty_map = {}
-    try:
-        # Check local data folder first
-        local_p = os.path.join(DATA_DIR, "nifty750.json")
-        raw = None
-        if os.path.exists(local_p):
+    raw = None
+    
+    if os.path.exists(local_p):
+        try:
             with open(local_p, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
-        else:
-            resp = requests.get(url, headers=HEADERS, timeout=15)
-            if resp.status_code == 200:
-                raw = resp.json()
+        except Exception:
+            raw = None
 
-        if raw and isinstance(raw, list):
+    if not raw:
+        url = "https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/nifty750.json"
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw = json.loads(resp.read().decode("utf-8"))
+        except Exception as e:
+            print(f"⚠️ Nifty fallback notice: {e}")
+
+    if raw and isinstance(raw, list):
+        try:
             df_idx = pd.DataFrame(raw)
             df_idx["close"] = pd.to_numeric(df_idx["close"], errors="coerce")
             df_idx["sma_50"] = df_idx["close"].rolling(50).mean()
@@ -41,8 +48,9 @@ def load_nifty500_regime():
                 t = str(r["time"])[:10]
                 nifty_map[t] = bool(r["is_bullish"])
             print(f"✅ Loaded {len(nifty_map)} sessions of Nifty regime data.")
-    except Exception as e:
-        print(f"⚠️ Notice: Nifty regime data fallback ({e}). Defaulting to bullish.")
+        except Exception as e:
+            print(f"⚠️ Error parsing Nifty regime data: {e}")
+
     return nifty_map
 
 def calculate_indicators(df):
@@ -80,7 +88,6 @@ def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
     stop_loss = 0.0
     initial_risk = 0.0
     entry_date = ""
-    entry_idx = 0
     t1_hit = False
     last_stopout_idx = -999
 
@@ -109,15 +116,15 @@ def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
                 })
                 in_trade = False
                 t1_hit = False
-                last_stopout_idx = i  # Trigger cooldown
+                last_stopout_idx = i  # Activate cooldown
                 continue
 
-            # 2. Earlier Break-Even Trigger: At 1.5R Gain
+            # 2. Break-Even Trigger: At 1.5R Gain
             if not t1_hit and curr["high"] >= (entry_price + 1.5 * initial_risk):
                 t1_hit = True
-                stop_loss = round(entry_price * 1.002, 2)  # BE with +0.2% buffer
+                stop_loss = round(entry_price * 1.002, 2)  # BE +0.2% buffer
 
-            # 3. Dynamic Trailing Exits (Only active after T1 is achieved)
+            # 3. Dynamic Trailing Exits (Active after 1.5R is hit)
             if t1_hit:
                 if exit_mode == "EMA20" and curr["close"] < curr["ema_20"]:
                     pnl_pct = round(((curr["close"] - entry_price) / entry_price) * 100, 2)
@@ -158,7 +165,7 @@ def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
             continue
 
         # --- ENTRY CONDITIONS ---
-        # 1. Ticker Cooldown Window (10 sessions)
+        # 1. 10-Session Ticker Cooldown Window
         if (i - last_stopout_idx) < COOLDOWN_DAYS:
             continue
 
@@ -166,7 +173,7 @@ def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
         if curr["turnover_sma20"] < MIN_TURNOVER_CR or curr["close"] < 30.0 or curr["close"] < curr["sma_50"]:
             continue
 
-        # 3. Dynamic Consolidation Detection (12 to 35 bars)
+        # 3. Dynamic Base Consolidation (12 to 35 bars)
         found_base = False
         best_k = 0
         pivot_ceiling = 0.0
@@ -209,7 +216,6 @@ def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
             in_trade = True
             entry_price = round(curr["close"], 2)
             entry_date = c_date
-            entry_idx = i
             stop_loss = round(max(curr["low"] * 0.99, pivot_floor), 2)
             initial_risk = entry_price - stop_loss
             t1_hit = False
@@ -234,7 +240,7 @@ def compute_metrics(df_sub):
     }
 
 def run_comparative_backtest():
-    print("🚀 Running Comparative Backtest with Cooldown, Market Caps & Exit Rules...")
+    print("🚀 Starting Refined Comparative Backtest Engine...")
     
     nifty_map = load_nifty500_regime()
 
@@ -260,7 +266,7 @@ def run_comparative_backtest():
     all_trades_ema = []
     all_trades_swing = []
 
-    for idx, f in enumerate(stock_files):
+    for f in stock_files:
         sym = f.replace(".json", "").strip().upper()
         json_p = os.path.join(DATA_DIR, f)
         try:
@@ -271,13 +277,13 @@ def run_comparative_backtest():
 
             df = pd.DataFrame(candles)
             df = calculate_indicators(df)
-            cat = meta.get(sym, {}).get("category", "Small/Midcap")
+            cat = meta.get(sym, {}).get("category", "Small/Micro Cap")
 
-            # Run with EMA 20 Trailing Exit
+            # Simulate with EMA 20 Trailing Exit
             trades_ema = simulate_trades(sym, df, cat, nifty_map, exit_mode="EMA20")
             all_trades_ema.extend(trades_ema)
 
-            # Run with Swing Low Trailing Exit
+            # Simulate with Swing Low Trailing Exit
             trades_swing = simulate_trades(sym, df, cat, nifty_map, exit_mode="SWING_LOW")
             all_trades_swing.extend(trades_swing)
         except Exception:
@@ -286,7 +292,6 @@ def run_comparative_backtest():
     df_ema = pd.DataFrame(all_trades_ema)
     df_swing = pd.DataFrame(all_trades_swing)
 
-    # 1. Core Comparison: EMA20 vs SWING_LOW Exits
     report = {
         "report_generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "cooldown_days": COOLDOWN_DAYS,
@@ -295,13 +300,11 @@ def run_comparative_backtest():
             "EMA20_Exit": compute_metrics(df_ema),
             "Swing_Low_Exit": compute_metrics(df_swing)
         },
-        # 2. Nifty 500 Market Regime Breakdown (Using default EMA20 trades)
         "nifty_regime_breakdown": {
             "All_Time": compute_metrics(df_ema),
             "When_Nifty_Above_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == True]),
             "When_Nifty_Below_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == False])
         },
-        # 3. Market Cap Breakdown
         "market_cap_breakdown": {
             "Large_Cap": compute_metrics(df_ema[df_ema["category"].str.contains("500|Large", case=False, na=False)]),
             "Mid_Cap": compute_metrics(df_ema[df_ema["category"].str.contains("Midcap", case=False, na=False)]),
