@@ -1,114 +1,172 @@
 import os
+import io
 import json
 import numpy as np
 import pandas as pd
+import requests
 from datetime import datetime
 
 DATA_DIR = "data"
 REPORT_FILE = os.path.join(DATA_DIR, "swing2_backtest_report.json")
-MIN_TURNOVER_CR = 2.0  # ₹2 Crore 20-day avg turnover
+FUNDAMENTALS_FILE = os.path.join(DATA_DIR, "fundamentals.json")
+MIN_TURNOVER_CR = 2.0  # ₹2 Crore turnover baseline
+COOLDOWN_DAYS = 10     # Ticker cooldown after stop-out
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
+}
+
+def load_nifty500_regime():
+    """Fetches Nifty 500 benchmark history to calculate rolling SMA 50."""
+    url = "https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/nifty750.json"
+    nifty_map = {}
+    try:
+        # Check local data folder first
+        local_p = os.path.join(DATA_DIR, "nifty750.json")
+        raw = None
+        if os.path.exists(local_p):
+            with open(local_p, "r", encoding="utf-8") as fp:
+                raw = json.load(fp)
+        else:
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            if resp.status_code == 200:
+                raw = resp.json()
+
+        if raw and isinstance(raw, list):
+            df_idx = pd.DataFrame(raw)
+            df_idx["close"] = pd.to_numeric(df_idx["close"], errors="coerce")
+            df_idx["sma_50"] = df_idx["close"].rolling(50).mean()
+            df_idx["is_bullish"] = df_idx["close"] > df_idx["sma_50"]
+            for _, r in df_idx.iterrows():
+                t = str(r["time"])[:10]
+                nifty_map[t] = bool(r["is_bullish"])
+            print(f"✅ Loaded {len(nifty_map)} sessions of Nifty regime data.")
+    except Exception as e:
+        print(f"⚠️ Notice: Nifty regime data fallback ({e}). Defaulting to bullish.")
+    return nifty_map
 
 def calculate_indicators(df):
-    df["close"] = pd.to_numeric(df["close"], errors="coerce")
-    df["open"] = pd.to_numeric(df["open"], errors="coerce")
-    df["high"] = pd.to_numeric(df["high"], errors="coerce")
-    df["low"] = pd.to_numeric(df["low"], errors="coerce")
-    df["volume"] = pd.to_numeric(df["volume"], errors="coerce").fillna(0)
+    for col in ["open", "high", "low", "close", "volume"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
     df["delivery_vol"] = pd.to_numeric(df.get("delivery_vol", df["volume"]), errors="coerce").fillna(0)
     df["deliv_pct"] = pd.to_numeric(df.get("deliv_pct", 0), errors="coerce").fillna(0)
 
-    # 20-day average turnover in ₹ Crore
+    # Turnover & ATR
     df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
     df["turnover_sma20"] = df["turnover_cr"].rolling(20).mean()
 
-    # True Range & ATR
     prev_close = df["close"].shift(1)
     tr = pd.concat([
         df["high"] - df["low"],
         (df["high"] - prev_close).abs(),
         (df["low"] - prev_close).abs()
     ], axis=1).max(axis=1)
-    
+
     df["atr_5"] = tr.rolling(5).mean()
     df["atr_50"] = tr.rolling(50).mean()
     df["deliv_sma20"] = df["delivery_vol"].rolling(20).mean()
     df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
     df["sma_50"] = df["close"].rolling(50).mean()
 
+    # Structural 5-day swing low for trailing exit rule comparison
+    df["swing_low_5"] = df["low"].shift(1).rolling(5).min()
+
     return df
 
-def evaluate_symbol(sym, records):
-    if len(records) < 100:
-        return []
-
-    df = pd.DataFrame(records)
-    df = calculate_indicators(df)
-
+def simulate_trades(sym, df, category, nifty_map, exit_mode="EMA20"):
     trades = []
     in_trade = False
     entry_price = 0.0
     stop_loss = 0.0
-    target_1 = 0.0
+    initial_risk = 0.0
     entry_date = ""
+    entry_idx = 0
     t1_hit = False
+    last_stopout_idx = -999
 
-    # Backtest simulation loop
     for i in range(55, len(df)):
         curr = df.iloc[i]
         prev = df.iloc[i - 1]
+        c_date = str(curr["time"])[:10]
 
         # --- TRADE MANAGEMENT ---
         if in_trade:
-            # Check Stop Loss (Intraday Low breach)
+            # 1. Stop Loss check
             if curr["low"] <= stop_loss:
                 exit_price = stop_loss
                 pnl_pct = round(((exit_price - entry_price) / entry_price) * 100, 2)
                 trades.append({
                     "symbol": sym,
+                    "category": category,
                     "entry_date": entry_date,
-                    "exit_date": curr["time"],
+                    "exit_date": c_date,
                     "entry_price": entry_price,
                     "exit_price": exit_price,
                     "pnl_pct": pnl_pct,
-                    "exit_reason": "SL_HIT" if not t1_hit else "BE_OR_TRAIL_HIT"
+                    "exit_reason": "SL_HIT" if not t1_hit else "BE_HIT",
+                    "nifty_above_50sma": nifty_map.get(entry_date, True),
+                    "exit_mode": exit_mode
                 })
                 in_trade = False
                 t1_hit = False
+                last_stopout_idx = i  # Trigger cooldown
                 continue
 
-            # Check Target 1 (2R Gain) -> Scale out / move stop to Break-Even
-            risk = entry_price - stop_loss
-            if not t1_hit and curr["high"] >= (entry_price + 2.0 * risk):
+            # 2. Earlier Break-Even Trigger: At 1.5R Gain
+            if not t1_hit and curr["high"] >= (entry_price + 1.5 * initial_risk):
                 t1_hit = True
-                stop_loss = entry_price * 1.002  # Move to break-even (+0.2% buffer)
+                stop_loss = round(entry_price * 1.002, 2)  # BE with +0.2% buffer
 
-            # Check Trailing Stop (Close below 20 EMA after T1)
-            if t1_hit and curr["close"] < curr["ema_20"]:
-                exit_price = curr["close"]
-                pnl_pct = round(((exit_price - entry_price) / entry_price) * 100, 2)
-                trades.append({
-                    "symbol": sym,
-                    "entry_date": entry_date,
-                    "exit_date": curr["time"],
-                    "entry_price": entry_price,
-                    "exit_price": exit_price,
-                    "pnl_pct": pnl_pct,
-                    "exit_reason": "EMA20_TRAIL_EXIT"
-                })
-                in_trade = False
-                t1_hit = False
-                continue
+            # 3. Dynamic Trailing Exits (Only active after T1 is achieved)
+            if t1_hit:
+                if exit_mode == "EMA20" and curr["close"] < curr["ema_20"]:
+                    pnl_pct = round(((curr["close"] - entry_price) / entry_price) * 100, 2)
+                    trades.append({
+                        "symbol": sym,
+                        "category": category,
+                        "entry_date": entry_date,
+                        "exit_date": c_date,
+                        "entry_price": entry_price,
+                        "exit_price": round(curr["close"], 2),
+                        "pnl_pct": pnl_pct,
+                        "exit_reason": "EMA20_TRAIL_EXIT",
+                        "nifty_above_50sma": nifty_map.get(entry_date, True),
+                        "exit_mode": exit_mode
+                    })
+                    in_trade = False
+                    t1_hit = False
+                    continue
+
+                elif exit_mode == "SWING_LOW" and curr["close"] < curr["swing_low_5"]:
+                    pnl_pct = round(((curr["close"] - entry_price) / entry_price) * 100, 2)
+                    trades.append({
+                        "symbol": sym,
+                        "category": category,
+                        "entry_date": entry_date,
+                        "exit_date": c_date,
+                        "entry_price": entry_price,
+                        "exit_price": round(curr["close"], 2),
+                        "pnl_pct": pnl_pct,
+                        "exit_reason": "SWING_LOW_EXIT",
+                        "nifty_above_50sma": nifty_map.get(entry_date, True),
+                        "exit_mode": exit_mode
+                    })
+                    in_trade = False
+                    t1_hit = False
+                    continue
 
             continue
 
         # --- ENTRY CONDITIONS ---
-        # 1. Turnover & Trend Floor
-        if curr["turnover_sma20"] < MIN_TURNOVER_CR or curr["close"] < 30.0:
-            continue
-        if curr["close"] < curr["sma_50"]:
+        # 1. Ticker Cooldown Window (10 sessions)
+        if (i - last_stopout_idx) < COOLDOWN_DAYS:
             continue
 
-        # 2. Dynamic Base Detection: Check recent consolidation lengths (12 to 35 bars)
+        # 2. Liquidity & Baseline Trend
+        if curr["turnover_sma20"] < MIN_TURNOVER_CR or curr["close"] < 30.0 or curr["close"] < curr["sma_50"]:
+            continue
+
+        # 3. Dynamic Consolidation Detection (12 to 35 bars)
         found_base = False
         best_k = 0
         pivot_ceiling = 0.0
@@ -118,8 +176,6 @@ def evaluate_symbol(sym, records):
             sub_high = df["high"].iloc[i-k:i].max()
             sub_low = df["low"].iloc[i-k:i].min()
             spread = (sub_high - sub_low) / curr["close"]
-
-            # Base must be tight (<= 12% range)
             if spread <= 0.12:
                 found_base = True
                 best_k = k
@@ -130,23 +186,21 @@ def evaluate_symbol(sym, records):
         if not found_base:
             continue
 
-        # 3. Volatility Squeeze Check (ATR Contraction)
+        # 4. Volatility Squeeze (ATR Contraction)
         if (prev["atr_5"] / prev["atr_50"]) > 0.70:
             continue
 
-        # 4. Asymmetric Delivery Ratio in Base (Accumulation check)
+        # 5. Asymmetric Delivery Accumulation
         base_slice = df.iloc[i-best_k:i]
         up_days = base_slice[base_slice["close"] > base_slice["open"]]
         down_days = base_slice[base_slice["close"] < base_slice["open"]]
-
         avg_up_deliv = up_days["delivery_vol"].mean() if len(up_days) > 0 else 0
         avg_down_deliv = down_days["delivery_vol"].mean() if len(down_days) > 0 else 1
-        deliv_ratio = avg_up_deliv / max(avg_down_deliv, 1)
 
-        if deliv_ratio < 1.25:
+        if (avg_up_deliv / max(avg_down_deliv, 1)) < 1.25:
             continue
 
-        # 5. Breakout Trigger Bar: Price clears ceiling + Delivery surges
+        # 6. Breakout Ignition Trigger
         is_breakout = curr["close"] > pivot_ceiling
         is_deliv_surge = (curr["delivery_vol"] >= 1.4 * curr["deliv_sma20"]) and (curr["deliv_pct"] >= 35.0)
         strong_close = ((curr["close"] - curr["low"]) / max((curr["high"] - curr["low"]), 0.01)) >= 0.65
@@ -154,66 +208,112 @@ def evaluate_symbol(sym, records):
         if is_breakout and is_deliv_surge and strong_close:
             in_trade = True
             entry_price = round(curr["close"], 2)
-            entry_date = curr["time"]
+            entry_date = c_date
+            entry_idx = i
             stop_loss = round(max(curr["low"] * 0.99, pivot_floor), 2)
+            initial_risk = entry_price - stop_loss
             t1_hit = False
 
     return trades
 
-def run_backtest():
-    print("🚀 Initiating Swing 2.0 Backtest Engine...")
+def compute_metrics(df_sub):
+    if df_sub.empty:
+        return {"trades": 0, "win_rate": 0, "profit_factor": 0, "avg_gain": 0, "avg_loss": 0}
+    win = df_sub[df_sub["pnl_pct"] > 0]
+    loss = df_sub[df_sub["pnl_pct"] <= 0]
+    win_rate = round((len(win) / len(df_sub)) * 100, 2)
+    avg_gain = round(win["pnl_pct"].mean(), 2) if not win.empty else 0
+    avg_loss = round(loss["pnl_pct"].mean(), 2) if not loss.empty else 0
+    profit_factor = round(abs(win["pnl_pct"].sum() / max(abs(loss["pnl_pct"].sum()), 0.01)), 2)
+    return {
+        "trades": len(df_sub),
+        "win_rate": win_rate,
+        "profit_factor": profit_factor,
+        "avg_gain": avg_gain,
+        "avg_loss": avg_loss
+    }
+
+def run_comparative_backtest():
+    print("🚀 Running Comparative Backtest with Cooldown, Market Caps & Exit Rules...")
+    
+    nifty_map = load_nifty500_regime()
+
+    # Load Fundamentals mapping
+    meta = {}
+    if os.path.exists(FUNDAMENTALS_FILE):
+        try:
+            with open(FUNDAMENTALS_FILE, "r", encoding="utf-8") as fp:
+                meta = json.load(fp)
+        except Exception:
+            pass
+
     stock_files = [
         f for f in os.listdir(DATA_DIR)
         if f.endswith(".json") and f not in [
             "fundamentals.json", "screener_results.json",
             "wyckoff_screener_results.json", "active_trade_plan.json",
             "backtest_report.json", "init_progress.json", "fno_history.json",
-            "swing2_backtest_report.json"
+            "swing2_backtest_report.json", "nifty750.json"
         ]
     ]
 
-    all_trades = []
-    for f in stock_files:
+    all_trades_ema = []
+    all_trades_swing = []
+
+    for idx, f in enumerate(stock_files):
         sym = f.replace(".json", "").strip().upper()
-        p = os.path.join(DATA_DIR, f)
+        json_p = os.path.join(DATA_DIR, f)
         try:
-            with open(p, "r", encoding="utf-8") as fp:
-                data = json.load(fp)
-            trades = evaluate_symbol(sym, data)
-            all_trades.extend(trades)
+            with open(json_p, "r", encoding="utf-8") as fp:
+                candles = json.load(fp)
+            if not isinstance(candles, list) or len(candles) < 100:
+                continue
+
+            df = pd.DataFrame(candles)
+            df = calculate_indicators(df)
+            cat = meta.get(sym, {}).get("category", "Small/Midcap")
+
+            # Run with EMA 20 Trailing Exit
+            trades_ema = simulate_trades(sym, df, cat, nifty_map, exit_mode="EMA20")
+            all_trades_ema.extend(trades_ema)
+
+            # Run with Swing Low Trailing Exit
+            trades_swing = simulate_trades(sym, df, cat, nifty_map, exit_mode="SWING_LOW")
+            all_trades_swing.extend(trades_swing)
         except Exception:
             continue
 
-    if not all_trades:
-        print("No completed trades recorded.")
-        return
+    df_ema = pd.DataFrame(all_trades_ema)
+    df_swing = pd.DataFrame(all_trades_swing)
 
-    df_trades = pd.DataFrame(all_trades)
-    win_trades = df_trades[df_trades["pnl_pct"] > 0]
-    loss_trades = df_trades[df_trades["pnl_pct"] <= 0]
-
-    win_rate = round((len(win_trades) / len(df_trades)) * 100, 2)
-    avg_gain = round(win_trades["pnl_pct"].mean(), 2) if len(win_trades) > 0 else 0
-    avg_loss = round(loss_trades["pnl_pct"].mean(), 2) if len(loss_trades) > 0 else 0
-    profit_factor = round(abs((win_trades["pnl_pct"].sum()) / max(abs(loss_trades["pnl_pct"].sum()), 0.01)), 2)
-
-    summary = {
+    # 1. Core Comparison: EMA20 vs SWING_LOW Exits
+    report = {
         "report_generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-        "total_trades": len(df_trades),
-        "win_rate_pct": win_rate,
-        "avg_gain_pct": avg_gain,
-        "avg_loss_pct": avg_loss,
-        "profit_factor": profit_factor,
-        "recent_trades": all_trades[-100:]  # Store last 100 executed setups
+        "cooldown_days": COOLDOWN_DAYS,
+        "be_threshold_r": 1.5,
+        "exit_rule_comparison": {
+            "EMA20_Exit": compute_metrics(df_ema),
+            "Swing_Low_Exit": compute_metrics(df_swing)
+        },
+        # 2. Nifty 500 Market Regime Breakdown (Using default EMA20 trades)
+        "nifty_regime_breakdown": {
+            "All_Time": compute_metrics(df_ema),
+            "When_Nifty_Above_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == True]),
+            "When_Nifty_Below_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == False])
+        },
+        # 3. Market Cap Breakdown
+        "market_cap_breakdown": {
+            "Large_Cap": compute_metrics(df_ema[df_ema["category"].str.contains("500|Large", case=False, na=False)]),
+            "Mid_Cap": compute_metrics(df_ema[df_ema["category"].str.contains("Midcap", case=False, na=False)]),
+            "Small_Micro_Cap": compute_metrics(df_ema[df_ema["category"].str.contains("Small|Micro", case=False, na=False)])
+        },
+        "recent_trades": all_trades_ema[-150:]
     }
 
     with open(REPORT_FILE, "w", encoding="utf-8") as fp:
-        json.dump(summary, fp, indent=2)
+        json.dump(report, fp, indent=2)
 
-    print(f"\n📊 --- BACKTEST SUMMARY ---")
-    print(f"Total Trades: {len(df_trades)} | Win Rate: {win_rate}% | Profit Factor: {profit_factor}")
-    print(f"Avg Gain: +{avg_gain}% | Avg Loss: {avg_loss}%")
-    print(f"📁 Report saved to {REPORT_FILE}")
+    print(f"🎉 Comparative Backtest completed and saved to '{REPORT_FILE}'.")
 
 if __name__ == "__main__":
-    run_backtest()
+    run_comparative_backtest()
