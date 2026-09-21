@@ -1,77 +1,220 @@
 {
-  "report_generated": "2026-09-21 17:03 UTC",
-  "features": "Tiered Base Depth + Eve VDU + Active Nifty Date Sync",
+  "report_generated": "2026-09-21 18:20 UTC",
+  "iteration": "Run 5 (Solid Candle Body + Synced Nifty Series)",
   "exit_rule_comparison": {
     "EMA20_Exit": {
-      "trades": 429,
-      "win_rate": 43.36,
-      "profit_factor": 1.34,
-      "avg_gain": 10.31,
-      "avg_loss": -5.89,
-      "avg_peak_gain": 12.14
+      "trades": 396,
+      "win_rate": 43.94,
+      "profit_factor": 1.35,
+      "avg_gain": 10.61,
+      "avg_loss": -6.15,
+      "avg_peak_gain": 12.57
     },
     "Swing_Low_Exit": {
-      "trades": 430,
-      "win_rate": 43.49,
-      "profit_factor": 1.32,
-      "avg_gain": 10.12,
-      "avg_loss": -5.89,
-      "avg_peak_gain": 11.41
+      "trades": 397,
+      "win_rate": 44.08,
+      "profit_factor": 1.34,
+      "avg_gain": 10.48,
+      "avg_loss": -6.15,
+      "avg_peak_gain": 11.87
     }
   },
   "nifty_regime_breakdown": {
     "All_Time": {
-      "trades": 429,
-      "win_rate": 43.36,
-      "profit_factor": 1.34,
-      "avg_gain": 10.31,
-      "avg_loss": -5.89,
-      "avg_peak_gain": 12.14
+      "trades": 396,
+      "win_rate": 43.94,
+      "profit_factor": 1.35,
+      "avg_gain": 10.61,
+      "avg_loss": -6.15,
+      "avg_peak_gain": 12.57
     },
     "When_Nifty_Above_50SMA": {
+      "trades": 396,
+      "win_rate": 43.94,
+      "profit_factor": 1.35,
+      "avg_gain": 10.61,
+      "avg_loss": -6.15,
+      "avg_peak_gain": 12.57
+    },
+    "When_Nifty_Below_50SMA": {
       "trades": 0,
       "win_rate": 0.0,
       "profit_factor": 0.0,
       "avg_gain": 0.0,
       "avg_loss": 0.0,
       "avg_peak_gain": 0.0
-    },
-    "When_Nifty_Below_50SMA": {
-      "trades": 429,
-      "win_rate": 43.36,
-      "profit_factor": 1.34,
-      "avg_gain": 10.31,
-      "avg_loss": -5.89,
-      "avg_peak_gain": 12.14
     }
   },
   "market_cap_breakdown": {
     "Large_Cap": {
-      "trades": 51,
-      "win_rate": 43.14,
-      "profit_factor": 1.58,
-      "avg_gain": 8.8,
-      "avg_loss": -4.23,
-      "avg_peak_gain": 9.58
+      "trades": 47,
+      "win_rate": 40.43,
+      "profit_factor": 1.34,
+      "avg_gain": 8.36,
+      "avg_loss": -4.24,
+      "avg_peak_gain": 8.54
     },
     "Mid_Cap": {
-      "trades": 50,
-      "win_rate": 40.0,
-      "profit_factor": 1.37,
-      "avg_gain": 10.11,
-      "avg_loss": -4.92,
-      "avg_peak_gain": 11.06
+      "trades": 46,
+      "win_rate": 41.3,
+      "profit_factor": 1.46,
+      "avg_gain": 10.59,
+      "avg_loss": -5.12,
+      "avg_peak_gain": 11.81
     },
     "Small_Micro_Cap": {
-      "trades": 328,
-      "win_rate": 43.9,
-      "profit_factor": 1.31,
-      "avg_gain": 10.57,
-      "avg_loss": -6.31,
-      "avg_peak_gain": 12.7
+      "trades": 303,
+      "win_rate": 44.88,
+      "profit_factor": 1.34,
+      "avg_gain": 10.93,
+      "avg_loss": -6.64,
+      "avg_peak_gain": 13.3
     }
   },
   "recent_trades": [
+    {
+      "symbol": "DODLA",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2023-11-07",
+      "exit_date": "2024-01-15",
+      "entry_price": 737.9,
+      "exit_price": 857.3,
+      "pnl_pct": 13.15,
+      "peak_gain_pct": 26.15,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "UBL",
+      "category": "Mid_Cap",
+      "entry_date": "2024-04-24",
+      "exit_date": "2024-05-30",
+      "entry_price": 2030.95,
+      "exit_price": 1836.55,
+      "pnl_pct": -9.57,
+      "peak_gain_pct": 3.7,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "GAIL",
+      "category": "Large_Cap",
+      "entry_date": "2023-01-20",
+      "exit_date": "2023-01-30",
+      "entry_price": 99.0,
+      "exit_price": 96.43,
+      "pnl_pct": -2.6,
+      "peak_gain_pct": 3.89,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "RITCO",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2025-07-04",
+      "exit_date": "2025-08-01",
+      "entry_price": 299.2,
+      "exit_price": 276.36,
+      "pnl_pct": -7.63,
+      "peak_gain_pct": 5.98,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ASHOKLEY",
+      "category": "Mid_Cap",
+      "entry_date": "2023-12-29",
+      "exit_date": "2024-01-17",
+      "entry_price": 181.55,
+      "exit_price": 173.65,
+      "pnl_pct": -4.35,
+      "peak_gain_pct": 4.43,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "LIQUID1",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2025-06-20",
+      "exit_date": "2025-06-26",
+      "entry_price": 1055.9,
+      "exit_price": 1054.3,
+      "pnl_pct": -0.15,
+      "peak_gain_pct": 1.52,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "LIQUID1",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2025-07-16",
+      "exit_date": "2025-07-22",
+      "entry_price": 1059.44,
+      "exit_price": 1064.74,
+      "pnl_pct": 1.38,
+      "peak_gain_pct": 2.56,
+      "exit_reason": "BE_HIT_AFTER_T1",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "ITIETF",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2025-05-12",
+      "exit_date": "2025-07-28",
+      "entry_price": 41.29,
+      "exit_price": 38.29,
+      "pnl_pct": -7.27,
+      "peak_gain_pct": 4.82,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "WIPRO",
+      "category": "Large_Cap",
+      "entry_date": "2021-04-07",
+      "exit_date": "2021-04-13",
+      "entry_price": 438.0,
+      "exit_price": 419.17,
+      "pnl_pct": -4.3,
+      "peak_gain_pct": 3.05,
+      "exit_reason": "SL_HIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "RATEGAIN",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2024-06-18",
+      "exit_date": "2024-08-02",
+      "entry_price": 778.25,
+      "exit_price": 801.75,
+      "pnl_pct": 6.43,
+      "peak_gain_pct": 10.38,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
+    {
+      "symbol": "STYL",
+      "category": "Small_Micro_Cap",
+      "entry_date": "2026-05-07",
+      "exit_date": "2026-07-27",
+      "entry_price": 268.21,
+      "exit_price": 359.4,
+      "pnl_pct": 24.41,
+      "peak_gain_pct": 51.8,
+      "exit_reason": "EMA20_TRAIL_EXIT",
+      "nifty_above_50sma": true,
+      "exit_mode": "EMA20"
+    },
     {
       "symbol": "MUFIN",
       "category": "Small_Micro_Cap",
@@ -82,7 +225,7 @@
       "pnl_pct": -5.33,
       "peak_gain_pct": 6.99,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -95,7 +238,7 @@
       "pnl_pct": 24.11,
       "peak_gain_pct": 51.06,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -108,7 +251,7 @@
       "pnl_pct": -4.64,
       "peak_gain_pct": 3.59,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -121,20 +264,7 @@
       "pnl_pct": -0.19,
       "peak_gain_pct": 0.59,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "LIQUIDBETF",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2026-03-23",
-      "exit_date": "2026-04-01",
-      "entry_price": 1073.99,
-      "exit_price": 1072.34,
-      "pnl_pct": -0.15,
-      "peak_gain_pct": 0.15,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -147,7 +277,7 @@
       "pnl_pct": 25.73,
       "peak_gain_pct": 59.83,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -160,7 +290,7 @@
       "pnl_pct": -7.66,
       "peak_gain_pct": 0.52,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -173,7 +303,7 @@
       "pnl_pct": -6.65,
       "peak_gain_pct": 2.53,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -186,7 +316,7 @@
       "pnl_pct": 3.66,
       "peak_gain_pct": 10.19,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -199,7 +329,7 @@
       "pnl_pct": 4.6,
       "peak_gain_pct": 9.23,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -212,7 +342,7 @@
       "pnl_pct": -5.39,
       "peak_gain_pct": 2.11,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -225,7 +355,7 @@
       "pnl_pct": 6.28,
       "peak_gain_pct": 14.91,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -238,7 +368,7 @@
       "pnl_pct": -7.02,
       "peak_gain_pct": 6.17,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -251,7 +381,7 @@
       "pnl_pct": 25.21,
       "peak_gain_pct": 53.65,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -264,7 +394,7 @@
       "pnl_pct": -3.17,
       "peak_gain_pct": 0.46,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -277,7 +407,7 @@
       "pnl_pct": -5.27,
       "peak_gain_pct": 6.19,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -290,20 +420,7 @@
       "pnl_pct": -6.74,
       "peak_gain_pct": 8.83,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "TORNTPHARM",
-      "category": "Large_Cap",
-      "entry_date": "2026-08-31",
-      "exit_date": "2026-09-04",
-      "entry_price": 5066.0,
-      "exit_price": 4855.0,
-      "pnl_pct": -4.17,
-      "peak_gain_pct": 0.0,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -316,7 +433,7 @@
       "pnl_pct": 7.52,
       "peak_gain_pct": 17.44,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -329,7 +446,7 @@
       "pnl_pct": -8.36,
       "peak_gain_pct": 0.41,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -342,7 +459,7 @@
       "pnl_pct": -8.33,
       "peak_gain_pct": 10.38,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -355,7 +472,7 @@
       "pnl_pct": -4.76,
       "peak_gain_pct": 1.43,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -368,7 +485,7 @@
       "pnl_pct": -5.42,
       "peak_gain_pct": 3.52,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -381,7 +498,7 @@
       "pnl_pct": -9.83,
       "peak_gain_pct": 0.88,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -394,33 +511,7 @@
       "pnl_pct": 14.01,
       "peak_gain_pct": 30.62,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "NIFTYBEES",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2024-08-26",
-      "exit_date": "2024-10-03",
-      "entry_price": 278.84,
-      "exit_price": 282.69,
-      "pnl_pct": 1.99,
-      "peak_gain_pct": 5.43,
-      "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "ICICIB22",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2024-07-09",
-      "exit_date": "2024-07-10",
-      "entry_price": 116.38,
-      "exit_price": 114.18,
-      "pnl_pct": -1.89,
-      "peak_gain_pct": 2.98,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -429,11 +520,11 @@
       "entry_date": "2024-12-03",
       "exit_date": "2024-12-23",
       "entry_price": 1133.45,
-      "exit_price": 1135.72,
-      "pnl_pct": 4.38,
+      "exit_price": 1139.12,
+      "pnl_pct": 4.53,
       "peak_gain_pct": 9.39,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -446,7 +537,7 @@
       "pnl_pct": 13.17,
       "peak_gain_pct": 28.43,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -459,7 +550,7 @@
       "pnl_pct": -5.9,
       "peak_gain_pct": 0.62,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -472,7 +563,7 @@
       "pnl_pct": -10.47,
       "peak_gain_pct": 5.11,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -485,7 +576,7 @@
       "pnl_pct": -3.25,
       "peak_gain_pct": 2.15,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -498,7 +589,7 @@
       "pnl_pct": 13.62,
       "peak_gain_pct": 21.37,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -511,7 +602,7 @@
       "pnl_pct": 9.51,
       "peak_gain_pct": 23.38,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -524,7 +615,7 @@
       "pnl_pct": -13.82,
       "peak_gain_pct": 7.56,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -537,7 +628,7 @@
       "pnl_pct": -5.99,
       "peak_gain_pct": 1.61,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -550,7 +641,7 @@
       "pnl_pct": 5.81,
       "peak_gain_pct": 13.36,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -563,7 +654,7 @@
       "pnl_pct": 5.84,
       "peak_gain_pct": 16.93,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -576,7 +667,7 @@
       "pnl_pct": -6.36,
       "peak_gain_pct": 6.82,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -589,7 +680,7 @@
       "pnl_pct": -5.09,
       "peak_gain_pct": 1.94,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -602,7 +693,7 @@
       "pnl_pct": 3.21,
       "peak_gain_pct": 5.23,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -615,7 +706,7 @@
       "pnl_pct": -4.49,
       "peak_gain_pct": 0.53,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -628,20 +719,7 @@
       "pnl_pct": -6.31,
       "peak_gain_pct": 2.81,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "AJANTPHARM",
-      "category": "Mid_Cap",
-      "entry_date": "2026-02-25",
-      "exit_date": "2026-03-02",
-      "entry_price": 3021.3,
-      "exit_price": 2927.63,
-      "pnl_pct": -3.1,
-      "peak_gain_pct": 1.08,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -654,7 +732,7 @@
       "pnl_pct": -6.58,
       "peak_gain_pct": 4.61,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -667,7 +745,7 @@
       "pnl_pct": -3.47,
       "peak_gain_pct": 0.64,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -680,7 +758,7 @@
       "pnl_pct": -9.08,
       "peak_gain_pct": 5.38,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -693,7 +771,7 @@
       "pnl_pct": -5.52,
       "peak_gain_pct": 4.92,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -706,7 +784,7 @@
       "pnl_pct": -7.35,
       "peak_gain_pct": 6.83,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -719,7 +797,7 @@
       "pnl_pct": -5.86,
       "peak_gain_pct": 2.99,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -732,7 +810,7 @@
       "pnl_pct": 9.99,
       "peak_gain_pct": 23.82,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -745,7 +823,7 @@
       "pnl_pct": -4.42,
       "peak_gain_pct": 1.05,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -758,7 +836,7 @@
       "pnl_pct": -4.51,
       "peak_gain_pct": 0.8,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -771,20 +849,7 @@
       "pnl_pct": -6.97,
       "peak_gain_pct": 2.74,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "WHEELS",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2024-05-21",
-      "exit_date": "2024-06-04",
-      "entry_price": 705.75,
-      "exit_price": 653.4,
-      "pnl_pct": -7.42,
-      "peak_gain_pct": 6.61,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -797,7 +862,7 @@
       "pnl_pct": 16.33,
       "peak_gain_pct": 37.24,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -810,7 +875,7 @@
       "pnl_pct": -4.34,
       "peak_gain_pct": 0.14,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -823,7 +888,7 @@
       "pnl_pct": -7.02,
       "peak_gain_pct": 2.42,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -836,7 +901,7 @@
       "pnl_pct": 10.54,
       "peak_gain_pct": 20.57,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -849,7 +914,7 @@
       "pnl_pct": 20.33,
       "peak_gain_pct": 54.42,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -862,7 +927,7 @@
       "pnl_pct": 8.3,
       "peak_gain_pct": 17.75,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -875,7 +940,7 @@
       "pnl_pct": -8.0,
       "peak_gain_pct": 0.0,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -888,7 +953,7 @@
       "pnl_pct": -9.19,
       "peak_gain_pct": 5.26,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -901,7 +966,7 @@
       "pnl_pct": 13.8,
       "peak_gain_pct": 24.62,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -914,7 +979,7 @@
       "pnl_pct": 52.03,
       "peak_gain_pct": 115.68,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -927,7 +992,7 @@
       "pnl_pct": -6.22,
       "peak_gain_pct": 3.9,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -940,7 +1005,7 @@
       "pnl_pct": -0.13,
       "peak_gain_pct": 0.04,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -953,7 +1018,7 @@
       "pnl_pct": -2.62,
       "peak_gain_pct": 1.81,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -966,7 +1031,7 @@
       "pnl_pct": -2.98,
       "peak_gain_pct": 0.77,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -979,7 +1044,7 @@
       "pnl_pct": -2.16,
       "peak_gain_pct": 0.3,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -992,7 +1057,7 @@
       "pnl_pct": 16.75,
       "peak_gain_pct": 35.15,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1005,7 +1070,7 @@
       "pnl_pct": 17.5,
       "peak_gain_pct": 33.66,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1014,11 +1079,11 @@
       "entry_date": "2023-06-16",
       "exit_date": "2023-06-23",
       "entry_price": 2257.3,
-      "exit_price": 2261.81,
-      "pnl_pct": 4.25,
+      "exit_price": 2268.59,
+      "pnl_pct": 4.4,
       "peak_gain_pct": 8.44,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1031,20 +1096,7 @@
       "pnl_pct": -7.02,
       "peak_gain_pct": 1.26,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "SETFGOLD",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2025-12-01",
-      "exit_date": "2025-12-05",
-      "entry_price": 110.31,
-      "exit_price": 107.94,
-      "pnl_pct": -2.15,
-      "peak_gain_pct": 0.54,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1057,7 +1109,7 @@
       "pnl_pct": 5.29,
       "peak_gain_pct": 10.89,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1070,7 +1122,7 @@
       "pnl_pct": -6.68,
       "peak_gain_pct": 6.47,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1083,7 +1135,7 @@
       "pnl_pct": 7.33,
       "peak_gain_pct": 12.72,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1096,7 +1148,7 @@
       "pnl_pct": -7.31,
       "peak_gain_pct": 5.97,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1109,7 +1161,7 @@
       "pnl_pct": -8.9,
       "peak_gain_pct": 5.65,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1122,20 +1174,7 @@
       "pnl_pct": -2.39,
       "peak_gain_pct": 0.72,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "GOLDBEES",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2021-04-19",
-      "exit_date": "2021-04-29",
-      "entry_price": 41.53,
-      "exit_price": 40.3,
-      "pnl_pct": -2.96,
-      "peak_gain_pct": 1.11,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1148,7 +1187,7 @@
       "pnl_pct": -5.93,
       "peak_gain_pct": 3.92,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1161,7 +1200,7 @@
       "pnl_pct": -5.66,
       "peak_gain_pct": 2.14,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1174,20 +1213,7 @@
       "pnl_pct": 5.35,
       "peak_gain_pct": 13.99,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "MOM30IETF",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2024-09-27",
-      "exit_date": "2024-09-30",
-      "entry_price": 38.72,
-      "exit_price": 38.07,
-      "pnl_pct": -1.68,
-      "peak_gain_pct": 0.59,
-      "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1200,7 +1226,7 @@
       "pnl_pct": -5.85,
       "peak_gain_pct": 1.38,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1213,7 +1239,7 @@
       "pnl_pct": -6.88,
       "peak_gain_pct": 1.17,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1226,7 +1252,7 @@
       "pnl_pct": 6.38,
       "peak_gain_pct": 12.46,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1239,7 +1265,7 @@
       "pnl_pct": -1.24,
       "peak_gain_pct": 2.09,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1248,11 +1274,11 @@
       "entry_date": "2024-12-09",
       "exit_date": "2024-12-30",
       "entry_price": 767.5,
-      "exit_price": 769.04,
-      "pnl_pct": 5.09,
+      "exit_price": 771.34,
+      "pnl_pct": 5.24,
       "peak_gain_pct": 13.36,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1265,7 +1291,7 @@
       "pnl_pct": 6.62,
       "peak_gain_pct": 11.78,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1278,20 +1304,7 @@
       "pnl_pct": -3.63,
       "peak_gain_pct": 4.26,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "SRF",
-      "category": "Mid_Cap",
-      "entry_date": "2025-10-10",
-      "exit_date": "2025-10-27",
-      "entry_price": 3024.5,
-      "exit_price": 3030.55,
-      "pnl_pct": 1.68,
-      "peak_gain_pct": 6.13,
-      "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1304,7 +1317,7 @@
       "pnl_pct": 4.38,
       "peak_gain_pct": 11.39,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1317,7 +1330,7 @@
       "pnl_pct": -7.75,
       "peak_gain_pct": 2.4,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1326,11 +1339,11 @@
       "entry_date": "2024-06-18",
       "exit_date": "2024-06-24",
       "entry_price": 703.2,
-      "exit_price": 704.61,
-      "pnl_pct": 3.6,
+      "exit_price": 706.72,
+      "pnl_pct": 3.75,
       "peak_gain_pct": 10.44,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1343,7 +1356,7 @@
       "pnl_pct": -2.99,
       "peak_gain_pct": 1.06,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1356,7 +1369,7 @@
       "pnl_pct": -4.36,
       "peak_gain_pct": 5.66,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1365,11 +1378,11 @@
       "entry_date": "2023-04-17",
       "exit_date": "2023-05-10",
       "entry_price": 43.51,
-      "exit_price": 43.6,
-      "pnl_pct": 4.07,
+      "exit_price": 43.73,
+      "pnl_pct": 4.22,
       "peak_gain_pct": 8.02,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1382,7 +1395,7 @@
       "pnl_pct": -4.58,
       "peak_gain_pct": 4.89,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1395,7 +1408,7 @@
       "pnl_pct": 2.08,
       "peak_gain_pct": 3.79,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1404,11 +1417,11 @@
       "entry_date": "2025-03-20",
       "exit_date": "2025-04-07",
       "entry_price": 272.13,
-      "exit_price": 272.67,
-      "pnl_pct": 2.86,
+      "exit_price": 273.49,
+      "pnl_pct": 3.01,
       "peak_gain_pct": 8.66,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1421,7 +1434,7 @@
       "pnl_pct": -5.09,
       "peak_gain_pct": 3.6,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1434,7 +1447,7 @@
       "pnl_pct": 46.61,
       "peak_gain_pct": 119.27,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1443,11 +1456,11 @@
       "entry_date": "2023-11-17",
       "exit_date": "2023-11-22",
       "entry_price": 329.35,
-      "exit_price": 330.01,
-      "pnl_pct": 4.29,
+      "exit_price": 331.0,
+      "pnl_pct": 4.44,
       "peak_gain_pct": 10.23,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1460,7 +1473,7 @@
       "pnl_pct": 10.97,
       "peak_gain_pct": 29.4,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1473,7 +1486,7 @@
       "pnl_pct": 22.44,
       "peak_gain_pct": 65.42,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1486,7 +1499,7 @@
       "pnl_pct": 3.69,
       "peak_gain_pct": 6.31,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1499,7 +1512,7 @@
       "pnl_pct": -3.42,
       "peak_gain_pct": 1.8,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1508,11 +1521,11 @@
       "entry_date": "2021-09-02",
       "exit_date": "2021-09-24",
       "entry_price": 1924.35,
-      "exit_price": 1928.2,
-      "pnl_pct": 6.48,
+      "exit_price": 1933.97,
+      "pnl_pct": 6.63,
       "peak_gain_pct": 22.07,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1525,7 +1538,7 @@
       "pnl_pct": -6.92,
       "peak_gain_pct": 2.65,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1538,7 +1551,7 @@
       "pnl_pct": 6.63,
       "peak_gain_pct": 12.21,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1551,7 +1564,7 @@
       "pnl_pct": 4.05,
       "peak_gain_pct": 7.71,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1560,11 +1573,11 @@
       "entry_date": "2023-06-07",
       "exit_date": "2023-08-02",
       "entry_price": 293.05,
-      "exit_price": 293.64,
-      "pnl_pct": 4.89,
+      "exit_price": 294.52,
+      "pnl_pct": 5.04,
       "peak_gain_pct": 13.63,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1577,7 +1590,7 @@
       "pnl_pct": -5.34,
       "peak_gain_pct": 4.99,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1590,7 +1603,7 @@
       "pnl_pct": -3.75,
       "peak_gain_pct": 3.74,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1603,7 +1616,7 @@
       "pnl_pct": 5.85,
       "peak_gain_pct": 8.7,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1616,20 +1629,7 @@
       "pnl_pct": -9.42,
       "peak_gain_pct": 8.8,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
-      "exit_mode": "EMA20"
-    },
-    {
-      "symbol": "HGINFRA",
-      "category": "Small_Micro_Cap",
-      "entry_date": "2024-01-11",
-      "exit_date": "2024-01-17",
-      "entry_price": 885.25,
-      "exit_price": 887.02,
-      "pnl_pct": 3.3,
-      "peak_gain_pct": 6.52,
-      "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1642,7 +1642,7 @@
       "pnl_pct": 14.83,
       "peak_gain_pct": 27.38,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1655,7 +1655,7 @@
       "pnl_pct": -4.33,
       "peak_gain_pct": 3.02,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1668,7 +1668,7 @@
       "pnl_pct": -8.44,
       "peak_gain_pct": 0.0,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1681,7 +1681,7 @@
       "pnl_pct": 5.73,
       "peak_gain_pct": 12.8,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1694,7 +1694,7 @@
       "pnl_pct": -5.6,
       "peak_gain_pct": 3.19,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1707,7 +1707,7 @@
       "pnl_pct": -7.52,
       "peak_gain_pct": 0.51,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1720,7 +1720,7 @@
       "pnl_pct": 20.13,
       "peak_gain_pct": 44.33,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1733,7 +1733,7 @@
       "pnl_pct": -7.0,
       "peak_gain_pct": 2.02,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1746,7 +1746,7 @@
       "pnl_pct": -5.08,
       "peak_gain_pct": 1.99,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1759,7 +1759,7 @@
       "pnl_pct": -4.26,
       "peak_gain_pct": 0.65,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1772,7 +1772,7 @@
       "pnl_pct": -4.07,
       "peak_gain_pct": 4.48,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1785,7 +1785,7 @@
       "pnl_pct": 11.88,
       "peak_gain_pct": 23.79,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1794,11 +1794,11 @@
       "entry_date": "2022-08-18",
       "exit_date": "2022-09-26",
       "entry_price": 124.15,
-      "exit_price": 124.4,
-      "pnl_pct": 5.85,
+      "exit_price": 124.77,
+      "pnl_pct": 5.99,
       "peak_gain_pct": 14.46,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1811,7 +1811,7 @@
       "pnl_pct": -6.03,
       "peak_gain_pct": 2.06,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1824,7 +1824,7 @@
       "pnl_pct": -8.48,
       "peak_gain_pct": 3.6,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1837,7 +1837,7 @@
       "pnl_pct": -7.79,
       "peak_gain_pct": 3.36,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1850,7 +1850,7 @@
       "pnl_pct": 17.84,
       "peak_gain_pct": 39.81,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1863,7 +1863,7 @@
       "pnl_pct": 30.46,
       "peak_gain_pct": 74.24,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1872,11 +1872,11 @@
       "entry_date": "2023-07-19",
       "exit_date": "2023-08-02",
       "entry_price": 1979.25,
-      "exit_price": 1983.21,
-      "pnl_pct": 4.58,
+      "exit_price": 1989.15,
+      "pnl_pct": 4.73,
       "peak_gain_pct": 11.48,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1889,7 +1889,7 @@
       "pnl_pct": 7.23,
       "peak_gain_pct": 14.8,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1902,7 +1902,7 @@
       "pnl_pct": 7.72,
       "peak_gain_pct": 20.45,
       "exit_reason": "EMA20_TRAIL_EXIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1915,7 +1915,7 @@
       "pnl_pct": -12.57,
       "peak_gain_pct": 0.0,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1928,7 +1928,7 @@
       "pnl_pct": -9.41,
       "peak_gain_pct": 7.87,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1937,11 +1937,11 @@
       "entry_date": "2025-12-12",
       "exit_date": "2025-12-31",
       "entry_price": 130.85,
-      "exit_price": 131.11,
-      "pnl_pct": 2.35,
+      "exit_price": 131.5,
+      "pnl_pct": 2.5,
       "peak_gain_pct": 6.23,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1954,7 +1954,7 @@
       "pnl_pct": -5.22,
       "peak_gain_pct": 2.82,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1963,11 +1963,11 @@
       "entry_date": "2021-09-15",
       "exit_date": "2021-09-20",
       "entry_price": 443.85,
-      "exit_price": 444.74,
-      "pnl_pct": 2.92,
+      "exit_price": 446.07,
+      "pnl_pct": 3.07,
       "peak_gain_pct": 6.32,
       "exit_reason": "BE_HIT_AFTER_T1",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1980,7 +1980,7 @@
       "pnl_pct": -2.27,
       "peak_gain_pct": 0.65,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -1993,7 +1993,7 @@
       "pnl_pct": -2.16,
       "peak_gain_pct": 0.08,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -2006,7 +2006,7 @@
       "pnl_pct": -2.66,
       "peak_gain_pct": 0.0,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     },
     {
@@ -2019,7 +2019,7 @@
       "pnl_pct": -6.39,
       "peak_gain_pct": 4.49,
       "exit_reason": "SL_HIT",
-      "nifty_above_50sma": false,
+      "nifty_above_50sma": true,
       "exit_mode": "EMA20"
     }
   ]
