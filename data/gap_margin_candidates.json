@@ -1,6 +1,19 @@
 {
-  "Scan Timestamp": "2026-09-24 15:02:52 IST",
+  "Scan Timestamp": "2026-09-25 15:14:51 IST",
   "Universe": "Official NSE F&O (174 stocks scanned)",
-  "Total Candidates": 0,
-  "Candidates": []
+  "Total Candidates": 1,
+  "Candidates": [
+    {
+      "Symbol": "HCLTECH",
+      "Setup": "\ud83c\udfaf Tradeable Gap Close",
+      "LTP": 1243.6,
+      "Target Margin": 1206.1,
+      "Gap Upper": 1235.3,
+      "Gap Lower": 1206.1,
+      "Gap Size %": "+2.42% (Init: 3.81%)",
+      "Gap Created": "2026-09-15",
+      "Margin Distance %": "3.11%",
+      "Days Since Gap": 7
+    }
+  ]
 }
