@@ -1,10 +1,10 @@
 {
-  "Generated Timestamp": "2026-09-25 18:05:06 IST",
-  "Execution Duration Sec": 16.7,
+  "Generated Timestamp": "2026-09-28 20:14:12 IST",
+  "Execution Duration Sec": 16.6,
   "Summary": {
     "Total Scanned": 3593,
     "Triggered Today": 0,
-    "Ready at Ceiling": 3
+    "Ready at Ceiling": 1
   },
   "Alerts": {
     "Bucket A": [
@@ -16,26 +16,11 @@
         "current_price": 999.99,
         "breakout_level": 1004.99,
         "distance_pct": 0.5,
-        "stop_loss": 991.5,
-        "risk_pct": 1.3,
+        "stop_loss": 967.19,
+        "risk_pct": 3.8,
         "box_depth": 3.1,
         "dots_count": 11,
-        "avg_turnover_cr": 30.74,
-        "target_rule": "+50% Rally / Trailing 20d"
-      },
-      {
-        "symbol": "LICHSGFIN",
-        "bucket": "Bucket A",
-        "status": "\ud83d\udfe1 READY AT CEILING",
-        "is_triggered": false,
-        "current_price": 566.0,
-        "breakout_level": 579.4,
-        "distance_pct": 2.31,
-        "stop_loss": 525.36,
-        "risk_pct": 9.3,
-        "box_depth": 19.4,
-        "dots_count": 8,
-        "avg_turnover_cr": 157.61,
+        "avg_turnover_cr": 30.76,
         "target_rule": "+50% Rally / Trailing 20d"
       }
     ],
