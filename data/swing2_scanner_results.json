@@ -1,61 +1,25 @@
 {
-  "scan_time_utc": "2026-09-30 12:51 UTC",
+  "scan_time_utc": "2026-09-30 19:21 UTC",
   "market_regime": {
     "is_market_above_50sma": false,
     "status": "CORRECTION_CHOP"
   },
   "engine": "Swing 2.0 (Run 3 Universal Model)",
-  "total_tickers_scanned": 3607,
+  "total_tickers_scanned": 3614,
   "total_triggers": 0,
-  "total_watchlist": 4,
+  "total_watchlist": 1,
   "active_triggers": [],
   "pre_breakout_watch": [
     {
       "symbol": "LIQGRWBEES",
       "category": "Small_Micro_Cap",
-      "scan_date": "2026-09-29",
-      "close": 1057.36,
+      "scan_date": "2026-09-30",
+      "close": 1057.5,
       "pivot_ceiling": 1063.44,
-      "dist_to_pivot_pct": 0.58,
+      "dist_to_pivot_pct": 0.56,
       "stop_loss": 1054.75,
-      "risk_pct": 0.25,
-      "turnover_cr": 12.9,
-      "status": "COILING_AT_PIVOT"
-    },
-    {
-      "symbol": "GLAND",
-      "category": "Small_Micro_Cap",
-      "scan_date": "2026-09-29",
-      "close": 2989.7,
-      "pivot_ceiling": 3033.9,
-      "dist_to_pivot_pct": 1.48,
-      "stop_loss": 2875.1,
-      "risk_pct": 3.83,
-      "turnover_cr": 262.16,
-      "status": "COILING_AT_PIVOT"
-    },
-    {
-      "symbol": "GANDHAR",
-      "category": "Mid_Cap",
-      "scan_date": "2026-09-29",
-      "close": 273.55,
-      "pivot_ceiling": 278.0,
-      "dist_to_pivot_pct": 1.63,
-      "stop_loss": 257.3,
-      "risk_pct": 5.94,
-      "turnover_cr": 18.91,
-      "status": "COILING_AT_PIVOT"
-    },
-    {
-      "symbol": "RATNAMANI",
-      "category": "Small_Micro_Cap",
-      "scan_date": "2026-09-29",
-      "close": 2833.3,
-      "pivot_ceiling": 2897.4,
-      "dist_to_pivot_pct": 2.26,
-      "stop_loss": 2701.6,
-      "risk_pct": 4.65,
-      "turnover_cr": 20.47,
+      "risk_pct": 0.26,
+      "turnover_cr": 9.06,
       "status": "COILING_AT_PIVOT"
     }
   ]
