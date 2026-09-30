@@ -8,48 +8,43 @@ from datetime import datetime
 DATA_DIR = "data"
 REPORT_FILE = os.path.join(DATA_DIR, "swing2_backtest_report.json")
 FUNDAMENTALS_FILE = os.path.join(DATA_DIR, "fundamentals.json")
-MIN_TURNOVER_CR = 2.0
-COOLDOWN_DAYS = 10
+MIN_TURNOVER_CR = 2.0  # ₹2 Crore turnover baseline
+COOLDOWN_DAYS = 10     # Ticker cooldown after stop-out
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 }
 
-def load_nifty500_series():
-    """Loads Nifty index and returns a clean datetime-indexed boolean Series."""
-    local_p = os.path.join(DATA_DIR, "nifty750.json")
-    raw = None
+def load_market_benchmark():
+    """Builds a datetime-indexed benchmark series using liquid anchor history."""
+    for sym in ["RELIANCE", "HDFCBANK", "ICICIBANK", "TCS"]:
+        p = os.path.join(DATA_DIR, f"{sym}.json")
+        raw = None
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    raw = json.load(fp)
+            except Exception:
+                raw = None
+        if not raw:
+            url = f"https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/{sym}.json"
+            try:
+                req = urllib.request.Request(url, headers=HEADERS)
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    raw = json.loads(resp.read().decode("utf-8"))
+            except Exception:
+                continue
 
-    if os.path.exists(local_p):
-        try:
-            with open(local_p, "r", encoding="utf-8") as fp:
-                raw = json.load(fp)
-        except Exception:
-            raw = None
-
-    if not raw:
-        url = "https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/nifty750.json"
-        try:
-            req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                raw = json.loads(resp.read().decode("utf-8"))
-        except Exception as e:
-            print(f"⚠️ Notice downloading Nifty benchmark: {e}")
-
-    if raw and isinstance(raw, list):
-        try:
-            df_idx = pd.DataFrame(raw)
-            df_idx["dt"] = pd.to_datetime(df_idx["time"]).dt.tz_localize(None).dt.normalize()
-            df_idx["close"] = pd.to_numeric(df_idx["close"], errors="coerce")
-            df_idx = df_idx.sort_values("dt").drop_duplicates(subset=["dt"]).reset_index(drop=True)
-            df_idx["sma_50"] = df_idx["close"].rolling(50).mean()
-            df_idx["is_bullish"] = df_idx["close"] > df_idx["sma_50"]
-            
-            s = df_idx.set_index("dt")["is_bullish"]
-            print(f"✅ Loaded {len(s)} sessions of Nifty regime data ({s.index.min().date()} to {s.index.max().date()}).")
+        if raw and isinstance(raw, list) and len(raw) > 100:
+            df_b = pd.DataFrame(raw)
+            df_b["dt"] = pd.to_datetime(df_b["time"]).dt.tz_localize(None).dt.normalize()
+            df_b["close"] = pd.to_numeric(df_b["close"], errors="coerce")
+            df_b = df_b.sort_values("dt").drop_duplicates(subset=["dt"]).reset_index(drop=True)
+            df_b["sma_50"] = df_b["close"].rolling(50).mean()
+            df_b["is_bullish"] = df_b["close"] > df_b["sma_50"]
+            s = df_b.set_index("dt")["is_bullish"]
+            print(f"✅ Market benchmark anchor built using {sym} ({len(s)} sessions).")
             return s
-        except Exception as e:
-            print(f"⚠️ Error parsing Nifty series: {e}")
 
     return pd.Series(dtype=bool)
 
@@ -59,7 +54,6 @@ def calculate_indicators(df):
     df["delivery_vol"] = pd.to_numeric(df.get("delivery_vol", df["volume"]), errors="coerce").fillna(0)
     df["deliv_pct"] = pd.to_numeric(df.get("deliv_pct", 0), errors="coerce").fillna(0)
 
-    # Standardized tz-naive normalized datetime
     df["dt"] = pd.to_datetime(df["time"]).dt.tz_localize(None).dt.normalize()
     df["std_date"] = df["dt"].dt.strftime("%Y-%m-%d")
 
@@ -69,7 +63,7 @@ def calculate_indicators(df):
     df["dobv"] = (direction * df["delivery_vol"]).cumsum()
     df["dobv_sma20"] = df["dobv"].rolling(20).mean()
 
-    # Turnover & ATR
+    # Turnover & Averages
     df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
     df["turnover_sma20"] = df["turnover_cr"].rolling(20).mean()
 
@@ -89,7 +83,7 @@ def calculate_indicators(df):
 
     return df
 
-def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
+def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
     trades = []
     in_trade = False
     entry_price = 0.0
@@ -101,6 +95,7 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
     peak_gain_pct = 0.0
     last_stopout_idx = -999
 
+    is_mid = (category == "Mid_Cap")
     is_large = (category == "Large_Cap")
 
     for i in range(55, len(df)):
@@ -138,7 +133,7 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
                     "pnl_pct": total_pnl,
                     "peak_gain_pct": peak_gain_pct,
                     "exit_reason": exit_reason,
-                    "nifty_above_50sma": is_entry_bullish,
+                    "market_above_50sma": is_entry_bullish,
                     "exit_mode": exit_mode
                 })
                 in_trade = False
@@ -146,12 +141,12 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
                 last_stopout_idx = i
                 continue
 
-            # 50% Profit Booking @ +1.5R
+            # 50% Profit Booking @ +1.5R & Move SL to Breakeven
             if not t1_hit and curr["high"] >= (entry_price + 1.5 * initial_risk):
                 t1_hit = True
-                stop_loss = round(entry_price * 1.005, 2)  # BE +0.5% profit floor
+                stop_loss = round(entry_price * 1.002, 2)
 
-            # Trailing Exit on Remaining 50%
+            # Runner Trailing Exit
             if t1_hit:
                 triggered_exit = False
                 if exit_mode == "EMA20" and curr["close"] < curr["ema_20"]:
@@ -176,7 +171,7 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
                         "pnl_pct": total_pnl,
                         "peak_gain_pct": peak_gain_pct,
                         "exit_reason": exit_reason,
-                        "nifty_above_50sma": is_entry_bullish,
+                        "market_above_50sma": is_entry_bullish,
                         "exit_mode": exit_mode
                     })
                     in_trade = False
@@ -189,15 +184,24 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
         if (i - last_stopout_idx) < COOLDOWN_DAYS:
             continue
 
-        min_price = 10.0 if curr["turnover_sma20"] >= 10.0 else 30.0
+        # 1. Price Floor & Turnover Baseline
+        if is_mid:
+            min_price = 10.0 if curr["turnover_sma20"] >= 10.0 else 30.0  # Run 5 Midcap Tier
+        else:
+            min_price = 10.0  # Run 3 Large / Small / Micro Floor
+
         if curr["turnover_sma20"] < MIN_TURNOVER_CR or curr["close"] < min_price:
             continue
         if curr["close"] < curr["sma_50"]:
             continue
 
-        # Base Depth Rules
-        max_base_depth = 0.22 if is_large else 0.14
-        max_coil_depth = 0.10 if is_large else 0.09
+        # 2. Base Depth Strategy Routing
+        if is_mid:
+            max_base_depth = 0.14  # Run 5 Midcap Tight Base
+            max_coil_depth = 0.09
+        else:
+            max_base_depth = 0.22  # Run 3 Loose Macro Base
+            max_coil_depth = 0.10
 
         found_base = False
         pivot_ceiling = 0.0
@@ -222,18 +226,28 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
         if not found_base:
             continue
 
-        if (prev["atr_5"] / prev["atr_50"]) > 0.70:
+        # 3. ATR Squeeze
+        atr_limit = 0.70 if is_mid else 0.72
+        if (prev["atr_5"] / prev["atr_50"]) > atr_limit:
             continue
 
-        # t-1 Volume Dry-Up (Eve Squeeze)
-        if prev["delivery_vol"] > (0.75 * prev["deliv_sma20"]):
-            continue
+        # 4. Volume Dry-Up (VDU)
+        if is_mid:
+            # Run 5: Strict Eve Dry-Up (t-1)
+            if prev["delivery_vol"] > (0.75 * prev["deliv_sma20"]):
+                continue
+        else:
+            # Run 3: Permissive 3-Day Window Dry-Up
+            prior_3_days_deliv = df["delivery_vol"].iloc[i-3:i]
+            prior_3_days_sma = df["deliv_sma20"].iloc[i-3:i]
+            if not (prior_3_days_deliv < (0.60 * prior_3_days_sma)).any():
+                continue
 
-        # Demat OBV accumulation check
+        # 5. True Demat OBV Confirmation
         if curr["dobv"] < df["dobv_sma20"].iloc[i-1]:
             continue
 
-        # Breakout Candle Quality
+        # 6. Breakout Candle & Wick Discipline
         is_breakout = curr["close"] > pivot_ceiling
         surge_mult = 1.25 if is_large else 1.40
         is_deliv_surge = (curr["delivery_vol"] >= surge_mult * curr["deliv_sma20"]) and (curr["deliv_pct"] >= 35.0)
@@ -241,10 +255,14 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
         bar_span = max(curr["high"] - curr["low"], 0.01)
         close_pos = (curr["close"] - curr["low"]) / bar_span
         upper_wick = (curr["high"] - max(curr["open"], curr["close"])) / bar_span
-        body_fraction = (curr["close"] - curr["open"]) / bar_span
 
-        # Solid green expansion candle
-        is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20) and (body_fraction >= 0.45)
+        if is_mid:
+            # Run 5 Solid Body Requirement
+            body_fraction = (curr["close"] - curr["open"]) / bar_span
+            is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20) and (body_fraction >= 0.45)
+        else:
+            # Run 3 Standard Quality Close
+            is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20)
 
         if is_breakout and is_deliv_surge and is_clean_candle:
             in_trade = True
@@ -255,13 +273,12 @@ def simulate_trades(sym, df, category, nifty_series, exit_mode="EMA20"):
             t1_hit = False
             peak_gain_pct = 0.0
 
-            # Accurate Nifty lookup
-            if not nifty_series.empty and curr_dt in nifty_series.index:
-                is_entry_bullish = bool(nifty_series.loc[curr_dt])
-            elif not nifty_series.empty:
-                # Forward-fill if date is off-calendar by 1 session
-                idx_pos = nifty_series.index.searchsorted(curr_dt, side="right") - 1
-                is_entry_bullish = bool(nifty_series.iloc[max(0, idx_pos)])
+            # Benchmark Regime Lookup
+            if not bench_series.empty and curr_dt in bench_series.index:
+                is_entry_bullish = bool(bench_series.loc[curr_dt])
+            elif not bench_series.empty:
+                idx_pos = bench_series.index.searchsorted(curr_dt, side="right") - 1
+                is_entry_bullish = bool(bench_series.iloc[max(0, idx_pos)])
             else:
                 is_entry_bullish = True
 
@@ -286,10 +303,10 @@ def compute_metrics(df_sub):
         "avg_peak_gain": avg_peak
     }
 
-def run_comparative_backtest():
-    print("🚀 Starting Run 5: Solid Green Body + Bulletproof Nifty Regime Sync...")
+def run_hybrid_backtest():
+    print("🚀 Starting Hybrid Backtest Engine (Run 3 Large/Small + Run 5 Midcap)...")
 
-    nifty_series = load_nifty500_series()
+    bench_series = load_market_benchmark()
 
     meta = {}
     if os.path.exists(FUNDAMENTALS_FILE):
@@ -332,10 +349,10 @@ def run_comparative_backtest():
             else:
                 cat = "Small_Micro_Cap"
 
-            trades_ema = simulate_trades(sym, df, cat, nifty_series, exit_mode="EMA20")
+            trades_ema = simulate_trades(sym, df, cat, bench_series, exit_mode="EMA20")
             all_trades_ema.extend(trades_ema)
 
-            trades_swing = simulate_trades(sym, df, cat, nifty_series, exit_mode="SWING_LOW")
+            trades_swing = simulate_trades(sym, df, cat, bench_series, exit_mode="SWING_LOW")
             all_trades_swing.extend(trades_swing)
         except Exception:
             continue
@@ -345,20 +362,20 @@ def run_comparative_backtest():
 
     report = {
         "report_generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-        "iteration": "Run 5 (Solid Candle Body + Synced Nifty Series)",
+        "iteration": "Hybrid Run (Run 3 Large/Small + Run 5 Midcap)",
         "exit_rule_comparison": {
             "EMA20_Exit": compute_metrics(df_ema),
             "Swing_Low_Exit": compute_metrics(df_swing)
-        },
-        "nifty_regime_breakdown": {
-            "All_Time": compute_metrics(df_ema),
-            "When_Nifty_Above_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == True]),
-            "When_Nifty_Below_50SMA": compute_metrics(df_ema[df_ema["nifty_above_50sma"] == False])
         },
         "market_cap_breakdown": {
             "Large_Cap": compute_metrics(df_ema[df_ema["category"] == "Large_Cap"]),
             "Mid_Cap": compute_metrics(df_ema[df_ema["category"] == "Mid_Cap"]),
             "Small_Micro_Cap": compute_metrics(df_ema[df_ema["category"] == "Small_Micro_Cap"])
+        },
+        "market_regime_breakdown": {
+            "All_Time": compute_metrics(df_ema),
+            "When_Market_Above_50SMA": compute_metrics(df_ema[df_ema["market_above_50sma"] == True]),
+            "When_Market_Below_50SMA": compute_metrics(df_ema[df_ema["market_above_50sma"] == False])
         },
         "recent_trades": all_trades_ema[-150:]
     }
@@ -366,7 +383,7 @@ def run_comparative_backtest():
     with open(REPORT_FILE, "w", encoding="utf-8") as fp:
         json.dump(report, fp, indent=2)
 
-    print(f"🎉 Backtest complete. Total trades logged: {len(df_ema)}. Report saved to '{REPORT_FILE}'.")
+    print(f"🎉 Hybrid backtest complete. Total trades logged: {len(df_ema)}. Report saved to '{REPORT_FILE}'.")
 
 if __name__ == "__main__":
-    run_comparative_backtest()
+    run_hybrid_backtest()
