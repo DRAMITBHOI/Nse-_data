@@ -8,8 +8,8 @@ from datetime import datetime
 DATA_DIR = "data"
 REPORT_FILE = os.path.join(DATA_DIR, "swing2_backtest_report.json")
 FUNDAMENTALS_FILE = os.path.join(DATA_DIR, "fundamentals.json")
-MIN_TURNOVER_CR = 2.0  # ₹2 Crore turnover floor
-COOLDOWN_DAYS = 10     # Ticker cooldown after stop-out
+MIN_TURNOVER_CR = 2.0
+COOLDOWN_DAYS = 10
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
@@ -49,16 +49,10 @@ def load_market_benchmark():
     return pd.Series(dtype=bool)
 
 def classify_stock(sym, meta, df):
-    """
-    Three-Tier Demarcation:
-    1. Explicit category tags (Mid & Small evaluated first to avoid '500' hijacking)
-    2. Numerical market cap (if present in metadata)
-    3. NSE Daily Turnover median distribution
-    """
+    """Robust 3-Tier Categorization: Explicit Tags -> Market Cap -> Median Turnover."""
     m = meta.get(sym, {})
     raw_cat = str(m.get("category", "")).lower()
 
-    # 1. Text Classification
     if any(k in raw_cat for k in ["midcap", "mid cap", "nifty mid"]):
         return "Mid_Cap"
     if any(k in raw_cat for k in ["smallcap", "small cap", "microcap", "nifty small"]):
@@ -66,7 +60,6 @@ def classify_stock(sym, meta, df):
     if any(k in raw_cat for k in ["large", "nifty 50", "nifty 100", "nifty next 50", "largecap"]):
         return "Large_Cap"
 
-    # 2. Numeric Market Cap (in Crores)
     mcap = m.get("market_cap") or m.get("market_cap_cr") or m.get("mcap", 0)
     try:
         mcap = float(mcap)
@@ -79,7 +72,6 @@ def classify_stock(sym, meta, df):
     except (ValueError, TypeError):
         pass
 
-    # 3. Dynamic Median Daily Turnover Bucketing
     median_to = df["turnover_sma20"].median()
     if pd.isna(median_to):
         median_to = 0.0
@@ -100,13 +92,11 @@ def calculate_indicators(df):
     df["dt"] = pd.to_datetime(df["time"]).dt.tz_localize(None).dt.normalize()
     df["std_date"] = df["dt"].dt.strftime("%Y-%m-%d")
 
-    # True Demat OBV
     price_diff = df["close"].diff()
     direction = np.where(price_diff > 0, 1.0, np.where(price_diff < 0, -1.0, 0.0))
     df["dobv"] = (direction * df["delivery_vol"]).cumsum()
     df["dobv_sma20"] = df["dobv"].rolling(20).mean()
 
-    # Turnover & ATR
     df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
     df["turnover_sma20"] = df["turnover_cr"].rolling(20).mean()
 
@@ -122,11 +112,10 @@ def calculate_indicators(df):
     df["deliv_sma20"] = df["delivery_vol"].rolling(20).mean()
     df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
     df["sma_50"] = df["close"].rolling(50).mean()
-    df["swing_low_5"] = df["low"].shift(1).rolling(5).min()
 
     return df
 
-def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
+def simulate_engine(sym, df, category, bench_series, engine_type="RUN_3"):
     trades = []
     in_trade = False
     entry_price = 0.0
@@ -138,7 +127,6 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
     peak_gain_pct = 0.0
     last_stopout_idx = -999
 
-    is_mid = (category == "Mid_Cap")
     is_large = (category == "Large_Cap")
 
     for i in range(55, len(df)):
@@ -147,13 +135,12 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
         c_date = curr["std_date"]
         curr_dt = curr["dt"]
 
-        # --- TRADE MANAGEMENT ---
+        # --- TRADE MANAGEMENT (50% @ 1.5R + BE, 20 EMA Runner) ---
         if in_trade:
             curr_peak = ((curr["high"] - entry_price) / entry_price) * 100
             if curr_peak > peak_gain_pct:
                 peak_gain_pct = round(curr_peak, 2)
 
-            # Stop Loss Hit
             if curr["low"] <= stop_loss:
                 runner_exit_price = stop_loss
                 runner_pnl = ((runner_exit_price - entry_price) / entry_price) * 100
@@ -171,55 +158,38 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
                     "category": category,
                     "entry_date": entry_date,
                     "exit_date": c_date,
-                    "entry_price": entry_price,
-                    "exit_price": runner_exit_price,
                     "pnl_pct": total_pnl,
                     "peak_gain_pct": peak_gain_pct,
-                    "exit_reason": exit_reason,
                     "market_above_50sma": is_entry_bullish,
-                    "exit_mode": exit_mode
+                    "engine": engine_type
                 })
                 in_trade = False
                 t1_hit = False
                 last_stopout_idx = i
                 continue
 
-            # 50% Profit Booking @ +1.5R & Move SL to Breakeven (+0.2%)
             if not t1_hit and curr["high"] >= (entry_price + 1.5 * initial_risk):
                 t1_hit = True
                 stop_loss = round(entry_price * 1.002, 2)
 
-            # Dynamic Runner Trailing Exit
-            if t1_hit:
-                triggered_exit = False
-                if exit_mode == "EMA20" and curr["close"] < curr["ema_20"]:
-                    triggered_exit = True
-                    exit_reason = "EMA20_TRAIL_EXIT"
-                elif exit_mode == "SWING_LOW" and curr["close"] < curr["swing_low_5"]:
-                    triggered_exit = True
-                    exit_reason = "SWING_LOW_EXIT"
+            if t1_hit and curr["close"] < curr["ema_20"]:
+                runner_pnl = ((curr["close"] - entry_price) / entry_price) * 100
+                locked_gain = (1.5 * initial_risk / entry_price) * 100
+                total_pnl = round(0.5 * locked_gain + 0.5 * runner_pnl, 2)
 
-                if triggered_exit:
-                    runner_pnl = ((curr["close"] - entry_price) / entry_price) * 100
-                    locked_gain = (1.5 * initial_risk / entry_price) * 100
-                    total_pnl = round(0.5 * locked_gain + 0.5 * runner_pnl, 2)
-
-                    trades.append({
-                        "symbol": sym,
-                        "category": category,
-                        "entry_date": entry_date,
-                        "exit_date": c_date,
-                        "entry_price": entry_price,
-                        "exit_price": round(curr["close"], 2),
-                        "pnl_pct": total_pnl,
-                        "peak_gain_pct": peak_gain_pct,
-                        "exit_reason": exit_reason,
-                        "market_above_50sma": is_entry_bullish,
-                        "exit_mode": exit_mode
-                    })
-                    in_trade = False
-                    t1_hit = False
-                    continue
+                trades.append({
+                    "symbol": sym,
+                    "category": category,
+                    "entry_date": entry_date,
+                    "exit_date": c_date,
+                    "pnl_pct": total_pnl,
+                    "peak_gain_pct": peak_gain_pct,
+                    "market_above_50sma": is_entry_bullish,
+                    "engine": engine_type
+                })
+                in_trade = False
+                t1_hit = False
+                continue
 
             continue
 
@@ -227,17 +197,24 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
         if (i - last_stopout_idx) < COOLDOWN_DAYS:
             continue
 
-        # 1. Price Floor & Turnover Baseline
-        min_price = 15.0 if is_mid else 10.0
+        # 1. Price Floor & Turnover
+        if engine_type == "RUN_3":
+            min_price = 10.0
+        else:  # RUN_5
+            min_price = 10.0 if curr["turnover_sma20"] >= 10.0 else 30.0
+
         if curr["turnover_sma20"] < MIN_TURNOVER_CR or curr["close"] < min_price:
             continue
         if curr["close"] < curr["sma_50"]:
             continue
 
-        # 2. Base Architecture
-        # Mid Caps allow up to 18% macro base depth with a 10% micro coil
-        max_base_depth = 0.18 if is_mid else 0.22
-        max_coil_depth = 0.10
+        # 2. Base Depth Configuration
+        if engine_type == "RUN_3":
+            max_base_depth = 0.22
+            max_coil_depth = 0.10
+        else:  # RUN_5
+            max_base_depth = 0.22 if is_large else 0.14
+            max_coil_depth = 0.10 if is_large else 0.09
 
         found_base = False
         pivot_ceiling = 0.0
@@ -263,41 +240,38 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
             continue
 
         # 3. ATR Squeeze
-        atr_threshold = 0.72 if is_mid else 0.72
-        if (prev["atr_5"] / prev["atr_50"]) > atr_threshold:
+        atr_limit = 0.72 if engine_type == "RUN_3" else 0.70
+        if (prev["atr_5"] / prev["atr_50"]) > atr_limit:
             continue
 
         # 4. Volume Dry-Up (VDU)
-        if is_mid:
-            # 2-day pocket check (t-1 or t-2)
-            has_vdu = (df["delivery_vol"].iloc[i-2:i] <= (0.75 * df["deliv_sma20"].iloc[i-2:i])).any()
-            if not has_vdu:
-                continue
-        else:
-            # 3-day pocket check
+        if engine_type == "RUN_3":
             prior_3_days_deliv = df["delivery_vol"].iloc[i-3:i]
             prior_3_days_sma = df["deliv_sma20"].iloc[i-3:i]
             if not (prior_3_days_deliv < (0.60 * prior_3_days_sma)).any():
                 continue
+        else:  # RUN_5: Strict Eve Dry-Up
+            if prev["delivery_vol"] > (0.75 * prev["deliv_sma20"]):
+                continue
 
-        # 5. True Demat OBV Confirmation
+        # 5. True Demat OBV Trend
         if curr["dobv"] < df["dobv_sma20"].iloc[i-1]:
             continue
 
-        # 6. Breakout Candle & Wick Discipline
+        # 6. Breakout Trigger & Candle Discipline
         is_breakout = curr["close"] > pivot_ceiling
-        surge_mult = 1.25 if is_large else 1.35
+        surge_mult = 1.25 if is_large else 1.40
         is_deliv_surge = (curr["delivery_vol"] >= surge_mult * curr["deliv_sma20"]) and (curr["deliv_pct"] >= 35.0)
 
         bar_span = max(curr["high"] - curr["low"], 0.01)
         close_pos = (curr["close"] - curr["low"]) / bar_span
         upper_wick = (curr["high"] - max(curr["open"], curr["close"])) / bar_span
 
-        if is_mid:
-            body_fraction = (curr["close"] - curr["open"]) / bar_span
-            is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20) and (body_fraction >= 0.35)
-        else:
+        if engine_type == "RUN_3":
             is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20)
+        else:  # RUN_5: Requires Solid Green Body
+            body_fraction = (curr["close"] - curr["open"]) / bar_span
+            is_clean_candle = (close_pos >= 0.70) and (upper_wick <= 0.20) and (body_fraction >= 0.45)
 
         if is_breakout and is_deliv_surge and is_clean_candle:
             in_trade = True
@@ -308,7 +282,6 @@ def simulate_trades(sym, df, category, bench_series, exit_mode="EMA20"):
             t1_hit = False
             peak_gain_pct = 0.0
 
-            # Map benchmark state on entry
             if not bench_series.empty and curr_dt in bench_series.index:
                 is_entry_bullish = bool(bench_series.loc[curr_dt])
             elif not bench_series.empty:
@@ -338,8 +311,8 @@ def compute_metrics(df_sub):
         "avg_peak_gain": avg_peak
     }
 
-def run_hybrid_backtest():
-    print("🚀 Starting Tuned Hybrid Backtest (Demarcation + Expanded Midcap Architecture)...")
+def run_simultaneous_backtest():
+    print("🚀 Running Head-to-Head Shootout: Run 3 vs. Run 5 across all market caps...")
 
     bench_series = load_market_benchmark()
 
@@ -361,8 +334,8 @@ def run_hybrid_backtest():
         ]
     ]
 
-    all_trades_ema = []
-    all_trades_swing = []
+    trades_run3 = []
+    trades_run5 = []
 
     for f in stock_files:
         sym = f.replace(".json", "").strip().upper()
@@ -375,45 +348,51 @@ def run_hybrid_backtest():
 
             df = pd.DataFrame(candles)
             df = calculate_indicators(df)
-
-            # Robust Demarcation
             cat = classify_stock(sym, meta, df)
 
-            trades_ema = simulate_trades(sym, df, cat, bench_series, exit_mode="EMA20")
-            all_trades_ema.extend(trades_ema)
-
-            trades_swing = simulate_trades(sym, df, cat, bench_series, exit_mode="SWING_LOW")
-            all_trades_swing.extend(trades_swing)
+            trades_run3.extend(simulate_engine(sym, df, cat, bench_series, engine_type="RUN_3"))
+            trades_run5.extend(simulate_engine(sym, df, cat, bench_series, engine_type="RUN_5"))
         except Exception:
             continue
 
-    df_ema = pd.DataFrame(all_trades_ema)
-    df_swing = pd.DataFrame(all_trades_swing)
+    df3 = pd.DataFrame(trades_run3)
+    df5 = pd.DataFrame(trades_run5)
+
+    head_to_head_totals = {
+        "Run_3_Total": compute_metrics(df3),
+        "Run_5_Total": compute_metrics(df5)
+    }
+
+    market_cap_comparison = {
+        "Large_Cap (Run 3)": compute_metrics(df3[df3["category"] == "Large_Cap"]),
+        "Large_Cap (Run 5)": compute_metrics(df5[df5["category"] == "Large_Cap"]),
+        "Mid_Cap (Run 3)": compute_metrics(df3[df3["category"] == "Mid_Cap"]),
+        "Mid_Cap (Run 5)": compute_metrics(df5[df5["category"] == "Mid_Cap"]),
+        "Small_Micro (Run 3)": compute_metrics(df3[df3["category"] == "Small_Micro_Cap"]),
+        "Small_Micro (Run 5)": compute_metrics(df5[df5["category"] == "Small_Micro_Cap"])
+    }
+
+    regime_comparison = {
+        "Above_50SMA (Run 3)": compute_metrics(df3[df3["market_above_50sma"] == True]),
+        "Above_50SMA (Run 5)": compute_metrics(df5[df5["market_above_50sma"] == True]),
+        "Below_50SMA (Run 3)": compute_metrics(df3[df3["market_above_50sma"] == False]),
+        "Below_50SMA (Run 5)": compute_metrics(df5[df5["market_above_50sma"] == False])
+    }
 
     report = {
         "report_generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-        "iteration": "Tuned Hybrid (3-Tier Demarcation + Expanded Midcap Funnel)",
-        "exit_rule_comparison": {
-            "EMA20_Exit": compute_metrics(df_ema),
-            "Swing_Low_Exit": compute_metrics(df_swing)
-        },
-        "market_cap_breakdown": {
-            "Large_Cap": compute_metrics(df_ema[df_ema["category"] == "Large_Cap"]),
-            "Mid_Cap": compute_metrics(df_ema[df_ema["category"] == "Mid_Cap"]),
-            "Small_Micro_Cap": compute_metrics(df_ema[df_ema["category"] == "Small_Micro_Cap"])
-        },
-        "market_regime_breakdown": {
-            "All_Time": compute_metrics(df_ema),
-            "When_Market_Above_50SMA": compute_metrics(df_ema[df_ema["market_above_50sma"] == True]),
-            "When_Market_Below_50SMA": compute_metrics(df_ema[df_ema["market_above_50sma"] == False])
-        },
-        "recent_trades": all_trades_ema[-150:]
+        "iteration": "Simultaneous Shootout: Run 3 vs Run 5",
+        "head_to_head_totals": head_to_head_totals,
+        "market_cap_comparison": market_cap_comparison,
+        "regime_comparison": regime_comparison,
+        "recent_trades_run3": trades_run3[-150:],
+        "recent_trades_run5": trades_run5[-150:]
     }
 
     with open(REPORT_FILE, "w", encoding="utf-8") as fp:
         json.dump(report, fp, indent=2)
 
-    print(f"🎉 Backtest complete. Total trades logged: {len(df_ema)}. Report saved to '{REPORT_FILE}'.")
+    print(f"🎉 Shootout complete! Run 3: {len(df3)} trades | Run 5: {len(df5)} trades.")
 
 if __name__ == "__main__":
-    run_hybrid_backtest()
+    run_simultaneous_backtest()
