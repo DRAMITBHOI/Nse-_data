@@ -1,14 +1,14 @@
 {
-  "report_generated": "2026-09-30 18:58 UTC",
+  "report_generated": "2026-10-01 19:34 UTC",
   "iteration": "Simultaneous Shootout: Run 3 vs Run 5",
   "head_to_head_totals": {
     "Run_3_Total": {
-      "trades": 908,
-      "win_rate": 44.38,
+      "trades": 909,
+      "win_rate": 44.33,
       "profit_factor": 1.51,
       "avg_gain": 11.39,
       "avg_loss": -6.01,
-      "avg_peak_gain": 13.94
+      "avg_peak_gain": 13.93
     },
     "Run_5_Total": {
       "trades": 400,
@@ -16,57 +16,57 @@
       "profit_factor": 1.35,
       "avg_gain": 10.6,
       "avg_loss": -6.1,
-      "avg_peak_gain": 12.58
+      "avg_peak_gain": 12.59
     }
   },
   "market_cap_comparison": {
     "Large_Cap (Run 3)": {
       "trades": 109,
-      "win_rate": 44.04,
-      "profit_factor": 1.76,
-      "avg_gain": 8.84,
-      "avg_loss": -3.95,
-      "avg_peak_gain": 10.2
+      "win_rate": 45.87,
+      "profit_factor": 1.96,
+      "avg_gain": 9.22,
+      "avg_loss": -3.99,
+      "avg_peak_gain": 10.84
     },
     "Large_Cap (Run 5)": {
-      "trades": 57,
-      "win_rate": 38.6,
-      "profit_factor": 1.26,
-      "avg_gain": 7.9,
-      "avg_loss": -3.93,
-      "avg_peak_gain": 8.17
+      "trades": 55,
+      "win_rate": 40.0,
+      "profit_factor": 1.37,
+      "avg_gain": 8.2,
+      "avg_loss": -3.99,
+      "avg_peak_gain": 8.66
     },
     "Mid_Cap (Run 3)": {
-      "trades": 229,
-      "win_rate": 44.1,
-      "profit_factor": 1.68,
-      "avg_gain": 10.69,
+      "trades": 232,
+      "win_rate": 42.67,
+      "profit_factor": 1.55,
+      "avg_gain": 10.48,
       "avg_loss": -5.02,
-      "avg_peak_gain": 12.93
+      "avg_peak_gain": 12.29
     },
     "Mid_Cap (Run 5)": {
-      "trades": 100,
-      "win_rate": 47.0,
-      "profit_factor": 1.67,
-      "avg_gain": 9.93,
-      "avg_loss": -5.27,
-      "avg_peak_gain": 12.38
+      "trades": 104,
+      "win_rate": 46.15,
+      "profit_factor": 1.46,
+      "avg_gain": 8.91,
+      "avg_loss": -5.24,
+      "avg_peak_gain": 11.06
     },
     "Small_Micro (Run 3)": {
-      "trades": 570,
-      "win_rate": 44.56,
-      "profit_factor": 1.44,
-      "avg_gain": 12.16,
+      "trades": 568,
+      "win_rate": 44.72,
+      "profit_factor": 1.45,
+      "avg_gain": 12.18,
       "avg_loss": -6.8,
-      "avg_peak_gain": 15.06
+      "avg_peak_gain": 15.2
     },
     "Small_Micro (Run 5)": {
-      "trades": 243,
-      "win_rate": 43.62,
-      "profit_factor": 1.27,
-      "avg_gain": 11.46,
+      "trades": 241,
+      "win_rate": 43.57,
+      "profit_factor": 1.32,
+      "avg_gain": 11.88,
       "avg_loss": -6.97,
-      "avg_peak_gain": 13.7
+      "avg_peak_gain": 14.15
     }
   },
   "regime_comparison": {
@@ -87,20 +87,20 @@
       "avg_peak_gain": 12.7
     },
     "Below_50SMA (Run 3)": {
-      "trades": 338,
-      "win_rate": 40.83,
-      "profit_factor": 1.29,
+      "trades": 339,
+      "win_rate": 40.71,
+      "profit_factor": 1.28,
       "avg_gain": 11.06,
       "avg_loss": -5.93,
-      "avg_peak_gain": 12.68
+      "avg_peak_gain": 12.67
     },
     "Below_50SMA (Run 5)": {
       "trades": 140,
       "win_rate": 44.29,
-      "profit_factor": 1.4,
+      "profit_factor": 1.39,
       "avg_gain": 10.44,
-      "avg_loss": -5.94,
-      "avg_peak_gain": 12.35
+      "avg_loss": -5.97,
+      "avg_peak_gain": 12.39
     }
   },
   "recent_trades_run3": [
@@ -636,7 +636,7 @@
     },
     {
       "symbol": "ASTERDM",
-      "category": "Small_Micro_Cap",
+      "category": "Mid_Cap",
       "entry_date": "2021-07-12",
       "exit_date": "2021-08-10",
       "pnl_pct": -8.64,
@@ -1596,7 +1596,7 @@
     },
     {
       "symbol": "AWL",
-      "category": "Mid_Cap",
+      "category": "Small_Micro_Cap",
       "entry_date": "2022-07-12",
       "exit_date": "2022-07-19",
       "pnl_pct": -7.15,
@@ -1608,17 +1608,17 @@
   "recent_trades_run5": [
     {
       "symbol": "RECLTD",
-      "category": "Large_Cap",
-      "entry_date": "2024-12-06",
-      "exit_date": "2024-12-18",
-      "pnl_pct": -3.58,
-      "peak_gain_pct": 2.54,
+      "category": "Mid_Cap",
+      "entry_date": "2022-06-30",
+      "exit_date": "2022-07-12",
+      "pnl_pct": 2.74,
+      "peak_gain_pct": 6.26,
       "market_above_50sma": false,
       "engine": "RUN_5"
     },
     {
       "symbol": "RECLTD",
-      "category": "Large_Cap",
+      "category": "Mid_Cap",
       "entry_date": "2025-06-06",
       "exit_date": "2025-06-13",
       "pnl_pct": -4.31,
@@ -1688,7 +1688,7 @@
     },
     {
       "symbol": "ACC",
-      "category": "Mid_Cap",
+      "category": "Small_Micro_Cap",
       "entry_date": "2022-11-30",
       "exit_date": "2022-12-23",
       "pnl_pct": -3.15,
@@ -2068,7 +2068,7 @@
     },
     {
       "symbol": "SAATVIKGL",
-      "category": "Small_Micro_Cap",
+      "category": "Mid_Cap",
       "entry_date": "2026-01-07",
       "exit_date": "2026-01-20",
       "pnl_pct": -11.04,
@@ -2168,7 +2168,7 @@
     },
     {
       "symbol": "HEMIPROP",
-      "category": "Small_Micro_Cap",
+      "category": "Mid_Cap",
       "entry_date": "2021-05-21",
       "exit_date": "2021-05-28",
       "pnl_pct": -5.34,
