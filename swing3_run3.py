@@ -7,13 +7,13 @@ from datetime import datetime
 import urllib.request
 
 DATA_DIR = "data"
-RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run3_results.json")
+RESULTS_JSON = os.path.join(DATA_DIR, "swing3_exit_study_results.json")
 NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 MIN_TURNOVER_CR = 10.0
 
 
 # -------------------------------------------------------------
-# 1. DATA PREPARATION & CORPORATE ACTIONS
+# 1. DATA SANITIZATION & SPLIT ADJUSTMENT
 # -------------------------------------------------------------
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -162,10 +162,18 @@ def load_nifty750_symbols():
 
 
 # -------------------------------------------------------------
-# 3. SWING 3 RUN 3 BASELINE SIGNAL EXTRACTOR
+# 3. RANK 5 ENTRY DETECTOR & CANDIDATE BUILDER
 # -------------------------------------------------------------
-def extract_run3_signals(symbol, clean_data, nifty_perf_map, nifty750_set):
-    if len(clean_data) < 60 or symbol not in nifty750_set:
+def get_rank5_candidates(clean_data, nifty_perf_map):
+    """
+    Extracts setups adhering strictly to Rank 5:
+    - Base cumulative delivery ratio >= 1.5x
+    - Demat OBV at 20-day high (Lever B)
+    - Micro-launchpad spread squeeze <= 8% (Lever C)
+    - Conviction Score >= 2.5 (Lever D1)
+    - Stage 2 (Price >= 200 SMA) and 60d RS > Nifty
+    """
+    if len(clean_data) < 60:
         return []
 
     df = pd.DataFrame(clean_data)
@@ -203,16 +211,7 @@ def extract_run3_signals(symbol, clean_data, nifty_perf_map, nifty750_set):
     demat_obv_maxes = df["demat_obv_20max"].values
     times = df["time"].values
 
-    signals = []
-    in_position = False
-    entry_price = 0.0
-    initial_stop = 0.0
-    current_stop = 0.0
-    r_unit = 0.0
-    moved_to_be = False
-    entry_idx = 0
-    setup_name = ""
-    tag_info = {}
+    candidates = []
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -226,149 +225,220 @@ def extract_run3_signals(symbol, clean_data, nifty_perf_map, nifty750_set):
         dp = deliv_pcts[i]
         dp_avg = deliv_pct_avgs[i]
         rc = range_closes[i]
-        ema = ema20s[i]
         sma200 = sma200s[i]
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        if not in_position:
-            if turnover < MIN_TURNOVER_CR:
-                continue
+        if turnover < MIN_TURNOVER_CR:
+            continue
 
-            entry_triggered = False
-            curr_setup = ""
-            calc_entry = 0.0
-            calc_sl = 0.0
-            base_cumul_ratio = 1.0
-            actual_spread = 1.0
+        entry_triggered = False
+        curr_setup = ""
+        calc_entry = 0.0
+        calc_sl = 0.0
 
-            # ENGINE 1: V-REVERSAL
-            recent_20_high = highs[i - 20:i].max()
-            if (recent_20_high - l) / recent_20_high >= 0.18:
-                recent_trough = lows[i - 5:i].min()
-                prior_3d_high = highs[i - 4:i].max()
-                c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
-                c_vol_rev = v >= (1.3 * v_avg)
-                c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg if dp_avg > 0 else False)
-                c_candle_rev = rc >= 0.55
+        # ENGINE 1: V-REVERSAL
+        recent_20_high = highs[i - 20:i].max()
+        if (recent_20_high - l) / recent_20_high >= 0.18:
+            recent_trough = lows[i - 5:i].min()
+            prior_3d_high = highs[i - 4:i].max()
+            c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
+            c_vol_rev = v >= (1.3 * v_avg)
+            c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg if dp_avg > 0 else False)
+            c_candle_rev = rc >= 0.55
 
-                if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
+            if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
+                entry_triggered = True
+                curr_setup = "V-REVERSAL"
+                calc_entry = round(prior_3d_high, 2)
+                calc_sl = round(recent_trough * 0.995, 2)
+
+        # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (LEVER C: SPREAD <= 8%)
+        if not entry_triggered:
+            valid_launchpad = False
+            launchpad_high = 0.0
+            launchpad_low = 0.0
+
+            for shelf_len in range(10, 19):
+                s_high = highs[i - shelf_len:i].max()
+                s_low = lows[i - shelf_len:i].min()
+                if s_low > 0:
+                    spr = (s_high - s_low) / s_low
+                    if spr <= 0.08:  # Lever C
+                        valid_launchpad = True
+                        launchpad_high = round(float(s_high), 2)
+                        launchpad_low = round(float(s_low), 2)
+                        break
+
+            if valid_launchpad:
+                base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
+                base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
+                base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 1.5
+
+                c_bo = (c >= launchpad_high) and (h >= launchpad_high)
+                c_vol_bo = v >= (1.4 * v_avg)
+                c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg if dp_avg > 0 else False)
+                c_candle_bo = rc >= 0.65
+
+                # Lever B: Demat OBV at 20-day high & Base Delivery >= 1.5x
+                obv_high = bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True
+
+                if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.50) and obv_high:
                     entry_triggered = True
-                    curr_setup = "V-REVERSAL"
-                    calc_entry = round(prior_3d_high, 2)
-                    calc_sl = round(recent_trough * 0.995, 2)
-                    base_cumul_ratio = 2.5
-                    actual_spread = 0.07
+                    curr_setup = "LAUNCHPAD-BO"
+                    calc_entry = launchpad_high
+                    calc_sl = round(min(l, launchpad_low), 2)
 
-            # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT
-            if not entry_triggered:
-                valid_launchpad = False
-                launchpad_high = 0.0
-                launchpad_low = 0.0
+        if entry_triggered:
+            r_dist = calc_entry - calc_sl
+            if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
+                is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
+                n_perf = nifty_perf_map.get(t)
+                if n_perf is None:
+                    prior_dates = [d for d in nifty_perf_map.keys() if d <= t]
+                    n_perf = nifty_perf_map[max(prior_dates)] if prior_dates else 0.001
+                is_rs = bool(stock_p60 > n_perf)
 
-                for shelf_len in range(10, 19):
-                    s_high = highs[i - shelf_len:i].max()
-                    s_low = lows[i - shelf_len:i].min()
-                    if s_low > 0:
-                        spr = (s_high - s_low) / s_low
-                        if spr <= 0.13:
-                            valid_launchpad = True
-                            launchpad_high = round(float(s_high), 2)
-                            launchpad_low = round(float(s_low), 2)
-                            actual_spread = spr
-                            break
+                if is_stage2 and is_rs:
+                    deliv_surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
+                    rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
+                    conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
-                if valid_launchpad:
-                    base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
-                    base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
-                    base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 2.0
-
-                    c_bo = (c >= launchpad_high) and (h >= launchpad_high)
-                    c_vol_bo = v >= (1.4 * v_avg)
-                    c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg if dp_avg > 0 else False)
-                    c_candle_bo = rc >= 0.65
-
-                    if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.15):
-                        entry_triggered = True
-                        curr_setup = "LAUNCHPAD-BO"
-                        calc_entry = launchpad_high
-                        calc_sl = round(min(l, launchpad_low), 2)
-
-            if entry_triggered:
-                r_dist = calc_entry - calc_sl
-                if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
-                    # Stage 2 + 60d RS Filter (Nifty 50 SMA regime completely removed)
-                    is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
-                    n_perf = nifty_perf_map.get(t)
-                    if n_perf is None:
-                        prior_dates = [d for d in nifty_perf_map.keys() if d <= t]
-                        n_perf = nifty_perf_map[max(prior_dates)] if prior_dates else 0.001
-                    is_rs = bool(stock_p60 > n_perf)
-
-                    if is_stage2 and is_rs:
-                        in_position = True
-                        entry_price = calc_entry
-                        initial_stop = calc_sl
-                        current_stop = initial_stop
-                        r_unit = r_dist
-                        moved_to_be = False
-                        entry_idx = i
-                        setup_name = curr_setup
-
-                        deliv_surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
-                        rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
-                        conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
-
-                        tag_info = {
-                            "cumul_ratio": base_cumul_ratio,
-                            "is_obv_20max": bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True,
-                            "spread": actual_spread,
+                    # Lever D1: Score >= 2.5
+                    if conviction_score >= 2.5:
+                        candidates.append({
+                            "entry_idx": i,
+                            "entry_date": t,
+                            "entry_price": calc_entry,
+                            "initial_stop": calc_sl,
+                            "r_unit": r_dist,
+                            "setup": curr_setup,
                             "conviction_score": conviction_score,
-                            "deliv_surge_ratio": round(deliv_surge_ratio, 2)
-                        }
+                            "highs": highs,
+                            "lows": lows,
+                            "closes": closes,
+                            "ema20s": ema20s,
+                            "times": times,
+                        })
 
-        else:
-            if not moved_to_be and h >= (entry_price + 1.5 * r_unit):
-                current_stop = max(current_stop, entry_price)
-                moved_to_be = True
-
-            if moved_to_be:
-                current_stop = max(current_stop, round(float(ema), 2))
-
-            if c < current_stop:
-                exit_price = round(current_stop, 2)
-                pnl_pts = exit_price - entry_price
-                pnl_pct = round((pnl_pts / entry_price) * 100.0, 2)
-                r_multiple = round(pnl_pts / r_unit, 2)
-
-                signals.append({
-                    "Symbol": symbol,
-                    "Setup": setup_name,
-                    "Entry Date": times[entry_idx],
-                    "Exit Date": times[i],
-                    "Duration (Days)": i - entry_idx,
-                    "Entry Price": entry_price,
-                    "Exit Price": exit_price,
-                    "PnL %": pnl_pct,
-                    "R Multiple": r_multiple,
-                    "Outcome": "WIN" if pnl_pts > 0 else "LOSS",
-                    "cumul_ratio": tag_info["cumul_ratio"],
-                    "is_obv_20max": tag_info["is_obv_20max"],
-                    "spread": tag_info["spread"],
-                    "conviction_score": tag_info["conviction_score"],
-                    "deliv_surge_ratio": tag_info["deliv_surge_ratio"]
-                })
-
-                in_position = False
-                entry_price = 0.0
-                current_stop = 0.0
-                moved_to_be = False
-
-    return signals
+    return candidates
 
 
 # -------------------------------------------------------------
-# 4. METRICS & DAILY CONCURRENCY FILTER
+# 4. EXIT ARCHITECTURE SIMULATORS
+# -------------------------------------------------------------
+def simulate_exit(cand, mode="breakeven_then_trail"):
+    """
+    mode options:
+      1. 'breakeven_then_trail': Move stop to BE at +1.5R, then trail 20 EMA.
+      2. 'pure_structural_trail': Never move stop to BE. Stop stays at initial_stop until 20 EMA overtakes it.
+      3. 'book_50_at_1_5r': Book 50% at +1.5R, move remaining 50% stop to BE, trail remainder on 20 EMA.
+    """
+    entry_idx = cand["entry_idx"]
+    entry_p = cand["entry_price"]
+    initial_sl = cand["initial_stop"]
+    r_unit = cand["r_unit"]
+    highs = cand["highs"]
+    closes = cand["closes"]
+    ema20s = cand["ema20s"]
+    times = cand["times"]
+
+    be_target = entry_p + (1.5 * r_unit)
+    current_sl = initial_sl
+    moved_to_be = False
+    half_booked = False
+    booked_pnl_pct = 0.0
+
+    for i in range(entry_idx + 1, len(closes)):
+        h = highs[i]
+        c = closes[i]
+        ema = ema20s[i]
+
+        if mode == "breakeven_then_trail":
+            if not moved_to_be and h >= be_target:
+                current_sl = max(current_sl, entry_p)
+                moved_to_be = True
+            if moved_to_be:
+                current_sl = max(current_sl, round(float(ema), 2))
+
+            if c < current_sl:
+                exit_p = round(current_sl, 2)
+                pnl_pts = exit_p - entry_p
+                pnl_pct = round((pnl_pts / entry_p) * 100.0, 2)
+                r_mult = round(pnl_pts / r_unit, 2)
+                return {
+                    "entry_date": cand["entry_date"],
+                    "exit_date": times[i],
+                    "duration": i - entry_idx,
+                    "pnl_pct": pnl_pct,
+                    "r_mult": r_mult,
+                    "outcome": "WIN" if pnl_pts > 0 else "LOSS"
+                }
+
+        elif mode == "pure_structural_trail":
+            # Never shift early to breakeven. Only trail via 20 EMA once it moves above initial stop.
+            current_sl = max(initial_sl, round(float(ema), 2))
+
+            if c < current_sl:
+                exit_p = round(current_sl, 2)
+                pnl_pts = exit_p - entry_p
+                pnl_pct = round((pnl_pts / entry_p) * 100.0, 2)
+                r_mult = round(pnl_pts / r_unit, 2)
+                return {
+                    "entry_date": cand["entry_date"],
+                    "exit_date": times[i],
+                    "duration": i - entry_idx,
+                    "pnl_pct": pnl_pct,
+                    "r_mult": r_mult,
+                    "outcome": "WIN" if pnl_pts > 0 else "LOSS"
+                }
+
+        elif mode == "book_50_at_1_5r":
+            if not half_booked and h >= be_target:
+                half_booked = True
+                booked_pnl_pct = round(((be_target - entry_p) / entry_p) * 100.0, 2)
+                current_sl = max(current_sl, entry_p)
+
+            if half_booked:
+                current_sl = max(current_sl, round(float(ema), 2))
+
+            if c < current_sl:
+                exit_p = round(current_sl, 2)
+                rem_pnl_pct = round(((exit_p - entry_p) / entry_p) * 100.0, 2)
+
+                if half_booked:
+                    final_pnl_pct = round(0.5 * booked_pnl_pct + 0.5 * rem_pnl_pct, 2)
+                    final_r_mult = round(0.5 * 1.5 + 0.5 * ((exit_p - entry_p) / r_unit), 2)
+                else:
+                    final_pnl_pct = rem_pnl_pct
+                    final_r_mult = round((exit_p - entry_p) / r_unit, 2)
+
+                return {
+                    "entry_date": cand["entry_date"],
+                    "exit_date": times[i],
+                    "duration": i - entry_idx,
+                    "pnl_pct": final_pnl_pct,
+                    "r_mult": final_r_mult,
+                    "outcome": "WIN" if final_pnl_pct > 0 else "LOSS"
+                }
+
+    # If position still active at end of historical data
+    last_idx = len(closes) - 1
+    last_c = closes[last_idx]
+    last_pnl_pct = round(((last_c - entry_p) / entry_p) * 100.0, 2)
+    last_r_mult = round((last_c - entry_p) / r_unit, 2)
+    return {
+        "entry_date": cand["entry_date"],
+        "exit_date": times[last_idx],
+        "duration": last_idx - entry_idx,
+        "pnl_pct": last_pnl_pct,
+        "r_mult": last_r_mult,
+        "outcome": "WIN" if last_pnl_pct > 0 else "LOSS"
+    }
+
+
+# -------------------------------------------------------------
+# 5. METRICS HELPER
 # -------------------------------------------------------------
 def compute_metrics(trades_list, label):
     if not trades_list:
@@ -376,22 +446,22 @@ def compute_metrics(trades_list, label):
             "Configuration": label,
             "Trades": 0, "Win Rate %": 0.0, "Profit Factor": 0.0,
             "Avg Gain %": 0.0, "Avg Loss %": 0.0, "Max Profit %": 0.0,
-            "Avg Hold (Days)": 0.0, "Distance to 400": 400
+            "Avg Hold (Days)": 0.0
         }
 
     df = pd.DataFrame(trades_list)
     total = len(df)
-    wins = df[df["Outcome"] == "WIN"]
-    losses = df[df["Outcome"] == "LOSS"]
+    wins = df[df["outcome"] == "WIN"]
+    losses = df[df["outcome"] == "LOSS"]
 
     win_rate = round((len(wins) / total) * 100.0, 2)
-    avg_gain = round(wins["PnL %"].mean(), 2) if not wins.empty else 0.0
-    avg_loss = round(losses["PnL %"].mean(), 2) if not losses.empty else 0.0
-    max_gain = round(df["PnL %"].max(), 2) if not df.empty else 0.0
-    avg_duration = round(df["Duration (Days)"].mean(), 1)
+    avg_gain = round(wins["pnl_pct"].mean(), 2) if not wins.empty else 0.0
+    avg_loss = round(losses["pnl_pct"].mean(), 2) if not losses.empty else 0.0
+    max_gain = round(df["pnl_pct"].max(), 2) if not df.empty else 0.0
+    avg_duration = round(df["duration"].mean(), 1)
 
-    gross_win = wins["PnL %"].sum() if not wins.empty else 0.0
-    gross_loss = abs(losses["PnL %"].sum()) if not losses.empty else 1.0
+    gross_win = wins["pnl_pct"].sum() if not wins.empty else 0.0
+    gross_loss = abs(losses["pnl_pct"].sum()) if not losses.empty else 1.0
     profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else 999.0
 
     return {
@@ -402,26 +472,14 @@ def compute_metrics(trades_list, label):
         "Avg Gain %": avg_gain,
         "Avg Loss %": avg_loss,
         "Max Profit %": max_gain,
-        "Avg Hold (Days)": avg_duration,
-        "Distance to 400": abs(total - 400)
+        "Avg Hold (Days)": avg_duration
     }
 
 
-def filter_daily(trades, max_per_day=1, sort_key="conviction_score"):
-    trades_by_date = {}
-    for t in trades:
-        trades_by_date.setdefault(t["Entry Date"], []).append(t)
-    out = []
-    for d, d_trades in sorted(trades_by_date.items()):
-        d_trades.sort(key=lambda x: x[sort_key], reverse=True)
-        out.extend(d_trades[:max_per_day])
-    return out
-
-
 # -------------------------------------------------------------
-# 5. TARGET ~400 TRADES COMBINATION ENGINE
+# 6. RUNNER FOR EXIT STUDY
 # -------------------------------------------------------------
-def run_target400_ablation():
+def run_exit_study():
     nifty_perf_map = load_nifty_perf_map()
     nifty750_set = load_nifty750_symbols()
 
@@ -430,12 +488,13 @@ def run_target400_ablation():
         "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
         "gap_margin_candidates.json", "swing3_results.json",
         "backtest_results.json", "swing3_compare.json", "swing3_run2_results.json",
-        "swing3_run2_compare_results.json", "swing3_run3_results.json"
+        "swing3_run2_compare_results.json", "swing3_run3_results.json",
+        "swing3_target400_results.json", "swing3_exit_study_results.json"
     }
     target_files = [f for f in json_files if os.path.basename(f).lower() not in excluded]
 
-    print(f"🚀 Scanning {len(target_files)} tickers in Nifty 750 (Swing 3 Run 3 Base)...")
-    raw_signals = []
+    print(f"🚀 Scanning {len(target_files)} symbols in Nifty 750 for Swing 3.0 (Rank 5 Model)...")
+    all_raw_candidates = []
 
     for path in sorted(target_files):
         sym = os.path.splitext(os.path.basename(path))[0].upper()
@@ -446,115 +505,62 @@ def run_target400_ablation():
                 raw = json.load(fp)
             clean = clean_and_prepare(raw)
             if clean:
-                t = extract_run3_signals(sym, clean, nifty_perf_map, nifty750_set)
-                raw_signals.extend(t)
+                cands = get_rank5_candidates(clean, nifty_perf_map)
+                for c in cands:
+                    c["symbol"] = sym
+                all_raw_candidates.extend(cands)
         except Exception:
             continue
 
-    if not raw_signals:
-        print("⚠️ No qualifying signals found.")
+    if not all_raw_candidates:
+        print("⚠️ No qualifying candidates found.")
         return
 
-    # Predicates for the 4 Levers:
-    # A: Delivery Ratio >= 2.0x
-    # B: Demat OBV at 20d High
-    # C: Spread Squeeze <= 8% (or 7.5%)
-    # D1: Score >= 2.5 (Max 1/day)
-    # D2: Score >= 3.0 (Max 1/day)
+    # Apply Max 1/day by Conviction Score (Identical Trade Set across all 3 exit tests)
+    cands_by_date = {}
+    for c in all_raw_candidates:
+        cands_by_date.setdefault(c["entry_date"], []).append(c)
 
-    results = []
+    filtered_candidates = []
+    for d, d_cands in sorted(cands_by_date.items()):
+        d_cands.sort(key=lambda x: x["conviction_score"], reverse=True)
+        filtered_candidates.append(d_cands[0])
 
-    # Baseline (Swing 3 Run 3 Base: Max 2/day, surge sorted)
-    t_base = filter_daily(raw_signals, max_per_day=2, sort_key="deliv_surge_ratio")
-    results.append(compute_metrics(t_base, "Baseline: Run 3 Base (Max 2/d)"))
+    print(f"✅ Filtered candidates ready: {len(filtered_candidates)} trades for exit simulation.")
 
-    # 1. INDIVIDUAL LEVERS
-    # Lever A isolated: Delivery >= 2.0x (Max 2/day)
-    t_A = [t for t in raw_signals if t["cumul_ratio"] >= 2.0]
-    results.append(compute_metrics(filter_daily(t_A, 2, "deliv_surge_ratio"), "Lever A: Delivery Accum >= 2.0x"))
+    # 1. Variant 1: Move SL to Breakeven @ +1.5R and Trail EMA
+    t_v1 = [simulate_exit(c, "breakeven_then_trail") for c in filtered_candidates]
+    m_v1 = compute_metrics(t_v1, "1. Move SL to BE @ 1.5R, then Trail 20 EMA")
 
-    # Lever B isolated: OBV 20d High (Max 2/day)
-    t_B = [t for t in raw_signals if t["is_obv_20max"]]
-    results.append(compute_metrics(filter_daily(t_B, 2, "deliv_surge_ratio"), "Lever B: Demat OBV @ 20d High"))
+    # 2. Variant 2: Never Move to BE (Pure Structural Hold + 20 EMA Trail)
+    t_v2 = [simulate_exit(c, "pure_structural_trail") for c in filtered_candidates]
+    m_v2 = compute_metrics(t_v2, "2. Never Move to BE (Hold Pivot SL, Trail EMA)")
 
-    # Lever C isolated: Spread Squeeze <= 8% (Max 2/day)
-    t_C = [t for t in raw_signals if t["spread"] <= 0.08]
-    results.append(compute_metrics(filter_daily(t_C, 2, "deliv_surge_ratio"), "Lever C: Squeeze Spread <= 8%"))
+    # 3. Variant 3: Book 50% @ 1.5R, Move Remainder to BE, Trail 50%
+    t_v3 = [simulate_exit(c, "book_50_at_1_5r") for c in filtered_candidates]
+    m_v3 = compute_metrics(t_v3, "3. Book 50% @ 1.5R + Trail 50% on EMA")
 
-    # Lever D1 isolated: Max 1/day with Score >= 2.5
-    t_D1 = [t for t in raw_signals if t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_D1, 1, "conviction_score"), "Lever D1: Max 1/d + Score >= 2.5"))
-
-    # Lever D2 isolated: Max 1/day with Score >= 3.0
-    t_D2 = [t for t in raw_signals if t["conviction_score"] >= 3.0]
-    results.append(compute_metrics(filter_daily(t_D2, 1, "conviction_score"), "Lever D2: Max 1/d + Score >= 3.0"))
-
-    # 2. COMBINATIONS OF 2 LEVERS
-    # Combo (A + B): Delivery 2.0x + OBV High (Max 2/day)
-    t_AB = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"]]
-    results.append(compute_metrics(filter_daily(t_AB, 2, "deliv_surge_ratio"), "Combo (A+B): Deliv 2.0x + OBV High"))
-
-    # Combo (A + C): Delivery 2.0x + Spread <= 8% (Max 2/day)
-    t_AC = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["spread"] <= 0.08]
-    results.append(compute_metrics(filter_daily(t_AC, 2, "deliv_surge_ratio"), "Combo (A+C): Deliv 2.0x + Spread <= 8%"))
-
-    # Combo (B + D1): OBV High + Max 1/d Score >= 2.5
-    t_BD1 = [t for t in raw_signals if t["is_obv_20max"] and t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_BD1, 1, "conviction_score"), "Combo (B+D1): OBV High + Score >= 2.5 (1/d)"))
-
-    # Combo (C + D1): Spread <= 8% + Max 1/d Score >= 2.5
-    t_CD1 = [t for t in raw_signals if t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_CD1, 1, "conviction_score"), "Combo (C+D1): Spread <= 8% + Score >= 2.5 (1/d)"))
-
-    # 3. COMBINATIONS OF 3 LEVERS
-    # Combo (A + B + C): Deliv 2.0x + OBV High + Spread <= 8% (Max 2/day)
-    t_ABC = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08]
-    results.append(compute_metrics(filter_daily(t_ABC, 2, "deliv_surge_ratio"), "Combo (A+B+C): Deliv 2.0x + OBV + Spread 8%"))
-
-    # Combo (A + B + D1): Deliv 2.0x + OBV High + Max 1/d Score >= 2.5
-    t_ABD1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_ABD1, 1, "conviction_score"), "Combo (A+B+D1): Deliv 2.0x + OBV + Score 2.5 (1/d)"))
-
-    # Combo (B + C + D1): OBV High + Spread <= 8% + Max 1/d Score >= 2.5
-    t_BCD1 = [t for t in raw_signals if t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_BCD1, 1, "conviction_score"), "Combo (B+C+D1): OBV + Spread 8% + Score 2.5 (1/d)"))
-
-    # Combo (A + C + D1): Deliv 2.0x + Spread <= 8% + Max 1/d Score >= 2.5
-    t_ACD1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
-    results.append(compute_metrics(filter_daily(t_ACD1, 1, "conviction_score"), "Combo (A+C+D1): Deliv 2.0x + Spread 8% + Score 2.5 (1/d)"))
-
-    # 4. ALL 4 LEVERS COMBINED
-    # All 4 with Score >= 2.5
-    t_all4_d1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
-    final_all4_d1 = filter_daily(t_all4_d1, 1, "conviction_score")
-    results.append(compute_metrics(final_all4_d1, "🎯 ALL 4 COMBINED (A + B + C + Score >= 2.5)"))
-
-    # All 4 with Score >= 3.0
-    t_all4_d2 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 3.0]
-    final_all4_d2 = filter_daily(t_all4_d2, 1, "conviction_score")
-    results.append(compute_metrics(final_all4_d2, "🎯 ALL 4 COMBINED (A + B + C + Score >= 3.0)"))
-
-    # RANK STRICTLY BY CLOSENESS TO 400 TRADES (Distance to 400 ascending)
-    df_res = pd.DataFrame(results)
-    df_sorted = df_res.sort_values(by=["Distance to 400", "Profit Factor"], ascending=[True, False]).reset_index(drop=True)
+    report = [m_v1, m_v2, m_v3]
+    df_report = pd.DataFrame(report)
+    df_sorted = df_report.sort_values(by=["Profit Factor", "Win Rate %"], ascending=[False, False]).reset_index(drop=True)
     df_sorted.insert(0, "Rank", range(1, len(df_sorted) + 1))
 
-    print("\n" + "=" * 124)
-    print("🏆 SWING 3.0 RUN 3: ABLATION TARGETING ~400 TRADES (RANKED BY CLOSENESS TO 400)")
-    print("=" * 124)
-    print(df_sorted.drop(columns=["Distance to 400"]).to_string(index=False))
-    print("=" * 124 + "\n")
-
-    ranked_list = df_sorted.to_dict(orient="records")
+    print("\n" + "=" * 118)
+    print("🏆 SWING 3.0 (RANK 5 MODEL): EXIT ARCHITECTURE COMPARISON STUDY")
+    print("=" * 118)
+    print(df_sorted.to_string(index=False))
+    print("=" * 118 + "\n")
 
     payload = {
         "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
-        "Report": ranked_list,
-        "Sample Trades": final_all4_d1[-100:]
+        "Report": df_sorted.to_dict(orient="records"),
+        "Sample Trades (Variant 1)": t_v1[-50:],
+        "Sample Trades (Variant 2)": t_v2[-50:],
+        "Sample Trades (Variant 3)": t_v3[-50:],
     }
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
 
 if __name__ == "__main__":
-    run_target400_ablation()
+    run_exit_study()
