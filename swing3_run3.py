@@ -13,7 +13,7 @@ MIN_TURNOVER_CR = 10.0
 
 
 # -------------------------------------------------------------
-# 1. DATA SANITIZATION & SPLIT ADJUSTMENT
+# 1. DATA PREPARATION & CORPORATE ACTIONS
 # -------------------------------------------------------------
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -162,9 +162,9 @@ def load_nifty750_symbols():
 
 
 # -------------------------------------------------------------
-# 3. EXTRACTION ENGINE (EXCLUDES NIFTY 50 SMA CHECK)
+# 3. SWING 3 RUN 3 BASELINE SIGNAL EXTRACTOR
 # -------------------------------------------------------------
-def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
+def extract_run3_signals(symbol, clean_data, nifty_perf_map, nifty750_set):
     if len(clean_data) < 60 or symbol not in nifty750_set:
         return []
 
@@ -178,7 +178,6 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
     df["sma200"] = df["close"].rolling(200, min_periods=50).mean()
     df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
-    # Demat OBV & 20-Day Peak
     direction = np.where(df["close"] >= df["close"].shift(1), 1.0, -1.0)
     df["demat_obv"] = (direction * df["delivery_vol"]).cumsum()
     df["demat_obv_20max"] = df["demat_obv"].rolling(20, min_periods=5).max()
@@ -240,16 +239,12 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
             curr_setup = ""
             calc_entry = 0.0
             calc_sl = 0.0
+            base_cumul_ratio = 1.0
+            actual_spread = 1.0
 
-            is_cumul_150 = False
-            is_obv_20max = False
-            is_spread_10 = False
-
-            # SETUP 1: V-REVERSAL
+            # ENGINE 1: V-REVERSAL
             recent_20_high = highs[i - 20:i].max()
-            is_steep_drop = (recent_20_high - l) / recent_20_high >= 0.18
-
-            if is_steep_drop:
+            if (recent_20_high - l) / recent_20_high >= 0.18:
                 recent_trough = lows[i - 5:i].min()
                 prior_3d_high = highs[i - 4:i].max()
                 c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
@@ -262,16 +257,14 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
                     curr_setup = "V-REVERSAL"
                     calc_entry = round(prior_3d_high, 2)
                     calc_sl = round(recent_trough * 0.995, 2)
-                    is_cumul_150 = True
-                    is_obv_20max = bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True
-                    is_spread_10 = True
+                    base_cumul_ratio = 2.5
+                    actual_spread = 0.07
 
-            # SETUP 2: LAUNCHPAD BREAKOUT
+            # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT
             if not entry_triggered:
-                valid_launchpad_13 = False
+                valid_launchpad = False
                 launchpad_high = 0.0
                 launchpad_low = 0.0
-                actual_spread = 1.0
 
                 for shelf_len in range(10, 19):
                     s_high = highs[i - shelf_len:i].max()
@@ -279,38 +272,33 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
                     if s_low > 0:
                         spr = (s_high - s_low) / s_low
                         if spr <= 0.13:
-                            valid_launchpad_13 = True
+                            valid_launchpad = True
                             launchpad_high = round(float(s_high), 2)
                             launchpad_low = round(float(s_low), 2)
                             actual_spread = spr
                             break
 
-                if valid_launchpad_13:
+                if valid_launchpad:
                     base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
                     base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
-                    cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 1.5
+                    base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 2.0
 
                     c_bo = (c >= launchpad_high) and (h >= launchpad_high)
                     c_vol_bo = v >= (1.4 * v_avg)
                     c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg if dp_avg > 0 else False)
                     c_candle_bo = rc >= 0.65
 
-                    if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (cumul_ratio >= 1.15):
+                    if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.15):
                         entry_triggered = True
                         curr_setup = "LAUNCHPAD-BO"
                         calc_entry = launchpad_high
                         calc_sl = round(min(l, launchpad_low), 2)
 
-                        is_cumul_150 = bool(cumul_ratio >= 1.50)
-                        is_obv_20max = bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True
-                        is_spread_10 = bool(actual_spread <= 0.10)
-
             if entry_triggered:
                 r_dist = calc_entry - calc_sl
                 if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
-                    # Stage 2 + 60d RS Filter (Nifty 50 SMA Regime removed)
+                    # Stage 2 + 60d RS Filter (Nifty 50 SMA regime completely removed)
                     is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
-                    
                     n_perf = nifty_perf_map.get(t)
                     if n_perf is None:
                         prior_dates = [d for d in nifty_perf_map.keys() if d <= t]
@@ -327,15 +315,14 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
                         entry_idx = i
                         setup_name = curr_setup
 
-                        # Delivery surge & conviction score
                         deliv_surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
                         rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
                         conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
                         tag_info = {
-                            "cumul_150": is_cumul_150,
-                            "obv_20max": is_obv_20max,
-                            "spread_10": is_spread_10,
+                            "cumul_ratio": base_cumul_ratio,
+                            "is_obv_20max": bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True,
+                            "spread": actual_spread,
                             "conviction_score": conviction_score,
                             "deliv_surge_ratio": round(deliv_surge_ratio, 2)
                         }
@@ -365,11 +352,11 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
                     "PnL %": pnl_pct,
                     "R Multiple": r_multiple,
                     "Outcome": "WIN" if pnl_pts > 0 else "LOSS",
-                    "cumul_150": tag_info["cumul_150"],
-                    "obv_20max": tag_info["obv_20max"],
-                    "spread_10": tag_info["spread_10"],
+                    "cumul_ratio": tag_info["cumul_ratio"],
+                    "is_obv_20max": tag_info["is_obv_20max"],
+                    "spread": tag_info["spread"],
                     "conviction_score": tag_info["conviction_score"],
-                    "deliv_surge_ratio": tag_info["deliv_surge_ratio"],
+                    "deliv_surge_ratio": tag_info["deliv_surge_ratio"]
                 })
 
                 in_position = False
@@ -381,7 +368,7 @@ def extract_signals_for_stock(symbol, clean_data, nifty_perf_map, nifty750_set):
 
 
 # -------------------------------------------------------------
-# 4. METRICS & PORTFOLIO RANKING
+# 4. METRICS & DAILY CONCURRENCY FILTER
 # -------------------------------------------------------------
 def compute_metrics(trades_list, label):
     if not trades_list:
@@ -389,7 +376,7 @@ def compute_metrics(trades_list, label):
             "Configuration": label,
             "Trades": 0, "Win Rate %": 0.0, "Profit Factor": 0.0,
             "Avg Gain %": 0.0, "Avg Loss %": 0.0, "Max Profit %": 0.0,
-            "Avg Hold (Days)": 0.0
+            "Avg Hold (Days)": 0.0, "Distance to 400": 400
         }
 
     df = pd.DataFrame(trades_list)
@@ -415,25 +402,26 @@ def compute_metrics(trades_list, label):
         "Avg Gain %": avg_gain,
         "Avg Loss %": avg_loss,
         "Max Profit %": max_gain,
-        "Avg Hold (Days)": avg_duration
+        "Avg Hold (Days)": avg_duration,
+        "Distance to 400": abs(total - 400)
     }
 
 
-def filter_daily_concurrency(trades, max_entries_per_day, sort_key="conviction_score"):
+def filter_daily(trades, max_per_day=1, sort_key="conviction_score"):
     trades_by_date = {}
     for t in trades:
         trades_by_date.setdefault(t["Entry Date"], []).append(t)
-    filtered = []
+    out = []
     for d, d_trades in sorted(trades_by_date.items()):
         d_trades.sort(key=lambda x: x[sort_key], reverse=True)
-        filtered.extend(d_trades[:max_entries_per_day])
-    return filtered
+        out.extend(d_trades[:max_per_day])
+    return out
 
 
 # -------------------------------------------------------------
-# 5. EXECUTION MATRIX & RANKER
+# 5. TARGET ~400 TRADES COMBINATION ENGINE
 # -------------------------------------------------------------
-def run_swing3_run3_ablation():
+def run_target400_ablation():
     nifty_perf_map = load_nifty_perf_map()
     nifty750_set = load_nifty750_symbols()
 
@@ -446,101 +434,127 @@ def run_swing3_run3_ablation():
     }
     target_files = [f for f in json_files if os.path.basename(f).lower() not in excluded]
 
-    print(f"🚀 Scanning {len(target_files)} symbols for Swing 3 Run 3 Ablation (All Market Regimes)...")
+    print(f"🚀 Scanning {len(target_files)} tickers in Nifty 750 (Swing 3 Run 3 Base)...")
     raw_signals = []
 
     for path in sorted(target_files):
         sym = os.path.splitext(os.path.basename(path))[0].upper()
+        if sym not in nifty750_set:
+            continue
         try:
             with open(path, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
             clean = clean_and_prepare(raw)
             if clean:
-                t = extract_signals_for_stock(sym, clean, nifty_perf_map, nifty750_set)
+                t = extract_run3_signals(sym, clean, nifty_perf_map, nifty750_set)
                 raw_signals.extend(t)
         except Exception:
             continue
 
     if not raw_signals:
-        print("⚠️ No qualifying signals triggered.")
+        print("⚠️ No qualifying signals found.")
         return
 
-    # 1. Swing 3 Run 3 Baseline (Run 2 Full without Nifty 50 SMA filter, Max 2/day by surge)
-    base_trades = filter_daily_concurrency(raw_signals, max_entries_per_day=2, sort_key="deliv_surge_ratio")
-    m_baseline = compute_metrics(base_trades, "Run 3 Baseline (No SMA50, Max 2/d)")
+    # Predicates for the 4 Levers:
+    # A: Delivery Ratio >= 2.0x
+    # B: Demat OBV at 20d High
+    # C: Spread Squeeze <= 8% (or 7.5%)
+    # D1: Score >= 2.5 (Max 1/day)
+    # D2: Score >= 3.0 (Max 1/day)
 
-    # 2. Individual Improvements
-    t_imp1 = [t for t in raw_signals if t["cumul_150"]]
-    m_imp1 = compute_metrics(filter_daily_concurrency(t_imp1, 2, "deliv_surge_ratio"), "Imp 1: Delivery Accum >= 1.5x")
+    results = []
 
-    t_imp2 = [t for t in raw_signals if t["obv_20max"]]
-    m_imp2 = compute_metrics(filter_daily_concurrency(t_imp2, 2, "deliv_surge_ratio"), "Imp 2: Demat OBV @ 20d High")
+    # Baseline (Swing 3 Run 3 Base: Max 2/day, surge sorted)
+    t_base = filter_daily(raw_signals, max_per_day=2, sort_key="deliv_surge_ratio")
+    results.append(compute_metrics(t_base, "Baseline: Run 3 Base (Max 2/d)"))
 
-    t_imp3 = [t for t in raw_signals if t["spread_10"]]
-    m_imp3 = compute_metrics(filter_daily_concurrency(t_imp3, 2, "deliv_surge_ratio"), "Imp 3: Shelf Spread <= 10%")
+    # 1. INDIVIDUAL LEVERS
+    # Lever A isolated: Delivery >= 2.0x (Max 2/day)
+    t_A = [t for t in raw_signals if t["cumul_ratio"] >= 2.0]
+    results.append(compute_metrics(filter_daily(t_A, 2, "deliv_surge_ratio"), "Lever A: Delivery Accum >= 2.0x"))
 
-    t_imp4 = filter_daily_concurrency(raw_signals, max_entries_per_day=1, sort_key="conviction_score")
-    m_imp4 = compute_metrics(t_imp4, "Imp 4: Score-Based Max 1/Day")
+    # Lever B isolated: OBV 20d High (Max 2/day)
+    t_B = [t for t in raw_signals if t["is_obv_20max"]]
+    results.append(compute_metrics(filter_daily(t_B, 2, "deliv_surge_ratio"), "Lever B: Demat OBV @ 20d High"))
 
-    # 3. Combinations of 2 Improvements
-    t_c_1_3 = [t for t in raw_signals if t["cumul_150"] and t["spread_10"]]
-    m_c_1_3 = compute_metrics(filter_daily_concurrency(t_c_1_3, 2, "deliv_surge_ratio"), "Combo (1+3): Delivery 1.5x + Spread 10%")
+    # Lever C isolated: Spread Squeeze <= 8% (Max 2/day)
+    t_C = [t for t in raw_signals if t["spread"] <= 0.08]
+    results.append(compute_metrics(filter_daily(t_C, 2, "deliv_surge_ratio"), "Lever C: Squeeze Spread <= 8%"))
 
-    t_c_1_2 = [t for t in raw_signals if t["cumul_150"] and t["obv_20max"]]
-    m_c_1_2 = compute_metrics(filter_daily_concurrency(t_c_1_2, 2, "deliv_surge_ratio"), "Combo (1+2): Delivery 1.5x + OBV 20d High")
+    # Lever D1 isolated: Max 1/day with Score >= 2.5
+    t_D1 = [t for t in raw_signals if t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_D1, 1, "conviction_score"), "Lever D1: Max 1/d + Score >= 2.5"))
 
-    t_c_2_4 = [t for t in raw_signals if t["obv_20max"]]
-    m_c_2_4 = compute_metrics(filter_daily_concurrency(t_c_2_4, 1, "conviction_score"), "Combo (2+4): OBV 20d High + Score Max 1/d")
+    # Lever D2 isolated: Max 1/day with Score >= 3.0
+    t_D2 = [t for t in raw_signals if t["conviction_score"] >= 3.0]
+    results.append(compute_metrics(filter_daily(t_D2, 1, "conviction_score"), "Lever D2: Max 1/d + Score >= 3.0"))
 
-    t_c_3_4 = [t for t in raw_signals if t["spread_10"]]
-    m_c_3_4 = compute_metrics(filter_daily_concurrency(t_c_3_4, 1, "conviction_score"), "Combo (3+4): Spread 10% + Score Max 1/d")
+    # 2. COMBINATIONS OF 2 LEVERS
+    # Combo (A + B): Delivery 2.0x + OBV High (Max 2/day)
+    t_AB = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"]]
+    results.append(compute_metrics(filter_daily(t_AB, 2, "deliv_surge_ratio"), "Combo (A+B): Deliv 2.0x + OBV High"))
 
-    # 4. Combinations of 3 Improvements
-    t_c_1_2_3 = [t for t in raw_signals if t["cumul_150"] and t["obv_20max"] and t["spread_10"]]
-    m_c_1_2_3 = compute_metrics(filter_daily_concurrency(t_c_1_2_3, 2, "deliv_surge_ratio"), "Combo (1+2+3): Deliv 1.5x + OBV + Spr 10%")
+    # Combo (A + C): Delivery 2.0x + Spread <= 8% (Max 2/day)
+    t_AC = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["spread"] <= 0.08]
+    results.append(compute_metrics(filter_daily(t_AC, 2, "deliv_surge_ratio"), "Combo (A+C): Deliv 2.0x + Spread <= 8%"))
 
-    t_c_1_2_4 = [t for t in raw_signals if t["cumul_150"] and t["obv_20max"]]
-    m_c_1_2_4 = compute_metrics(filter_daily_concurrency(t_c_1_2_4, 1, "conviction_score"), "Combo (1+2+4): Deliv 1.5x + OBV + Score 1/d")
+    # Combo (B + D1): OBV High + Max 1/d Score >= 2.5
+    t_BD1 = [t for t in raw_signals if t["is_obv_20max"] and t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_BD1, 1, "conviction_score"), "Combo (B+D1): OBV High + Score >= 2.5 (1/d)"))
 
-    t_c_2_3_4 = [t for t in raw_signals if t["obv_20max"] and t["spread_10"]]
-    m_c_2_3_4 = compute_metrics(filter_daily_concurrency(t_c_2_3_4, 1, "conviction_score"), "Combo (2+3+4): OBV + Spread 10% + Score 1/d")
+    # Combo (C + D1): Spread <= 8% + Max 1/d Score >= 2.5
+    t_CD1 = [t for t in raw_signals if t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_CD1, 1, "conviction_score"), "Combo (C+D1): Spread <= 8% + Score >= 2.5 (1/d)"))
 
-    # 5. All 4 Improvements Combined
-    t_all4 = [t for t in raw_signals if t["cumul_150"] and t["obv_20max"] and t["spread_10"]]
-    t_all4_final = filter_daily_concurrency(t_all4, max_entries_per_day=1, sort_key="conviction_score")
-    m_all4 = compute_metrics(t_all4_final, "🎯 SWING 3 RUN 3 (ALL 4 COMBINED)")
+    # 3. COMBINATIONS OF 3 LEVERS
+    # Combo (A + B + C): Deliv 2.0x + OBV High + Spread <= 8% (Max 2/day)
+    t_ABC = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08]
+    results.append(compute_metrics(filter_daily(t_ABC, 2, "deliv_surge_ratio"), "Combo (A+B+C): Deliv 2.0x + OBV + Spread 8%"))
 
-    all_results = [
-        m_baseline,
-        m_imp1, m_imp2, m_imp3, m_imp4,
-        m_c_1_3, m_c_1_2, m_c_2_4, m_c_3_4,
-        m_c_1_2_3, m_c_1_2_4, m_c_2_3_4,
-        m_all4
-    ]
+    # Combo (A + B + D1): Deliv 2.0x + OBV High + Max 1/d Score >= 2.5
+    t_ABD1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_ABD1, 1, "conviction_score"), "Combo (A+B+D1): Deliv 2.0x + OBV + Score 2.5 (1/d)"))
 
-    # Rank: First separate baseline, then rank candidates by highest Profit Factor with trades close to 400
-    df_res = pd.DataFrame(all_results)
-    
-    # Sort by Profit Factor descending
-    df_sorted = df_res.sort_values(by=["Profit Factor", "Win Rate %"], ascending=[False, False]).reset_index(drop=True)
+    # Combo (B + C + D1): OBV High + Spread <= 8% + Max 1/d Score >= 2.5
+    t_BCD1 = [t for t in raw_signals if t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_BCD1, 1, "conviction_score"), "Combo (B+C+D1): OBV + Spread 8% + Score 2.5 (1/d)"))
+
+    # Combo (A + C + D1): Deliv 2.0x + Spread <= 8% + Max 1/d Score >= 2.5
+    t_ACD1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
+    results.append(compute_metrics(filter_daily(t_ACD1, 1, "conviction_score"), "Combo (A+C+D1): Deliv 2.0x + Spread 8% + Score 2.5 (1/d)"))
+
+    # 4. ALL 4 LEVERS COMBINED
+    # All 4 with Score >= 2.5
+    t_all4_d1 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 2.5]
+    final_all4_d1 = filter_daily(t_all4_d1, 1, "conviction_score")
+    results.append(compute_metrics(final_all4_d1, "🎯 ALL 4 COMBINED (A + B + C + Score >= 2.5)"))
+
+    # All 4 with Score >= 3.0
+    t_all4_d2 = [t for t in raw_signals if t["cumul_ratio"] >= 2.0 and t["is_obv_20max"] and t["spread"] <= 0.08 and t["conviction_score"] >= 3.0]
+    final_all4_d2 = filter_daily(t_all4_d2, 1, "conviction_score")
+    results.append(compute_metrics(final_all4_d2, "🎯 ALL 4 COMBINED (A + B + C + Score >= 3.0)"))
+
+    # RANK STRICTLY BY CLOSENESS TO 400 TRADES (Distance to 400 ascending)
+    df_res = pd.DataFrame(results)
+    df_sorted = df_res.sort_values(by=["Distance to 400", "Profit Factor"], ascending=[True, False]).reset_index(drop=True)
     df_sorted.insert(0, "Rank", range(1, len(df_sorted) + 1))
 
-    print("\n" + "=" * 115)
-    print("🏆 SWING 3.0 RUN 3: FULL IMPROVEMENT MATRIX RANKED BY PROFIT FACTOR (TARGET: ~400 TRADES)")
-    print("=" * 115)
-    print(df_sorted.to_string(index=False))
-    print("=" * 115 + "\n")
+    print("\n" + "=" * 124)
+    print("🏆 SWING 3.0 RUN 3: ABLATION TARGETING ~400 TRADES (RANKED BY CLOSENESS TO 400)")
+    print("=" * 124)
+    print(df_sorted.drop(columns=["Distance to 400"]).to_string(index=False))
+    print("=" * 124 + "\n")
 
     ranked_list = df_sorted.to_dict(orient="records")
 
     payload = {
         "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Report": ranked_list,
-        "Recent Trades": t_all4_final[-100:]
+        "Sample Trades": final_all4_d1[-100:]
     }
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
 
 if __name__ == "__main__":
-    run_swing3_run3_ablation()
+    run_target400_ablation()
