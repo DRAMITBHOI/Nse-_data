@@ -4,14 +4,16 @@ import glob
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import urllib.request
 
 DATA_DIR = "data"
-RESULTS_JSON = os.path.join(DATA_DIR, "swing3_results.json")
-RESULTS_HTML = os.path.join(DATA_DIR, "swing3_summary.html")
-
-MIN_TURNOVER_CR = 2.0  # Liquidity floor: 50-day average turnover >= 2 Crore
+RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run2_results.json")
+MIN_TURNOVER_CR = 10.0  # Swing 3 Run 2 baseline floor: >= 10 Crore/day
 
 
+# -------------------------------------------------------------
+# ROBUST DATA CLEANING & SPLIT ADJUSTMENT
+# -------------------------------------------------------------
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
         return []
@@ -20,15 +22,17 @@ def clean_and_prepare(raw_data):
     for r in raw_data:
         if not isinstance(r, dict):
             continue
-        raw_t = str(r.get("time", "")).strip()[:10]
+        raw_t = str(r.get("time", "")).strip()
         if not raw_t:
             continue
+        # Standardize date to YYYY-MM-DD regardless of timestamp format
+        d_str = raw_t[:10]
         try:
             c = float(r.get("close", 0) or 0)
             if c <= 0:
                 continue
             entry = {
-                "time": raw_t,
+                "time": d_str,
                 "open": float(r.get("open", c) or c),
                 "high": float(r.get("high", c) or c),
                 "low": float(r.get("low", c) or c),
@@ -37,14 +41,14 @@ def clean_and_prepare(raw_data):
                 "volume": float(r.get("volume", 0) or 0),
                 "deliv_pct": float(r.get("deliv_pct", 0) or 0),
             }
-            if raw_t not in date_map or entry["volume"] > date_map[raw_t]["volume"]:
-                date_map[raw_t] = entry
+            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                date_map[d_str] = entry
         except Exception:
             continue
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
 
-    # Split / Corporate Action Multiplier Detection
+    # Split / Corporate Action Multipliers
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -72,7 +76,6 @@ def clean_and_prepare(raw_data):
                     clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
                     clean[j]["volume"] = clean[j]["volume"] * adj_factor
 
-    # Volume & Delivery Sanity Fill
     running_vol = 50000.0
     for i in range(len(clean)):
         v = clean[i]["volume"]
@@ -93,7 +96,77 @@ def clean_and_prepare(raw_data):
     return clean
 
 
-def backtest_single_stock(symbol, clean_data):
+# -------------------------------------------------------------
+# BULLETPROOF NIFTY 50 REGIME LOADER (WITH LIVE FALLBACK)
+# -------------------------------------------------------------
+def load_nifty_regime():
+    """
+    Loads Nifty 50, standardizes date indices, and computes rolling 50-day SMA.
+    Falls back to fetching historical index quotes if local files are missing/malformed.
+    """
+    nifty_candidates = [
+        os.path.join(DATA_DIR, "nifty.json"),
+        os.path.join(DATA_DIR, "nifty50.json"),
+        os.path.join(DATA_DIR, "NIFTY.json"),
+        os.path.join(DATA_DIR, "NIFTY50.json"),
+        os.path.join(DATA_DIR, "^NSEI.json")
+    ]
+    raw = None
+    for path in nifty_candidates:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as fp:
+                    data = json.load(fp)
+                    if isinstance(data, list) and len(data) > 50:
+                        raw = data
+                        print(f"📖 Loaded Nifty index history from: {path}")
+                        break
+            except Exception:
+                continue
+
+    # Fallback to direct download if local file is missing
+    if not raw:
+        print("🌐 Local Nifty index file missing. Fetching historical benchmark data...")
+        try:
+            url = "https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?interval=1d&range=5y"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                yf_data = json.loads(resp.read().decode("utf-8"))
+                res = yf_data["chart"]["result"][0]
+                timestamps = res["timestamp"]
+                quotes = res["indicators"]["quote"][0]
+                raw = []
+                for ts, o, h, l, c, v in zip(timestamps, quotes["open"], quotes["high"], quotes["low"], quotes["close"], quotes["volume"]):
+                    if c is not None and c > 0:
+                        d_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+                        raw.append({"time": d_str, "open": o, "high": h, "low": l, "close": c, "volume": v or 100000})
+        except Exception as e:
+            print(f"⚠️ Could not fetch Nifty index externally: {e}")
+
+    clean = clean_and_prepare(raw)
+    if not clean:
+        print("❌ CRITICAL: Failed to construct Nifty 50 regime data.")
+        return {}
+
+    df = pd.DataFrame(clean)
+    df["sma50"] = df["close"].rolling(50, min_periods=20).mean()
+
+    nifty_map = {}
+    for _, row in df.iterrows():
+        t = row["time"]
+        c = row["close"]
+        s50 = row["sma50"]
+        if pd.notnull(s50):
+            nifty_map[t] = bool(c >= s50)
+
+    print(f"✅ Nifty 50 SMA regime map constructed for {len(nifty_map)} sessions.")
+    return nifty_map
+
+
+# -------------------------------------------------------------
+# SWING 3.0 RUN 2 ENGINE
+# -------------------------------------------------------------
+def backtest_single_stock(symbol, clean_data, nifty_map):
     if len(clean_data) < 60:
         return []
 
@@ -131,6 +204,7 @@ def backtest_single_stock(symbol, clean_data):
     moved_to_be = False
     entry_idx = 0
     setup_name = ""
+    is_nifty_above_sma = False
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -145,8 +219,10 @@ def backtest_single_stock(symbol, clean_data):
         dp_avg = deliv_pct_avgs[i]
         rc = range_closes[i]
         ema = ema20s[i]
+        t = times[i]
 
         if not in_position:
+            # Baseline turnover floor >= 10 Crore
             if turnover < MIN_TURNOVER_CR:
                 continue
 
@@ -156,7 +232,7 @@ def backtest_single_stock(symbol, clean_data):
             calc_sl = 0.0
 
             # -------------------------------------------------------------
-            # ENGINE 1: DOWNTREND REVERSAL (V-SHAPE / SELLING CLIMAX)
+            # ENGINE 1: DOWNTREND REVERSAL (V-SHAPE RECLAIM)
             # -------------------------------------------------------------
             recent_20_high = highs[i - 20:i].max()
             is_steep_drop = (recent_20_high - l) / recent_20_high >= 0.18
@@ -177,7 +253,7 @@ def backtest_single_stock(symbol, clean_data):
                     calc_sl = round(recent_trough * 0.995, 2)
 
             # -------------------------------------------------------------
-            # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (HFCL / PAISALO STYLE)
+            # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT
             # -------------------------------------------------------------
             if not entry_triggered:
                 valid_launchpad = False
@@ -194,15 +270,9 @@ def backtest_single_stock(symbol, clean_data):
                         break
 
                 if valid_launchpad:
-                    base_up_deliv = sum(
-                        deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1]
-                    )
-                    base_down_deliv = sum(
-                        deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1]
-                    )
-                    cumulative_ratio = (
-                        (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 1.5
-                    )
+                    base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
+                    base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
+                    cumulative_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 1.5
 
                     c_bo = (c >= launchpad_high) and (h >= launchpad_high)
                     c_vol_bo = v >= (1.4 * v_avg)
@@ -216,7 +286,7 @@ def backtest_single_stock(symbol, clean_data):
                         calc_sl = round(min(l, launchpad_low), 2)
 
             # -------------------------------------------------------------
-            # EXECUTION
+            # POSITION TRIGGER & NIFTY REGIME TAGGING
             # -------------------------------------------------------------
             if entry_triggered:
                 r_dist = calc_entry - calc_sl
@@ -229,18 +299,23 @@ def backtest_single_stock(symbol, clean_data):
                     moved_to_be = False
                     entry_idx = i
                     setup_name = curr_setup
+                    
+                    # Exact date matching with fallback to closest prior trading date
+                    if t in nifty_map:
+                        is_nifty_above_sma = nifty_map[t]
+                    else:
+                        prior_dates = [d for d in nifty_map.keys() if d <= t]
+                        is_nifty_above_sma = nifty_map[max(prior_dates)] if prior_dates else True
 
         else:
-            # 1. Breakeven at +1.5R
+            # Trailing Stop Management
             if not moved_to_be and h >= (entry_price + 1.5 * r_unit):
                 current_stop = max(current_stop, entry_price)
                 moved_to_be = True
 
-            # 2. Trail along 20 EMA
             if moved_to_be:
                 current_stop = max(current_stop, round(float(ema), 2))
 
-            # 3. Exit Condition
             if c < current_stop:
                 exit_price = round(current_stop, 2)
                 pnl_pts = exit_price - entry_price
@@ -256,10 +331,10 @@ def backtest_single_stock(symbol, clean_data):
                     "Entry Price": entry_price,
                     "Exit Price": exit_price,
                     "Initial Stop": initial_stop,
-                    "R Unit": round(r_unit, 2),
                     "PnL %": pnl_pct,
                     "R Multiple": r_multiple,
                     "Outcome": "WIN" if pnl_pts > 0 else "LOSS",
+                    "Nifty >= 50 SMA": is_nifty_above_sma
                 })
 
                 in_position = False
@@ -270,24 +345,57 @@ def backtest_single_stock(symbol, clean_data):
     return trades
 
 
-def run_full_backtest():
-    json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
-    excluded_files = {
-        "nifty750.json",
-        "nifty50.json",
-        "nifty.json",
-        "gap_margin_candidates.json",
-        "swing3_results.json",
-        "backtest_results.json",
+# -------------------------------------------------------------
+# STATISTICAL METRICS COMPILER
+# -------------------------------------------------------------
+def compute_metrics(trades_list, label):
+    if not trades_list:
+        return {
+            "Configuration": label,
+            "Trades": 0, "Win Rate %": 0.0, "Profit Factor": 0.0,
+            "Avg Gain %": 0.0, "Avg Loss %": 0.0, "Max Gain %": 0.0,
+            "Avg Hold (Days)": 0.0
+        }
+
+    df = pd.DataFrame(trades_list)
+    total = len(df)
+    wins = df[df["Outcome"] == "WIN"]
+    losses = df[df["Outcome"] == "LOSS"]
+
+    win_rate = round((len(wins) / total) * 100.0, 2)
+    avg_gain = round(wins["PnL %"].mean(), 2) if not wins.empty else 0.0
+    avg_loss = round(losses["PnL %"].mean(), 2) if not losses.empty else 0.0
+    max_gain = round(df["PnL %"].max(), 2) if not df.empty else 0.0
+    avg_duration = round(df["Duration (Days)"].mean(), 1)
+
+    gross_win = wins["PnL %"].sum() if not wins.empty else 0.0
+    gross_loss = abs(losses["PnL %"].sum()) if not losses.empty else 1.0
+    profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else 999.0
+
+    return {
+        "Configuration": label,
+        "Trades": total,
+        "Win Rate %": win_rate,
+        "Profit Factor": profit_factor,
+        "Avg Gain %": avg_gain,
+        "Avg Loss %": avg_loss,
+        "Max Gain %": max_gain,
+        "Avg Hold (Days)": avg_duration
     }
-    target_files = [
-        f for f in json_files if os.path.basename(f).lower() not in excluded_files
-    ]
 
-    print(f"🚀 Starting Swing 3.0 Backtest across {len(target_files)} symbols in '{DATA_DIR}'...")
 
+def run_swing3_run2():
+    nifty_map = load_nifty_regime()
+    json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+    excluded = {
+        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+        "gap_margin_candidates.json", "swing3_results.json",
+        "backtest_results.json", "swing3_compare.json", "swing3_run2_results.json"
+    }
+    target_files = [f for f in json_files if os.path.basename(f).lower() not in excluded]
+
+    print(f"🚀 Scanning {len(target_files)} symbols for Swing 3.0 Run 2 (Turnover >= ₹{MIN_TURNOVER_CR} Cr/day)...")
     all_trades = []
-    scanned_count = 0
 
     for path in sorted(target_files):
         sym = os.path.splitext(os.path.basename(path))[0].upper()
@@ -296,9 +404,8 @@ def run_full_backtest():
                 raw = json.load(fp)
             clean = clean_and_prepare(raw)
             if clean:
-                sym_trades = backtest_single_stock(sym, clean)
-                all_trades.extend(sym_trades)
-                scanned_count += 1
+                t = backtest_single_stock(sym, clean, nifty_map)
+                all_trades.extend(t)
         except Exception:
             continue
 
@@ -306,115 +413,31 @@ def run_full_backtest():
         print("⚠️ No qualifying trades triggered.")
         return
 
-    # Metrics
-    df_trades = pd.DataFrame(all_trades)
-    total_trades = len(df_trades)
-    wins = df_trades[df_trades["Outcome"] == "WIN"]
-    losses = df_trades[df_trades["Outcome"] == "LOSS"]
-    win_rate = round((len(wins) / total_trades) * 100.0, 2)
+    # Segregate Nifty Regime subsets
+    trades_above = [t for t in all_trades if t["Nifty >= 50 SMA"]]
+    trades_below = [t for t in all_trades if not t["Nifty >= 50 SMA"]]
 
-    avg_win_pct = round(wins["PnL %"].mean(), 2) if not wins.empty else 0.0
-    avg_loss_pct = round(losses["PnL %"].mean(), 2) if not losses.empty else 0.0
-    avg_r = round(df_trades["R Multiple"].mean(), 2)
-    max_r = round(df_trades["R Multiple"].max(), 2)
-    avg_hold_days = round(df_trades["Duration (Days)"].mean(), 1)
+    metrics_baseline = compute_metrics(all_trades, "Swing 3.0 Run 2 Baseline (Turnover >= 10 Cr)")
+    metrics_above = compute_metrics(trades_above, "Nifty >= 50 SMA (Bull/Healthy Regime)")
+    metrics_below = compute_metrics(trades_below, "Nifty < 50 SMA (Correction/Chop Regime)")
 
-    gross_win = wins["PnL %"].sum() if not wins.empty else 0.0
-    gross_loss = abs(losses["PnL %"].sum()) if not losses.empty else 1.0
-    profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else 999.0
+    report = [metrics_baseline, metrics_above, metrics_below]
+    df_report = pd.DataFrame(report)
 
-    breakout_trades = df_trades[df_trades["Setup"] == "LAUNCHPAD-BO"]
-    reversal_trades = df_trades[df_trades["Setup"] == "V-REVERSAL"]
+    print("\n" + "=" * 105)
+    print("🎯 SWING 3.0 RUN 2: NIFTY 50 SMA REGIME COMPARISON (TURNOVER >= ₹10 CR)")
+    print("=" * 105)
+    print(df_report.to_string(index=False))
+    print("=" * 105 + "\n")
 
-    summary_metrics = {
-        "Strategy": "Swing 3.0 (Launchpad Breakouts & V-Reversals)",
-        "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
-        "Symbols Scanned": scanned_count,
-        "Total Trades": total_trades,
-        "Win Rate %": win_rate,
-        "Profit Factor": profit_factor,
-        "Average R": avg_r,
-        "Max R": max_r,
-        "Avg Win %": avg_win_pct,
-        "Avg Loss %": avg_loss_pct,
-        "Avg Duration (Days)": avg_hold_days,
-        "Launchpad Breakouts": {
-            "Count": len(breakout_trades),
-            "Win Rate %": round((len(breakout_trades[breakout_trades['Outcome'] == 'WIN']) / len(breakout_trades)) * 100.0, 2) if not breakout_trades.empty else 0,
-            "Avg R": round(breakout_trades["R Multiple"].mean(), 2) if not breakout_trades.empty else 0,
-        },
-        "V-Reversals": {
-            "Count": len(reversal_trades),
-            "Win Rate %": round((len(reversal_trades[reversal_trades['Outcome'] == 'WIN']) / len(reversal_trades)) * 100.0, 2) if not reversal_trades.empty else 0,
-            "Avg R": round(reversal_trades["R Multiple"].mean(), 2) if not reversal_trades.empty else 0,
-        },
-    }
-
-    # Save JSON Payload
     payload = {
-        "Metrics": summary_metrics,
-        "Recent Trades": all_trades[-150:],
+        "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Report": report,
+        "Recent Trades": all_trades[-100:]
     }
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    # Save HTML Dashboard
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Swing 3.0 Backtest Summary</title>
-      <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0f19; color: #e2e8f0; padding: 24px; }}
-        .card {{ background-color: #131b2e; border: 1px solid #1e293b; border-radius: 8px; padding: 18px; margin-bottom: 20px; }}
-        .metric-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 12px; }}
-        .metric-item {{ background-color: #0a0e17; padding: 12px; border-radius: 6px; border-left: 3px solid #38bdf8; }}
-        .metric-val {{ font-size: 20px; font-weight: 800; color: #ffffff; margin-top: 4px; }}
-        table {{ width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }}
-        th {{ background-color: #1e293b; color: #38bdf8; text-align: left; padding: 10px; }}
-        td {{ padding: 10px; border-bottom: 1px solid #1e293b; }}
-        tr:nth-child(even) {{ background-color: #0d1322; }}
-        .win {{ color: #00E676; font-weight: bold; }}
-        .loss {{ color: #FF5252; font-weight: bold; }}
-      </style>
-    </head>
-    <body>
-      <h2>⚡ Swing 3.0 Backtest Dashboard</h2>
-      <div class="card">
-        <h3>Performance Summary</h3>
-        <div class="metric-grid">
-          <div class="metric-item"><div>Total Trades</div><div class="metric-val">{total_trades}</div></div>
-          <div class="metric-item"><div>Win Rate</div><div class="metric-val">{win_rate}%</div></div>
-          <div class="metric-item"><div>Profit Factor</div><div class="metric-val">{profit_factor}</div></div>
-          <div class="metric-item"><div>Average R</div><div class="metric-val">+{avg_r}R</div></div>
-          <div class="metric-item"><div>Max R Multiple</div><div class="metric-val">+{max_r}R</div></div>
-          <div class="metric-item"><div>Avg Hold Time</div><div class="metric-val">{avg_hold_days} Days</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Sample Trigger Log (Last 50 Trades)</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Symbol</th><th>Setup</th><th>Entry Date</th><th>Exit Date</th><th>Hold Days</th>
-              <th>Entry</th><th>Exit</th><th>PnL %</th><th>R Multiple</th><th>Outcome</th>
-            </tr>
-          </thead>
-          <tbody>
-            {''.join(f"<tr><td>{t['Symbol']}</td><td>{t['Setup']}</td><td>{t['Entry Date']}</td><td>{t['Exit Date']}</td><td>{t['Duration (Days)']}</td><td>₹{t['Entry Price']}</td><td>₹{t['Exit Price']}</td><td class='{'win' if t['PnL %'] > 0 else 'loss'}'>{t['PnL %']:+}%</td><td>{t['R Multiple']:+}R</td><td class='{'win' if t['Outcome'] == 'WIN' else 'loss'}'>{t['Outcome']}</td></tr>" for t in all_trades[-50:])}
-          </tbody>
-        </table>
-      </div>
-    </body>
-    </html>
-    """
-    with open(RESULTS_HTML, "w", encoding="utf-8") as fp:
-        fp.write(html_content)
-
-    print(f"✅ Swing 3.0 Backtest complete. Scanned: {scanned_count} | Trades: {total_trades} | Win Rate: {win_rate}% | Profit Factor: {profit_factor}")
-    print(f"📁 Results saved to: '{RESULTS_JSON}' and '{RESULTS_HTML}'.")
-
 
 if __name__ == "__main__":
-    run_full_backtest()
+    run_swing3_run2()
