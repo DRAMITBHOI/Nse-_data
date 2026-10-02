@@ -1,0 +1,37 @@
+name: Execute Swing 3 Run 3 Ablation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-run3-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy requests
+
+      - name: Execute Swing 3 Run 3 Engine
+        run: python swing3_run3.py
+
+      - name: Commit & Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/swing3_run3_results.json || true
+          git commit -m "Update Swing 3 Run 3 Ablation Results [skip ci]" || echo "No changes to commit"
+          git push
