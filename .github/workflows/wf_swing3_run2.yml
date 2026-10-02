@@ -1,4 +1,4 @@
-name: Execute Swing 3.0 Run 2 Backtest
+name: Execute Swing 3.0 Run 2 Study
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  run-swing3-run2:
+  run-study:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -25,13 +25,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy requests
 
-      - name: Execute Swing 3.0 Run 2 Engine
-        run: python swing3_run2.py
+      - name: Execute Study Engine
+        run: python swing3_run2_compare.py
 
       - name: Commit & Push Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/swing3_run2_results.json || true
-          git commit -m "Update Swing 3.0 Run 2 Results [skip ci]" || echo "No changes to commit"
+          git add data/swing3_run2_compare_results.json || true
+          git commit -m "Update Swing 3.0 Run 2 Study Results [skip ci]" || echo "No changes to commit"
           git push
