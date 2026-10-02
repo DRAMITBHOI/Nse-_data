@@ -1,0 +1,74 @@
+[
+  {
+    "Configuration": "Baseline (Turnover >= 10 Cr)",
+    "Trades": 7849,
+    "Win Rate %": 61.93,
+    "Profit Factor": 3.23,
+    "Avg Gain %": 15.35,
+    "Avg Loss %": -7.74,
+    "Avg Duration (Days)": 32.0
+  },
+  {
+    "Configuration": "1. Universe: Nifty 750",
+    "Trades": 4642,
+    "Win Rate %": 63.14,
+    "Profit Factor": 3.65,
+    "Avg Gain %": 15.8,
+    "Avg Loss %": -7.41,
+    "Avg Duration (Days)": 35.3
+  },
+  {
+    "Configuration": "1. Universe: Non-Nifty 750",
+    "Trades": 3207,
+    "Win Rate %": 60.18,
+    "Profit Factor": 2.71,
+    "Avg Gain %": 14.66,
+    "Avg Loss %": -8.19,
+    "Avg Duration (Days)": 27.2
+  },
+  {
+    "Configuration": "2. Regime: Nifty >= 50 SMA",
+    "Trades": 7849,
+    "Win Rate %": 61.93,
+    "Profit Factor": 3.23,
+    "Avg Gain %": 15.35,
+    "Avg Loss %": -7.74,
+    "Avg Duration (Days)": 32.0
+  },
+  {
+    "Configuration": "2. Regime: Nifty < 50 SMA",
+    "Trades": 0,
+    "Win Rate %": 0.0,
+    "Profit Factor": 0.0,
+    "Avg Gain %": 0.0,
+    "Avg Loss %": 0.0,
+    "Avg Duration (Days)": 0.0
+  },
+  {
+    "Configuration": "3. Stage 2 + 60d RS vs Nifty",
+    "Trades": 5133,
+    "Win Rate %": 64.06,
+    "Profit Factor": 3.65,
+    "Avg Gain %": 16.0,
+    "Avg Loss %": -7.81,
+    "Avg Duration (Days)": 32.6
+  },
+  {
+    "Configuration": "4. Concurrency: Max 2/Day (Surge)",
+    "Trades": 2378,
+    "Win Rate %": 66.99,
+    "Profit Factor": 4.2,
+    "Avg Gain %": 16.48,
+    "Avg Loss %": -7.95,
+    "Avg Duration (Days)": 31.3
+  },
+  {
+    "Configuration": "\ud83d\udd25 RUN 2 FULL (750 + Regime + RS + Max2)",
+    "Trades": 1711,
+    "Win Rate %": 67.86,
+    "Profit Factor": 4.71,
+    "Avg Gain %": 16.95,
+    "Avg Loss %": -7.59,
+    "Avg Duration (Days)": 35.9
+  }
+]
