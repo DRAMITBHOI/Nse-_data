@@ -7,12 +7,13 @@ from datetime import datetime
 import urllib.request
 
 DATA_DIR = "data"
-RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run2_results.json")
-MIN_TURNOVER_CR = 10.0  # Swing 3 Run 2 baseline floor: >= 10 Crore/day
+RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run2_compare_results.json")
+NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
+MIN_TURNOVER_CR = 10.0  # Baseline floor: >= 10 Crore turnover/day
 
 
 # -------------------------------------------------------------
-# ROBUST DATA CLEANING & SPLIT ADJUSTMENT
+# 1. DATA PREPARATION & SPLIT ADJUSTMENT
 # -------------------------------------------------------------
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -25,7 +26,6 @@ def clean_and_prepare(raw_data):
         raw_t = str(r.get("time", "")).strip()
         if not raw_t:
             continue
-        # Standardize date to YYYY-MM-DD regardless of timestamp format
         d_str = raw_t[:10]
         try:
             c = float(r.get("close", 0) or 0)
@@ -48,7 +48,6 @@ def clean_and_prepare(raw_data):
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
 
-    # Split / Corporate Action Multipliers
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -97,19 +96,14 @@ def clean_and_prepare(raw_data):
 
 
 # -------------------------------------------------------------
-# BULLETPROOF NIFTY 50 REGIME LOADER (WITH LIVE FALLBACK)
+# 2. MARKET REGIME & UNIVERSE CLASSIFICATION
 # -------------------------------------------------------------
 def load_nifty_regime():
-    """
-    Loads Nifty 50, standardizes date indices, and computes rolling 50-day SMA.
-    Falls back to fetching historical index quotes if local files are missing/malformed.
-    """
     nifty_candidates = [
         os.path.join(DATA_DIR, "nifty.json"),
         os.path.join(DATA_DIR, "nifty50.json"),
         os.path.join(DATA_DIR, "NIFTY.json"),
         os.path.join(DATA_DIR, "NIFTY50.json"),
-        os.path.join(DATA_DIR, "^NSEI.json")
     ]
     raw = None
     for path in nifty_candidates:
@@ -119,14 +113,11 @@ def load_nifty_regime():
                     data = json.load(fp)
                     if isinstance(data, list) and len(data) > 50:
                         raw = data
-                        print(f"📖 Loaded Nifty index history from: {path}")
                         break
             except Exception:
                 continue
 
-    # Fallback to direct download if local file is missing
     if not raw:
-        print("🌐 Local Nifty index file missing. Fetching historical benchmark data...")
         try:
             url = "https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?interval=1d&range=5y"
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -140,33 +131,76 @@ def load_nifty_regime():
                     if c is not None and c > 0:
                         d_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
                         raw.append({"time": d_str, "open": o, "high": h, "low": l, "close": c, "volume": v or 100000})
-        except Exception as e:
-            print(f"⚠️ Could not fetch Nifty index externally: {e}")
+        except Exception:
+            pass
 
     clean = clean_and_prepare(raw)
     if not clean:
-        print("❌ CRITICAL: Failed to construct Nifty 50 regime data.")
         return {}
 
     df = pd.DataFrame(clean)
     df["sma50"] = df["close"].rolling(50, min_periods=20).mean()
+    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
     nifty_map = {}
     for _, row in df.iterrows():
         t = row["time"]
-        c = row["close"]
-        s50 = row["sma50"]
-        if pd.notnull(s50):
-            nifty_map[t] = bool(c >= s50)
-
-    print(f"✅ Nifty 50 SMA regime map constructed for {len(nifty_map)} sessions.")
+        nifty_map[t] = {
+            "above_sma50": bool(row["close"] >= row["sma50"]) if pd.notnull(row["sma50"]) else True,
+            "perf_60d": float(row["perf_60d"]) if pd.notnull(row["perf_60d"]) else 0.0
+        }
     return nifty_map
 
 
+def load_universe_classifications():
+    """
+    Classifies symbols into:
+    - Nifty 750 (Large 100, Mid 150, Small 250, Micro 250)
+    - Non-Nifty 750
+    """
+    nifty750_set = set()
+    large_set = set()
+    mid_set = set()
+    small_set = set()
+
+    # Load Nifty 750 base index
+    if os.path.exists(NIFTY750_FILE):
+        try:
+            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, list):
+                nifty750_set = {str(x).strip().upper() for x in data}
+            elif isinstance(data, dict):
+                nifty750_set = {str(x).strip().upper() for x in data.keys()}
+        except Exception:
+            pass
+
+    # Check for direct cap lists in data directory if available
+    def fetch_csv_symbols(url):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                lines = resp.read().decode("utf-8").splitlines()
+                return {p.split(",")[2].strip().upper() for p in lines[1:] if len(p.split(",")) > 2}
+        except Exception:
+            return set()
+
+    large_set = fetch_csv_symbols("https://nsearchives.nseindia.com/content/indices/ind_nifty100list.csv")
+    mid_set = fetch_csv_symbols("https://nsearchives.nseindia.com/content/indices/ind_niftymidcap150list.csv")
+    small_set = fetch_csv_symbols("https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap250list.csv")
+
+    return {
+        "nifty750": nifty750_set,
+        "large": large_set,
+        "mid": mid_set,
+        "small": small_set
+    }
+
+
 # -------------------------------------------------------------
-# SWING 3.0 RUN 2 ENGINE
+# 3. SINGLE STOCK EVALUATION ENGINE
 # -------------------------------------------------------------
-def backtest_single_stock(symbol, clean_data, nifty_map):
+def backtest_single_stock(symbol, clean_data, nifty_map, universes):
     if len(clean_data) < 60:
         return []
 
@@ -177,6 +211,8 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
     df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
     df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean().fillna(0)
     df["ema20"] = df["close"].ewm(span=20, adjust=False).mean()
+    df["sma200"] = df["close"].rolling(200, min_periods=50).mean()
+    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.0)
@@ -193,6 +229,8 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
     deliv_pct_avgs = df["deliv_pct_50d"].values
     range_closes = df["range_closeness"].values
     ema20s = df["ema20"].values
+    sma200s = df["sma200"].values
+    perf_60s = df["perf_60d"].values
     times = df["time"].values
 
     trades = []
@@ -204,7 +242,25 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
     moved_to_be = False
     entry_idx = 0
     setup_name = ""
-    is_nifty_above_sma = False
+    tag_info = {}
+
+    # Identify stock tier
+    is_n750 = symbol in universes["nifty750"]
+    if symbol in universes["large"]:
+        market_cap_tier = "Large_Cap"
+    elif symbol in universes["mid"]:
+        market_cap_tier = "Mid_Cap"
+    elif symbol in universes["small"]:
+        market_cap_tier = "Small_Cap"
+    else:
+        # Fallback heuristic based on 50-day turnover if official list unreachable
+        avg_to = float(to_50d[-1])
+        if avg_to >= 150.0:
+            market_cap_tier = "Large_Cap"
+        elif avg_to >= 40.0:
+            market_cap_tier = "Mid_Cap"
+        else:
+            market_cap_tier = "Small_Cap"
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -219,10 +275,12 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
         dp_avg = deliv_pct_avgs[i]
         rc = range_closes[i]
         ema = ema20s[i]
+        sma200 = sma200s[i]
+        stock_p60 = perf_60s[i]
         t = times[i]
 
         if not in_position:
-            # Baseline turnover floor >= 10 Crore
+            # Baseline constraint: Turnover >= 10 Cr
             if turnover < MIN_TURNOVER_CR:
                 continue
 
@@ -230,17 +288,15 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
             curr_setup = ""
             calc_entry = 0.0
             calc_sl = 0.0
+            surge_ratio = 1.0
 
-            # -------------------------------------------------------------
-            # ENGINE 1: DOWNTREND REVERSAL (V-SHAPE RECLAIM)
-            # -------------------------------------------------------------
+            # ENGINE 1: V-REVERSAL
             recent_20_high = highs[i - 20:i].max()
             is_steep_drop = (recent_20_high - l) / recent_20_high >= 0.18
 
             if is_steep_drop:
                 recent_trough = lows[i - 5:i].min()
                 prior_3d_high = highs[i - 4:i].max()
-
                 c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
                 c_vol_rev = v >= (1.3 * v_avg)
                 c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg if dp_avg > 0 else False)
@@ -251,10 +307,9 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
                     curr_setup = "V-REVERSAL"
                     calc_entry = round(prior_3d_high, 2)
                     calc_sl = round(recent_trough * 0.995, 2)
+                    surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
 
-            # -------------------------------------------------------------
-            # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT
-            # -------------------------------------------------------------
+            # ENGINE 2: LAUNCHPAD BREAKOUT
             if not entry_triggered:
                 valid_launchpad = False
                 launchpad_high = 0.0
@@ -284,10 +339,8 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
                         curr_setup = "LAUNCHPAD-BO"
                         calc_entry = launchpad_high
                         calc_sl = round(min(l, launchpad_low), 2)
+                        surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
 
-            # -------------------------------------------------------------
-            # POSITION TRIGGER & NIFTY REGIME TAGGING
-            # -------------------------------------------------------------
             if entry_triggered:
                 r_dist = calc_entry - calc_sl
                 if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
@@ -299,16 +352,25 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
                     moved_to_be = False
                     entry_idx = i
                     setup_name = curr_setup
-                    
-                    # Exact date matching with fallback to closest prior trading date
-                    if t in nifty_map:
-                        is_nifty_above_sma = nifty_map[t]
-                    else:
+
+                    # Tag conditions on date
+                    nifty_info = nifty_map.get(t)
+                    if not nifty_info:
                         prior_dates = [d for d in nifty_map.keys() if d <= t]
-                        is_nifty_above_sma = nifty_map[max(prior_dates)] if prior_dates else True
+                        nifty_info = nifty_map[max(prior_dates)] if prior_dates else {"above_sma50": True, "perf_60d": 0.0}
+
+                    is_above_sma200 = bool(c >= sma200) if pd.notnull(sma200) else False
+                    is_rs_outperforming = bool(stock_p60 > nifty_info["perf_60d"])
+
+                    tag_info = {
+                        "is_nifty750": is_n750,
+                        "cap_tier": market_cap_tier,
+                        "nifty_above_sma50": nifty_info["above_sma50"],
+                        "stage2_and_rs": (is_above_sma200 and is_rs_outperforming),
+                        "surge_score": round(surge_ratio, 2)
+                    }
 
         else:
-            # Trailing Stop Management
             if not moved_to_be and h >= (entry_price + 1.5 * r_unit):
                 current_stop = max(current_stop, entry_price)
                 moved_to_be = True
@@ -330,11 +392,14 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
                     "Duration (Days)": i - entry_idx,
                     "Entry Price": entry_price,
                     "Exit Price": exit_price,
-                    "Initial Stop": initial_stop,
                     "PnL %": pnl_pct,
                     "R Multiple": r_multiple,
                     "Outcome": "WIN" if pnl_pts > 0 else "LOSS",
-                    "Nifty >= 50 SMA": is_nifty_above_sma
+                    "is_nifty750": tag_info["is_nifty750"],
+                    "cap_tier": tag_info["cap_tier"],
+                    "nifty_above_sma50": tag_info["nifty_above_sma50"],
+                    "stage2_and_rs": tag_info["stage2_and_rs"],
+                    "surge_score": tag_info["surge_score"]
                 })
 
                 in_position = False
@@ -346,7 +411,7 @@ def backtest_single_stock(symbol, clean_data, nifty_map):
 
 
 # -------------------------------------------------------------
-# STATISTICAL METRICS COMPILER
+# 4. STATISTICAL COMPILATION
 # -------------------------------------------------------------
 def compute_metrics(trades_list, label):
     if not trades_list:
@@ -384,17 +449,20 @@ def compute_metrics(trades_list, label):
     }
 
 
-def run_swing3_run2():
+def run_comprehensive_study():
     nifty_map = load_nifty_regime()
+    universes = load_universe_classifications()
+
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     excluded = {
         "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
         "gap_margin_candidates.json", "swing3_results.json",
-        "backtest_results.json", "swing3_compare.json", "swing3_run2_results.json"
+        "backtest_results.json", "swing3_compare.json", "swing3_run2_results.json",
+        "swing3_run2_compare_results.json"
     }
     target_files = [f for f in json_files if os.path.basename(f).lower() not in excluded]
 
-    print(f"🚀 Scanning {len(target_files)} symbols for Swing 3.0 Run 2 (Turnover >= ₹{MIN_TURNOVER_CR} Cr/day)...")
+    print(f"🚀 Scanning {len(target_files)} symbols for Swing 3.0 Run 2 Study (Turnover >= ₹{MIN_TURNOVER_CR} Cr)...")
     all_trades = []
 
     for path in sorted(target_files):
@@ -404,7 +472,7 @@ def run_swing3_run2():
                 raw = json.load(fp)
             clean = clean_and_prepare(raw)
             if clean:
-                t = backtest_single_stock(sym, clean, nifty_map)
+                t = backtest_single_stock(sym, clean, nifty_map, universes)
                 all_trades.extend(t)
         except Exception:
             continue
@@ -413,22 +481,67 @@ def run_swing3_run2():
         print("⚠️ No qualifying trades triggered.")
         return
 
-    # Segregate Nifty Regime subsets
-    trades_above = [t for t in all_trades if t["Nifty >= 50 SMA"]]
-    trades_below = [t for t in all_trades if not t["Nifty >= 50 SMA"]]
+    # 1. Baseline
+    m_base = compute_metrics(all_trades, "Run 2 Baseline (Turnover >= 10 Cr)")
 
-    metrics_baseline = compute_metrics(all_trades, "Swing 3.0 Run 2 Baseline (Turnover >= 10 Cr)")
-    metrics_above = compute_metrics(trades_above, "Nifty >= 50 SMA (Bull/Healthy Regime)")
-    metrics_below = compute_metrics(trades_below, "Nifty < 50 SMA (Correction/Chop Regime)")
+    # 2. Nifty 750 vs Non-Nifty 750
+    t_n750 = [t for t in all_trades if t["is_nifty750"]]
+    t_non_n750 = [t for t in all_trades if not t["is_nifty750"]]
+    m_n750 = compute_metrics(t_n750, "1. Universe: Nifty 750")
+    m_non_n750 = compute_metrics(t_non_n750, "1. Universe: Non-Nifty 750")
 
-    report = [metrics_baseline, metrics_above, metrics_below]
+    # 3. Market Cap Tiers in Nifty 750
+    t_large = [t for t in t_n750 if t["cap_tier"] == "Large_Cap"]
+    t_mid = [t for t in t_n750 if t["cap_tier"] == "Mid_Cap"]
+    t_small = [t for t in t_n750 if t["cap_tier"] == "Small_Cap"]
+    m_large = compute_metrics(t_large, "2. Nifty 750: Large Cap (Nifty 100)")
+    m_mid = compute_metrics(t_mid, "2. Nifty 750: Mid Cap (Midcap 150)")
+    m_small = compute_metrics(t_small, "2. Nifty 750: Small Cap (Smallcap 250)")
+
+    # 4. Nifty Regime (50 SMA)
+    t_above_sma = [t for t in all_trades if t["nifty_above_sma50"]]
+    t_below_sma = [t for t in all_trades if not t["nifty_above_sma50"]]
+    m_above = compute_metrics(t_above_sma, "3. Regime: Nifty >= 50 SMA")
+    m_below = compute_metrics(t_below_sma, "3. Regime: Nifty < 50 SMA")
+
+    # 5. Stage 2 + 60d RS vs Nifty
+    t_stage2_rs = [t for t in all_trades if t["stage2_and_rs"]]
+    m_stage2_rs = compute_metrics(t_stage2_rs, "4. Stage 2 (>=200 SMA) + 60d RS")
+
+    # 6. Max 2 Entries Per Day (Ranked by Delivery Surge)
+    trades_by_date = {}
+    for t in all_trades:
+        trades_by_date.setdefault(t["Entry Date"], []).append(t)
+    t_max2 = []
+    for d, day_trades in sorted(trades_by_date.items()):
+        day_trades.sort(key=lambda x: x["surge_score"], reverse=True)
+        t_max2.extend(day_trades[:2])
+    m_max2 = compute_metrics(t_max2, "5. Concurrency: Max 2/Day (Surge)")
+
+    # 7. Combined Portfolio (Run 2 Full: Nifty 750 + Regime + Stage 2 RS + Max 2/Day)
+    ideal_by_date = {}
+    for t in t_n750:
+        if t["nifty_above_sma50"] and t["stage2_and_rs"]:
+            ideal_by_date.setdefault(t["Entry Date"], []).append(t)
+    t_full = []
+    for d, day_trades in sorted(ideal_by_date.items()):
+        day_trades.sort(key=lambda x: x["surge_score"], reverse=True)
+        t_full.extend(day_trades[:2])
+    m_full = compute_metrics(t_full, "🔥 RUN 2 FULL (750 + Regime + RS + Max2)")
+
+    report = [
+        m_base, m_n750, m_non_n750,
+        m_large, m_mid, m_small,
+        m_above, m_below,
+        m_stage2_rs, m_max2, m_full
+    ]
+
     df_report = pd.DataFrame(report)
-
-    print("\n" + "=" * 105)
-    print("🎯 SWING 3.0 RUN 2: NIFTY 50 SMA REGIME COMPARISON (TURNOVER >= ₹10 CR)")
-    print("=" * 105)
+    print("\n" + "=" * 108)
+    print("🎯 SWING 3.0 RUN 2: COMPREHENSIVE MULTI-DIMENSIONAL ABLATION STUDY")
+    print("=" * 108)
     print(df_report.to_string(index=False))
-    print("=" * 105 + "\n")
+    print("=" * 108 + "\n")
 
     payload = {
         "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
@@ -440,4 +553,4 @@ def run_swing3_run2():
 
 
 if __name__ == "__main__":
-    run_swing3_run2()
+    run_comprehensive_study()
