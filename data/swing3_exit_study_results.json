@@ -1,0 +1,1244 @@
+{
+  "Generated At": "2026-10-02 19:06:49 IST",
+  "Report": [
+    {
+      "Rank": 1,
+      "Configuration": "2. Never Move to BE (Hold Pivot SL, Trail EMA)",
+      "Trades": 667,
+      "Win Rate %": 67.62,
+      "Profit Factor": 12.19,
+      "Avg Gain %": 11.6,
+      "Avg Loss %": -1.99,
+      "Max Profit %": 297.12,
+      "Avg Hold (Days)": 18.4
+    },
+    {
+      "Rank": 2,
+      "Configuration": "1. Move SL to BE @ 1.5R, then Trail 20 EMA",
+      "Trades": 667,
+      "Win Rate %": 67.77,
+      "Profit Factor": 5.21,
+      "Avg Gain %": 14.11,
+      "Avg Loss %": -5.69,
+      "Max Profit %": 297.14,
+      "Avg Hold (Days)": 29.7
+    },
+    {
+      "Rank": 3,
+      "Configuration": "3. Book 50% @ 1.5R + Trail 50% on EMA",
+      "Trades": 667,
+      "Win Rate %": 70.16,
+      "Profit Factor": 4.36,
+      "Avg Gain %": 11.41,
+      "Avg Loss %": -6.15,
+      "Max Profit %": 152.62,
+      "Avg Hold (Days)": 29.7
+    }
+  ],
+  "Sample Trades (Variant 1)": [
+    {
+      "entry_date": "2026-05-08",
+      "exit_date": "2026-06-22",
+      "duration": 31,
+      "pnl_pct": 5.23,
+      "r_mult": 0.79,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-11",
+      "exit_date": "2026-05-22",
+      "duration": 9,
+      "pnl_pct": 0.0,
+      "r_mult": 0.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-05-14",
+      "exit_date": "2026-06-10",
+      "duration": 19,
+      "pnl_pct": 9.35,
+      "r_mult": 1.31,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-29",
+      "exit_date": "2026-07-03",
+      "duration": 25,
+      "pnl_pct": 3.93,
+      "r_mult": 0.55,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-08",
+      "exit_date": "2026-07-22",
+      "duration": 32,
+      "pnl_pct": 11.84,
+      "r_mult": 1.89,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-09",
+      "exit_date": "2026-07-06",
+      "duration": 19,
+      "pnl_pct": 7.65,
+      "r_mult": 1.29,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-07-13",
+      "duration": 20,
+      "pnl_pct": 19.94,
+      "r_mult": 2.44,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-16",
+      "exit_date": "2026-07-23",
+      "duration": 27,
+      "pnl_pct": 9.13,
+      "r_mult": 1.29,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-17",
+      "exit_date": "2026-07-23",
+      "duration": 26,
+      "pnl_pct": 6.12,
+      "r_mult": 0.85,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-19",
+      "exit_date": "2026-07-16",
+      "duration": 19,
+      "pnl_pct": 7.88,
+      "r_mult": 1.28,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-22",
+      "exit_date": "2026-08-12",
+      "duration": 37,
+      "pnl_pct": 9.4,
+      "r_mult": 1.55,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-23",
+      "exit_date": "2026-07-23",
+      "duration": 22,
+      "pnl_pct": 5.17,
+      "r_mult": 0.71,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-29",
+      "exit_date": "2026-09-15",
+      "duration": 56,
+      "pnl_pct": 67.07,
+      "r_mult": 10.94,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-30",
+      "exit_date": "2026-07-23",
+      "duration": 17,
+      "pnl_pct": 4.75,
+      "r_mult": 0.8,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-01",
+      "exit_date": "2026-07-17",
+      "duration": 12,
+      "pnl_pct": 0.98,
+      "r_mult": 0.16,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-02",
+      "exit_date": "2026-09-02",
+      "duration": 44,
+      "pnl_pct": 26.34,
+      "r_mult": 4.91,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-03",
+      "exit_date": "2026-09-03",
+      "duration": 44,
+      "pnl_pct": 9.07,
+      "r_mult": 1.49,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-06",
+      "exit_date": "2026-08-31",
+      "duration": 40,
+      "pnl_pct": 14.19,
+      "r_mult": 2.05,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-07",
+      "exit_date": "2026-09-15",
+      "duration": 50,
+      "pnl_pct": -7.05,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-10",
+      "exit_date": "2026-09-28",
+      "duration": 56,
+      "pnl_pct": -5.18,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-16",
+      "exit_date": "2026-09-04",
+      "duration": 36,
+      "pnl_pct": 22.96,
+      "r_mult": 3.6,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-17",
+      "exit_date": "2026-08-12",
+      "duration": 18,
+      "pnl_pct": 4.43,
+      "r_mult": 0.67,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-21",
+      "exit_date": "2026-09-02",
+      "duration": 31,
+      "pnl_pct": -4.64,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-22",
+      "exit_date": "2026-09-07",
+      "duration": 33,
+      "pnl_pct": 11.74,
+      "r_mult": 2.19,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-24",
+      "exit_date": "2026-09-07",
+      "duration": 31,
+      "pnl_pct": 15.13,
+      "r_mult": 2.5,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-28",
+      "exit_date": "2026-08-18",
+      "duration": 15,
+      "pnl_pct": 0.45,
+      "r_mult": 0.07,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-29",
+      "exit_date": "2026-09-15",
+      "duration": 34,
+      "pnl_pct": 17.03,
+      "r_mult": 3.32,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-30",
+      "exit_date": "2026-08-31",
+      "duration": 22,
+      "pnl_pct": -5.12,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-31",
+      "exit_date": "2026-09-24",
+      "duration": 39,
+      "pnl_pct": -6.8,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-03",
+      "exit_date": "2026-09-30",
+      "duration": 42,
+      "pnl_pct": -2.17,
+      "r_mult": -0.36,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-07",
+      "exit_date": "2026-09-21",
+      "duration": 31,
+      "pnl_pct": 20.35,
+      "r_mult": 3.76,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-10",
+      "exit_date": "2026-09-29",
+      "duration": 36,
+      "pnl_pct": -6.36,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-12",
+      "exit_date": "2026-09-30",
+      "duration": 35,
+      "pnl_pct": -2.0,
+      "r_mult": -0.46,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-13",
+      "exit_date": "2026-08-27",
+      "duration": 10,
+      "pnl_pct": -6.29,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-14",
+      "exit_date": "2026-09-07",
+      "duration": 16,
+      "pnl_pct": -9.77,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-17",
+      "exit_date": "2026-09-11",
+      "duration": 19,
+      "pnl_pct": -5.31,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-18",
+      "exit_date": "2026-09-09",
+      "duration": 16,
+      "pnl_pct": 7.06,
+      "r_mult": 0.98,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-21",
+      "exit_date": "2026-09-11",
+      "duration": 15,
+      "pnl_pct": -7.1,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-24",
+      "exit_date": "2026-09-15",
+      "duration": 16,
+      "pnl_pct": -6.56,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-25",
+      "exit_date": "2026-09-25",
+      "duration": 23,
+      "pnl_pct": 4.5,
+      "r_mult": 0.67,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-26",
+      "exit_date": "2026-09-15",
+      "duration": 14,
+      "pnl_pct": -6.32,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-27",
+      "exit_date": "2026-09-15",
+      "duration": 13,
+      "pnl_pct": 7.32,
+      "r_mult": 1.32,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-28",
+      "exit_date": "2026-09-21",
+      "duration": 16,
+      "pnl_pct": -6.15,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-31",
+      "exit_date": "2026-09-30",
+      "duration": 22,
+      "pnl_pct": -3.03,
+      "r_mult": -0.42,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-01",
+      "exit_date": "2026-09-07",
+      "duration": 4,
+      "pnl_pct": -4.77,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-02",
+      "exit_date": "2026-09-15",
+      "duration": 9,
+      "pnl_pct": 0.0,
+      "r_mult": 0.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-03",
+      "exit_date": "2026-09-30",
+      "duration": 19,
+      "pnl_pct": -2.71,
+      "r_mult": -0.38,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-18",
+      "exit_date": "2026-09-30",
+      "duration": 8,
+      "pnl_pct": -3.09,
+      "r_mult": -0.42,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-22",
+      "exit_date": "2026-09-30",
+      "duration": 6,
+      "pnl_pct": -5.49,
+      "r_mult": -0.74,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-25",
+      "exit_date": "2026-09-30",
+      "duration": 3,
+      "pnl_pct": 1.35,
+      "r_mult": 0.25,
+      "outcome": "WIN"
+    }
+  ],
+  "Sample Trades (Variant 2)": [
+    {
+      "entry_date": "2026-05-08",
+      "exit_date": "2026-06-22",
+      "duration": 31,
+      "pnl_pct": 5.18,
+      "r_mult": 0.78,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-11",
+      "exit_date": "2026-05-25",
+      "duration": 10,
+      "pnl_pct": -0.33,
+      "r_mult": -0.07,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-05-14",
+      "exit_date": "2026-06-10",
+      "duration": 19,
+      "pnl_pct": 9.26,
+      "r_mult": 1.3,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-29",
+      "exit_date": "2026-06-11",
+      "duration": 9,
+      "pnl_pct": -0.54,
+      "r_mult": -0.08,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-06-08",
+      "exit_date": "2026-06-10",
+      "duration": 2,
+      "pnl_pct": -2.2,
+      "r_mult": -0.35,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-06-09",
+      "exit_date": "2026-07-06",
+      "duration": 19,
+      "pnl_pct": 7.47,
+      "r_mult": 1.26,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-06-16",
+      "duration": 1,
+      "pnl_pct": 2.38,
+      "r_mult": 0.29,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-16",
+      "exit_date": "2026-07-23",
+      "duration": 27,
+      "pnl_pct": 8.96,
+      "r_mult": 1.27,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-17",
+      "exit_date": "2026-07-23",
+      "duration": 26,
+      "pnl_pct": 6.1,
+      "r_mult": 0.84,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-19",
+      "exit_date": "2026-06-22",
+      "duration": 1,
+      "pnl_pct": 0.12,
+      "r_mult": 0.02,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-22",
+      "exit_date": "2026-08-12",
+      "duration": 37,
+      "pnl_pct": 9.32,
+      "r_mult": 1.54,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-23",
+      "exit_date": "2026-07-23",
+      "duration": 22,
+      "pnl_pct": 5.15,
+      "r_mult": 0.71,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-29",
+      "exit_date": "2026-09-15",
+      "duration": 56,
+      "pnl_pct": 66.9,
+      "r_mult": 10.91,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-30",
+      "exit_date": "2026-07-23",
+      "duration": 17,
+      "pnl_pct": 4.62,
+      "r_mult": 0.78,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-01",
+      "exit_date": "2026-07-17",
+      "duration": 12,
+      "pnl_pct": 0.94,
+      "r_mult": 0.15,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-02",
+      "exit_date": "2026-09-02",
+      "duration": 44,
+      "pnl_pct": 26.1,
+      "r_mult": 4.87,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-03",
+      "exit_date": "2026-07-20",
+      "duration": 11,
+      "pnl_pct": -1.38,
+      "r_mult": -0.23,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-06",
+      "exit_date": "2026-08-31",
+      "duration": 40,
+      "pnl_pct": 14.03,
+      "r_mult": 2.02,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-07",
+      "exit_date": "2026-07-08",
+      "duration": 1,
+      "pnl_pct": -3.35,
+      "r_mult": -0.48,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-10",
+      "exit_date": "2026-07-21",
+      "duration": 7,
+      "pnl_pct": 0.18,
+      "r_mult": 0.03,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-16",
+      "exit_date": "2026-07-17",
+      "duration": 1,
+      "pnl_pct": -3.14,
+      "r_mult": -0.49,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-17",
+      "exit_date": "2026-08-12",
+      "duration": 18,
+      "pnl_pct": 4.39,
+      "r_mult": 0.66,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-21",
+      "exit_date": "2026-07-24",
+      "duration": 3,
+      "pnl_pct": -3.59,
+      "r_mult": -0.77,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-22",
+      "exit_date": "2026-09-07",
+      "duration": 33,
+      "pnl_pct": 11.74,
+      "r_mult": 2.19,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-24",
+      "exit_date": "2026-09-07",
+      "duration": 31,
+      "pnl_pct": 14.71,
+      "r_mult": 2.43,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-28",
+      "exit_date": "2026-08-18",
+      "duration": 15,
+      "pnl_pct": 0.44,
+      "r_mult": 0.06,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-29",
+      "exit_date": "2026-09-15",
+      "duration": 34,
+      "pnl_pct": 16.97,
+      "r_mult": 3.3,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-30",
+      "exit_date": "2026-08-11",
+      "duration": 8,
+      "pnl_pct": 0.69,
+      "r_mult": 0.13,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-31",
+      "exit_date": "2026-08-07",
+      "duration": 5,
+      "pnl_pct": 0.35,
+      "r_mult": 0.05,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-03",
+      "exit_date": "2026-09-04",
+      "duration": 24,
+      "pnl_pct": 4.53,
+      "r_mult": 0.74,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-07",
+      "exit_date": "2026-09-21",
+      "duration": 31,
+      "pnl_pct": 20.35,
+      "r_mult": 3.76,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-10",
+      "exit_date": "2026-09-03",
+      "duration": 18,
+      "pnl_pct": 0.71,
+      "r_mult": 0.11,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-12",
+      "exit_date": "2026-08-31",
+      "duration": 13,
+      "pnl_pct": -0.2,
+      "r_mult": -0.05,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-13",
+      "exit_date": "2026-08-27",
+      "duration": 10,
+      "pnl_pct": -3.75,
+      "r_mult": -0.6,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-14",
+      "exit_date": "2026-08-28",
+      "duration": 10,
+      "pnl_pct": 3.74,
+      "r_mult": 0.38,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-17",
+      "exit_date": "2026-09-07",
+      "duration": 15,
+      "pnl_pct": 0.06,
+      "r_mult": 0.01,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-18",
+      "exit_date": "2026-09-09",
+      "duration": 16,
+      "pnl_pct": 7.02,
+      "r_mult": 0.98,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-21",
+      "exit_date": "2026-09-02",
+      "duration": 8,
+      "pnl_pct": -2.21,
+      "r_mult": -0.31,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-24",
+      "exit_date": "2026-09-07",
+      "duration": 10,
+      "pnl_pct": -2.67,
+      "r_mult": -0.41,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-25",
+      "exit_date": "2026-09-25",
+      "duration": 23,
+      "pnl_pct": 4.16,
+      "r_mult": 0.62,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-26",
+      "exit_date": "2026-09-02",
+      "duration": 5,
+      "pnl_pct": -2.65,
+      "r_mult": -0.42,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-27",
+      "exit_date": "2026-09-15",
+      "duration": 13,
+      "pnl_pct": 6.64,
+      "r_mult": 1.2,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-28",
+      "exit_date": "2026-09-07",
+      "duration": 6,
+      "pnl_pct": -1.42,
+      "r_mult": -0.23,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-31",
+      "exit_date": "2026-09-10",
+      "duration": 8,
+      "pnl_pct": -3.16,
+      "r_mult": -0.44,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-01",
+      "exit_date": "2026-09-04",
+      "duration": 3,
+      "pnl_pct": -2.42,
+      "r_mult": -0.51,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-02",
+      "exit_date": "2026-09-15",
+      "duration": 9,
+      "pnl_pct": -0.39,
+      "r_mult": -0.08,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-03",
+      "exit_date": "2026-09-15",
+      "duration": 8,
+      "pnl_pct": -2.82,
+      "r_mult": -0.4,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-18",
+      "exit_date": "2026-09-28",
+      "duration": 6,
+      "pnl_pct": -2.22,
+      "r_mult": -0.3,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-22",
+      "exit_date": "2026-09-28",
+      "duration": 4,
+      "pnl_pct": -2.72,
+      "r_mult": -0.37,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-25",
+      "exit_date": "2026-09-30",
+      "duration": 3,
+      "pnl_pct": 1.35,
+      "r_mult": 0.25,
+      "outcome": "WIN"
+    }
+  ],
+  "Sample Trades (Variant 3)": [
+    {
+      "entry_date": "2026-05-08",
+      "exit_date": "2026-06-22",
+      "duration": 31,
+      "pnl_pct": 7.61,
+      "r_mult": 1.14,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-11",
+      "exit_date": "2026-05-22",
+      "duration": 9,
+      "pnl_pct": 3.67,
+      "r_mult": 0.75,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-14",
+      "exit_date": "2026-06-10",
+      "duration": 19,
+      "pnl_pct": 10.02,
+      "r_mult": 1.41,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-05-29",
+      "exit_date": "2026-07-03",
+      "duration": 25,
+      "pnl_pct": 7.27,
+      "r_mult": 1.03,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-08",
+      "exit_date": "2026-07-22",
+      "duration": 32,
+      "pnl_pct": 10.61,
+      "r_mult": 1.7,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-09",
+      "exit_date": "2026-07-06",
+      "duration": 19,
+      "pnl_pct": 8.28,
+      "r_mult": 1.39,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-15",
+      "exit_date": "2026-07-13",
+      "duration": 20,
+      "pnl_pct": 16.1,
+      "r_mult": 1.97,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-16",
+      "exit_date": "2026-07-23",
+      "duration": 27,
+      "pnl_pct": 9.87,
+      "r_mult": 1.4,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-17",
+      "exit_date": "2026-07-23",
+      "duration": 26,
+      "pnl_pct": 8.48,
+      "r_mult": 1.17,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-19",
+      "exit_date": "2026-07-16",
+      "duration": 19,
+      "pnl_pct": 8.56,
+      "r_mult": 1.39,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-22",
+      "exit_date": "2026-08-12",
+      "duration": 37,
+      "pnl_pct": 9.25,
+      "r_mult": 1.52,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-23",
+      "exit_date": "2026-07-23",
+      "duration": 22,
+      "pnl_pct": 8.02,
+      "r_mult": 1.11,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-29",
+      "exit_date": "2026-09-15",
+      "duration": 56,
+      "pnl_pct": 38.13,
+      "r_mult": 6.22,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-06-30",
+      "exit_date": "2026-07-23",
+      "duration": 17,
+      "pnl_pct": 6.82,
+      "r_mult": 1.15,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-01",
+      "exit_date": "2026-07-17",
+      "duration": 12,
+      "pnl_pct": 5.16,
+      "r_mult": 0.83,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-02",
+      "exit_date": "2026-09-02",
+      "duration": 44,
+      "pnl_pct": 17.19,
+      "r_mult": 3.21,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-03",
+      "exit_date": "2026-09-03",
+      "duration": 44,
+      "pnl_pct": 9.12,
+      "r_mult": 1.49,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-06",
+      "exit_date": "2026-08-31",
+      "duration": 40,
+      "pnl_pct": 12.29,
+      "r_mult": 1.77,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-07",
+      "exit_date": "2026-09-15",
+      "duration": 50,
+      "pnl_pct": -7.05,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-10",
+      "exit_date": "2026-09-28",
+      "duration": 56,
+      "pnl_pct": -5.18,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-16",
+      "exit_date": "2026-09-04",
+      "duration": 36,
+      "pnl_pct": 16.26,
+      "r_mult": 2.55,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-17",
+      "exit_date": "2026-08-12",
+      "duration": 18,
+      "pnl_pct": 7.17,
+      "r_mult": 1.09,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-21",
+      "exit_date": "2026-09-02",
+      "duration": 31,
+      "pnl_pct": -4.64,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-22",
+      "exit_date": "2026-09-07",
+      "duration": 33,
+      "pnl_pct": 9.89,
+      "r_mult": 1.84,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-24",
+      "exit_date": "2026-09-07",
+      "duration": 31,
+      "pnl_pct": 12.11,
+      "r_mult": 2.0,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-28",
+      "exit_date": "2026-08-18",
+      "duration": 15,
+      "pnl_pct": 5.38,
+      "r_mult": 0.78,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-29",
+      "exit_date": "2026-09-15",
+      "duration": 34,
+      "pnl_pct": 12.37,
+      "r_mult": 2.41,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-07-30",
+      "exit_date": "2026-08-31",
+      "duration": 22,
+      "pnl_pct": -5.12,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-07-31",
+      "exit_date": "2026-09-24",
+      "duration": 39,
+      "pnl_pct": -6.8,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-03",
+      "exit_date": "2026-09-30",
+      "duration": 42,
+      "pnl_pct": -2.17,
+      "r_mult": -0.36,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-07",
+      "exit_date": "2026-09-21",
+      "duration": 31,
+      "pnl_pct": 14.23,
+      "r_mult": 2.63,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-10",
+      "exit_date": "2026-09-29",
+      "duration": 36,
+      "pnl_pct": -6.36,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-12",
+      "exit_date": "2026-09-30",
+      "duration": 35,
+      "pnl_pct": -2.0,
+      "r_mult": -0.46,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-13",
+      "exit_date": "2026-08-27",
+      "duration": 10,
+      "pnl_pct": -6.29,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-14",
+      "exit_date": "2026-09-07",
+      "duration": 16,
+      "pnl_pct": -9.77,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-17",
+      "exit_date": "2026-09-11",
+      "duration": 19,
+      "pnl_pct": -5.31,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-18",
+      "exit_date": "2026-09-09",
+      "duration": 16,
+      "pnl_pct": 8.92,
+      "r_mult": 1.24,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-21",
+      "exit_date": "2026-09-11",
+      "duration": 15,
+      "pnl_pct": -7.1,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-24",
+      "exit_date": "2026-09-15",
+      "duration": 16,
+      "pnl_pct": -6.56,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-25",
+      "exit_date": "2026-09-25",
+      "duration": 23,
+      "pnl_pct": 7.29,
+      "r_mult": 1.08,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-26",
+      "exit_date": "2026-09-15",
+      "duration": 14,
+      "pnl_pct": -6.32,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-27",
+      "exit_date": "2026-09-15",
+      "duration": 13,
+      "pnl_pct": 7.82,
+      "r_mult": 1.41,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-08-28",
+      "exit_date": "2026-09-21",
+      "duration": 16,
+      "pnl_pct": -6.15,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-08-31",
+      "exit_date": "2026-09-30",
+      "duration": 22,
+      "pnl_pct": -3.03,
+      "r_mult": -0.42,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-01",
+      "exit_date": "2026-09-07",
+      "duration": 4,
+      "pnl_pct": -4.77,
+      "r_mult": -1.0,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-02",
+      "exit_date": "2026-09-15",
+      "duration": 9,
+      "pnl_pct": 3.58,
+      "r_mult": 0.75,
+      "outcome": "WIN"
+    },
+    {
+      "entry_date": "2026-09-03",
+      "exit_date": "2026-09-30",
+      "duration": 19,
+      "pnl_pct": -2.71,
+      "r_mult": -0.38,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-18",
+      "exit_date": "2026-09-30",
+      "duration": 8,
+      "pnl_pct": -3.09,
+      "r_mult": -0.42,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-22",
+      "exit_date": "2026-09-30",
+      "duration": 6,
+      "pnl_pct": -5.49,
+      "r_mult": -0.74,
+      "outcome": "LOSS"
+    },
+    {
+      "entry_date": "2026-09-25",
+      "exit_date": "2026-09-30",
+      "duration": 3,
+      "pnl_pct": 1.35,
+      "r_mult": 0.25,
+      "outcome": "WIN"
+    }
+  ]
+}
