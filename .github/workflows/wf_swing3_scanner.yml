@@ -1,8 +1,10 @@
 name: Run Daily Swing 3.0 Scanner
 
 on:
-  schedule:
-    - cron: '15 11 * * 1-5' # 4:45 PM IST Mon-Fri
+  workflow_run:
+    workflows: ["Daily NSE Stock Update"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -11,6 +13,8 @@ permissions:
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
+    # Run only if triggered manually OR if the upstream data update completed successfully
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 15
 
     steps:
