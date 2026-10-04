@@ -1,0 +1,38 @@
+{
+  "Generated At": "2026-10-04 14:30:27 IST",
+  "Report": [
+    {
+      "Rank": 1,
+      "Exit Model": "1. Current: Strict 20 EMA Close Exit",
+      "Trades": 783,
+      "Win Rate %": 65.9,
+      "Profit Factor": 11.25,
+      "Avg Gain %": 11.68,
+      "Avg Loss %": -2.01,
+      "Max Profit %": 297.12,
+      "Avg Hold (Days)": 17.9
+    },
+    {
+      "Rank": 2,
+      "Exit Model": "2. Institutional: Close < 20 EMA + OBV Dump",
+      "Trades": 783,
+      "Win Rate %": 54.02,
+      "Profit Factor": 4.61,
+      "Avg Gain %": 13.61,
+      "Avg Loss %": -3.47,
+      "Max Profit %": 296.53,
+      "Avg Hold (Days)": 23.3
+    },
+    {
+      "Rank": 3,
+      "Exit Model": "3. Balanced: OBV Buffer + 6d Decay + 15d Chop Exit",
+      "Trades": 783,
+      "Win Rate %": 59.26,
+      "Profit Factor": 4.59,
+      "Avg Gain %": 11.5,
+      "Avg Loss %": -3.65,
+      "Max Profit %": 133.66,
+      "Avg Hold (Days)": 20.0
+    }
+  ]
+}
