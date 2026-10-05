@@ -1,284 +1,83 @@
 {
-  "Generated At": "2026-10-05 13:44:54 IST",
-  "Triggered Today": [],
-  "Coiling Watchlist": [
+  "Scan_Timestamp": "2026-10-05 19:53:00 IST",
+  "Target_Universe": "Nifty 750 Universe",
+  "Strategy_Specs": "Swing 3.0 Production (Shelf <= 8%, Conviction >= 2.5, 20 EMA Trail)",
+  "Fresh_Triggers_Count": 0,
+  "Active_Positions_Count": 2,
+  "Watchlist_Count": 5,
+  "Fresh_Triggers": [],
+  "Active_Positions": [
+    {
+      "symbol": "CASTROLIND",
+      "entry_date": "2026-09-25",
+      "entry_price": 197.85,
+      "current_close": 199.51,
+      "trailing_stop_20ema": 195.39,
+      "pnl_%": 0.84,
+      "holding_days": 6,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LGEINDIA",
+      "entry_date": "2026-09-25",
+      "entry_price": 1719.9,
+      "current_close": 1770.9,
+      "trailing_stop_20ema": 1697.28,
+      "pnl_%": 2.97,
+      "holding_days": 6,
+      "status": "HOLD"
+    }
+  ],
+  "Watchlist": [
     {
       "symbol": "LENSKART",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
+      "type": "COILING SHELF",
       "close": 692.75,
-      "pivot_ceiling": 698.3,
-      "dist_to_ceiling_pct": 0.79,
-      "stop_loss": 679.02,
-      "risk_pct": 1.98,
-      "conviction_score": 0.366,
+      "pivot_target": 698.3,
+      "dist_to_pivot_pct": 0.8,
+      "spread_%": 7.71,
+      "conviction_score": 81.14,
       "turnover_cr": 647.1
     },
     {
       "symbol": "PETRONET",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
+      "type": "COILING SHELF",
       "close": 290.0,
-      "pivot_ceiling": 293.05,
-      "dist_to_ceiling_pct": 1.04,
-      "stop_loss": 286.59,
-      "risk_pct": 1.18,
-      "conviction_score": 1.423,
+      "pivot_target": 294.0,
+      "dist_to_pivot_pct": 1.38,
+      "spread_%": 4.89,
+      "conviction_score": 54.229,
       "turnover_cr": 51.1
     },
     {
-      "symbol": "ENRIN",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
-      "close": 3316.4,
-      "pivot_ceiling": 3358.0,
-      "dist_to_ceiling_pct": 1.24,
-      "stop_loss": 3241.62,
-      "risk_pct": 2.25,
-      "conviction_score": 1.331,
-      "turnover_cr": 210.0
-    },
-    {
-      "symbol": "DLF",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
-      "close": 673.0,
-      "pivot_ceiling": 683.6,
-      "dist_to_ceiling_pct": 1.55,
-      "stop_loss": 662.74,
-      "risk_pct": 1.52,
-      "conviction_score": 0.731,
-      "turnover_cr": 244.3
-    },
-    {
       "symbol": "REDINGTON",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
+      "type": "COILING SHELF",
       "close": 412.75,
-      "pivot_ceiling": 419.5,
-      "dist_to_ceiling_pct": 1.61,
-      "stop_loss": 394.54,
-      "risk_pct": 4.41,
-      "conviction_score": 3.335,
+      "pivot_target": 419.5,
+      "dist_to_pivot_pct": 1.64,
+      "spread_%": 7.37,
+      "conviction_score": 1045.971,
       "turnover_cr": 306.1
     },
     {
       "symbol": "FINCABLES",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
+      "type": "COILING SHELF",
       "close": 1467.3,
-      "pivot_ceiling": 1493.9,
-      "dist_to_ceiling_pct": 1.78,
-      "stop_loss": 1408.41,
-      "risk_pct": 4.01,
-      "conviction_score": 0.706,
+      "pivot_target": 1496.1,
+      "dist_to_pivot_pct": 1.96,
+      "spread_%": 7.25,
+      "conviction_score": 196.677,
       "turnover_cr": 195.8
     },
     {
-      "symbol": "CASTROLIND",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
-      "close": 199.51,
-      "pivot_ceiling": 203.4,
-      "dist_to_ceiling_pct": 1.91,
-      "stop_loss": 195.39,
-      "risk_pct": 2.07,
-      "conviction_score": 0.614,
-      "turnover_cr": 60.2
-    },
-    {
-      "symbol": "FEDERALBNK",
-      "phase": "COILING",
-      "setup": "PRE-BREAKOUT",
-      "close": 327.35,
-      "pivot_ceiling": 335.35,
-      "dist_to_ceiling_pct": 2.39,
-      "stop_loss": 330.31,
-      "risk_pct": -0.9,
-      "conviction_score": 1.166,
-      "turnover_cr": 187.3
-    }
-  ],
-  "Active Swings (20 EMA Trail)": [
-    {
-      "symbol": "SUNTV",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 626.85,
-      "trailing_stop_ema20": 528.24,
-      "cushion_pct": 15.73,
-      "turnover_cr": 100.3
-    },
-    {
-      "symbol": "STLTECH",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1001.25,
-      "trailing_stop_ema20": 859.65,
-      "cushion_pct": 14.14,
-      "turnover_cr": 154.9
-    },
-    {
-      "symbol": "HFCL",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 250.27,
-      "trailing_stop_ema20": 226.58,
-      "cushion_pct": 9.46,
-      "turnover_cr": 345.2
-    },
-    {
-      "symbol": "CUPID",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 310.1,
-      "trailing_stop_ema20": 285.54,
-      "cushion_pct": 7.92,
-      "turnover_cr": 714.2
-    },
-    {
-      "symbol": "CPPLUS",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 3989.5,
-      "trailing_stop_ema20": 3735.73,
-      "cushion_pct": 6.36,
-      "turnover_cr": 92.2
-    },
-    {
-      "symbol": "TDPOWERSYS",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 812.9,
-      "trailing_stop_ema20": 762.97,
-      "cushion_pct": 6.14,
-      "turnover_cr": 240.5
-    },
-    {
-      "symbol": "NUVAMA",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1820.8,
-      "trailing_stop_ema20": 1715.08,
-      "cushion_pct": 5.81,
-      "turnover_cr": 73.9
-    },
-    {
-      "symbol": "CARBORUNIV",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1267.6,
-      "trailing_stop_ema20": 1194.56,
-      "cushion_pct": 5.76,
-      "turnover_cr": 46.3
-    },
-    {
-      "symbol": "CYIENT",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1140.2,
-      "trailing_stop_ema20": 1077.97,
-      "cushion_pct": 5.46,
-      "turnover_cr": 105.3
-    },
-    {
-      "symbol": "GESHIP",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1559.3,
-      "trailing_stop_ema20": 1475.42,
-      "cushion_pct": 5.38,
-      "turnover_cr": 148.5
-    },
-    {
-      "symbol": "ENGINERSIN",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 307.85,
-      "trailing_stop_ema20": 293.38,
-      "cushion_pct": 4.7,
-      "turnover_cr": 154.2
-    },
-    {
-      "symbol": "WELSPUNLIV",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 230.27,
-      "trailing_stop_ema20": 219.5,
-      "cushion_pct": 4.68,
-      "turnover_cr": 141.3
-    },
-    {
-      "symbol": "RRKABEL",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 2648.0,
-      "trailing_stop_ema20": 2526.4,
-      "cushion_pct": 4.59,
-      "turnover_cr": 147.6
-    },
-    {
-      "symbol": "WHIRLPOOL",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 871.75,
-      "trailing_stop_ema20": 832.0,
-      "cushion_pct": 4.56,
-      "turnover_cr": 135.3
-    },
-    {
-      "symbol": "SCI",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 290.6,
-      "trailing_stop_ema20": 277.88,
-      "cushion_pct": 4.38,
-      "turnover_cr": 79.5
-    },
-    {
-      "symbol": "AZAD",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 2927.2,
-      "trailing_stop_ema20": 2801.84,
-      "cushion_pct": 4.28,
-      "turnover_cr": 208.9
-    },
-    {
-      "symbol": "MTARTECH",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 7654.0,
-      "trailing_stop_ema20": 7331.57,
-      "cushion_pct": 4.21,
-      "turnover_cr": 102.3
-    },
-    {
-      "symbol": "LGEINDIA",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 1770.9,
-      "trailing_stop_ema20": 1697.28,
-      "cushion_pct": 4.16,
-      "turnover_cr": 130.4
-    },
-    {
-      "symbol": "ABDL",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 696.75,
-      "trailing_stop_ema20": 670.8,
-      "cushion_pct": 3.72,
-      "turnover_cr": 45.1
-    },
-    {
-      "symbol": "MEESHO",
-      "phase": "ACTIVE_HOLD",
-      "setup": "TREND_RUNNER",
-      "close": 226.5,
-      "trailing_stop_ema20": 219.41,
-      "cushion_pct": 3.13,
-      "turnover_cr": 390.0
+      "symbol": "TECHM",
+      "type": "COILING SHELF",
+      "close": 1535.9,
+      "pivot_target": 1576.2,
+      "dist_to_pivot_pct": 2.62,
+      "spread_%": 4.4,
+      "conviction_score": 38.836,
+      "turnover_cr": 376.1
     }
   ]
 }
