@@ -138,7 +138,6 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
-    # 1. Simulate historical state up to the current bar
     in_trade = False
     entry_p = 0.0
     initial_sl = 0.0
@@ -179,7 +178,6 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # SWING 3 EXIT ENGINE
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
@@ -259,7 +257,6 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 entry_d = t
                 entry_idx = i
 
-    # Active Position Tracking
     active_position = None
     if in_trade:
         cur_c = closes[-1]
@@ -277,24 +274,15 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             "status": "HOLD" if cur_c >= trailing_sl else "EXIT (CLOSE < 20 EMA)"
         }
 
-    # 2. Fresh Trigger Today (ONLY IF NOT IN AN ACTIVE TRADE)
     fresh_trigger = None
     last_i = len(df) - 1
     c_today = closes[last_i]
-    h_today = highs[last_i]
-    l_today = lows[last_i]
-    v_today = volumes[last_i]
-    v_avg_today = vol_avgs[last_i]
+    to_today = to_50d[last_i]
     dv_today = deliv_vols[last_i]
     dv_avg_today = deliv_avgs[last_i]
-    dp_today = deliv_pcts[last_i]
-    to_today = to_50d[last_i]
-    rc_today = range_closes[last_i]
-    sma200_today = sma200s[last_i]
     stock_p60_today = perf_60s[last_i]
     t_today = times[last_i]
 
-    # Only fire if the entry happened ON THE CURRENT BAR
     if in_trade and entry_d == t_today:
         deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
         n_p = nifty_perf_map.get(t_today, 0.001)
@@ -316,10 +304,9 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
         }
 
-    # 3. Watchlist (Pre-Breakouts + Pre-V-Reversals)
     watchlist_item = None
     if not in_trade and to_today >= MIN_TURNOVER_CR:
-        is_st2 = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
+        is_st2 = bool(c_today >= sma200s[last_i]) if pd.notnull(sma200s[last_i]) else False
         n_p = nifty_perf_map.get(t_today, 0.001)
         is_rs = bool(stock_p60_today > n_p)
 
@@ -328,45 +315,45 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
             conv_sc = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
-            # Check Type A: Launchpad Pre-Breakout (Coiling <= 13%)
-            for shelf_len in range(10, 19):
-                s_h = highs[last_i - shelf_len:last_i + 1].max()
-                s_l = lows[last_i - shelf_len:last_i + 1].min()
-                if s_l > 0:
-                    spread = (s_h - s_l) / s_l
-                    if spread <= 0.13:
-                        dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
-                        if 0 <= dist_pct <= 3.0:
-                            watchlist_item = {
-                                "symbol": symbol,
-                                "type": "COILING SHELF",
-                                "close": round(c_today, 2),
-                                "pivot_target": round(float(s_h), 2),
-                                "dist_to_pivot_pct": dist_pct,
-                                "spread_%": round(spread * 100, 2),
-                                "conviction_score": conv_sc,
-                                "turnover_cr": round(to_today, 1)
-                            }
-                            break
+            # Option A: Pre-V-Reversal Reclaim
+            r20_h = highs[last_i - 20:last_i + 1].max()
+            pullback_depth = (r20_h - lows[last_i]) / r20_h
+            if pullback_depth >= 0.18:
+                prior_3d_high = highs[last_i - 3:last_i].max()
+                dist_to_reclaim = round(((float(prior_3d_high) - c_today) / c_today) * 100.0, 2)
+                if 0 <= dist_to_reclaim <= 3.0:
+                    watchlist_item = {
+                        "symbol": symbol,
+                        "setup_class": "V-REVERSAL PRE-RECLAIM",
+                        "close": round(c_today, 2),
+                        "pivot_target": round(float(prior_3d_high), 2),
+                        "dist_to_pivot_pct": dist_to_reclaim,
+                        "spread_%": round(pullback_depth * 100, 2),
+                        "conviction_score": conv_sc,
+                        "turnover_cr": round(to_today, 1)
+                    }
 
-            # Check Type B: Pre-V-Reversal (Deep Flush >= 18% approaching 3-day high)
+            # Option B: Launchpad Coiling Base (Spread <= 13%)
             if not watchlist_item:
-                r20_h = highs[last_i - 20:last_i + 1].max()
-                pullback_depth = (r20_h - l_today) / r20_h
-                if pullback_depth >= 0.18:
-                    prior_3d_high = highs[last_i - 3:last_i].max()
-                    dist_to_reclaim = round(((float(prior_3d_high) - c_today) / c_today) * 100.0, 2)
-                    if 0 <= dist_to_reclaim <= 3.0:
-                        watchlist_item = {
-                            "symbol": symbol,
-                            "type": "PRE-V-REVERSAL",
-                            "close": round(c_today, 2),
-                            "pivot_target": round(float(prior_3d_high), 2),
-                            "dist_to_pivot_pct": dist_to_reclaim,
-                            "spread_%": round(pullback_depth * 100, 2),
-                            "conviction_score": conv_sc,
-                            "turnover_cr": round(to_today, 1)
-                        }
+                for shelf_len in range(10, 19):
+                    s_h = highs[last_i - shelf_len:last_i + 1].max()
+                    s_l = lows[last_i - shelf_len:last_i + 1].min()
+                    if s_l > 0:
+                        spread = (s_h - s_l) / s_l
+                        if spread <= 0.13:
+                            dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
+                            if 0 <= dist_pct <= 3.0:
+                                watchlist_item = {
+                                    "symbol": symbol,
+                                    "setup_class": "LAUNCHPAD COIL",
+                                    "close": round(c_today, 2),
+                                    "pivot_target": round(float(s_h), 2),
+                                    "dist_to_pivot_pct": dist_pct,
+                                    "spread_%": round(spread * 100, 2),
+                                    "conviction_score": conv_sc,
+                                    "turnover_cr": round(to_today, 1)
+                                }
+                                break
 
     return fresh_trigger, active_position, watchlist_item
 
@@ -384,7 +371,10 @@ def execute_scanner():
         "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json"
     }
 
-    target_files = [f for f in json_files if os.path.basename(f) not in excluded and os.path.splitext(os.path.basename(f))[0].upper() not in nifty750_set]
+    target_files = [
+        f for f in json_files
+        if os.path.basename(f) not in excluded and os.path.splitext(os.path.basename(f))[0].upper() not in nifty750_set
+    ]
 
     triggers = []
     active_positions = []
@@ -407,8 +397,9 @@ def execute_scanner():
         except Exception:
             continue
 
+    # Decremental Conviction Score sort for both lists
     triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
-    watchlist.sort(key=lambda x: x["dist_to_pivot_pct"])
+    watchlist.sort(key=lambda x: x["conviction_score"], reverse=True)
 
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
