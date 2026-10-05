@@ -138,7 +138,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
-    # 1. Historical Simulator for Active Open Trades
+    # 1. Simulate historical state up to the current bar
     in_trade = False
     entry_p = 0.0
     initial_sl = 0.0
@@ -179,6 +179,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         stock_p60 = perf_60s[i]
         t = times[i]
 
+        # SWING 3 EXIT ENGINE
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
@@ -258,6 +259,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 entry_d = t
                 entry_idx = i
 
+    # Active Position Tracking
     active_position = None
     if in_trade:
         cur_c = closes[-1]
@@ -275,7 +277,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             "status": "HOLD" if cur_c >= trailing_sl else "EXIT (CLOSE < 20 EMA)"
         }
 
-    # 2. Fresh Trigger Check
+    # 2. Fresh Trigger Today (ONLY IF NOT IN AN ACTIVE TRADE)
     fresh_trigger = None
     last_i = len(df) - 1
     c_today = closes[last_i]
@@ -286,111 +288,85 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
     dv_today = deliv_vols[last_i]
     dv_avg_today = deliv_avgs[last_i]
     dp_today = deliv_pcts[last_i]
-    dp_avg_today = deliv_pct_avgs[last_i]
     to_today = to_50d[last_i]
     rc_today = range_closes[last_i]
     sma200_today = sma200s[last_i]
     stock_p60_today = perf_60s[last_i]
     t_today = times[last_i]
 
-    if to_today >= MIN_TURNOVER_CR:
-        is_stage2_today = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
+    # Only fire if the entry happened ON THE CURRENT BAR
+    if in_trade and entry_d == t_today:
+        deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
         n_p = nifty_perf_map.get(t_today, 0.001)
-        is_rs_today = bool(stock_p60_today > n_p)
+        rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
+        conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
-        if is_stage2_today and is_rs_today:
-            deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
-            rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
-            conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
+        ext_pct = round(((c_today - entry_p) / entry_p) * 100.0, 2)
+        fresh_trigger = {
+            "symbol": symbol,
+            "date": t_today,
+            "type": "V-REVERSAL" if (entry_p != initial_sl) else "LAUNCHPAD-BO",
+            "pivot_ceiling": entry_p,
+            "close": round(c_today, 2),
+            "extended_pct": ext_pct,
+            "stop_loss": initial_sl,
+            "risk_%": round(((entry_p - initial_sl) / entry_p) * 100, 2),
+            "conviction_score": conviction_score,
+            "turnover_cr": round(to_today, 1),
+            "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
+        }
 
-            # Engine 1
-            r20_high = highs[last_i - 20:last_i].max()
-            if (r20_high - l_today) / r20_high >= 0.18:
-                r_trough = lows[last_i - 5:last_i].min()
-                p3_high = highs[last_i - 4:last_i].max()
-                if (c_today >= p3_high and c_today > closes[last_i - 1] and
-                    v_today >= 1.3 * v_avg_today and (dv_today >= 1.25 * dv_avg_today or dp_today >= 1.15 * dp_avg_today) and
-                    rc_today >= 0.55):
-                    e_price = round(p3_high, 2)
-                    s_price = round(r_trough * 0.995, 2)
-                    if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
-                        ext_pct = round(((c_today - e_price) / e_price) * 100.0, 2)
-                        fresh_trigger = {
-                            "symbol": symbol,
-                            "date": t_today,
-                            "type": "V-REVERSAL",
-                            "pivot_ceiling": e_price,
-                            "close": round(c_today, 2),
-                            "extended_pct": ext_pct,
-                            "stop_loss": s_price,
-                            "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
-                            "conviction_score": conviction_score,
-                            "turnover_cr": round(to_today, 1),
-                            "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
-                        }
-
-            # Engine 2
-            if not fresh_trigger:
-                for shelf_len in range(10, 19):
-                    s_h = highs[last_i - shelf_len:last_i].max()
-                    s_l = lows[last_i - shelf_len:last_i].min()
-                    if s_l > 0 and ((s_h - s_l) / s_l) <= 0.13:
-                        up_d = sum(deliv_vols[k] for k in range(last_i - 15, last_i) if closes[k] >= closes[k - 1])
-                        dn_d = sum(deliv_vols[k] for k in range(last_i - 15, last_i) if closes[k] < closes[k - 1])
-                        c_ratio = (up_d / dn_d) if dn_d > 0 else 2.0
-                        if (c_today >= s_h and h_today >= s_h and
-                            v_today >= 1.4 * v_avg_today and (dv_today >= 1.25 * dv_avg_today or dp_today >= 1.25 * dp_avg_today) and
-                            rc_today >= 0.65 and c_ratio >= 1.15):
-                            e_price = round(float(s_h), 2)
-                            s_price = round(min(l_today, float(s_l)), 2)
-                            if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
-                                ext_pct = round(((c_today - e_price) / e_price) * 100.0, 2)
-                                fresh_trigger = {
-                                    "symbol": symbol,
-                                    "date": t_today,
-                                    "type": "LAUNCHPAD-BO",
-                                    "pivot_ceiling": e_price,
-                                    "close": round(c_today, 2),
-                                    "extended_pct": ext_pct,
-                                    "stop_loss": s_price,
-                                    "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
-                                    "conviction_score": conviction_score,
-                                    "turnover_cr": round(to_today, 1),
-                                    "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
-                                }
-                                break
-
-    # 3. Watchlist Pre-Breakout Candidate Check
+    # 3. Watchlist (Pre-Breakouts + Pre-V-Reversals)
     watchlist_item = None
-    if not fresh_trigger and to_today >= MIN_TURNOVER_CR:
+    if not in_trade and to_today >= MIN_TURNOVER_CR:
         is_st2 = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
         n_p = nifty_perf_map.get(t_today, 0.001)
         is_rs = bool(stock_p60_today > n_p)
+
         if is_st2 and is_rs:
+            deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
+            rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
+            conv_sc = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
+
+            # Check Type A: Launchpad Pre-Breakout (Coiling <= 13%)
             for shelf_len in range(10, 19):
-                s_h = highs[last_i - shelf_len:last_i].max()
-                s_l = lows[last_i - shelf_len:last_i].min()
+                s_h = highs[last_i - shelf_len:last_i + 1].max()
+                s_l = lows[last_i - shelf_len:last_i + 1].min()
                 if s_l > 0:
                     spread = (s_h - s_l) / s_l
                     if spread <= 0.13:
                         dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
-                        if dist_pct >= 0:
-                            deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
-                            rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
-                            conv_sc = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
-
+                        if 0 <= dist_pct <= 3.0:
                             watchlist_item = {
                                 "symbol": symbol,
-                                "date": t_today,
+                                "type": "COILING SHELF",
                                 "close": round(c_today, 2),
-                                "shelf_high": round(float(s_h), 2),
-                                "shelf_low": round(float(s_l), 2),
-                                "dist_to_ceiling_pct": dist_pct,
+                                "pivot_target": round(float(s_h), 2),
+                                "dist_to_pivot_pct": dist_pct,
                                 "spread_%": round(spread * 100, 2),
                                 "conviction_score": conv_sc,
                                 "turnover_cr": round(to_today, 1)
                             }
                             break
+
+            # Check Type B: Pre-V-Reversal (Deep Flush >= 18% approaching 3-day high)
+            if not watchlist_item:
+                r20_h = highs[last_i - 20:last_i + 1].max()
+                pullback_depth = (r20_h - l_today) / r20_h
+                if pullback_depth >= 0.18:
+                    prior_3d_high = highs[last_i - 3:last_i].max()
+                    dist_to_reclaim = round(((float(prior_3d_high) - c_today) / c_today) * 100.0, 2)
+                    if 0 <= dist_to_reclaim <= 3.0:
+                        watchlist_item = {
+                            "symbol": symbol,
+                            "type": "PRE-V-REVERSAL",
+                            "close": round(c_today, 2),
+                            "pivot_target": round(float(prior_3d_high), 2),
+                            "dist_to_pivot_pct": dist_to_reclaim,
+                            "spread_%": round(pullback_depth * 100, 2),
+                            "conviction_score": conv_sc,
+                            "turnover_cr": round(to_today, 1)
+                        }
 
     return fresh_trigger, active_position, watchlist_item
 
@@ -432,7 +408,7 @@ def execute_scanner():
             continue
 
     triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
-    watchlist.sort(key=lambda x: x["dist_to_ceiling_pct"])
+    watchlist.sort(key=lambda x: x["dist_to_pivot_pct"])
 
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
@@ -440,10 +416,10 @@ def execute_scanner():
         "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, Conviction Scoring, 20 EMA Trail Exit)",
         "Fresh_Triggers_Count": len(triggers),
         "Active_Positions_Count": len(active_positions),
-        "Watchlist_Coiling_Count": len(watchlist),
+        "Watchlist_Count": len(watchlist),
         "Fresh_Triggers": triggers,
         "Active_Positions": active_positions,
-        "Watchlist_Coiling": watchlist[:30]
+        "Watchlist": watchlist[:30]
     }
 
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
