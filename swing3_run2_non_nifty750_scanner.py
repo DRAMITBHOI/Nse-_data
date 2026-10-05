@@ -1,0 +1,456 @@
+import os
+import io
+import json
+import glob
+import datetime
+import requests
+import numpy as np
+import pandas as pd
+
+DATA_DIR = "data"
+RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run2_non_nifty750_scanner_results.json")
+NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
+MIN_TURNOVER_CR = 10.0
+
+
+def clean_and_prepare(raw_data):
+    if not raw_data or not isinstance(raw_data, list):
+        return []
+    date_map = {}
+    for r in raw_data:
+        if not isinstance(r, dict):
+            continue
+        raw_t = str(r.get("time", "")).strip()
+        if not raw_t:
+            continue
+        d_str = raw_t[:10]
+        try:
+            c = float(r.get("close", 0) or 0)
+            if c <= 0:
+                continue
+            entry = {
+                "time": d_str,
+                "open": float(r.get("open", c) or c),
+                "high": float(r.get("high", c) or c),
+                "low": float(r.get("low", c) or c),
+                "close": c,
+                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                "volume": float(r.get("volume", 0) or 0),
+                "deliv_pct": float(r.get("deliv_pct", 0) or 0),
+            }
+            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                date_map[d_str] = entry
+        except Exception:
+            continue
+
+    clean = [date_map[k] for k in sorted(date_map.keys())]
+
+    # Split / Corporate Action Normalization
+    known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
+    for i in range(len(clean) - 1, 0, -1):
+        prev_c = clean[i - 1]["close"]
+        curr_o = clean[i]["open"]
+        if prev_c > 0 and curr_o > 0:
+            ratio = prev_c / curr_o
+            adj_factor = None
+            if ratio >= 1.35:
+                for k in known_multipliers:
+                    if abs(ratio - k) / k < 0.15:
+                        adj_factor = k
+                        break
+                if not adj_factor and 1.70 <= ratio <= 2.30:
+                    adj_factor = 2.0
+                elif not adj_factor and 4.30 <= ratio <= 5.50:
+                    adj_factor = 5.0
+                elif not adj_factor and 8.50 <= ratio <= 11.50:
+                    adj_factor = 10.0
+            if adj_factor:
+                for j in range(0, i):
+                    clean[j]["open"] = round(clean[j]["open"] / adj_factor, 2)
+                    clean[j]["high"] = round(clean[j]["high"] / adj_factor, 2)
+                    clean[j]["low"] = round(clean[j]["low"] / adj_factor, 2)
+                    clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
+                    clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
+                    clean[j]["volume"] = clean[j]["volume"] * adj_factor
+
+    running_vol = 50000.0
+    for i in range(len(clean)):
+        v = clean[i]["volume"]
+        dv = clean[i]["delivery_vol"]
+        pct = clean[i]["deliv_pct"]
+        if v > 0:
+            running_vol = 0.9 * running_vol + 0.1 * v
+        else:
+            clean[i]["volume"] = running_vol
+            v = running_vol
+        if dv <= 0:
+            clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
+            clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
+        elif dv > v:
+            clean[i]["delivery_vol"] = v
+            clean[i]["deliv_pct"] = 100.0
+
+    return clean
+
+
+def load_nifty_benchmark():
+    for f in ["nifty.json", "nifty50.json", "NIFTY.json"]:
+        p = os.path.join(DATA_DIR, f)
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    raw = json.load(fp)
+                clean = clean_and_prepare(raw)
+                if len(clean) > 50:
+                    df = pd.DataFrame(clean)
+                    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+                    return {r["time"]: float(r["perf_60d"]) for _, r in df.iterrows()}
+            except Exception:
+                continue
+    return {}
+
+
+def load_nifty750_symbols():
+    if os.path.exists(NIFTY750_FILE):
+        try:
+            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, list):
+                return {str(x).strip().upper() for x in data}
+            if isinstance(data, dict):
+                return {str(x).strip().upper() for x in data.keys()}
+        except Exception:
+            pass
+    return set()
+
+
+def scan_stock(symbol, clean_data, nifty_perf_map):
+    if len(clean_data) < 60:
+        return None, None, None
+
+    df = pd.DataFrame(clean_data)
+    df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
+    df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
+    df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+    df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
+    df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean().fillna(35.0)
+    df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
+    df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
+    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+
+    c_range = df["high"] - df["low"]
+    df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
+
+    # Historical Trade Simulator to evaluate currently active open positions
+    trades = []
+    in_trade = False
+    entry_p = 0.0
+    initial_sl = 0.0
+    current_sl = 0.0
+    entry_d = ""
+    entry_idx = 0
+
+    highs = df["high"].values
+    lows = df["low"].values
+    closes = df["close"].values
+    volumes = df["volume"].values
+    vol_avgs = df["gross_vol_sma20"].values
+    deliv_vols = df["delivery_vol"].values
+    deliv_avgs = df["deliv_sma20"].values
+    deliv_pcts = df["deliv_pct"].values
+    deliv_pct_avgs = df["deliv_pct_50d"].values
+    to_50d = df["turnover_50d"].values
+    range_closes = df["range_closeness"].values
+    ema20s = df["ema_20"].values
+    sma200s = df["sma_200"].values
+    perf_60s = df["perf_60d"].values
+    times = df["time"].values
+
+    for i in range(40, len(df)):
+        c = closes[i]
+        h = highs[i]
+        l = lows[i]
+        v = volumes[i]
+        v_avg = vol_avgs[i]
+        dv = deliv_vols[i]
+        dv_avg = deliv_avgs[i]
+        turnover = to_50d[i]
+        dp = deliv_pcts[i]
+        dp_avg = deliv_pct_avgs[i]
+        rc = range_closes[i]
+        ema = ema20s[i]
+        sma200 = sma200s[i]
+        stock_p60 = perf_60s[i]
+        t = times[i]
+
+        # SWING 3 EXIT ENGINE
+        if in_trade:
+            current_sl = max(initial_sl, round(float(ema), 2))
+            if c < current_sl:
+                in_trade = False
+                continue
+            continue
+
+        if turnover < MIN_TURNOVER_CR:
+            continue
+
+        is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
+        n_perf = nifty_perf_map.get(t)
+        if n_perf is None:
+            prior_dates = [d for d in nifty_perf_map.keys() if d <= t]
+            n_perf = nifty_perf_map[max(prior_dates)] if prior_dates else 0.001
+        is_rs = bool(stock_p60 > n_perf)
+
+        if not (is_stage2 and is_rs):
+            continue
+
+        entry_triggered = False
+        calc_entry = 0.0
+        calc_sl = 0.0
+
+        # ENGINE 1: V-REVERSAL
+        recent_20_high = highs[i - 20:i].max()
+        if (recent_20_high - l) / recent_20_high >= 0.18:
+            recent_trough = lows[i - 5:i].min()
+            prior_3d_high = highs[i - 4:i].max()
+            c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
+            c_vol_rev = v >= (1.3 * v_avg)
+            c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg)
+            c_candle_rev = rc >= 0.55
+
+            if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
+                entry_triggered = True
+                calc_entry = round(prior_3d_high, 2)
+                calc_sl = round(recent_trough * 0.995, 2)
+
+        # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (SPREAD <= 13%)
+        if not entry_triggered:
+            valid_launchpad = False
+            launchpad_high = 0.0
+            launchpad_low = 0.0
+
+            for shelf_len in range(10, 19):
+                s_high = highs[i - shelf_len:i].max()
+                s_low = lows[i - shelf_len:i].min()
+                if s_low > 0 and ((s_high - s_low) / s_low) <= 0.13:
+                    valid_launchpad = True
+                    launchpad_high = round(float(s_high), 2)
+                    launchpad_low = round(float(s_low), 2)
+                    break
+
+            if valid_launchpad:
+                base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
+                base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
+                base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 2.0
+
+                c_bo = (c >= launchpad_high) and (h >= launchpad_high)
+                c_vol_bo = v >= (1.4 * v_avg)
+                c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg)
+                c_candle_bo = rc >= 0.65
+
+                if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.15):
+                    entry_triggered = True
+                    calc_entry = launchpad_high
+                    calc_sl = round(min(l, launchpad_low), 2)
+
+        if entry_triggered:
+            r_dist = calc_entry - calc_sl
+            if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
+                in_trade = True
+                entry_p = calc_entry
+                initial_sl = calc_sl
+                current_sl = initial_sl
+                entry_d = t
+                entry_idx = i
+
+    # 1. Active Open Trade Check
+    active_position = None
+    if in_trade:
+        cur_c = closes[-1]
+        cur_ema = round(float(ema20s[-1]), 2)
+        trailing_sl = max(initial_sl, cur_ema)
+        pnl_pct = round(((cur_c - entry_p) / entry_p) * 100.0, 2)
+        active_position = {
+            "symbol": symbol,
+            "entry_date": entry_d,
+            "entry_price": entry_p,
+            "current_close": round(cur_c, 2),
+            "trailing_stop_20ema": trailing_sl,
+            "pnl_%": pnl_pct,
+            "holding_days": len(df) - 1 - entry_idx,
+            "status": "HOLD" if cur_c >= trailing_sl else "EXIT TRIGGERED (CLOSE < 20 EMA)"
+        }
+
+    # 2. Fresh Today Breakout / Reversal Trigger
+    fresh_trigger = None
+    last_i = len(df) - 1
+    c_today = closes[last_i]
+    h_today = highs[last_i]
+    l_today = lows[last_i]
+    v_today = volumes[last_i]
+    v_avg_today = vol_avgs[last_i]
+    dv_today = deliv_vols[last_i]
+    dv_avg_today = deliv_avgs[last_i]
+    dp_today = deliv_pcts[last_i]
+    dp_avg_today = deliv_pct_avgs[last_i]
+    to_today = to_50d[last_i]
+    rc_today = range_closes[last_i]
+    sma200_today = sma200s[last_i]
+    stock_p60_today = perf_60s[last_i]
+    t_today = times[last_i]
+
+    if to_today >= MIN_TURNOVER_CR:
+        is_stage2_today = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
+        n_p = nifty_perf_map.get(t_today, 0.001)
+        is_rs_today = bool(stock_p60_today > n_p)
+
+        if is_stage2_today and is_rs_today:
+            # Engine 1 Trigger Check
+            r20_high = highs[last_i - 20:last_i].max()
+            if (r20_high - l_today) / r20_high >= 0.18:
+                r_trough = lows[last_i - 5:last_i].min()
+                p3_high = highs[last_i - 4:last_i].max()
+                if (c_today >= p3_high and c_today > closes[last_i - 1] and
+                    v_today >= 1.3 * v_avg_today and (dv_today >= 1.25 * dv_avg_today or dp_today >= 1.15 * dp_avg_today) and
+                    rc_today >= 0.55):
+                    e_price = round(p3_high, 2)
+                    s_price = round(r_trough * 0.995, 2)
+                    if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
+                        fresh_trigger = {
+                            "symbol": symbol,
+                            "date": t_today,
+                            "type": "V-REVERSAL RECLAIM",
+                            "entry_price": e_price,
+                            "stop_loss": s_price,
+                            "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
+                            "turnover_cr": round(to_today, 1),
+                            "deliv_surge": round(dv_today / dv_avg_today, 2) if dv_avg_today > 0 else 1.0
+                        }
+
+            # Engine 2 Trigger Check
+            if not fresh_trigger:
+                for shelf_len in range(10, 19):
+                    s_h = highs[last_i - shelf_len:last_i].max()
+                    s_l = lows[last_i - shelf_len:last_i].min()
+                    if s_l > 0 and ((s_h - s_l) / s_l) <= 0.13:
+                        up_d = sum(deliv_vols[k] for k in range(last_i - 15, last_i) if closes[k] >= closes[k - 1])
+                        dn_d = sum(deliv_vols[k] for k in range(last_i - 15, last_i) if closes[k] < closes[k - 1])
+                        c_ratio = (up_d / dn_d) if dn_d > 0 else 2.0
+                        if (c_today >= s_h and h_today >= s_h and
+                            v_today >= 1.4 * v_avg_today and (dv_today >= 1.25 * dv_avg_today or dp_today >= 1.25 * dp_avg_today) and
+                            rc_today >= 0.65 and c_ratio >= 1.15):
+                            e_price = round(float(s_h), 2)
+                            s_price = round(min(l_today, float(s_l)), 2)
+                            if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
+                                fresh_trigger = {
+                                    "symbol": symbol,
+                                    "date": t_today,
+                                    "type": "LAUNCHPAD BREAKOUT",
+                                    "entry_price": e_price,
+                                    "stop_loss": s_price,
+                                    "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
+                                    "turnover_cr": round(to_today, 1),
+                                    "deliv_surge": round(dv_today / dv_avg_today, 2) if dv_avg_today > 0 else 1.0
+                                }
+                                break
+
+    # 3. Watchlist Candidate Check (Coiling Shelf <= 13%, Turnover >= 10 Cr, Stage 2, RS > Nifty)
+    watchlist_item = None
+    if not fresh_trigger:
+        if to_today >= MIN_TURNOVER_CR:
+            is_st2 = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
+            n_p = nifty_perf_map.get(t_today, 0.001)
+            is_rs = bool(stock_p60_today > n_p)
+            if is_st2 and is_rs:
+                for shelf_len in range(10, 19):
+                    s_h = highs[last_i - shelf_len:last_i].max()
+                    s_l = lows[last_i - shelf_len:last_i].min()
+                    if s_l > 0:
+                        spread = (s_h - s_l) / s_l
+                        if spread <= 0.13:
+                            watchlist_item = {
+                                "symbol": symbol,
+                                "date": t_today,
+                                "close": round(c_today, 2),
+                                "shelf_high": round(float(s_h), 2),
+                                "shelf_low": round(float(s_l), 2),
+                                "spread_%": round(spread * 100, 2),
+                                "turnover_cr": round(to_today, 1)
+                            }
+                            break
+
+    return fresh_trigger, active_position, watchlist_item
+
+
+def execute_scanner():
+    nifty_perf_map = load_nifty_benchmark()
+    nifty750_set = load_nifty750_symbols()
+
+    json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+    excluded = {
+        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+        "fundamentals.json", "backtest_results.json", "swing3_results.json",
+        "swing3_run2_results.json", "swing3_run2_global_results.json",
+        "swing3_vs_run2_nifty750_results.json", "swing3_run2_non_nifty750_results.json",
+        "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json"
+    }
+
+    target_files = []
+    for f in json_files:
+        b_name = os.path.basename(f)
+        if b_name in excluded:
+            continue
+        sym = os.path.splitext(b_name)[0].upper()
+        if sym not in nifty750_set:
+            target_files.append(f)
+
+    print(f"📡 Scanning {len(target_files)} Non-Nifty 750 NSE symbols under Swing 3 Run 2 rules...")
+
+    triggers = []
+    active_positions = []
+    watchlist = []
+
+    for path in sorted(target_files):
+        sym = os.path.splitext(os.path.basename(path))[0].upper()
+        try:
+            with open(path, "r", encoding="utf-8") as fp:
+                raw = json.load(fp)
+            clean = clean_and_prepare(raw)
+            if clean:
+                trig, active, watch = scan_stock(sym, clean, nifty_perf_map)
+                if trig:
+                    triggers.append(trig)
+                if active:
+                    active_positions.append(active)
+                if watch:
+                    watchlist.append(watch)
+        except Exception:
+            continue
+
+    triggers.sort(key=lambda x: x["deliv_surge"], reverse=True)
+    watchlist.sort(key=lambda x: x["spread_%"])
+
+    payload = {
+        "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Target_Universe": "Non-Nifty 750 NSE Stocks",
+        "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, No SMA50 Gate, 20 EMA Trailing Exit)",
+        "Fresh_Triggers_Count": len(triggers),
+        "Active_Positions_Count": len(active_positions),
+        "Watchlist_Coiling_Count": len(watchlist),
+        "Fresh_Triggers": triggers,
+        "Active_Positions": active_positions,
+        "Watchlist_Coiling": watchlist[:30]
+    }
+
+    with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
+        json.dump(payload, fp, indent=2)
+
+    print(f"\n✅ Scan Completed Successfully!")
+    print(f"🎯 Fresh Triggers: {len(triggers)}")
+    print(f"📈 Active Trailing Positions: {len(active_positions)}")
+    print(f"👀 Watchlist (Coiling <= 13%): {len(watchlist)}")
+    print(f"💾 Results saved to {RESULTS_JSON}")
+
+
+if __name__ == "__main__":
+    execute_scanner()
