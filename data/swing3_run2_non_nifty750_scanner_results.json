@@ -1,0 +1,683 @@
+{
+  "Scan_Timestamp": "2026-10-05 13:33:11 IST",
+  "Target_Universe": "Non-Nifty 750 NSE Stocks",
+  "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, No SMA50 Gate, 20 EMA Trailing Exit)",
+  "Fresh_Triggers_Count": 0,
+  "Active_Positions_Count": 40,
+  "Watchlist_Coiling_Count": 133,
+  "Fresh_Triggers": [],
+  "Active_Positions": [
+    {
+      "symbol": "AKUMS",
+      "entry_date": "2026-09-21",
+      "entry_price": 792.0,
+      "current_close": 813.1,
+      "trailing_stop_20ema": 794.89,
+      "pnl_%": 2.66,
+      "holding_days": 9,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "ATLANTAELE",
+      "entry_date": "2026-10-01",
+      "entry_price": 1657.4,
+      "current_close": 1716.5,
+      "trailing_stop_20ema": 1689.64,
+      "pnl_%": 3.57,
+      "holding_days": 1,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "BLISSGVS",
+      "entry_date": "2026-09-28",
+      "entry_price": 728.0,
+      "current_close": 683.6,
+      "trailing_stop_20ema": 680.49,
+      "pnl_%": -6.1,
+      "holding_days": 4,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "CASHIETF",
+      "entry_date": "2025-07-10",
+      "entry_price": 1018.3,
+      "current_close": 1082.28,
+      "trailing_stop_20ema": 1080.31,
+      "pnl_%": 6.28,
+      "holding_days": 304,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "DYNAMATECH",
+      "entry_date": "2026-09-22",
+      "entry_price": 12454.0,
+      "current_close": 13756.0,
+      "trailing_stop_20ema": 12639.21,
+      "pnl_%": 10.45,
+      "holding_days": 8,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "EBGNG",
+      "entry_date": "2026-08-10",
+      "entry_price": 545.0,
+      "current_close": 704.7,
+      "trailing_stop_20ema": 672.77,
+      "pnl_%": 29.3,
+      "holding_days": 39,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "EIMCOELECO",
+      "entry_date": "2026-08-14",
+      "entry_price": 1921.3,
+      "current_close": 2268.8,
+      "trailing_stop_20ema": 2256.16,
+      "pnl_%": 18.09,
+      "holding_days": 35,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "FCL",
+      "entry_date": "2026-09-07",
+      "entry_price": 52.21,
+      "current_close": 55.72,
+      "trailing_stop_20ema": 55.44,
+      "pnl_%": 6.72,
+      "holding_days": 19,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "FEDDERSHOL",
+      "entry_date": "2026-09-21",
+      "entry_price": 53.39,
+      "current_close": 63.63,
+      "trailing_stop_20ema": 57.37,
+      "pnl_%": 19.18,
+      "holding_days": 9,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "GCSL",
+      "entry_date": "2026-09-21",
+      "entry_price": 620.5,
+      "current_close": 679.9,
+      "trailing_stop_20ema": 631.81,
+      "pnl_%": 9.57,
+      "holding_days": 9,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "GENESYS",
+      "entry_date": "2026-08-25",
+      "entry_price": 188.8,
+      "current_close": 281.35,
+      "trailing_stop_20ema": 272.83,
+      "pnl_%": 49.02,
+      "holding_days": 28,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "GMMPFAUDLR",
+      "entry_date": "2026-08-06",
+      "entry_price": 875.95,
+      "current_close": 1443.4,
+      "trailing_stop_20ema": 1377.54,
+      "pnl_%": 64.78,
+      "holding_days": 41,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "HERITGFOOD",
+      "entry_date": "2026-09-10",
+      "entry_price": 390.0,
+      "current_close": 402.9,
+      "trailing_stop_20ema": 401.05,
+      "pnl_%": 3.31,
+      "holding_days": 16,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "INDSWFTLAB",
+      "entry_date": "2026-08-11",
+      "entry_price": 242.0,
+      "current_close": 395.15,
+      "trailing_stop_20ema": 385.21,
+      "pnl_%": 63.29,
+      "holding_days": 38,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "JBCHEPHARM",
+      "entry_date": "2026-06-29",
+      "entry_price": 2300.0,
+      "current_close": 2408.9,
+      "trailing_stop_20ema": 2366.34,
+      "pnl_%": 4.73,
+      "holding_days": 13,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "KISSHT",
+      "entry_date": "2026-09-07",
+      "entry_price": 320.05,
+      "current_close": 371.15,
+      "trailing_stop_20ema": 347.36,
+      "pnl_%": 15.97,
+      "holding_days": 19,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "KLBRENG-B",
+      "entry_date": "2026-09-22",
+      "entry_price": 490.45,
+      "current_close": 523.95,
+      "trailing_stop_20ema": 492.7,
+      "pnl_%": 6.83,
+      "holding_days": 8,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LIQUID1",
+      "entry_date": "2024-12-05",
+      "entry_price": 1022.24,
+      "current_close": 1125.4,
+      "trailing_stop_20ema": 1123.42,
+      "pnl_%": 10.09,
+      "holding_days": 452,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LIQUIDADD",
+      "entry_date": "2024-12-11",
+      "entry_price": 1045.5,
+      "current_close": 1147.56,
+      "trailing_stop_20ema": 1145.54,
+      "pnl_%": 9.76,
+      "holding_days": 447,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LIQUIDBETF",
+      "entry_date": "2025-02-17",
+      "entry_price": 1016.25,
+      "current_close": 1101.46,
+      "trailing_stop_20ema": 1099.55,
+      "pnl_%": 8.38,
+      "holding_days": 399,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LIQUIDCASE",
+      "entry_date": "2024-06-07",
+      "entry_price": 102.57,
+      "current_close": 116.2,
+      "trailing_stop_20ema": 116.0,
+      "pnl_%": 13.29,
+      "holding_days": 572,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "LIQUIDPLUS",
+      "entry_date": "2025-04-07",
+      "entry_price": 1026.09,
+      "current_close": 1105.97,
+      "trailing_stop_20ema": 1103.98,
+      "pnl_%": 7.78,
+      "holding_days": 368,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "MAHLOG",
+      "entry_date": "2026-09-23",
+      "entry_price": 412.75,
+      "current_close": 416.4,
+      "trailing_stop_20ema": 410.68,
+      "pnl_%": 0.88,
+      "holding_days": 7,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "NAZARA",
+      "entry_date": "2026-09-29",
+      "entry_price": 384.5,
+      "current_close": 384.7,
+      "trailing_stop_20ema": 374.27,
+      "pnl_%": 0.05,
+      "holding_days": 3,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "RAYMOND",
+      "entry_date": "2026-09-03",
+      "entry_price": 674.9,
+      "current_close": 1197.2,
+      "trailing_stop_20ema": 1052.38,
+      "pnl_%": 77.39,
+      "holding_days": 21,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "RAYMONDREL",
+      "entry_date": "2026-09-23",
+      "entry_price": 615.0,
+      "current_close": 648.45,
+      "trailing_stop_20ema": 629.4,
+      "pnl_%": 5.44,
+      "holding_days": 7,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "RML",
+      "entry_date": "2026-09-04",
+      "entry_price": 1175.0,
+      "current_close": 1343.2,
+      "trailing_stop_20ema": 1316.34,
+      "pnl_%": 14.31,
+      "holding_days": 20,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SAMBHV",
+      "entry_date": "2026-09-07",
+      "entry_price": 133.1,
+      "current_close": 161.45,
+      "trailing_stop_20ema": 148.37,
+      "pnl_%": 21.3,
+      "holding_days": 19,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SBC",
+      "entry_date": "2026-09-25",
+      "entry_price": 49.97,
+      "current_close": 58.54,
+      "trailing_stop_20ema": 51.13,
+      "pnl_%": 17.15,
+      "holding_days": 5,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SBILIQETF",
+      "entry_date": "2026-06-29",
+      "entry_price": 1045.0,
+      "current_close": 1058.58,
+      "trailing_stop_20ema": 1056.69,
+      "pnl_%": 1.3,
+      "holding_days": 69,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SETL",
+      "entry_date": "2026-08-26",
+      "entry_price": 322.35,
+      "current_close": 416.95,
+      "trailing_stop_20ema": 407.51,
+      "pnl_%": 29.35,
+      "holding_days": 27,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SHANTIGOLD",
+      "entry_date": "2026-09-23",
+      "entry_price": 268.8,
+      "current_close": 303.55,
+      "trailing_stop_20ema": 280.79,
+      "pnl_%": 12.93,
+      "holding_days": 7,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SHILPAMED",
+      "entry_date": "2026-08-05",
+      "entry_price": 655.75,
+      "current_close": 1064.1,
+      "trailing_stop_20ema": 998.52,
+      "pnl_%": 62.27,
+      "holding_days": 42,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SHREEJISPG",
+      "entry_date": "2026-09-04",
+      "entry_price": 671.0,
+      "current_close": 775.35,
+      "trailing_stop_20ema": 725.31,
+      "pnl_%": 15.55,
+      "holding_days": 20,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SMSPHARMA",
+      "entry_date": "2026-09-04",
+      "entry_price": 378.5,
+      "current_close": 471.3,
+      "trailing_stop_20ema": 448.09,
+      "pnl_%": 24.52,
+      "holding_days": 20,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SOLARA",
+      "entry_date": "2026-08-20",
+      "entry_price": 559.8,
+      "current_close": 714.85,
+      "trailing_stop_20ema": 711.31,
+      "pnl_%": 27.7,
+      "holding_days": 31,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SOUTHBANK",
+      "entry_date": "2026-09-24",
+      "entry_price": 47.89,
+      "current_close": 47.44,
+      "trailing_stop_20ema": 47.22,
+      "pnl_%": -0.94,
+      "holding_days": 6,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "SPECTRUM",
+      "entry_date": "2026-09-03",
+      "entry_price": 2180.0,
+      "current_close": 3853.4,
+      "trailing_stop_20ema": 3275.72,
+      "pnl_%": 76.76,
+      "holding_days": 21,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "TEXRAIL",
+      "entry_date": "2026-09-23",
+      "entry_price": 119.95,
+      "current_close": 126.86,
+      "trailing_stop_20ema": 120.78,
+      "pnl_%": 5.76,
+      "holding_days": 7,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "WHEELS",
+      "entry_date": "2026-09-03",
+      "entry_price": 1613.7,
+      "current_close": 2241.3,
+      "trailing_stop_20ema": 2122.44,
+      "pnl_%": 38.89,
+      "holding_days": 21,
+      "status": "HOLD"
+    }
+  ],
+  "Watchlist_Coiling": [
+    {
+      "symbol": "SBILIQETF",
+      "date": "2026-10-02",
+      "close": 1058.58,
+      "shelf_high": 1058.59,
+      "shelf_low": 1056.61,
+      "spread_%": 0.19,
+      "turnover_cr": 13.8
+    },
+    {
+      "symbol": "LIQUIDCASE",
+      "date": "2026-10-02",
+      "close": 116.2,
+      "shelf_high": 116.22,
+      "shelf_low": 115.99,
+      "spread_%": 0.2,
+      "turnover_cr": 206.2
+    },
+    {
+      "symbol": "LIQUIDBETF",
+      "date": "2026-10-02",
+      "close": 1101.46,
+      "shelf_high": 1102.25,
+      "shelf_low": 1099.48,
+      "spread_%": 0.25,
+      "turnover_cr": 33.0
+    },
+    {
+      "symbol": "CASHIETF",
+      "date": "2026-10-02",
+      "close": 1082.28,
+      "shelf_high": 1083.33,
+      "shelf_low": 1078.82,
+      "spread_%": 0.42,
+      "turnover_cr": 38.8
+    },
+    {
+      "symbol": "LIQUIDPLUS",
+      "date": "2026-10-02",
+      "close": 1105.97,
+      "shelf_high": 1110.62,
+      "shelf_low": 1102.81,
+      "spread_%": 0.71,
+      "turnover_cr": 64.4
+    },
+    {
+      "symbol": "LIQUID1",
+      "date": "2026-10-02",
+      "close": 1125.4,
+      "shelf_high": 1147.32,
+      "shelf_low": 1118.19,
+      "spread_%": 2.61,
+      "turnover_cr": 110.6
+    },
+    {
+      "symbol": "LIQUIDADD",
+      "date": "2026-10-02",
+      "close": 1147.56,
+      "shelf_high": 1175.19,
+      "shelf_low": 1145.21,
+      "spread_%": 2.62,
+      "turnover_cr": 59.8
+    },
+    {
+      "symbol": "VRLLOG",
+      "date": "2026-10-02",
+      "close": 285.05,
+      "shelf_high": 297.0,
+      "shelf_low": 281.5,
+      "spread_%": 5.51,
+      "turnover_cr": 11.1
+    },
+    {
+      "symbol": "IIFLCAPS",
+      "date": "2026-10-02",
+      "close": 345.6,
+      "shelf_high": 356.4,
+      "shelf_low": 336.8,
+      "spread_%": 5.82,
+      "turnover_cr": 14.9
+    },
+    {
+      "symbol": "FINEORG",
+      "date": "2026-10-02",
+      "close": 5131.0,
+      "shelf_high": 5271.0,
+      "shelf_low": 4968.0,
+      "spread_%": 6.1,
+      "turnover_cr": 15.4
+    },
+    {
+      "symbol": "MUFIN",
+      "date": "2026-10-02",
+      "close": 130.59,
+      "shelf_high": 136.0,
+      "shelf_low": 127.53,
+      "spread_%": 6.64,
+      "turnover_cr": 12.8
+    },
+    {
+      "symbol": "PHARMABEES",
+      "date": "2026-10-02",
+      "close": 27.11,
+      "shelf_high": 28.58,
+      "shelf_low": 26.76,
+      "spread_%": 6.8,
+      "turnover_cr": 11.7
+    },
+    {
+      "symbol": "KOLTEPATIL",
+      "date": "2026-10-02",
+      "close": 418.8,
+      "shelf_high": 442.6,
+      "shelf_low": 413.35,
+      "spread_%": 7.08,
+      "turnover_cr": 20.1
+    },
+    {
+      "symbol": "STOVEKRAFT",
+      "date": "2026-10-02",
+      "close": 809.15,
+      "shelf_high": 842.9,
+      "shelf_low": 787.05,
+      "spread_%": 7.1,
+      "turnover_cr": 18.6
+    },
+    {
+      "symbol": "CEIGALL",
+      "date": "2026-10-02",
+      "close": 380.1,
+      "shelf_high": 396.0,
+      "shelf_low": 369.1,
+      "spread_%": 7.29,
+      "turnover_cr": 16.8
+    },
+    {
+      "symbol": "AGARWALEYE",
+      "date": "2026-10-02",
+      "close": 486.45,
+      "shelf_high": 506.5,
+      "shelf_low": 471.15,
+      "spread_%": 7.5,
+      "turnover_cr": 67.3
+    },
+    {
+      "symbol": "NILKAMAL",
+      "date": "2026-10-02",
+      "close": 1871.8,
+      "shelf_high": 1969.9,
+      "shelf_low": 1832.1,
+      "spread_%": 7.52,
+      "turnover_cr": 16.8
+    },
+    {
+      "symbol": "UFLEX",
+      "date": "2026-10-02",
+      "close": 649.85,
+      "shelf_high": 685.0,
+      "shelf_low": 636.8,
+      "spread_%": 7.57,
+      "turnover_cr": 27.2
+    },
+    {
+      "symbol": "GAEL",
+      "date": "2026-10-02",
+      "close": 157.69,
+      "shelf_high": 165.0,
+      "shelf_low": 153.23,
+      "spread_%": 7.68,
+      "turnover_cr": 22.7
+    },
+    {
+      "symbol": "GPPL",
+      "date": "2026-10-02",
+      "close": 165.88,
+      "shelf_high": 169.9,
+      "shelf_low": 157.66,
+      "spread_%": 7.76,
+      "turnover_cr": 30.2
+    },
+    {
+      "symbol": "VOLTAMP",
+      "date": "2026-10-02",
+      "close": 10426.0,
+      "shelf_high": 11094.0,
+      "shelf_low": 10285.0,
+      "spread_%": 7.87,
+      "turnover_cr": 46.4
+    },
+    {
+      "symbol": "MANINFRA",
+      "date": "2026-10-02",
+      "close": 124.3,
+      "shelf_high": 131.95,
+      "shelf_low": 122.21,
+      "spread_%": 7.97,
+      "turnover_cr": 29.2
+    },
+    {
+      "symbol": "ORIENTHOT",
+      "date": "2026-10-02",
+      "close": 140.0,
+      "shelf_high": 147.54,
+      "shelf_low": 136.5,
+      "spread_%": 8.09,
+      "turnover_cr": 26.2
+    },
+    {
+      "symbol": "INDGN",
+      "date": "2026-10-02",
+      "close": 593.5,
+      "shelf_high": 627.0,
+      "shelf_low": 580.0,
+      "spread_%": 8.1,
+      "turnover_cr": 41.8
+    },
+    {
+      "symbol": "BLSE",
+      "date": "2026-10-02",
+      "close": 322.05,
+      "shelf_high": 339.8,
+      "shelf_low": 313.55,
+      "spread_%": 8.37,
+      "turnover_cr": 15.3
+    },
+    {
+      "symbol": "PITTIENG",
+      "date": "2026-10-02",
+      "close": 1123.8,
+      "shelf_high": 1184.2,
+      "shelf_low": 1092.2,
+      "spread_%": 8.42,
+      "turnover_cr": 17.5
+    },
+    {
+      "symbol": "EXPLEOSOL",
+      "date": "2026-10-02",
+      "close": 848.75,
+      "shelf_high": 900.9,
+      "shelf_low": 830.1,
+      "spread_%": 8.53,
+      "turnover_cr": 18.7
+    },
+    {
+      "symbol": "SGMART",
+      "date": "2026-10-02",
+      "close": 742.2,
+      "shelf_high": 771.0,
+      "shelf_low": 710.0,
+      "spread_%": 8.59,
+      "turnover_cr": 23.2
+    },
+    {
+      "symbol": "JUSTDIAL",
+      "date": "2026-10-02",
+      "close": 653.15,
+      "shelf_high": 698.0,
+      "shelf_low": 642.4,
+      "spread_%": 8.66,
+      "turnover_cr": 17.4
+    },
+    {
+      "symbol": "MANGLMCEM",
+      "date": "2026-10-02",
+      "close": 984.65,
+      "shelf_high": 1052.4,
+      "shelf_low": 968.0,
+      "spread_%": 8.72,
+      "turnover_cr": 15.1
+    }
+  ]
+}
