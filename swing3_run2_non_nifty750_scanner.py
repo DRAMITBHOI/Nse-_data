@@ -1,9 +1,7 @@
 import os
-import io
 import json
 import glob
 import datetime
-import requests
 import numpy as np
 import pandas as pd
 
@@ -45,7 +43,6 @@ def clean_and_prepare(raw_data):
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
 
-    # Split / Corporate Action Normalization
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -141,8 +138,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
-    # Historical Trade Simulator to evaluate currently active open positions
-    trades = []
+    # 1. Historical Simulator for Active Open Trades
     in_trade = False
     entry_p = 0.0
     initial_sl = 0.0
@@ -183,7 +179,6 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # SWING 3 EXIT ENGINE
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
@@ -223,7 +218,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 calc_entry = round(prior_3d_high, 2)
                 calc_sl = round(recent_trough * 0.995, 2)
 
-        # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (SPREAD <= 13%)
+        # ENGINE 2: LAUNCHPAD BREAKOUT (SPREAD <= 13%)
         if not entry_triggered:
             valid_launchpad = False
             launchpad_high = 0.0
@@ -263,7 +258,6 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 entry_d = t
                 entry_idx = i
 
-    # 1. Active Open Trade Check
     active_position = None
     if in_trade:
         cur_c = closes[-1]
@@ -278,10 +272,10 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             "trailing_stop_20ema": trailing_sl,
             "pnl_%": pnl_pct,
             "holding_days": len(df) - 1 - entry_idx,
-            "status": "HOLD" if cur_c >= trailing_sl else "EXIT TRIGGERED (CLOSE < 20 EMA)"
+            "status": "HOLD" if cur_c >= trailing_sl else "EXIT (CLOSE < 20 EMA)"
         }
 
-    # 2. Fresh Today Breakout / Reversal Trigger
+    # 2. Fresh Trigger Check
     fresh_trigger = None
     last_i = len(df) - 1
     c_today = closes[last_i]
@@ -305,7 +299,11 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         is_rs_today = bool(stock_p60_today > n_p)
 
         if is_stage2_today and is_rs_today:
-            # Engine 1 Trigger Check
+            deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
+            rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
+            conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
+
+            # Engine 1
             r20_high = highs[last_i - 20:last_i].max()
             if (r20_high - l_today) / r20_high >= 0.18:
                 r_trough = lows[last_i - 5:last_i].min()
@@ -316,18 +314,22 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                     e_price = round(p3_high, 2)
                     s_price = round(r_trough * 0.995, 2)
                     if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
+                        ext_pct = round(((c_today - e_price) / e_price) * 100.0, 2)
                         fresh_trigger = {
                             "symbol": symbol,
                             "date": t_today,
-                            "type": "V-REVERSAL RECLAIM",
-                            "entry_price": e_price,
+                            "type": "V-REVERSAL",
+                            "pivot_ceiling": e_price,
+                            "close": round(c_today, 2),
+                            "extended_pct": ext_pct,
                             "stop_loss": s_price,
                             "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
+                            "conviction_score": conviction_score,
                             "turnover_cr": round(to_today, 1),
-                            "deliv_surge": round(dv_today / dv_avg_today, 2) if dv_avg_today > 0 else 1.0
+                            "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
                         }
 
-            # Engine 2 Trigger Check
+            # Engine 2
             if not fresh_trigger:
                 for shelf_len in range(10, 19):
                     s_h = highs[last_i - shelf_len:last_i].max()
@@ -342,39 +344,50 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                             e_price = round(float(s_h), 2)
                             s_price = round(min(l_today, float(s_l)), 2)
                             if 0.05 < (e_price - s_price) and ((e_price - s_price) / e_price) <= 0.12:
+                                ext_pct = round(((c_today - e_price) / e_price) * 100.0, 2)
                                 fresh_trigger = {
                                     "symbol": symbol,
                                     "date": t_today,
-                                    "type": "LAUNCHPAD BREAKOUT",
-                                    "entry_price": e_price,
+                                    "type": "LAUNCHPAD-BO",
+                                    "pivot_ceiling": e_price,
+                                    "close": round(c_today, 2),
+                                    "extended_pct": ext_pct,
                                     "stop_loss": s_price,
                                     "risk_%": round(((e_price - s_price) / e_price) * 100, 2),
+                                    "conviction_score": conviction_score,
                                     "turnover_cr": round(to_today, 1),
-                                    "deliv_surge": round(dv_today / dv_avg_today, 2) if dv_avg_today > 0 else 1.0
+                                    "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
                                 }
                                 break
 
-    # 3. Watchlist Candidate Check (Coiling Shelf <= 13%, Turnover >= 10 Cr, Stage 2, RS > Nifty)
+    # 3. Watchlist Pre-Breakout Candidate Check
     watchlist_item = None
-    if not fresh_trigger:
-        if to_today >= MIN_TURNOVER_CR:
-            is_st2 = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
-            n_p = nifty_perf_map.get(t_today, 0.001)
-            is_rs = bool(stock_p60_today > n_p)
-            if is_st2 and is_rs:
-                for shelf_len in range(10, 19):
-                    s_h = highs[last_i - shelf_len:last_i].max()
-                    s_l = lows[last_i - shelf_len:last_i].min()
-                    if s_l > 0:
-                        spread = (s_h - s_l) / s_l
-                        if spread <= 0.13:
+    if not fresh_trigger and to_today >= MIN_TURNOVER_CR:
+        is_st2 = bool(c_today >= sma200_today) if pd.notnull(sma200_today) else False
+        n_p = nifty_perf_map.get(t_today, 0.001)
+        is_rs = bool(stock_p60_today > n_p)
+        if is_st2 and is_rs:
+            for shelf_len in range(10, 19):
+                s_h = highs[last_i - shelf_len:last_i].max()
+                s_l = lows[last_i - shelf_len:last_i].min()
+                if s_l > 0:
+                    spread = (s_h - s_l) / s_l
+                    if spread <= 0.13:
+                        dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
+                        if dist_pct >= 0:
+                            deliv_surge_ratio = dv_today / dv_avg_today if dv_avg_today > 0 else 1.0
+                            rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
+                            conv_sc = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
+
                             watchlist_item = {
                                 "symbol": symbol,
                                 "date": t_today,
                                 "close": round(c_today, 2),
                                 "shelf_high": round(float(s_h), 2),
                                 "shelf_low": round(float(s_l), 2),
+                                "dist_to_ceiling_pct": dist_pct,
                                 "spread_%": round(spread * 100, 2),
+                                "conviction_score": conv_sc,
                                 "turnover_cr": round(to_today, 1)
                             }
                             break
@@ -395,16 +408,7 @@ def execute_scanner():
         "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json"
     }
 
-    target_files = []
-    for f in json_files:
-        b_name = os.path.basename(f)
-        if b_name in excluded:
-            continue
-        sym = os.path.splitext(b_name)[0].upper()
-        if sym not in nifty750_set:
-            target_files.append(f)
-
-    print(f"📡 Scanning {len(target_files)} Non-Nifty 750 NSE symbols under Swing 3 Run 2 rules...")
+    target_files = [f for f in json_files if os.path.basename(f) not in excluded and os.path.splitext(os.path.basename(f))[0].upper() not in nifty750_set]
 
     triggers = []
     active_positions = []
@@ -427,13 +431,13 @@ def execute_scanner():
         except Exception:
             continue
 
-    triggers.sort(key=lambda x: x["deliv_surge"], reverse=True)
-    watchlist.sort(key=lambda x: x["spread_%"])
+    triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
+    watchlist.sort(key=lambda x: x["dist_to_ceiling_pct"])
 
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Target_Universe": "Non-Nifty 750 NSE Stocks",
-        "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, No SMA50 Gate, 20 EMA Trailing Exit)",
+        "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, Conviction Scoring, 20 EMA Trail Exit)",
         "Fresh_Triggers_Count": len(triggers),
         "Active_Positions_Count": len(active_positions),
         "Watchlist_Coiling_Count": len(watchlist),
@@ -445,11 +449,7 @@ def execute_scanner():
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"\n✅ Scan Completed Successfully!")
-    print(f"🎯 Fresh Triggers: {len(triggers)}")
-    print(f"📈 Active Trailing Positions: {len(active_positions)}")
-    print(f"👀 Watchlist (Coiling <= 13%): {len(watchlist)}")
-    print(f"💾 Results saved to {RESULTS_JSON}")
+    print(f"✅ Scan Complete. Fresh: {len(triggers)}, Active: {len(active_positions)}, Watchlist: {len(watchlist)}")
 
 
 if __name__ == "__main__":
