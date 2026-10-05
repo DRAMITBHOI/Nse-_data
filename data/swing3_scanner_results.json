@@ -1,5 +1,5 @@
 {
-  "Scan_Timestamp": "2026-10-05 19:53:00 IST",
+  "Scan_Timestamp": "2026-10-05 20:36:18 IST",
   "Target_Universe": "Nifty 750 Universe",
   "Strategy_Specs": "Swing 3.0 Production (Shelf <= 8%, Conviction >= 2.5, 20 EMA Trail)",
   "Fresh_Triggers_Count": 0,
@@ -30,28 +30,8 @@
   ],
   "Watchlist": [
     {
-      "symbol": "LENSKART",
-      "type": "COILING SHELF",
-      "close": 692.75,
-      "pivot_target": 698.3,
-      "dist_to_pivot_pct": 0.8,
-      "spread_%": 7.71,
-      "conviction_score": 81.14,
-      "turnover_cr": 647.1
-    },
-    {
-      "symbol": "PETRONET",
-      "type": "COILING SHELF",
-      "close": 290.0,
-      "pivot_target": 294.0,
-      "dist_to_pivot_pct": 1.38,
-      "spread_%": 4.89,
-      "conviction_score": 54.229,
-      "turnover_cr": 51.1
-    },
-    {
       "symbol": "REDINGTON",
-      "type": "COILING SHELF",
+      "setup_class": "LAUNCHPAD COIL",
       "close": 412.75,
       "pivot_target": 419.5,
       "dist_to_pivot_pct": 1.64,
@@ -61,7 +41,7 @@
     },
     {
       "symbol": "FINCABLES",
-      "type": "COILING SHELF",
+      "setup_class": "LAUNCHPAD COIL",
       "close": 1467.3,
       "pivot_target": 1496.1,
       "dist_to_pivot_pct": 1.96,
@@ -70,8 +50,28 @@
       "turnover_cr": 195.8
     },
     {
+      "symbol": "LENSKART",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 692.75,
+      "pivot_target": 698.3,
+      "dist_to_pivot_pct": 0.8,
+      "spread_%": 7.71,
+      "conviction_score": 81.14,
+      "turnover_cr": 647.1
+    },
+    {
+      "symbol": "PETRONET",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 290.0,
+      "pivot_target": 294.0,
+      "dist_to_pivot_pct": 1.38,
+      "spread_%": 4.89,
+      "conviction_score": 54.229,
+      "turnover_cr": 51.1
+    },
+    {
       "symbol": "TECHM",
-      "type": "COILING SHELF",
+      "setup_class": "LAUNCHPAD COIL",
       "close": 1535.9,
       "pivot_target": 1576.2,
       "dist_to_pivot_pct": 2.62,
