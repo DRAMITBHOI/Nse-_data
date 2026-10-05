@@ -143,7 +143,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
-    # 1. Historical Simulator for Open Position State Tracking
     in_trade = False
     entry_p = 0.0
     initial_sl = 0.0
@@ -186,7 +185,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # Locked Plan 2 Exit: Trail max(Initial SL, 20 EMA) every bar
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
@@ -226,7 +224,7 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
                 calc_entry = round(prior_3d_high, 2)
                 calc_sl = round(recent_trough * 0.995, 2)
 
-        # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (SWING 3 LOCKED: SPREAD <= 8%)
+        # ENGINE 2: MICRO-LAUNCHPAD BREAKOUT (SPREAD <= 8%)
         if not entry_triggered:
             valid_launchpad = False
             launchpad_high = 0.0
@@ -252,7 +250,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
                 c_candle_bo = rc >= 0.65
                 obv_high = bool(demat_obvs[i] >= demat_obv_maxes[i-1]) if i > 0 else True
 
-                # Strict Swing 3: Ratio >= 1.50x + OBV at 20d High
                 if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.50) and obv_high:
                     entry_triggered = True
                     calc_entry = launchpad_high
@@ -265,7 +262,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
                 rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
                 conv_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
-                # Strict Swing 3: Score >= 2.5
                 if conv_score >= 2.5:
                     in_trade = True
                     entry_p = calc_entry
@@ -274,7 +270,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
                     entry_d = t
                     entry_idx = i
 
-    # Active Position Tracking
     active_position = None
     if in_trade:
         cur_c = closes[-1]
@@ -292,7 +287,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
             "status": "HOLD" if cur_c >= trailing_sl else "EXIT (CLOSE < 20 EMA)"
         }
 
-    # 2. Fresh Trigger Check (FIRES ONLY IF ENTRY OCCURRED ON TODAY'S BAR)
     fresh_trigger = None
     last_i = len(df) - 1
     c_today = closes[last_i]
@@ -323,7 +317,6 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
             "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
         }
 
-    # 3. Watchlist (Pre-Breakout Coil <= 8% + Pre-V-Reversal Reclaim)
     watchlist_item = None
     if not in_trade and to_today >= MIN_TURNOVER_CR:
         is_st2 = bool(c_today >= sma200s[last_i]) if pd.notnull(sma200s[last_i]) else False
@@ -335,45 +328,45 @@ def scan_stock_swing3(symbol, clean_data, nifty_perf_map):
             rs_ratio = (stock_p60_today / n_p) if n_p > 0 else (1.0 + abs(stock_p60_today))
             conv_sc = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
 
-            # Check Type A: Tight Shelf Squeeze (Spread <= 8%)
-            for shelf_len in range(10, 19):
-                s_h = highs[last_i - shelf_len:last_i + 1].max()
-                s_l = lows[last_i - shelf_len:last_i + 1].min()
-                if s_l > 0:
-                    spread = (s_h - s_l) / s_l
-                    if spread <= 0.08:
-                        dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
-                        if 0 <= dist_pct <= 3.0:
-                            watchlist_item = {
-                                "symbol": symbol,
-                                "type": "COILING SHELF",
-                                "close": round(c_today, 2),
-                                "pivot_target": round(float(s_h), 2),
-                                "dist_to_pivot_pct": dist_pct,
-                                "spread_%": round(spread * 100, 2),
-                                "conviction_score": conv_sc,
-                                "turnover_cr": round(to_today, 1)
-                            }
-                            break
+            # Option A: Pre-V-Reversal Reclaim
+            r20_h = highs[last_i - 20:last_i + 1].max()
+            pullback_depth = (r20_h - lows[last_i]) / r20_h
+            if pullback_depth >= 0.18:
+                prior_3d_high = highs[last_i - 3:last_i].max()
+                dist_to_reclaim = round(((float(prior_3d_high) - c_today) / c_today) * 100.0, 2)
+                if 0 <= dist_to_reclaim <= 3.0:
+                    watchlist_item = {
+                        "symbol": symbol,
+                        "setup_class": "V-REVERSAL PRE-RECLAIM",
+                        "close": round(c_today, 2),
+                        "pivot_target": round(float(prior_3d_high), 2),
+                        "dist_to_pivot_pct": dist_to_reclaim,
+                        "spread_%": round(pullback_depth * 100, 2),
+                        "conviction_score": conv_sc,
+                        "turnover_cr": round(to_today, 1)
+                    }
 
-            # Check Type B: Pre-V-Reversal (Flush >= 18% approaching 3-day high)
+            # Option B: Launchpad Tight Shelf Squeeze (Spread <= 8%)
             if not watchlist_item:
-                r20_h = highs[last_i - 20:last_i + 1].max()
-                pullback_depth = (r20_h - lows[last_i]) / r20_h
-                if pullback_depth >= 0.18:
-                    prior_3d_high = highs[last_i - 3:last_i].max()
-                    dist_to_reclaim = round(((float(prior_3d_high) - c_today) / c_today) * 100.0, 2)
-                    if 0 <= dist_to_reclaim <= 3.0:
-                        watchlist_item = {
-                            "symbol": symbol,
-                            "type": "PRE-V-REVERSAL",
-                            "close": round(c_today, 2),
-                            "pivot_target": round(float(prior_3d_high), 2),
-                            "dist_to_pivot_pct": dist_to_reclaim,
-                            "spread_%": round(pullback_depth * 100, 2),
-                            "conviction_score": conv_sc,
-                            "turnover_cr": round(to_today, 1)
-                        }
+                for shelf_len in range(10, 19):
+                    s_h = highs[last_i - shelf_len:last_i + 1].max()
+                    s_l = lows[last_i - shelf_len:last_i + 1].min()
+                    if s_l > 0:
+                        spread = (s_h - s_l) / s_l
+                        if spread <= 0.08:
+                            dist_pct = round(((float(s_h) - c_today) / c_today) * 100.0, 2)
+                            if 0 <= dist_pct <= 3.0:
+                                watchlist_item = {
+                                    "symbol": symbol,
+                                    "setup_class": "LAUNCHPAD COIL",
+                                    "close": round(c_today, 2),
+                                    "pivot_target": round(float(s_h), 2),
+                                    "dist_to_pivot_pct": dist_pct,
+                                    "spread_%": round(spread * 100, 2),
+                                    "conviction_score": conv_sc,
+                                    "turnover_cr": round(to_today, 1)
+                                }
+                                break
 
     return fresh_trigger, active_position, watchlist_item
 
@@ -391,7 +384,6 @@ def execute_scanner():
         "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json"
     }
 
-    # Restrict strictly to Nifty 750 universe
     target_files = [
         f for f in json_files
         if os.path.basename(f) not in excluded and os.path.splitext(os.path.basename(f))[0].upper() in nifty750_set
@@ -418,8 +410,9 @@ def execute_scanner():
         except Exception:
             continue
 
+    # Decremental Conviction Score sort for both lists
     triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
-    watchlist.sort(key=lambda x: x["dist_to_pivot_pct"])
+    watchlist.sort(key=lambda x: x["conviction_score"], reverse=True)
 
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
