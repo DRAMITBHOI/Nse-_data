@@ -1,0 +1,45 @@
+{
+  "Generated At": "2026-10-06 09:09:01 IST",
+  "Report": [
+    {
+      "configuration": "1. Swing 3.0: V-Reversal Only (Flush >= 18% \u2022 Score >= 2.5)",
+      "trades": 82,
+      "win_rate_%": 85.37,
+      "profit_factor": 33.81,
+      "avg_gain_%": 6.89,
+      "avg_loss_%": -1.19,
+      "max_gain_%": 150.66,
+      "avg_days": 7.1
+    },
+    {
+      "configuration": "2. Swing 3.0: Launchpad Only (Spread <= 8% \u2022 Score >= 2.5)",
+      "trades": 1504,
+      "win_rate_%": 61.37,
+      "profit_factor": 8.87,
+      "avg_gain_%": 10.66,
+      "avg_loss_%": -1.91,
+      "max_gain_%": 297.12,
+      "avg_days": 17.9
+    },
+    {
+      "configuration": "3. Swing 3 Run 2: V-Reversal Only (Flush >= 18% \u2022 No Score Gate)",
+      "trades": 275,
+      "win_rate_%": 83.27,
+      "profit_factor": 24.9,
+      "avg_gain_%": 7.19,
+      "avg_loss_%": -1.44,
+      "max_gain_%": 150.66,
+      "avg_days": 6.9
+    },
+    {
+      "configuration": "4. Swing 3 Run 2: Launchpad Only (Spread <= 13% \u2022 No Score Gate)",
+      "trades": 6568,
+      "win_rate_%": 59.38,
+      "profit_factor": 7.24,
+      "avg_gain_%": 11.99,
+      "avg_loss_%": -2.42,
+      "max_gain_%": 323.28,
+      "avg_days": 16.9
+    }
+  ]
+}
