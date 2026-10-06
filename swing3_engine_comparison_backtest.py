@@ -10,6 +10,8 @@ RESULTS_JSON = os.path.join(DATA_DIR, "swing3_engine_comparison_results.json")
 NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 MIN_TURNOVER_CR = 10.0
 
+os.makedirs(DATA_DIR, exist_ok=True)
+
 
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -122,12 +124,6 @@ def load_nifty750_symbols():
 
 
 def run_single_simulation(clean_data, nifty_perf_map, mode="swing3", allowed_engine="all"):
-    """
-    mode: 'swing3' (strict: 8% shelf, OBV high, deliv 1.5x, score >= 2.5)
-          'run2'   (broad: 13% shelf, deliv 1.15x, no conviction score gate)
-    allowed_engine: 'vreversal' (Engine 1 only)
-                    'launchpad' (Engine 2 only)
-    """
     if len(clean_data) < 60:
         return []
 
@@ -192,7 +188,7 @@ def run_single_simulation(clean_data, nifty_perf_map, mode="swing3", allowed_eng
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # PLAN 2 EXIT (SHARED: TRAIL 20 EMA DIRECTLY FROM DAY 1)
+        # Trailing Exit: max(Initial SL, 20 EMA)
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
@@ -236,4 +232,161 @@ def run_single_simulation(clean_data, nifty_perf_map, mode="swing3", allowed_eng
                 prior_3d_high = highs[i - 4:i].max()
                 c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
                 c_vol_rev = v >= (1.3 * v_avg)
-                c_deliv
+                c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg)
+                c_candle_rev = rc >= 0.55
+
+                if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
+                    entry_triggered = True
+                    calc_entry = round(prior_3d_high, 2)
+                    calc_sl = round(recent_trough * 0.995, 2)
+
+        # ENGINE 2: LAUNCHPAD BREAKOUT
+        if not entry_triggered and allowed_engine in ["all", "launchpad"]:
+            valid_launchpad = False
+            launchpad_high = 0.0
+            launchpad_low = 0.0
+            max_spread = 0.08 if mode == "swing3" else 0.13
+
+            for shelf_len in range(10, 19):
+                s_high = highs[i - shelf_len:i].max()
+                s_low = lows[i - shelf_len:i].min()
+                if s_low > 0 and ((s_high - s_low) / s_low) <= max_spread:
+                    valid_launchpad = True
+                    launchpad_high = round(float(s_high), 2)
+                    launchpad_low = round(float(s_low), 2)
+                    break
+
+            if valid_launchpad:
+                base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
+                base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
+                req_ratio = 1.50 if mode == "swing3" else 1.15
+                base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else req_ratio
+
+                c_bo = (c >= launchpad_high) and (h >= launchpad_high)
+                c_vol_bo = v >= (1.4 * v_avg)
+                c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg)
+                c_candle_bo = rc >= 0.65
+                obv_high = bool(demat_obvs[i] >= demat_obv_maxes[i - 1]) if (mode == "swing3" and i > 0) else True
+
+                if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= req_ratio) and obv_high:
+                    entry_triggered = True
+                    calc_entry = launchpad_high
+                    calc_sl = round(min(l, launchpad_low), 2)
+
+        if entry_triggered:
+            r_dist = calc_entry - calc_sl
+            if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
+                if mode == "swing3":
+                    deliv_surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
+                    rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
+                    conviction_score = round(deliv_surge_ratio * max(0.1, rs_ratio), 3)
+                    if conviction_score < 2.5:
+                        continue
+
+                in_trade = True
+                entry_p = calc_entry
+                initial_sl = calc_sl
+                current_sl = initial_sl
+                entry_d = t
+                entry_idx = i
+
+    return trades
+
+
+def compute_metrics(trades_list, label):
+    if not trades_list:
+        return {
+            "configuration": label, "trades": 0, "win_rate_%": 0.0, "profit_factor": 0.0,
+            "avg_gain_%": 0.0, "avg_loss_%": 0.0, "max_gain_%": 0.0, "avg_days": 0.0
+        }
+    df = pd.DataFrame(trades_list)
+    total = len(df)
+    wins = df[df["outcome"] == "WIN"]
+    losses = df[df["outcome"] == "LOSS"]
+
+    win_rate = round((len(wins) / total) * 100.0, 2)
+    avg_gain = round(wins["pnl_%"].mean(), 2) if not wins.empty else 0.0
+    avg_loss = round(losses["pnl_%"].mean(), 2) if not losses.empty else 0.0
+    max_gain = round(df["pnl_%"].max(), 2) if not df.empty else 0.0
+    avg_days = round(df["hold_days"].mean(), 1)
+
+    gross_win = wins["pnl_%"].sum() if not wins.empty else 0.0
+    gross_loss = abs(losses["pnl_%"].sum()) if not losses.empty else 1.0
+    pf = round(gross_win / gross_loss, 2) if gross_loss > 0 else 999.0
+
+    return {
+        "configuration": label,
+        "trades": total,
+        "win_rate_%": win_rate,
+        "profit_factor": pf,
+        "avg_gain_%": avg_gain,
+        "avg_loss_%": avg_loss,
+        "max_gain_%": max_gain,
+        "avg_days": avg_days,
+    }
+
+
+def execute_comparison():
+    nifty_perf_map = load_nifty_benchmark()
+    nifty750_set = load_nifty750_symbols()
+
+    json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+    excluded = {
+        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+        "fundamentals.json", "backtest_results.json"
+    }
+    target_files = [f for f in json_files if os.path.basename(f) not in excluded]
+
+    print(f"🚀 Running Engine Decomposition across {len(target_files)} stocks...")
+
+    s3_v_trades = []
+    s3_lp_trades = []
+    r2_v_trades = []
+    r2_lp_trades = []
+
+    for path in sorted(target_files):
+        sym = os.path.splitext(os.path.basename(path))[0].upper()
+        try:
+            with open(path, "r", encoding="utf-8") as fp:
+                raw = json.load(fp)
+            clean = clean_and_prepare(raw)
+            if not clean:
+                continue
+
+            if sym in nifty750_set:
+                s3_v_trades.extend(run_single_simulation(clean, nifty_perf_map, mode="swing3", allowed_engine="vreversal"))
+                s3_lp_trades.extend(run_single_simulation(clean, nifty_perf_map, mode="swing3", allowed_engine="launchpad"))
+
+            r2_v_trades.extend(run_single_simulation(clean, nifty_perf_map, mode="run2", allowed_engine="vreversal"))
+            r2_lp_trades.extend(run_single_simulation(clean, nifty_perf_map, mode="run2", allowed_engine="launchpad"))
+        except Exception:
+            continue
+
+    rows = [
+        compute_metrics(s3_v_trades, "1. Swing 3.0: V-Reversal Only (Flush >= 18% • Score >= 2.5)"),
+        compute_metrics(s3_lp_trades, "2. Swing 3.0: Launchpad Only (Spread <= 8% • Score >= 2.5)"),
+        compute_metrics(r2_v_trades, "3. Swing 3 Run 2: V-Reversal Only (Flush >= 18% • No Score Gate)"),
+        compute_metrics(r2_lp_trades, "4. Swing 3 Run 2: Launchpad Only (Spread <= 13% • No Score Gate)"),
+    ]
+
+    df_res = pd.DataFrame(rows)
+    print("\n" + "=" * 115)
+    print("🏆 ENGINE COMPARISON: V-REVERSAL vs. LAUNCHPAD BREAKOUTS")
+    print(f"Generated: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p IST')}")
+    print("=" * 115)
+    print(df_res.to_string(index=False))
+    print("=" * 115 + "\n")
+
+    payload = {
+        "Generated At": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Report": rows,
+    }
+
+    with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
+        json.dump(payload, fp, indent=2)
+
+    print(f"💾 Results saved successfully to {RESULTS_JSON}")
+
+
+if __name__ == "__main__":
+    execute_comparison()
