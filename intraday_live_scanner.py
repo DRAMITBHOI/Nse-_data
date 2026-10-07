@@ -8,11 +8,65 @@ NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 MIN_TURNOVER_CR = 10.0
 os.makedirs(DATA_DIR, exist_ok=True)
 
+TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+
 NSE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "*/*",
     "Referer": "https://www.nseindia.com/"
 }
+
+def send_telegram_alert(inst_bo, light_bo, scan_time, elapsed_mins):
+    if not TG_TOKEN or not TG_CHAT_ID:
+        print("ℹ Telegram credentials not configured. Skipping message push.")
+        return
+    if not inst_bo and not light_bo:
+        print("ℹ No breakouts today; no Telegram alert needed.")
+        return
+
+    lines = [
+        "🚨 <b>NSE LIVE BREAKOUT ALERT</b>",
+        f"🕒 <i>Time: {scan_time} (Session: {int(elapsed_mins)}m/375m)</i>",
+        "────────────────────────"
+    ]
+
+    if inst_bo:
+        lines.append(f"\n🔥 <b>INSTITUTIONAL BREAKOUTS ({len(inst_bo)})</b>")
+        lines.append("<i>Criteria: LTP ≥ Pivot & Projected Vol ≥ 1.4x SMA</i>\n")
+        for b in inst_bo:
+            lines.append(
+                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
+                f"  LTP: <b>₹{b['ltp']:.2f}</b> (Pivot: ₹{b['pivot_ceiling']:.2f}, {b['dist_pivot_%']:+.2f}%)\n"
+                f"  SL: ₹{b['stop_loss']:.2f} (Risk: {b['risk_%']:.1f}%)\n"
+                f"  Vol Pace: <b>{b['proj_vol_pace']:.2f}x SMA20</b>\n"
+            )
+
+    if light_bo:
+        lines.append(f"\n⚠️ <b>LIGHT VOLUME CROSSES ({len(light_bo)})</b>")
+        lines.append("<i>Caution: Retail push / Watch for rejection wick</i>\n")
+        for b in light_bo[:5]:  # Show top 5 light volume crosses to avoid text flood
+            lines.append(
+                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
+                f"  LTP: ₹{b['ltp']:.2f} | Pivot: ₹{b['pivot_ceiling']:.2f} | Vol Pace: {b['proj_vol_pace']:.2f}x\n"
+            )
+
+    msg_text = "\n".join(lines)
+    tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+    payload = urllib.parse.urlencode({
+        "chat_id": TG_CHAT_ID,
+        "text": msg_text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": "true"
+    }).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(tg_url, data=payload, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status == 200:
+                print("📲 Telegram notification delivered successfully.")
+    except Exception as e:
+        print(f"❌ Telegram delivery failed: {e}")
 
 def clean_data(raw):
     if not raw or not isinstance(raw, list): return []
@@ -124,7 +178,6 @@ def get_quote(symbol, cookies):
 def run():
     n_perf, n750 = load_benchmarks()
     files = [f for f in glob.glob(os.path.join(DATA_DIR, "*.json")) if not any(x in f for x in ["nifty", "fundamentals", "backtest", "swing3", "breakout"])]
-    print(f"Filtering {len(files)} stocks for pivot targets...")
     
     targets = {}
     for p in files:
@@ -142,7 +195,6 @@ def run():
     mins = 375.0 if now > now.replace(hour=15, minute=30, second=0, microsecond=0) else max(1.0, (now - m_open).total_seconds() / 60.0)
     pace_factor = 375.0 / mins
 
-    print(f"Polling {len(targets)} targets (Elapsed: {int(mins)}m)...")
     cookies = get_session()
     inst_bo, light_bo, coils = [], [], []
 
@@ -174,15 +226,18 @@ def run():
     light_bo.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
     coils.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
 
+    scan_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
     with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
         json.dump({
-            "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+            "Scan_Timestamp": scan_ts,
             "Elapsed_Minutes": int(mins),
             "Institutional_Breakouts": inst_bo,
             "Light_Vol_Crosses": light_bo,
             "Coiling_Approaching": coils[:25]
         }, fp, indent=2)
-    print(f"Saved: {len(inst_bo)} Institutional Breakouts, {len(light_bo)} Light Crosses.")
+
+    print(f"Scan complete. Found {len(inst_bo)} Institutional, {len(light_bo)} Light.")
+    send_telegram_alert(inst_bo, light_bo, scan_ts, mins)
 
 if __name__ == "__main__":
     run()
