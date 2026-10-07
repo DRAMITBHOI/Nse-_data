@@ -39,13 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy requests
 
-      - name: Ensure Target Levels Exist
-        run: |
-          if [ ! -f data/all_stock_breakout_levels.json ]; then
-            python generate_all_breakout_levels.py
-          fi
-
-      - name: Run Intraday Live Scanner
+      - name: Run Standalone Intraday Live Scanner
         run: python intraday_live_scanner.py
 
       - name: Commit & Push Live Breakouts
@@ -53,7 +47,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main
-          git add data/all_stock_breakout_levels.json || true
           git add data/live_intraday_breakouts.json || true
           git commit -m "Auto-update Intraday Breakouts [skip ci]" || echo "No changes to commit"
           git push origin main
