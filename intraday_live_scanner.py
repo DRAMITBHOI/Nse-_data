@@ -209,24 +209,4 @@ def fetch_live_quote(symbol, cookies):
     req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=6) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            price_info = data.get("priceInfo", {})
-            pre_open = data.get("preOpenMarket", {})
-            sec_details = data.get("securityDetails", {})
-
-            ltp = float(price_info.get("lastPrice", 0.0) or 0.0)
-            day_high = float(price_info.get("intraDayHighLow", {}).get("max", 0.0) or 0.0)
-
-            traded_vol = float(pre_open.get("totalTradedVolume", 0.0) or 0.0)
-            if traded_vol == 0:
-                traded_vol = float(sec_details.get("volumeTraded", 0.0) or 0.0)
-
-            return {"ltp": ltp, "high": day_high, "traded_vol": traded_vol}
-    except Exception:
-        return None
-
-
-def calculate_market_minutes():
-    now = datetime.datetime.now()
-    market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
-    market_close = now.replace(hour=15, minute=30, second=
+            data = json.loads(resp.read().decode("utf-
