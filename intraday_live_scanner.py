@@ -10,6 +10,8 @@ DATA_DIR = "data"
 LEVELS_JSON = os.path.join(DATA_DIR, "all_stock_breakout_levels.json")
 OUTPUT_JSON = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 
+os.makedirs(DATA_DIR, exist_ok=True)
+
 NSE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "*/*",
@@ -68,16 +70,20 @@ def calculate_market_minutes():
 
 def execute_intraday_scan():
     if not os.path.exists(LEVELS_JSON):
-        print(f"❌ Missing levels map: {LEVELS_JSON}")
-        return
+        print(f"⚠️ {LEVELS_JSON} not found. Running level generation fallback...")
+        try:
+            import generate_all_breakout_levels
+            generate_all_breakout_levels.generate_all_breakout_levels()
+        except Exception as e:
+            print(f"Fallback generation error: {e}")
 
-    with open(LEVELS_JSON, "r", encoding="utf-8") as fp:
-        data = json.load(fp)
-
-    targets = data.get("Targets", {})
-    if not targets:
-        print("ℹ No targets found in levels JSON.")
-        return
+    targets = {}
+    if os.path.exists(LEVELS_JSON):
+        try:
+            with open(LEVELS_JSON, "r", encoding="utf-8") as fp:
+                targets = json.load(fp).get("Targets", {})
+        except Exception:
+            pass
 
     elapsed_mins = calculate_market_minutes()
     pace_factor = 375.0 / elapsed_mins
@@ -91,7 +97,7 @@ def execute_intraday_scan():
 
     for sym, info in targets.items():
         quote = fetch_live_quote(sym, cookies)
-        time.sleep(0.08)  # Rate limiting buffer
+        time.sleep(0.08)
 
         if not quote or quote["ltp"] <= 0:
             continue
@@ -105,7 +111,6 @@ def execute_intraday_scan():
         setup = info["setup"]
         univ = info["universe"]
 
-        # Extrapolate current minute volume to the full 375-minute day
         projected_day_vol = traded_vol * pace_factor
         vol_surge_mult = round(projected_day_vol / v_sma, 2) if v_sma > 0 else 1.0
 
@@ -152,7 +157,7 @@ def execute_intraday_scan():
     with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"✅ Completed. Found {len(confirmed_institutional)} Institutional Breakouts, {len(light_vol_crosses)} Light Crosses.")
+    print(f"✅ Saved results to {OUTPUT_JSON}")
 
 
 if __name__ == "__main__":
