@@ -1,10 +1,4 @@
-import os
-import json
-import glob
-import time
-import datetime
-import urllib.request
-import urllib.parse
+import os, json, glob, time, datetime, urllib.request, urllib.parse
 import pandas as pd
 import numpy as np
 
@@ -12,201 +6,183 @@ DATA_DIR = "data"
 OUTPUT_JSON = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 MIN_TURNOVER_CR = 10.0
-
 os.makedirs(DATA_DIR, exist_ok=True)
 
 NSE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.nseindia.com/",
+    "Referer": "https://www.nseindia.com/"
 }
 
-
-def clean_and_prepare(raw_data):
-    if not raw_data or not isinstance(raw_data, list):
-        return []
-    date_map = {}
-    for r in raw_data:
-        if not isinstance(r, dict):
-            continue
-        raw_t = str(r.get("time", "")).strip()
-        if not raw_t:
-            continue
-        d_str = raw_t[:10]
-        try:
-            c = float(r.get("close", 0) or 0)
-            if c <= 0:
-                continue
-            entry = {
-                "time": d_str,
-                "open": float(r.get("open", c) or c),
-                "high": float(r.get("high", c) or c),
-                "low": float(r.get("low", c) or c),
-                "close": c,
-                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
-                "volume": float(r.get("volume", 0) or 0),
-                "deliv_pct": float(r.get("deliv_pct", 0) or 0),
-            }
-            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
-                date_map[d_str] = entry
-        except Exception:
-            continue
-
-    clean = [date_map[k] for k in sorted(date_map.keys())]
-
-    known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
-    for i in range(len(clean) - 1, 0, -1):
-        prev_c = clean[i - 1]["close"]
-        curr_o = clean[i]["open"]
-        if prev_c > 0 and curr_o > 0:
-            ratio = prev_c / curr_o
-            adj_factor = None
-            if ratio >= 1.35:
-                for k in known_multipliers:
-                    if abs(ratio - k) / k < 0.15:
-                        adj_factor = k
-                        break
-                if not adj_factor and 1.70 <= ratio <= 2.30:
-                    adj_factor = 2.0
-                elif not adj_factor and 4.30 <= ratio <= 5.50:
-                    adj_factor = 5.0
-                elif not adj_factor and 8.50 <= ratio <= 11.50:
-                    adj_factor = 10.0
-            if adj_factor:
-                for j in range(0, i):
-                    clean[j]["open"] = round(clean[j]["open"] / adj_factor, 2)
-                    clean[j]["high"] = round(clean[j]["high"] / adj_factor, 2)
-                    clean[j]["low"] = round(clean[j]["low"] / adj_factor, 2)
-                    clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
-                    clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
-                    clean[j]["volume"] = clean[j]["volume"] * adj_factor
-
+def clean_data(raw):
+    if not raw or not isinstance(raw, list): return []
+    dmap = {}
+    for r in raw:
+        if not isinstance(r, dict): continue
+        t = str(r.get("time", ""))[:10]
+        c = float(r.get("close", 0) or 0)
+        if not t or c <= 0: continue
+        dmap[t] = {
+            "time": t, "open": float(r.get("open", c) or c),
+            "high": float(r.get("high", c) or c), "low": float(r.get("low", c) or c),
+            "close": c, "volume": float(r.get("volume", 0) or 0)
+        }
+    clean = [dmap[k] for k in sorted(dmap.keys())]
+    for i in range(len(clean)-1, 0, -1):
+        p_c, c_o = clean[i-1]["close"], clean[i]["open"]
+        if p_c > 0 and c_o > 0 and (p_c / c_o) >= 1.35:
+            ratio = p_c / c_o
+            k = 2.0 if 1.7 <= ratio <= 2.3 else (5.0 if 4.3 <= ratio <= 5.5 else (10.0 if 8.5 <= ratio <= 11.5 else None))
+            if k:
+                for j in range(i):
+                    for f in ["open", "high", "low", "close"]: clean[j][f] = round(clean[j][f] / k, 2)
+                    clean[j]["volume"] = clean[j]["volume"] * k
     return clean
 
-
-def load_nifty_benchmark():
+def load_benchmarks():
+    n_perf = {}
     for f in ["nifty.json", "nifty50.json", "NIFTY.json"]:
         p = os.path.join(DATA_DIR, f)
         if os.path.exists(p):
             try:
                 with open(p, "r", encoding="utf-8") as fp:
-                    raw = json.load(fp)
-                clean = clean_and_prepare(raw)
-                if len(clean) > 50:
-                    df = pd.DataFrame(clean)
-                    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
-                    return {r["time"]: float(r["perf_60d"]) for _, r in df.iterrows()}
-            except Exception:
-                continue
-    return {}
-
-
-def load_nifty750_symbols():
+                    c = clean_data(json.load(fp))
+                if len(c) > 50:
+                    df = pd.DataFrame(c)
+                    df["p60"] = df["close"].pct_change(60).fillna(0)
+                    n_perf = {r["time"]: float(r["p60"]) for _, r in df.iterrows()}
+                    break
+            except Exception: pass
+    n750 = set()
     if os.path.exists(NIFTY750_FILE):
         try:
             with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
-                data = json.load(fp)
-            if isinstance(data, list):
-                return {str(x).strip().upper() for x in data}
-            if isinstance(data, dict):
-                return {str(x).strip().upper() for x in data.keys()}
-        except Exception:
-            pass
-    return set()
+                d = json.load(fp)
+            n750 = {str(x).strip().upper() for x in (d if isinstance(d, list) else d.keys())}
+        except Exception: pass
+    return n_perf, n750
 
+def extract_target(clean, n_perf, is_n750):
+    if len(clean) < 60: return None
+    df = pd.DataFrame(clean)
+    df["vol_sma"] = df["volume"].rolling(20, min_periods=5).mean()
+    df["turnover"] = (df["close"] * df["volume"]) / 1e7
+    df["to_50d"] = df["turnover"].rolling(50, min_periods=10).mean().fillna(0)
+    df["sma200"] = df["close"].rolling(200, min_periods=50).mean()
+    df["p60"] = df["close"].pct_change(60).fillna(0)
+    
+    last = len(df) - 1
+    c = df["close"].values[last]
+    if df["to_50d"].values[last] < MIN_TURNOVER_CR: return None
+    if pd.notnull(df["sma200"].values[last]) and c < df["sma200"].values[last]: return None
+    
+    t = df["time"].values[last]
+    if df["p60"].values[last] <= n_perf.get(t, 0.001): return None
 
-def extract_breakout_target(clean_data, nifty_perf_map, is_nifty750):
-    if len(clean_data) < 60:
-        return None
+    highs, lows = df["high"].values, df["low"].values
+    v_sma = float(df["vol_sma"].values[last] or 50000.0)
 
-    df = pd.DataFrame(clean_data)
-    df["vol_sma20"] = df["volume"].rolling(20, min_periods=5).mean()
-    df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
-    df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
-    df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
-    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+    # 1. V-Reversal Level (Flush >= 18%)
+    r20_h = highs[last-20:last+1].max()
+    if (r20_h - lows[last]) / r20_h >= 0.18:
+        p_ceil = round(float(highs[last-3:last+1].max()), 2)
+        sl = round(float(lows[last-4:last+1].min() * 0.995), 2)
+        if -2.0 <= ((p_ceil - c) / c) * 100 <= 6.5:
+            return {"setup": "V-REVERSAL", "universe": "NIFTY 750" if is_n750 else "NON-N750",
+                    "pivot": p_ceil, "sl": sl, "v_sma": v_sma}
 
-    last_i = len(df) - 1
-    c = df["close"].values[last_i]
-    to_50 = df["turnover_50d"].values[last_i]
-    sma200 = df["sma_200"].values[last_i]
-    p60 = df["perf_60d"].values[last_i]
-    t = df["time"].values[last_i]
-    v_sma20 = df["vol_sma20"].values[last_i]
-
-    if to_50 < MIN_TURNOVER_CR:
-        return None
-
-    is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
-    n_p = nifty_perf_map.get(t, 0.001)
-    is_rs = bool(p60 > n_p)
-
-    if not (is_stage2 and is_rs):
-        return None
-
-    highs = df["high"].values
-    lows = df["low"].values
-
-    # 1. Engine 1: V-Reversal Reclaim Level (Flush >= 18%)
-    r20_h = highs[last_i - 20:last_i + 1].max()
-    pullback = (r20_h - lows[last_i]) / r20_h
-    if pullback >= 0.18:
-        prior_3d_high = round(float(highs[last_i - 3:last_i + 1].max()), 2)
-        recent_trough = round(float(lows[last_i - 4:last_i + 1].min() * 0.995), 2)
-        dist_pct = round(((prior_3d_high - c) / c) * 100.0, 2)
-        if -2.0 <= dist_pct <= 6.5:
-            return {
-                "setup": "V-REVERSAL",
-                "universe": "NIFTY 750" if is_nifty750 else "NON-N750",
-                "pivot_ceiling": prior_3d_high,
-                "stop_loss": recent_trough,
-                "risk_%": round(((prior_3d_high - recent_trough) / prior_3d_high) * 100, 2),
-                "vol_sma20": round(float(v_sma20), 0),
-            }
-
-    # 2. Engine 2: Launchpad Base Ceiling (Spread <= 8% for Nifty 750, <= 13% for Non-N750)
-    max_allowed_spread = 0.08 if is_nifty750 else 0.13
-    for shelf_len in range(10, 19):
-        s_h = highs[last_i - shelf_len:last_i + 1].max()
-        s_l = lows[last_i - shelf_len:last_i + 1].min()
-        if s_l > 0:
-            spread = (s_h - s_l) / s_l
-            if spread <= max_allowed_spread:
-                p_ceil = round(float(s_h), 2)
-                p_sl = round(float(s_l), 2)
-                dist_pct = round(((p_ceil - c) / c) * 100.0, 2)
-                if -2.0 <= dist_pct <= 6.5:
-                    return {
-                        "setup": "LAUNCHPAD",
-                        "universe": "NIFTY 750" if is_nifty750 else "NON-N750",
-                        "pivot_ceiling": p_ceil,
-                        "stop_loss": p_sl,
-                        "risk_%": round(((p_ceil - p_sl) / p_ceil) * 100, 2),
-                        "vol_sma20": round(float(v_sma20), 0),
-                    }
-                break
-
+    # 2. Launchpad Level (Spread <= 8% / 13%)
+    max_sp = 0.08 if is_n750 else 0.13
+    for s_len in range(10, 19):
+        sh, slow = highs[last-s_len:last+1].max(), lows[last-s_len:last+1].min()
+        if slow > 0 and ((sh - slow) / slow) <= max_sp:
+            p_ceil, sl = round(float(sh), 2), round(float(slow), 2)
+            if -2.0 <= ((p_ceil - c) / c) * 100 <= 6.5:
+                return {"setup": "LAUNCHPAD", "universe": "NIFTY 750" if is_n750 else "NON-N750",
+                        "pivot": p_ceil, "sl": sl, "v_sma": v_sma}
+            break
     return None
 
-
-def get_nse_session():
-    cookie_req = urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS)
+def get_session():
     try:
-        resp = urllib.request.urlopen(cookie_req, timeout=10)
-        return resp.headers.get("Set-Cookie", "")
-    except Exception:
-        return ""
+        r = urllib.request.urlopen(urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS), timeout=8)
+        return r.headers.get("Set-Cookie", "")
+    except Exception: return ""
 
-
-def fetch_live_quote(symbol, cookies):
-    sym_encoded = urllib.parse.quote(symbol.strip().upper())
-    url = f"https://www.nseindia.com/api/quote-equity?symbol={sym_encoded}"
-    headers = dict(NSE_HEADERS)
-    if cookies:
-        headers["Cookie"] = cookies
-
-    req = urllib.request.Request(url, headers=headers)
+def get_quote(symbol, cookies):
+    sym = urllib.parse.quote(symbol.strip().upper())
+    h = dict(NSE_HEADERS)
+    if cookies: h["Cookie"] = cookies
     try:
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            data = json.loads(resp.read().decode("utf-
+        with urllib.request.urlopen(urllib.request.Request(f"https://www.nseindia.com/api/quote-equity?symbol={sym}", headers=h), timeout=5) as resp:
+            d = json.loads(resp.read().decode("utf-8", errors="ignore"))
+            p = d.get("priceInfo", {})
+            v = float(d.get("preOpenMarket", {}).get("totalTradedVolume", 0) or d.get("securityDetails", {}).get("volumeTraded", 0) or 0)
+            return {"ltp": float(p.get("lastPrice", 0) or 0), "high": float(p.get("intraDayHighLow", {}).get("max", 0) or 0), "vol": v}
+    except Exception: return None
+
+def run():
+    n_perf, n750 = load_benchmarks()
+    files = [f for f in glob.glob(os.path.join(DATA_DIR, "*.json")) if not any(x in f for x in ["nifty", "fundamentals", "backtest", "swing3", "breakout"])]
+    print(f"Filtering {len(files)} stocks for pivot targets...")
+    
+    targets = {}
+    for p in files:
+        sym = os.path.splitext(os.path.basename(p))[0].upper()
+        try:
+            with open(p, "r", encoding="utf-8") as fp: raw = json.load(fp)
+            c = clean_data(raw)
+            if c:
+                t = extract_target(c, n_perf, sym in n750)
+                if t: targets[sym] = t
+        except Exception: pass
+
+    now = datetime.datetime.now()
+    m_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
+    mins = 375.0 if now > now.replace(hour=15, minute=30, second=0, microsecond=0) else max(1.0, (now - m_open).total_seconds() / 60.0)
+    pace_factor = 375.0 / mins
+
+    print(f"Polling {len(targets)} targets (Elapsed: {int(mins)}m)...")
+    cookies = get_session()
+    inst_bo, light_bo, coils = [], [], []
+
+    for sym, info in targets.items():
+        q = get_quote(sym, cookies)
+        time.sleep(0.08)
+        if not q or q["ltp"] <= 0: continue
+
+        ltp, high, vol = q["ltp"], q["high"], q["vol"]
+        pivot, sl, vsma = info["pivot"], info["sl"], info["v_sma"]
+        surge = round((vol * pace_factor) / vsma, 2) if vsma > 0 else 1.0
+        diff = round(((ltp - pivot) / pivot) * 100.0, 2)
+        is_bo = (ltp >= pivot) or (high >= pivot)
+
+        row = {
+            "symbol": sym, "universe": info["universe"], "setup": info["setup"],
+            "pivot_ceiling": pivot, "ltp": ltp, "day_high": high, "stop_loss": sl,
+            "risk_%": round(((pivot - sl) / pivot) * 100, 2), "dist_pivot_%": diff,
+            "proj_vol_pace": surge, "action": "INSTITUTIONAL BREAKOUT" if surge >= 1.4 else "LIGHT-VOL CROSS"
+        }
+
+        if is_bo and surge >= 1.4: inst_bo.append(row)
+        elif is_bo: light_bo.append(row)
+        elif -2.5 <= diff < 0:
+            row["action"] = f"COILING ({abs(diff):.1f}% below)"
+            coils.append(row)
+
+    inst_bo.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
+    light_bo.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
+    coils.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
+
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
+        json.dump({
+            "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+            "Elapsed_Minutes": int(mins),
+            "Institutional_Breakouts": inst_bo,
+            "Light_Vol_Crosses": light_bo,
+            "Coiling_Approaching": coils[:25]
+        }, fp, indent=2)
+    print(f"Saved: {len(inst_bo)} Institutional Breakouts, {len(light_bo)} Light Crosses.")
+
+if __name__ == "__main__":
+    run()
