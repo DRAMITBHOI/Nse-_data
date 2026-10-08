@@ -1,13 +1,14 @@
-name: 30-Min Intraday Live Breakout Scanner
+name: 15-Min Intraday Live Breakout Scanner
 
 on:
   schedule:
-    # 03:45 UTC to 09:45 UTC (09:15 AM to 03:15 PM IST), firing at minute :15 and :45
-    - cron: '15,45 3-9 * * 1-5'
+    # Runs every 15 minutes from 03:45 UTC to 10:00 UTC (09:15 AM to 03:30 PM IST)
+    - cron: '*/15 3-10 * * 1-5'
   workflow_dispatch:
 
+# Dynamic concurrency: manual runs never block or get cancelled by scheduled runs
 concurrency:
-  group: live-intraday-scan
+  group: live-scan-${{ github.event_name }}-${{ github.run_id }}
   cancel-in-progress: false
 
 permissions:
@@ -34,17 +35,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas requests
 
-      - name: Run Standalone Intraday Live Scanner
+      - name: Run Cumulative Intraday Live Scanner
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python intraday_live_scanner.py
 
-      - name: Commit & Push Live Breakouts
+      - name: Commit & Push Cumulative Live Breakouts
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/live_intraday_breakouts.json || true
-          git commit -m "Auto-update Intraday Breakouts [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
           git pull --rebase origin main || true
           git push origin main
