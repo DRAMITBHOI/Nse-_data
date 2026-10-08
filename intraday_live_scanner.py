@@ -7,7 +7,7 @@ import urllib.parse
 import pandas as pd
 
 # ==============================================================================
-# 1. TIMEZONE & PATH CONFIGURATION
+# 1. PATHS & TIME CONFIGURATION
 # ==============================================================================
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 
@@ -15,6 +15,7 @@ DATA_DIR = "data"
 OUTPUT_JSON = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 S3_RESULTS = os.path.join(DATA_DIR, "swing3_scanner_results.json")
 R2_RESULTS = os.path.join(DATA_DIR, "swing3_run2_non_nifty750_scanner_results.json")
+MY_TRADES_FILE = os.path.join(DATA_DIR, "my_trades.json")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -49,38 +50,6 @@ def send_telegram_msg(msg_text):
             pass
     except Exception as e:
         print(f"❌ Telegram delivery failed: {e}")
-
-def notify_telegram(new_triggers, all_breakouts, scan_ts, mins):
-    # 1. Immediate Alert for Freshly Triggered Stocks
-    if new_triggers:
-        lines = [
-            "🚨 <b>FRESH INTRADAY BREAKOUT TRIGGERED!</b>",
-            f"🕒 <i>Time: {scan_ts} (Elapsed: {int(mins)}m/375m)</i>",
-            "────────────────────────",
-        ]
-        for b in new_triggers:
-            lines.append(
-                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
-                f"  LTP: <b>₹{b['ltp']:.2f}</b> (Pivot: ₹{b['pivot_ceiling']:.2f}, {b['dist_pivot_%']:+.2f}%)\n"
-                f"  SL: ₹{b['stop_loss']:.2f} (Risk: {b['risk_%']:.1f}%)\n"
-                f"  Vol Pace: <b>{b['proj_vol_pace']:.2f}x SMA20</b>\n"
-            )
-        send_telegram_msg("\n".join(lines))
-
-    # 2. Cumulative Progress Update (Sent every run if breakouts exist)
-    if all_breakouts:
-        summary_lines = [
-            "📊 <b>ALL-DAY BREAKOUT PROGRESS MONITOR</b>",
-            f"🕒 <i>Time: {scan_ts} | Active Breakouts: {len(all_breakouts)}</i>",
-            "────────────────────────",
-        ]
-        for b in all_breakouts:
-            status_icon = "🟢" if b["dist_pivot_%"] >= 0 else "🔴"
-            summary_lines.append(
-                f"{status_icon} <b>{b['symbol']}</b>: ₹{b['ltp']:.2f} ({b['dist_pivot_%']:+.2f}% vs Pivot) "
-                f"| High: ₹{b['day_high']:.2f} | Pace: {b['proj_vol_pace']:.1f}x"
-            )
-        send_telegram_msg("\n".join(summary_lines))
 
 # ==============================================================================
 # 3. NSE QUOTES & COOKIE SESSION
@@ -117,7 +86,7 @@ def get_quote(symbol, cookies):
         return None
 
 # ==============================================================================
-# 4. WATCHLIST & PERSISTENT HISTORY LOADER
+# 4. WATCHLIST & CUMULATIVE STATE LOADERS
 # ==============================================================================
 def load_verified_watchlists():
     targets = {}
@@ -144,12 +113,10 @@ def load_verified_watchlists():
     return targets
 
 def load_previous_day_state(today_date_str):
-    """Retains breakouts that triggered earlier today."""
     if os.path.exists(OUTPUT_JSON):
         try:
             with open(OUTPUT_JSON, "r", encoding="utf-8") as fp:
                 d = json.load(fp)
-            # Only keep history if the file was created today
             if d.get("Scan_Date") == today_date_str:
                 return {item["symbol"]: item for item in d.get("Breakouts_All_Day", [])}
         except Exception:
@@ -157,7 +124,82 @@ def load_previous_day_state(today_date_str):
     return {}
 
 # ==============================================================================
-# 5. EXECUTION & PROGRESS ACCUMULATOR
+# 5. ACTIVE TRADE TRAILING STOP EVALUATION (WICK VS CLOSING)
+# ==============================================================================
+def monitor_active_trades(cookies, scan_ts, mins):
+    if not os.path.exists(MY_TRADES_FILE):
+        return
+
+    try:
+        with open(MY_TRADES_FILE, "r", encoding="utf-8") as f:
+            trades = json.load(f)
+    except Exception:
+        return
+
+    open_trades = [t for t in trades if t.get("status") == "OPEN"]
+    if not open_trades:
+        return
+
+    # Closing window = After 3:00 PM IST (>= 345 mins elapsed out of 375 total mins)
+    is_closing_window = (mins >= 345.0)
+    warnings = []
+    hard_stops = []
+
+    for t in open_trades:
+        sym = t.get("symbol", "").upper().strip()
+        sl = float(t.get("hard_sl", 0.0))
+        entry = float(t.get("entry_price", 0.0))
+        if not sym or sl <= 0:
+            continue
+
+        q = get_quote(sym, cookies)
+        time.sleep(0.08)
+        if not q or q["ltp"] <= 0:
+            continue
+
+        ltp = q["ltp"]
+        pnl_pct = round(((ltp - entry) / entry) * 100, 2) if entry > 0 else 0.0
+        dist_sl_pct = round(((ltp - sl) / sl) * 100, 2)
+
+        if ltp <= sl:
+            row = {"symbol": sym, "ltp": ltp, "sl": sl, "pnl_%": pnl_pct, "dist_sl_%": dist_sl_pct}
+            if is_closing_window:
+                hard_stops.append(row)
+            else:
+                warnings.append(row)
+
+    # 1. Closing breakdown alert (action required)
+    if hard_stops:
+        lines = [
+            "🛑 <b>CONFIRMED CLOSING STOP BREACH</b>",
+            f"🕒 <i>Time: {scan_ts} (Closing Window)</i>",
+            "────────────────────────",
+        ]
+        for h in hard_stops:
+            lines.append(
+                f"• <b>{h['symbol']}</b>: LTP ₹{h['ltp']:.2f} <= SL ₹{h['sl']:.2f}\n"
+                f"  PnL: <b>{h['pnl_%']:+.2f}%</b> (Breach: {h['dist_sl_%']:.2f}%)\n"
+                f"  👉 <i>Closing below stop. Manual exit recommended per rules.</i>\n"
+            )
+        send_telegram_msg("\n".join(lines))
+
+    # 2. Midday wick test (advisory only)
+    elif warnings:
+        lines = [
+            "⚠️ <b>INTRADAY SUPPORT / SL WICK TEST</b>",
+            f"🕒 <i>Time: {scan_ts}</i>",
+            "────────────────────────",
+        ]
+        for w in warnings:
+            lines.append(
+                f"• <b>{w['symbol']}</b>: LTP ₹{w['ltp']:.2f} tested SL ₹{w['sl']:.2f}\n"
+                f"  PnL: {w['pnl_%']:+.2f}% (Breach: {w['dist_sl_%']:.2f}%)\n"
+                f"  ℹ️ <i>Candle unconfirmed. Assess support bounce vs closing breakdown.</i>\n"
+            )
+        send_telegram_msg("\n".join(lines))
+
+# ==============================================================================
+# 6. MAIN ENGINE EXECUTION
 # ==============================================================================
 def run():
     now_ist = datetime.datetime.now(IST)
@@ -218,9 +260,9 @@ def run():
 
     breakout_list = sorted(list(all_breakouts_map.values()), key=lambda x: x["dist_pivot_%"], reverse=True)
     coiling_list = sorted(coiling, key=lambda x: x["dist_pivot_%"], reverse=True)
-
     scan_ts = now_ist.strftime("%Y-%m-%d %I:%M:%S %p IST")
 
+    # Persist JSON State
     output_payload = {
         "Scan_Date": today_date,
         "Scan_Timestamp": scan_ts,
@@ -229,12 +271,44 @@ def run():
         "Breakouts_All_Day": breakout_list,
         "Coiling": coiling_list[:25],
     }
-
     with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
         json.dump(output_payload, fp, indent=2)
 
-    print(f"✅ [{scan_ts}] Total Breakouts: {len(breakout_list)} ({len(new_triggers)} new) | Coiling: {len(coiling_list)}")
-    notify_telegram(new_triggers, breakout_list, scan_ts, mins)
+    # 1. Send Fresh Breakout Triggers
+    if new_triggers:
+        lines = [
+            "🚨 <b>FRESH INTRADAY BREAKOUT TRIGGERED!</b>",
+            f"🕒 <i>Time: {scan_ts} (Elapsed: {int(mins)}m/375m)</i>",
+            "────────────────────────",
+        ]
+        for b in new_triggers:
+            lines.append(
+                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
+                f"  LTP: <b>₹{b['ltp']:.2f}</b> (Pivot: ₹{b['pivot_ceiling']:.2f}, {b['dist_pivot_%']:+.2f}%)\n"
+                f"  SL: ₹{b['stop_loss']:.2f} (Risk: {b['risk_%']:.1f}%)\n"
+                f"  Vol Pace: <b>{b['proj_vol_pace']:.2f}x SMA20</b>\n"
+            )
+        send_telegram_msg("\n".join(lines))
+
+    # 2. Send Cumulative Progress Monitor (only if breakouts exist)
+    if breakout_list:
+        summary_lines = [
+            "📊 <b>ALL-DAY BREAKOUT PROGRESS MONITOR</b>",
+            f"🕒 <i>Time: {scan_ts} | Active Breakouts: {len(breakout_list)}</i>",
+            "────────────────────────",
+        ]
+        for b in breakout_list:
+            status_icon = "🟢" if b["dist_pivot_%"] >= 0 else "🔴"
+            summary_lines.append(
+                f"{status_icon} <b>{b['symbol']}</b>: ₹{b['ltp']:.2f} ({b['dist_pivot_%']:+.2f}% vs Pivot) "
+                f"| High: ₹{b['day_high']:.2f} | Pace: {b['proj_vol_pace']:.1f}x"
+            )
+        send_telegram_msg("\n".join(summary_lines))
+
+    # 3. Check Active Trailing Stop-Losses
+    monitor_active_trades(cookies, scan_ts, mins)
+
+    print(f"✅ [{scan_ts}] Breakouts: {len(breakout_list)} ({len(new_triggers)} new) | Coils: {len(coiling_list)}")
 
 if __name__ == "__main__":
     run()
