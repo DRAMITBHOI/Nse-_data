@@ -2,37 +2,13 @@ name: 30-Min Intraday Live Breakout Scanner
 
 on:
   schedule:
-    # 03:45 UTC = 09:15 AM IST (Market Open Scan)
-    - cron: '45 3 * * 1-5'
-    # 04:15 UTC = 09:45 AM IST
-    - cron: '15 4 * * 1-5'
-    # 04:45 UTC = 10:15 AM IST
-    - cron: '45 4 * * 1-5'
-    # 05:15 UTC = 10:45 AM IST
-    - cron: '15 5 * * 1-5'
-    # 05:45 UTC = 11:15 AM IST
-    - cron: '45 5 * * 1-5'
-    # 06:15 UTC = 11:45 AM IST
-    - cron: '15 6 * * 1-5'
-    # 06:45 UTC = 12:15 PM IST
-    - cron: '45 6 * * 1-5'
-    # 07:15 UTC = 12:45 PM IST
-    - cron: '15 7 * * 1-5'
-    # 07:45 UTC = 01:15 PM IST
-    - cron: '45 7 * * 1-5'
-    # 08:15 UTC = 01:45 PM IST
-    - cron: '15 8 * * 1-5'
-    # 08:45 UTC = 02:15 PM IST
-    - cron: '45 8 * * 1-5'
-    # 09:15 UTC = 02:45 PM IST
-    - cron: '15 9 * * 1-5'
-    # 09:45 UTC = 03:15 PM IST (Closing Run)
-    - cron: '45 9 * * 1-5'
+    # 03:45 UTC to 09:45 UTC (09:15 AM to 03:15 PM IST), firing at minute :15 and :45
+    - cron: '15,45 3-9 * * 1-5'
   workflow_dispatch:
 
 concurrency:
   group: live-intraday-scan
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
