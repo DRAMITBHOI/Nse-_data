@@ -1,55 +1,57 @@
-import os, json, glob, time, datetime, urllib.request, urllib.parse
+import os
+import json
+import time
+import datetime
+import urllib.request
+import urllib.parse
 import pandas as pd
-import numpy as np
+
+# ==============================================================================
+# 1. TIMEZONE & PATH CONFIGURATION
+# ==============================================================================
+# Force Indian Standard Time (IST = UTC + 5:30) on any cloud runner
+IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 
 DATA_DIR = "data"
 OUTPUT_JSON = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
-NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
-MIN_TURNOVER_CR = 10.0
+S3_RESULTS = os.path.join(DATA_DIR, "swing3_scanner_results.json")
+R2_RESULTS = os.path.join(DATA_DIR, "swing3_run2_non_nifty750_scanner_results.json")
+
 os.makedirs(DATA_DIR, exist_ok=True)
 
 TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+if TG_TOKEN.lower().startswith("bot"):
+    TG_TOKEN = TG_TOKEN[3:]
 
 NSE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "*/*",
-    "Referer": "https://www.nseindia.com/"
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.nseindia.com/",
 }
 
-def send_telegram_alert(inst_bo, light_bo, scan_time, elapsed_mins):
-    if not TG_TOKEN or not TG_CHAT_ID:
-        print("ℹ Telegram credentials not configured. Skipping message push.")
-        return
-    if not inst_bo and not light_bo:
-        print("ℹ No breakouts today; no Telegram alert needed.")
+# ==============================================================================
+# 2. TELEGRAM ALERT DISPATCHER
+# ==============================================================================
+def send_telegram_alert(breakouts, scan_time_str, elapsed_mins):
+    if not TG_TOKEN or not TG_CHAT_ID or not breakouts:
         return
 
     lines = [
-        "🚨 <b>NSE LIVE BREAKOUT ALERT</b>",
-        f"🕒 <i>Time: {scan_time} (Session: {int(elapsed_mins)}m/375m)</i>",
-        "────────────────────────"
+        "🚨 <b>NSE LIVE INTRADAY BREAKOUT ALERT</b>",
+        f"🕒 <i>Time: {scan_time_str} (Session: {int(elapsed_mins)}m/375m)</i>",
+        "────────────────────────",
     ]
 
-    if inst_bo:
-        lines.append(f"\n🔥 <b>INSTITUTIONAL BREAKOUTS ({len(inst_bo)})</b>")
-        lines.append("<i>Criteria: LTP ≥ Pivot & Projected Vol ≥ 1.4x SMA</i>\n")
-        for b in inst_bo:
-            lines.append(
-                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
-                f"  LTP: <b>₹{b['ltp']:.2f}</b> (Pivot: ₹{b['pivot_ceiling']:.2f}, {b['dist_pivot_%']:+.2f}%)\n"
-                f"  SL: ₹{b['stop_loss']:.2f} (Risk: {b['risk_%']:.1f}%)\n"
-                f"  Vol Pace: <b>{b['proj_vol_pace']:.2f}x SMA20</b>\n"
-            )
-
-    if light_bo:
-        lines.append(f"\n⚠️ <b>LIGHT VOLUME CROSSES ({len(light_bo)})</b>")
-        lines.append("<i>Caution: Retail push / Watch for rejection wick</i>\n")
-        for b in light_bo[:5]:  # Show top 5 light volume crosses to avoid text flood
-            lines.append(
-                f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']})\n"
-                f"  LTP: ₹{b['ltp']:.2f} | Pivot: ₹{b['pivot_ceiling']:.2f} | Vol Pace: {b['proj_vol_pace']:.2f}x\n"
-            )
+    for b in breakouts:
+        tag = "🔥 INSTITUTIONAL SURGE" if b["proj_vol_pace"] >= 1.20 else "⚡ PIVOT BREACH"
+        lines.append(
+            f"• <b>{b['symbol']}</b> ({b['universe']} | {b['setup']}) - <b>{tag}</b>\n"
+            f"  LTP: <b>₹{b['ltp']:.2f}</b> (Pivot: ₹{b['pivot_ceiling']:.2f}, {b['dist_pivot_%']:+.2f}%)\n"
+            f"  SL: ₹{b['stop_loss']:.2f} (Risk: {b['risk_%']:.1f}%)\n"
+            f"  Vol Pace: <b>{b['proj_vol_pace']:.2f}x SMA20</b>\n"
+        )
 
     msg_text = "\n".join(lines)
     tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
@@ -57,187 +59,184 @@ def send_telegram_alert(inst_bo, light_bo, scan_time, elapsed_mins):
         "chat_id": TG_CHAT_ID,
         "text": msg_text,
         "parse_mode": "HTML",
-        "disable_web_page_preview": "true"
+        "disable_web_page_preview": "true",
     }).encode("utf-8")
 
     try:
-        req = urllib.request.Request(tg_url, data=payload, headers={"User-Agent": "Mozilla/5.0"})
+        req = urllib.request.Request(
+            tg_url, data=payload, headers={"User-Agent": "Mozilla/5.0"}
+        )
         with urllib.request.urlopen(req, timeout=10) as resp:
             if resp.status == 200:
-                print("📲 Telegram notification delivered successfully.")
+                print("📲 Telegram alert delivered successfully.")
     except Exception as e:
         print(f"❌ Telegram delivery failed: {e}")
 
-def clean_data(raw):
-    if not raw or not isinstance(raw, list): return []
-    dmap = {}
-    for r in raw:
-        if not isinstance(r, dict): continue
-        t = str(r.get("time", ""))[:10]
-        c = float(r.get("close", 0) or 0)
-        if not t or c <= 0: continue
-        dmap[t] = {
-            "time": t, "open": float(r.get("open", c) or c),
-            "high": float(r.get("high", c) or c), "low": float(r.get("low", c) or c),
-            "close": c, "volume": float(r.get("volume", 0) or 0)
-        }
-    clean = [dmap[k] for k in sorted(dmap.keys())]
-    for i in range(len(clean)-1, 0, -1):
-        p_c, c_o = clean[i-1]["close"], clean[i]["open"]
-        if p_c > 0 and c_o > 0 and (p_c / c_o) >= 1.35:
-            ratio = p_c / c_o
-            k = 2.0 if 1.7 <= ratio <= 2.3 else (5.0 if 4.3 <= ratio <= 5.5 else (10.0 if 8.5 <= ratio <= 11.5 else None))
-            if k:
-                for j in range(i):
-                    for f in ["open", "high", "low", "close"]: clean[j][f] = round(clean[j][f] / k, 2)
-                    clean[j]["volume"] = clean[j]["volume"] * k
-    return clean
-
-def load_benchmarks():
-    n_perf = {}
-    for f in ["nifty.json", "nifty50.json", "NIFTY.json"]:
-        p = os.path.join(DATA_DIR, f)
-        if os.path.exists(p):
-            try:
-                with open(p, "r", encoding="utf-8") as fp:
-                    c = clean_data(json.load(fp))
-                if len(c) > 50:
-                    df = pd.DataFrame(c)
-                    df["p60"] = df["close"].pct_change(60).fillna(0)
-                    n_perf = {r["time"]: float(r["p60"]) for _, r in df.iterrows()}
-                    break
-            except Exception: pass
-    n750 = set()
-    if os.path.exists(NIFTY750_FILE):
-        try:
-            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
-                d = json.load(fp)
-            n750 = {str(x).strip().upper() for x in (d if isinstance(d, list) else d.keys())}
-        except Exception: pass
-    return n_perf, n750
-
-def extract_target(clean, n_perf, is_n750):
-    if len(clean) < 60: return None
-    df = pd.DataFrame(clean)
-    df["vol_sma"] = df["volume"].rolling(20, min_periods=5).mean()
-    df["turnover"] = (df["close"] * df["volume"]) / 1e7
-    df["to_50d"] = df["turnover"].rolling(50, min_periods=10).mean().fillna(0)
-    df["sma200"] = df["close"].rolling(200, min_periods=50).mean()
-    df["p60"] = df["close"].pct_change(60).fillna(0)
-    
-    last = len(df) - 1
-    c = df["close"].values[last]
-    if df["to_50d"].values[last] < MIN_TURNOVER_CR: return None
-    if pd.notnull(df["sma200"].values[last]) and c < df["sma200"].values[last]: return None
-    
-    t = df["time"].values[last]
-    if df["p60"].values[last] <= n_perf.get(t, 0.001): return None
-
-    highs, lows = df["high"].values, df["low"].values
-    v_sma = float(df["vol_sma"].values[last] or 50000.0)
-
-    # 1. V-Reversal Level (Flush >= 18%)
-    r20_h = highs[last-20:last+1].max()
-    if (r20_h - lows[last]) / r20_h >= 0.18:
-        p_ceil = round(float(highs[last-3:last+1].max()), 2)
-        sl = round(float(lows[last-4:last+1].min() * 0.995), 2)
-        if -2.0 <= ((p_ceil - c) / c) * 100 <= 6.5:
-            return {"setup": "V-REVERSAL", "universe": "NIFTY 750" if is_n750 else "NON-N750",
-                    "pivot": p_ceil, "sl": sl, "v_sma": v_sma}
-
-    # 2. Launchpad Level (Spread <= 8% / 13%)
-    max_sp = 0.08 if is_n750 else 0.13
-    for s_len in range(10, 19):
-        sh, slow = highs[last-s_len:last+1].max(), lows[last-s_len:last+1].min()
-        if slow > 0 and ((sh - slow) / slow) <= max_sp:
-            p_ceil, sl = round(float(sh), 2), round(float(slow), 2)
-            if -2.0 <= ((p_ceil - c) / c) * 100 <= 6.5:
-                return {"setup": "LAUNCHPAD", "universe": "NIFTY 750" if is_n750 else "NON-N750",
-                        "pivot": p_ceil, "sl": sl, "v_sma": v_sma}
-            break
-    return None
-
-def get_session():
+# ==============================================================================
+# 3. LIVE NSE QUOTE FETCHING
+# ==============================================================================
+def get_nse_session():
+    cookie_req = urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS)
     try:
-        r = urllib.request.urlopen(urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS), timeout=8)
-        return r.headers.get("Set-Cookie", "")
-    except Exception: return ""
+        resp = urllib.request.urlopen(cookie_req, timeout=8)
+        return resp.headers.get("Set-Cookie", "")
+    except Exception:
+        return ""
 
 def get_quote(symbol, cookies):
     sym = urllib.parse.quote(symbol.strip().upper())
     h = dict(NSE_HEADERS)
-    if cookies: h["Cookie"] = cookies
+    if cookies:
+        h["Cookie"] = cookies
     try:
-        with urllib.request.urlopen(urllib.request.Request(f"https://www.nseindia.com/api/quote-equity?symbol={sym}", headers=h), timeout=5) as resp:
+        req = urllib.request.Request(
+            f"https://www.nseindia.com/api/quote-equity?symbol={sym}", headers=h
+        )
+        with urllib.request.urlopen(req, timeout=6) as resp:
             d = json.loads(resp.read().decode("utf-8", errors="ignore"))
             p = d.get("priceInfo", {})
-            v = float(d.get("preOpenMarket", {}).get("totalTradedVolume", 0) or d.get("securityDetails", {}).get("volumeTraded", 0) or 0)
-            return {"ltp": float(p.get("lastPrice", 0) or 0), "high": float(p.get("intraDayHighLow", {}).get("max", 0) or 0), "vol": v}
-    except Exception: return None
+            v = float(
+                d.get("preOpenMarket", {}).get("totalTradedVolume", 0)
+                or d.get("securityDetails", {}).get("volumeTraded", 0)
+                or 0
+            )
+            return {
+                "ltp": float(p.get("lastPrice", 0) or 0),
+                "high": float(p.get("intraDayHighLow", {}).get("max", 0) or 0),
+                "vol": v,
+            }
+    except Exception:
+        return None
 
-def run():
-    n_perf, n750 = load_benchmarks()
-    files = [f for f in glob.glob(os.path.join(DATA_DIR, "*.json")) if not any(x in f for x in ["nifty", "fundamentals", "backtest", "swing3", "breakout"])]
-    
+# ==============================================================================
+# 4. PRE-BREAKOUT WATCHLIST LOADER
+# ==============================================================================
+def load_verified_watchlists():
     targets = {}
-    for p in files:
-        sym = os.path.splitext(os.path.basename(p))[0].upper()
+
+    # Universe 1: Nifty 750 Pre-breakouts
+    if os.path.exists(S3_RESULTS):
         try:
-            with open(p, "r", encoding="utf-8") as fp: raw = json.load(fp)
-            c = clean_data(raw)
-            if c:
-                t = extract_target(c, n_perf, sym in n750)
-                if t: targets[sym] = t
-        except Exception: pass
+            with open(S3_RESULTS, "r", encoding="utf-8") as fp:
+                d = json.load(fp)
+            for item in d.get("Watchlist", []):
+                sym = item.get("symbol", "").strip().upper()
+                pivot = float(item.get("pivot_target", 0.0) or item.get("shelf_high", 0.0))
+                sl = float(item.get("shelf_low", 0.0) or (pivot * 0.93))
+                vsma = float(item.get("vol_sma20", 50000.0) or 50000.0)
+                if sym and pivot > 0:
+                    targets[sym] = {
+                        "universe": "NIFTY 750",
+                        "setup": item.get("setup_class", "LAUNCHPAD COIL"),
+                        "pivot": pivot,
+                        "sl": sl,
+                        "v_sma": vsma,
+                    }
+        except Exception as e:
+            print(f"⚠️ Error reading Nifty 750 watchlist: {e}")
 
-    now = datetime.datetime.now()
-    m_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
-    mins = 375.0 if now > now.replace(hour=15, minute=30, second=0, microsecond=0) else max(1.0, (now - m_open).total_seconds() / 60.0)
+    # Universe 2: Non-Nifty 750 Pre-breakouts
+    if os.path.exists(R2_RESULTS):
+        try:
+            with open(R2_RESULTS, "r", encoding="utf-8") as fp:
+                d = json.load(fp)
+            for item in d.get("Watchlist", []):
+                sym = item.get("symbol", "").strip().upper()
+                pivot = float(item.get("pivot_target", 0.0) or item.get("shelf_high", 0.0))
+                sl = float(item.get("shelf_low", 0.0) or (pivot * 0.92))
+                raw_setup = item.get("setup_class", "LAUNCHPAD COIL")
+                setup = "V-REVERSAL" if "V-REVERSAL" in raw_setup else "LAUNCHPAD"
+                vsma = float(item.get("vol_sma20", 50000.0) or 50000.0)
+                if sym and pivot > 0:
+                    targets[sym] = {
+                        "universe": "NON-N750",
+                        "setup": setup,
+                        "pivot": pivot,
+                        "sl": sl,
+                        "v_sma": vsma,
+                    }
+        except Exception as e:
+            print(f"⚠️ Error reading Non-N750 watchlist: {e}")
+
+    return targets
+
+# ==============================================================================
+# 5. SCANNER RUNNER WITH TRUE IST ELAPSED TIME
+# ==============================================================================
+def run():
+    targets = load_verified_watchlists()
+    print(f"📊 Monitoring {len(targets)} verified pre-breakout targets from daily scanners...")
+
+    # Accurate IST Time Calculation
+    now_ist = datetime.datetime.now(IST)
+    m_open = now_ist.replace(hour=9, minute=15, second=0, microsecond=0)
+    m_close = now_ist.replace(hour=15, minute=30, second=0, microsecond=0)
+
+    if now_ist < m_open:
+        mins = 1.0
+    elif now_ist > m_close:
+        mins = 375.0
+    else:
+        mins = max(1.0, (now_ist - m_open).total_seconds() / 60.0)
+
     pace_factor = 375.0 / mins
+    cookies = get_nse_session()
 
-    cookies = get_session()
-    inst_bo, light_bo, coils = [], [], []
+    breakouts = []
+    coiling = []
 
     for sym, info in targets.items():
         q = get_quote(sym, cookies)
         time.sleep(0.08)
-        if not q or q["ltp"] <= 0: continue
+        if not q or q["ltp"] <= 0:
+            continue
 
         ltp, high, vol = q["ltp"], q["high"], q["vol"]
         pivot, sl, vsma = info["pivot"], info["sl"], info["v_sma"]
+
+        # Full-day projected volume surge
         surge = round((vol * pace_factor) / vsma, 2) if vsma > 0 else 1.0
         diff = round(((ltp - pivot) / pivot) * 100.0, 2)
         is_bo = (ltp >= pivot) or (high >= pivot)
 
         row = {
-            "symbol": sym, "universe": info["universe"], "setup": info["setup"],
-            "pivot_ceiling": pivot, "ltp": ltp, "day_high": high, "stop_loss": sl,
-            "risk_%": round(((pivot - sl) / pivot) * 100, 2), "dist_pivot_%": diff,
-            "proj_vol_pace": surge, "action": "INSTITUTIONAL BREAKOUT" if surge >= 1.4 else "LIGHT-VOL CROSS"
+            "symbol": sym,
+            "universe": info["universe"],
+            "setup": info["setup"],
+            "pivot_ceiling": pivot,
+            "ltp": ltp,
+            "day_high": high,
+            "stop_loss": sl,
+            "risk_%": round(((pivot - sl) / pivot) * 100, 2) if pivot > 0 else 0.0,
+            "dist_pivot_%": diff,
+            "proj_vol_pace": surge,
+            "action": "BREAKOUT" if is_bo else "COILING",
         }
 
-        if is_bo and surge >= 1.4: inst_bo.append(row)
-        elif is_bo: light_bo.append(row)
-        elif -2.5 <= diff < 0:
-            row["action"] = f"COILING ({abs(diff):.1f}% below)"
-            coils.append(row)
+        if is_bo:
+            breakouts.append(row)
+        else:
+            coiling.append(row)
 
-    inst_bo.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
-    light_bo.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
-    coils.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
+    breakouts.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
+    coiling.sort(key=lambda x: x["dist_pivot_%"], reverse=True)
 
-    scan_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
+    scan_ts = now_ist.strftime("%Y-%m-%d %I:%M:%S %p IST")
+
+    output_payload = {
+        "Scan_Timestamp": scan_ts,
+        "Elapsed_Minutes": int(mins),
+        "Breakouts": breakouts,
+        "Coiling": coiling[:25],
+    }
+
     with open(OUTPUT_JSON, "w", encoding="utf-8") as fp:
-        json.dump({
-            "Scan_Timestamp": scan_ts,
-            "Elapsed_Minutes": int(mins),
-            "Institutional_Breakouts": inst_bo,
-            "Light_Vol_Crosses": light_bo,
-            "Coiling_Approaching": coils[:25]
-        }, fp, indent=2)
+        json.dump(output_payload, fp, indent=2)
 
-    print(f"Scan complete. Found {len(inst_bo)} Institutional, {len(light_bo)} Light.")
-    send_telegram_alert(inst_bo, light_bo, scan_ts, mins)
+    print(f"✅ [{scan_ts}] Scanned {len(targets)} targets: {len(breakouts)} Breakouts, {len(coiling)} Coiling.")
+
+    if breakouts:
+        send_telegram_alert(breakouts, scan_ts, mins)
 
 if __name__ == "__main__":
     run()
