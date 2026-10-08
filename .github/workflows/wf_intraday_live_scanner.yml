@@ -2,13 +2,32 @@ name: 30-Min Intraday Live Breakout Scanner
 
 on:
   schedule:
+    # 03:45 UTC = 09:15 AM IST (Market Open Scan)
     - cron: '45 3 * * 1-5'
-    - cron: '15,45 4 * * 1-5'
-    - cron: '15,45 5 * * 1-5'
-    - cron: '15,45 6 * * 1-5'
-    - cron: '15,45 7 * * 1-5'
-    - cron: '15,45 8 * * 1-5'
-    - cron: '15,45 9 * * 1-5'
+    # 04:15 UTC = 09:45 AM IST
+    - cron: '15 4 * * 1-5'
+    # 04:45 UTC = 10:15 AM IST
+    - cron: '45 4 * * 1-5'
+    # 05:15 UTC = 10:45 AM IST
+    - cron: '15 5 * * 1-5'
+    # 05:45 UTC = 11:15 AM IST
+    - cron: '45 5 * * 1-5'
+    # 06:15 UTC = 11:45 AM IST
+    - cron: '15 6 * * 1-5'
+    # 06:45 UTC = 12:15 PM IST
+    - cron: '45 6 * * 1-5'
+    # 07:15 UTC = 12:45 PM IST
+    - cron: '15 7 * * 1-5'
+    # 07:45 UTC = 01:15 PM IST
+    - cron: '45 7 * * 1-5'
+    # 08:15 UTC = 01:45 PM IST
+    - cron: '15 8 * * 1-5'
+    # 08:45 UTC = 02:15 PM IST
+    - cron: '45 8 * * 1-5'
+    # 09:15 UTC = 02:45 PM IST
+    - cron: '15 9 * * 1-5'
+    # 09:45 UTC = 03:15 PM IST (Closing Run)
+    - cron: '45 9 * * 1-5'
   workflow_dispatch:
 
 concurrency:
@@ -37,7 +56,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas numpy requests
+          pip install pandas requests
 
       - name: Run Standalone Intraday Live Scanner
         env:
@@ -49,24 +68,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
           git add data/live_intraday_breakouts.json || true
           git commit -m "Auto-update Intraday Breakouts [skip ci]" || echo "No changes to commit"
-          git push origin main
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas numpy requests
-
-      - name: Run Standalone Intraday Live Scanner
-        run: python intraday_live_scanner.py
-
-      - name: Commit & Push Live Breakouts
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
-          git add data/live_intraday_breakouts.json || true
-          git commit -m "Auto-update Intraday Breakouts [skip ci]" || echo "No changes to commit"
+          git pull --rebase origin main || true
           git push origin main
