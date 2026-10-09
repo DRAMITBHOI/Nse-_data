@@ -32,10 +32,13 @@ NSE_HEADERS = {
 }
 
 # ==============================================================================
-# 2. TELEGRAM BROADCASTER
+# 2. TELEGRAM BROADCASTER WITH LOGGING
 # ==============================================================================
 def send_telegram_msg(msg_text):
-    if not TG_TOKEN or not TG_CHAT_ID or not msg_text:
+    if not TG_TOKEN or not TG_CHAT_ID:
+        print("⚠️ Telegram skipped: Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret.")
+        return
+    if not msg_text:
         return
     tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
     payload = urllib.parse.urlencode({
@@ -47,7 +50,7 @@ def send_telegram_msg(msg_text):
     try:
         req = urllib.request.Request(tg_url, data=payload, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
-            pass
+            print(f"📡 Telegram alert dispatched successfully (HTTP {resp.status})")
     except Exception as e:
         print(f"❌ Telegram delivery failed: {e}")
 
@@ -58,8 +61,11 @@ def get_nse_session():
     cookie_req = urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS)
     try:
         resp = urllib.request.urlopen(cookie_req, timeout=8)
-        return resp.headers.get("Set-Cookie", "")
-    except Exception:
+        cookies = resp.headers.get("Set-Cookie", "")
+        print(f"🍪 NSE session initialized (Cookies length: {len(cookies)})")
+        return cookies
+    except Exception as e:
+        print(f"⚠️ Failed to acquire NSE cookie session: {e}")
         return ""
 
 def get_quote(symbol, cookies):
@@ -82,7 +88,8 @@ def get_quote(symbol, cookies):
                 "high": float(p.get("intraDayHighLow", {}).get("max", 0) or 0),
                 "vol": v,
             }
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ Error fetching quote for {symbol}: {e}")
         return None
 
 # ==============================================================================
@@ -108,8 +115,9 @@ def load_verified_watchlists():
                             "sl": sl,
                             "v_sma": vsma,
                         }
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"⚠️ Could not parse watchlist from {path}: {e}")
+    print(f"🎯 Total Watchlist Targets Loaded: {len(targets)}")
     return targets
 
 def load_previous_day_state(today_date_str):
@@ -127,16 +135,22 @@ def load_previous_day_state(today_date_str):
 # 5. ACTIVE TRADE TRAILING STOP EVALUATION (WICK VS CLOSING)
 # ==============================================================================
 def monitor_active_trades(cookies, scan_ts, mins):
+    print("────────────────────────────────────────────────────────────")
+    print(f"🔍 Checking active trade positions from: {MY_TRADES_FILE}")
+    
     if not os.path.exists(MY_TRADES_FILE):
+        print(f"❌ Active trade file '{MY_TRADES_FILE}' does not exist on repository!")
         return
 
     try:
         with open(MY_TRADES_FILE, "r", encoding="utf-8") as f:
             trades = json.load(f)
-    except Exception:
+    except Exception as e:
+        print(f"❌ Error reading JSON in {MY_TRADES_FILE}: {e}")
         return
 
     open_trades = [t for t in trades if t.get("status") == "OPEN"]
+    print(f"📋 Found {len(open_trades)} active trade(s) with status 'OPEN'.")
     if not open_trades:
         return
 
@@ -150,16 +164,19 @@ def monitor_active_trades(cookies, scan_ts, mins):
         sl = float(t.get("hard_sl", 0.0))
         entry = float(t.get("entry_price", 0.0))
         if not sym or sl <= 0:
+            print(f"⚠️ Skipping invalid trade record: {t}")
             continue
 
         q = get_quote(sym, cookies)
-        time.sleep(0.08)
+        time.sleep(0.1)
         if not q or q["ltp"] <= 0:
+            print(f"⚠️ Could not obtain real-time quote for active trade: {sym}")
             continue
 
         ltp = q["ltp"]
         pnl_pct = round(((ltp - entry) / entry) * 100, 2) if entry > 0 else 0.0
         dist_sl_pct = round(((ltp - sl) / sl) * 100, 2)
+        print(f"🔎 [{sym}] LTP: ₹{ltp:.2f} | Stop Loss: ₹{sl:.2f} | PnL: {pnl_pct:+.2f}% | Breach Margin: {dist_sl_pct:+.2f}%")
 
         if ltp <= sl:
             row = {"symbol": sym, "ltp": ltp, "sl": sl, "pnl_%": pnl_pct, "dist_sl_%": dist_sl_pct}
@@ -183,7 +200,7 @@ def monitor_active_trades(cookies, scan_ts, mins):
             )
         send_telegram_msg("\n".join(lines))
 
-    # 2. Midday wick test (advisory only)
+    # 2. Midday wick test (advisory warning)
     elif warnings:
         lines = [
             "⚠️ <b>INTRADAY SUPPORT / SL WICK TEST</b>",
@@ -197,6 +214,9 @@ def monitor_active_trades(cookies, scan_ts, mins):
                 f"  ℹ️ <i>Candle unconfirmed. Assess support bounce vs closing breakdown.</i>\n"
             )
         send_telegram_msg("\n".join(lines))
+    else:
+        print("🛡️ All active trades are holding safely above their stop losses.")
+    print("────────────────────────────────────────────────────────────")
 
 # ==============================================================================
 # 6. MAIN ENGINE EXECUTION
@@ -215,6 +235,9 @@ def run():
         mins = max(1.0, (now_ist - m_open).total_seconds() / 60.0)
 
     pace_factor = 375.0 / mins
+    scan_ts = now_ist.strftime("%Y-%m-%d %I:%M:%S %p IST")
+    print(f"\n🚀 Running Intraday Live Scanner @ {scan_ts} (Elapsed: {int(mins)}m/375m)")
+
     targets = load_verified_watchlists()
     existing_breakouts = load_previous_day_state(today_date)
     cookies = get_nse_session()
@@ -260,7 +283,6 @@ def run():
 
     breakout_list = sorted(list(all_breakouts_map.values()), key=lambda x: x["dist_pivot_%"], reverse=True)
     coiling_list = sorted(coiling, key=lambda x: x["dist_pivot_%"], reverse=True)
-    scan_ts = now_ist.strftime("%Y-%m-%d %I:%M:%S %p IST")
 
     # Persist JSON State
     output_payload = {
