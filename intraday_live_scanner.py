@@ -2,8 +2,7 @@ import os
 import json
 import time
 import datetime
-import urllib.request
-import urllib.parse
+import requests
 import pandas as pd
 import yfinance as yf
 
@@ -20,40 +19,38 @@ MY_TRADES_FILE = os.path.join(DATA_DIR, "my_trades.json")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
-TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
-TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip().replace('"', '').replace("'", "")
+TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip().replace('"', '').replace("'", "")
 if TG_TOKEN.lower().startswith("bot"):
     TG_TOKEN = TG_TOKEN[3:]
 
 # ==============================================================================
-# 2. TELEGRAM BROADCASTER
+# 2. TELEGRAM BROADCASTER (SAFE HTML ESCAPING)
 # ==============================================================================
 def send_telegram_msg(msg_text):
     if not TG_TOKEN or not TG_CHAT_ID or not msg_text:
         print("⚠️ Telegram skipped: Missing credentials or empty message.")
         return
     tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-    payload = urllib.parse.urlencode({
+    payload = {
         "chat_id": TG_CHAT_ID,
         "text": msg_text,
         "parse_mode": "HTML",
-        "disable_web_page_preview": "true",
-    }).encode("utf-8")
+        "disable_web_page_preview": True,
+    }
     try:
-        req = urllib.request.Request(tg_url, data=payload, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            print(f"📡 Telegram alert dispatched successfully (HTTP {resp.status})")
+        resp = requests.post(tg_url, json=payload, timeout=10)
+        if resp.status_code == 200:
+            print("📡 Telegram alert dispatched successfully (HTTP 200)")
+        else:
+            print(f"❌ Telegram API Error ({resp.status_code}): {resp.text}")
     except Exception as e:
-        print(f"❌ Telegram delivery failed: {e}")
+        print(f"❌ Telegram delivery network exception: {e}")
 
 # ==============================================================================
 # 3. REAL-TIME DATA QUOTE ENGINE (YFINANCE CLOUD-SAFE)
 # ==============================================================================
 def fetch_live_quotes_batch(symbol_list):
-    """
-    Downloads intraday quotes for all targets in 1 fast batch using Yahoo Finance.
-    Bypasses NSE's cloud datacenter 403 Forbidden blocks completely.
-    """
     if not symbol_list:
         return {}
 
@@ -75,11 +72,7 @@ def fetch_live_quotes_batch(symbol_list):
 
         for yf_sym, clean_sym in ticker_map.items():
             try:
-                if len(symbol_list) == 1:
-                    df = data
-                else:
-                    df = data[yf_sym]
-
+                df = data if len(symbol_list) == 1 else data[yf_sym]
                 df = df.dropna(how="all")
                 if not df.empty:
                     last_row = df.iloc[-1]
@@ -133,8 +126,8 @@ def load_verified_watchlists():
                             "sl": sl,
                             "v_sma": vsma,
                         }
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"⚠️ Could not parse watchlist from {path}: {e}")
     print(f"🎯 Total Watchlist Targets Loaded: {len(targets)}")
     return targets
 
@@ -210,9 +203,9 @@ def monitor_active_trades(quotes_map, scan_ts, mins):
         ]
         for h in hard_stops:
             lines.append(
-                f"• <b>{h['symbol']}</b>: LTP ₹{h['ltp']:.2f} <= SL ₹{h['sl']:.2f}\n"
+                f"• <b>{h['symbol']}</b>: LTP ₹{h['ltp']:.2f} (SL: ₹{h['sl']:.2f})\n"
                 f"  PnL: <b>{h['pnl_%']:+.2f}%</b> (Breach: {h['dist_sl_%']:.2f}%)\n"
-                f"  👉 <i>Closing below stop. Action recommended per system rules.</i>\n"
+                f"  👉 <i>Closing below stop. Action recommended per rules.</i>\n"
             )
         send_telegram_msg("\n".join(lines))
 
