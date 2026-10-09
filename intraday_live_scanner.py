@@ -5,6 +5,7 @@ import datetime
 import urllib.request
 import urllib.parse
 import pandas as pd
+import yfinance as yf
 
 # ==============================================================================
 # 1. PATHS & TIME CONFIGURATION
@@ -24,21 +25,12 @@ TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 if TG_TOKEN.lower().startswith("bot"):
     TG_TOKEN = TG_TOKEN[3:]
 
-NSE_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "*/*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.nseindia.com/",
-}
-
 # ==============================================================================
-# 2. TELEGRAM BROADCASTER WITH LOGGING
+# 2. TELEGRAM BROADCASTER
 # ==============================================================================
 def send_telegram_msg(msg_text):
-    if not TG_TOKEN or not TG_CHAT_ID:
-        print("⚠️ Telegram skipped: Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret.")
-        return
-    if not msg_text:
+    if not TG_TOKEN or not TG_CHAT_ID or not msg_text:
+        print("⚠️ Telegram skipped: Missing credentials or empty message.")
         return
     tg_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
     payload = urllib.parse.urlencode({
@@ -55,42 +47,68 @@ def send_telegram_msg(msg_text):
         print(f"❌ Telegram delivery failed: {e}")
 
 # ==============================================================================
-# 3. NSE QUOTES & COOKIE SESSION
+# 3. REAL-TIME DATA QUOTE ENGINE (YFINANCE CLOUD-SAFE)
 # ==============================================================================
-def get_nse_session():
-    cookie_req = urllib.request.Request("https://www.nseindia.com", headers=NSE_HEADERS)
-    try:
-        resp = urllib.request.urlopen(cookie_req, timeout=8)
-        cookies = resp.headers.get("Set-Cookie", "")
-        print(f"🍪 NSE session initialized (Cookies length: {len(cookies)})")
-        return cookies
-    except Exception as e:
-        print(f"⚠️ Failed to acquire NSE cookie session: {e}")
-        return ""
+def fetch_live_quotes_batch(symbol_list):
+    """
+    Downloads intraday quotes for all targets in 1 fast batch using Yahoo Finance.
+    Bypasses NSE's cloud datacenter 403 Forbidden blocks completely.
+    """
+    if not symbol_list:
+        return {}
 
-def get_quote(symbol, cookies):
-    sym = urllib.parse.quote(symbol.strip().upper())
-    h = dict(NSE_HEADERS)
-    if cookies:
-        h["Cookie"] = cookies
+    ticker_map = {f"{sym}.NS": sym for sym in symbol_list}
+    tickers_str = " ".join(ticker_map.keys())
+    print(f"📥 Fetching live cloud market data for {len(symbol_list)} symbols...")
+
+    quotes = {}
     try:
-        req = urllib.request.Request(f"https://www.nseindia.com/api/quote-equity?symbol={sym}", headers=h)
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            d = json.loads(resp.read().decode("utf-8", errors="ignore"))
-            p = d.get("priceInfo", {})
-            v = float(
-                d.get("preOpenMarket", {}).get("totalTradedVolume", 0)
-                or d.get("securityDetails", {}).get("volumeTraded", 0)
-                or 0
-            )
-            return {
-                "ltp": float(p.get("lastPrice", 0) or 0),
-                "high": float(p.get("intraDayHighLow", {}).get("max", 0) or 0),
-                "vol": v,
-            }
+        data = yf.download(
+            tickers=tickers_str,
+            period="1d",
+            interval="1m",
+            group_by="ticker",
+            auto_adjust=False,
+            progress=False,
+            threads=True
+        )
+
+        for yf_sym, clean_sym in ticker_map.items():
+            try:
+                if len(symbol_list) == 1:
+                    df = data
+                else:
+                    df = data[yf_sym]
+
+                df = df.dropna(how="all")
+                if not df.empty:
+                    last_row = df.iloc[-1]
+                    ltp = float(last_row["Close"])
+                    high = float(df["High"].max())
+                    vol = float(df["Volume"].sum())
+                    quotes[clean_sym] = {"ltp": ltp, "high": high, "vol": vol}
+            except Exception:
+                pass
     except Exception as e:
-        print(f"⚠️ Error fetching quote for {symbol}: {e}")
-        return None
+        print(f"⚠️ Batch quote fetch error: {e}")
+
+    # Fallback for individual tickers if missing
+    for sym in symbol_list:
+        if sym not in quotes:
+            try:
+                t = yf.Ticker(f"{sym}.NS")
+                hist = t.history(period="1d", interval="1m")
+                if not hist.empty:
+                    quotes[sym] = {
+                        "ltp": float(hist["Close"].iloc[-1]),
+                        "high": float(hist["High"].max()),
+                        "vol": float(hist["Volume"].sum()),
+                    }
+            except Exception:
+                pass
+
+    print(f"✅ Successfully received live quotes for {len(quotes)}/{len(symbol_list)} tickers.")
+    return quotes
 
 # ==============================================================================
 # 4. WATCHLIST & CUMULATIVE STATE LOADERS
@@ -115,8 +133,8 @@ def load_verified_watchlists():
                             "sl": sl,
                             "v_sma": vsma,
                         }
-            except Exception as e:
-                print(f"⚠️ Could not parse watchlist from {path}: {e}")
+            except Exception:
+                pass
     print(f"🎯 Total Watchlist Targets Loaded: {len(targets)}")
     return targets
 
@@ -132,21 +150,21 @@ def load_previous_day_state(today_date_str):
     return {}
 
 # ==============================================================================
-# 5. ACTIVE TRADE TRAILING STOP EVALUATION (WICK VS CLOSING)
+# 5. ACTIVE TRADE TRAILING STOP EVALUATION
 # ==============================================================================
-def monitor_active_trades(cookies, scan_ts, mins):
+def monitor_active_trades(quotes_map, scan_ts, mins):
     print("────────────────────────────────────────────────────────────")
     print(f"🔍 Checking active trade positions from: {MY_TRADES_FILE}")
-    
+
     if not os.path.exists(MY_TRADES_FILE):
-        print(f"❌ Active trade file '{MY_TRADES_FILE}' does not exist on repository!")
+        print(f"❌ Active trade file '{MY_TRADES_FILE}' not found.")
         return
 
     try:
         with open(MY_TRADES_FILE, "r", encoding="utf-8") as f:
             trades = json.load(f)
     except Exception as e:
-        print(f"❌ Error reading JSON in {MY_TRADES_FILE}: {e}")
+        print(f"❌ Error loading JSON: {e}")
         return
 
     open_trades = [t for t in trades if t.get("status") == "OPEN"]
@@ -154,7 +172,7 @@ def monitor_active_trades(cookies, scan_ts, mins):
     if not open_trades:
         return
 
-    # Closing window = After 3:00 PM IST (>= 345 mins elapsed out of 375 total mins)
+    # Closing Window: After 3:00 PM IST (345 mins elapsed out of 375 total mins)
     is_closing_window = (mins >= 345.0)
     warnings = []
     hard_stops = []
@@ -164,13 +182,11 @@ def monitor_active_trades(cookies, scan_ts, mins):
         sl = float(t.get("hard_sl", 0.0))
         entry = float(t.get("entry_price", 0.0))
         if not sym or sl <= 0:
-            print(f"⚠️ Skipping invalid trade record: {t}")
             continue
 
-        q = get_quote(sym, cookies)
-        time.sleep(0.1)
+        q = quotes_map.get(sym)
         if not q or q["ltp"] <= 0:
-            print(f"⚠️ Could not obtain real-time quote for active trade: {sym}")
+            print(f"⚠️ Quote unavailable for active trade: {sym}")
             continue
 
         ltp = q["ltp"]
@@ -196,7 +212,7 @@ def monitor_active_trades(cookies, scan_ts, mins):
             lines.append(
                 f"• <b>{h['symbol']}</b>: LTP ₹{h['ltp']:.2f} <= SL ₹{h['sl']:.2f}\n"
                 f"  PnL: <b>{h['pnl_%']:+.2f}%</b> (Breach: {h['dist_sl_%']:.2f}%)\n"
-                f"  👉 <i>Closing below stop. Manual exit recommended per rules.</i>\n"
+                f"  👉 <i>Closing below stop. Action recommended per system rules.</i>\n"
             )
         send_telegram_msg("\n".join(lines))
 
@@ -211,7 +227,7 @@ def monitor_active_trades(cookies, scan_ts, mins):
             lines.append(
                 f"• <b>{w['symbol']}</b>: LTP ₹{w['ltp']:.2f} tested SL ₹{w['sl']:.2f}\n"
                 f"  PnL: {w['pnl_%']:+.2f}% (Breach: {w['dist_sl_%']:.2f}%)\n"
-                f"  ℹ️ <i>Candle unconfirmed. Assess support bounce vs closing breakdown.</i>\n"
+                f"  ℹ️ <i>Candle unconfirmed. Review support bounce vs breakdown.</i>\n"
             )
         send_telegram_msg("\n".join(lines))
     else:
@@ -240,15 +256,28 @@ def run():
 
     targets = load_verified_watchlists()
     existing_breakouts = load_previous_day_state(today_date)
-    cookies = get_nse_session()
+
+    # Collect all symbols (Watchlists + My Trades)
+    all_symbols = list(targets.keys())
+    if os.path.exists(MY_TRADES_FILE):
+        try:
+            with open(MY_TRADES_FILE, "r", encoding="utf-8") as f:
+                tr = json.load(f)
+            for t in tr:
+                if t.get("status") == "OPEN":
+                    all_symbols.append(t["symbol"].upper().strip())
+        except Exception:
+            pass
+
+    unique_symbols = list(set(all_symbols))
+    quotes_map = fetch_live_quotes_batch(unique_symbols)
 
     all_breakouts_map = dict(existing_breakouts)
     new_triggers = []
     coiling = []
 
     for sym, info in targets.items():
-        q = get_quote(sym, cookies)
-        time.sleep(0.08)
+        q = quotes_map.get(sym)
         if not q or q["ltp"] <= 0:
             continue
 
@@ -328,7 +357,7 @@ def run():
         send_telegram_msg("\n".join(summary_lines))
 
     # 3. Check Active Trailing Stop-Losses
-    monitor_active_trades(cookies, scan_ts, mins)
+    monitor_active_trades(quotes_map, scan_ts, mins)
 
     print(f"✅ [{scan_ts}] Breakouts: {len(breakout_list)} ({len(new_triggers)} new) | Coils: {len(coiling_list)}")
 
