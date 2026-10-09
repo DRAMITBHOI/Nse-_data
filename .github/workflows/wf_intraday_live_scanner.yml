@@ -1,32 +1,30 @@
 name: 15-Min Intraday Live Breakout Scanner
 
 on:
-  workflow_dispatch:
   schedule:
+    # Backup cron: runs every 15 mins Monday-Friday during Indian market hours (03:45 to 10:00 UTC)
     - cron: '*/15 3-10 * * 1-5'
+  workflow_dispatch:
 
 concurrency:
-  group: live-scan-${{ github.run_id }}
-  cancel-in-progress: false
-
-permissions:
-  contents: write
+  group: intraday-scanner-group
+  cancel-in-progress: true
 
 jobs:
   run-live-scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'pip'
 
       - name: Install Dependencies
         run: |
@@ -37,13 +35,21 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python intraday_live_scanner.py
+        run: |
+          python intraday_live_scanner.py
 
       - name: Commit & Push Cumulative Live Breakouts
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/live_intraday_breakouts.json || true
-          git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
-          git pull --rebase origin main || true
-          git push origin main
+          
+          # Fetch latest remote changes to avoid merge conflicts
+          git fetch origin main
+          git checkout -B main origin/main
+          
+          # Stage and commit generated live JSON
+          if [ -f data/live_intraday_breakouts.json ]; then
+            git add -f data/live_intraday_breakouts.json
+            git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
+            git push origin main
+          fi
