@@ -2,7 +2,7 @@ name: 15-Min Intraday Live Breakout Scanner
 
 on:
   schedule:
-    # Backup cron: runs every 15 mins Monday-Friday during Indian market hours (03:45 to 10:00 UTC)
+    # Runs every 15 mins Monday-Friday during Indian market hours (03:45 to 10:00 UTC)
     - cron: '*/15 3-10 * * 1-5'
   workflow_dispatch:
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas requests
+          pip install pandas requests yfinance
 
       - name: Run Cumulative Intraday Live Scanner
         env:
@@ -42,11 +42,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Fetch latest remote changes to avoid merge conflicts
+          # Fetch remote changes cleanly to prevent merge conflicts
           git fetch origin main
           git checkout -B main origin/main
           
-          # Stage and commit generated live JSON
+          # Stage and push generated data
           if [ -f data/live_intraday_breakouts.json ]; then
             git add -f data/live_intraday_breakouts.json
             git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
