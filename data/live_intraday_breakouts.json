@@ -1,7 +1,7 @@
 {
   "Scan_Date": "2026-10-09",
-  "Scan_Timestamp": "2026-10-09 02:34:09 PM IST",
-  "Elapsed_Minutes": 319,
+  "Scan_Timestamp": "2026-10-09 02:49:31 PM IST",
+  "Elapsed_Minutes": 334,
   "Total_Breakouts_Today": 1,
   "Breakouts_All_Day": [
     {
@@ -14,7 +14,7 @@
       "stop_loss": 974.2800000000001,
       "risk_%": 8.0,
       "dist_pivot_%": 0.0,
-      "proj_vol_pace": 0.37,
+      "proj_vol_pace": 0.36,
       "action": "BREAKOUT",
       "first_trigger_time": "01:52 PM"
     }
@@ -25,56 +25,56 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 2049.0,
-      "ltp": 2041.0,
+      "ltp": 2039.0999755859375,
       "day_high": 2043.199951171875,
       "stop_loss": 1885.0800000000002,
       "risk_%": 8.0,
-      "dist_pivot_%": -0.39,
-      "proj_vol_pace": 3.3,
+      "dist_pivot_%": -0.48,
+      "proj_vol_pace": 3.35,
       "action": "COILING",
-      "first_trigger_time": "02:34 PM"
+      "first_trigger_time": "02:49 PM"
     },
     {
       "symbol": "PREMEXPLN",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 693.9,
-      "ltp": 687.0,
+      "ltp": 687.2000122070312,
       "day_high": 691.9000244140625,
       "stop_loss": 638.388,
       "risk_%": 8.0,
-      "dist_pivot_%": -0.99,
-      "proj_vol_pace": 1.87,
+      "dist_pivot_%": -0.97,
+      "proj_vol_pace": 1.83,
       "action": "COILING",
-      "first_trigger_time": "02:34 PM"
+      "first_trigger_time": "02:49 PM"
     },
     {
       "symbol": "PRUDENT",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 3292.5,
-      "ltp": 3249.39990234375,
+      "ltp": 3257.60009765625,
       "day_high": 3269.800048828125,
       "stop_loss": 3029.1,
       "risk_%": 8.0,
-      "dist_pivot_%": -1.31,
+      "dist_pivot_%": -1.06,
       "proj_vol_pace": 0.56,
       "action": "COILING",
-      "first_trigger_time": "02:34 PM"
+      "first_trigger_time": "02:49 PM"
     },
     {
       "symbol": "NAVINFLUOR",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 8600.0,
-      "ltp": 8354.5,
+      "ltp": 8355.0,
       "day_high": 8483.0,
       "stop_loss": 7912.0,
       "risk_%": 8.0,
       "dist_pivot_%": -2.85,
       "proj_vol_pace": 0.78,
       "action": "COILING",
-      "first_trigger_time": "02:34 PM"
+      "first_trigger_time": "02:49 PM"
     }
   ]
 }
