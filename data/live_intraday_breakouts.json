@@ -1,7 +1,7 @@
 {
   "Scan_Date": "2026-10-09",
-  "Scan_Timestamp": "2026-10-09 02:19:06 PM IST",
-  "Elapsed_Minutes": 304,
+  "Scan_Timestamp": "2026-10-09 02:34:09 PM IST",
+  "Elapsed_Minutes": 319,
   "Total_Breakouts_Today": 1,
   "Breakouts_All_Day": [
     {
@@ -9,12 +9,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1059.0,
-      "ltp": 1059.0,
+      "ltp": 1059.010009765625,
       "day_high": 1059.010009765625,
       "stop_loss": 974.2800000000001,
       "risk_%": 8.0,
       "dist_pivot_%": 0.0,
-      "proj_vol_pace": 0.38,
+      "proj_vol_pace": 0.37,
       "action": "BREAKOUT",
       "first_trigger_time": "01:52 PM"
     }
@@ -25,56 +25,56 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 2049.0,
-      "ltp": 2041.4000244140625,
+      "ltp": 2041.0,
       "day_high": 2043.199951171875,
       "stop_loss": 1885.0800000000002,
       "risk_%": 8.0,
-      "dist_pivot_%": -0.37,
-      "proj_vol_pace": 3.35,
+      "dist_pivot_%": -0.39,
+      "proj_vol_pace": 3.3,
       "action": "COILING",
-      "first_trigger_time": "02:19 PM"
-    },
-    {
-      "symbol": "PRUDENT",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 3292.5,
-      "ltp": 3264.699951171875,
-      "day_high": 3269.800048828125,
-      "stop_loss": 3029.1,
-      "risk_%": 8.0,
-      "dist_pivot_%": -0.84,
-      "proj_vol_pace": 0.56,
-      "action": "COILING",
-      "first_trigger_time": "02:19 PM"
+      "first_trigger_time": "02:34 PM"
     },
     {
       "symbol": "PREMEXPLN",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 693.9,
-      "ltp": 687.2000122070312,
+      "ltp": 687.0,
       "day_high": 691.9000244140625,
       "stop_loss": 638.388,
       "risk_%": 8.0,
-      "dist_pivot_%": -0.97,
-      "proj_vol_pace": 1.88,
+      "dist_pivot_%": -0.99,
+      "proj_vol_pace": 1.87,
       "action": "COILING",
-      "first_trigger_time": "02:19 PM"
+      "first_trigger_time": "02:34 PM"
+    },
+    {
+      "symbol": "PRUDENT",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 3292.5,
+      "ltp": 3249.39990234375,
+      "day_high": 3269.800048828125,
+      "stop_loss": 3029.1,
+      "risk_%": 8.0,
+      "dist_pivot_%": -1.31,
+      "proj_vol_pace": 0.56,
+      "action": "COILING",
+      "first_trigger_time": "02:34 PM"
     },
     {
       "symbol": "NAVINFLUOR",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 8600.0,
-      "ltp": 8369.5,
+      "ltp": 8354.5,
       "day_high": 8483.0,
       "stop_loss": 7912.0,
       "risk_%": 8.0,
-      "dist_pivot_%": -2.68,
-      "proj_vol_pace": 0.79,
+      "dist_pivot_%": -2.85,
+      "proj_vol_pace": 0.78,
       "action": "COILING",
-      "first_trigger_time": "02:19 PM"
+      "first_trigger_time": "02:34 PM"
     }
   ]
 }
