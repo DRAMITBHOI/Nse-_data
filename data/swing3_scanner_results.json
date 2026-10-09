@@ -1,43 +1,113 @@
 {
-  "Scan_Timestamp": "2026-10-08 19:25:43 IST",
+  "Scan_Timestamp": "2026-10-09 14:18:06 IST",
   "Target_Universe": "Nifty 750 Universe",
   "Strategy_Specs": "Swing 3.0 Production (Shelf <= 8%, Conviction >= 2.5, 20 EMA Trail)",
   "Fresh_Triggers_Count": 0,
-  "Active_Positions_Count": 2,
-  "Watchlist_Count": 1,
+  "Active_Positions_Count": 1,
+  "Watchlist_Count": 9,
   "Fresh_Triggers": [],
   "Active_Positions": [
-    {
-      "symbol": "CASTROLIND",
-      "entry_date": "2026-09-25",
-      "entry_price": 197.85,
-      "current_close": 196.08,
-      "trailing_stop_20ema": 195.98,
-      "pnl_%": -0.89,
-      "holding_days": 9,
-      "status": "HOLD"
-    },
     {
       "symbol": "LGEINDIA",
       "entry_date": "2026-09-25",
       "entry_price": 1719.9,
-      "current_close": 1723.0,
-      "trailing_stop_20ema": 1711.66,
-      "pnl_%": 0.18,
-      "holding_days": 9,
+      "current_close": 1757.0,
+      "trailing_stop_20ema": 1715.98,
+      "pnl_%": 2.16,
+      "holding_days": 10,
       "status": "HOLD"
     }
   ],
   "Watchlist": [
     {
+      "symbol": "LAURUSLABS",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 2036.6,
+      "pivot_target": 2065.2,
+      "dist_to_pivot_pct": 1.4,
+      "spread_%": 5.79,
+      "conviction_score": 220.234,
+      "turnover_cr": 470.3
+    },
+    {
+      "symbol": "RBLBANK",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 418.0,
+      "pivot_target": 419.9,
+      "dist_to_pivot_pct": 0.45,
+      "spread_%": 4.97,
+      "conviction_score": 127.369,
+      "turnover_cr": 137.9
+    },
+    {
+      "symbol": "AUROPHARMA",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 1693.0,
+      "pivot_target": 1727.9,
+      "dist_to_pivot_pct": 2.06,
+      "spread_%": 5.81,
+      "conviction_score": 69.539,
+      "turnover_cr": 150.3
+    },
+    {
+      "symbol": "PNB",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 116.98,
+      "pivot_target": 118.01,
+      "dist_to_pivot_pct": 0.88,
+      "spread_%": 7.9,
+      "conviction_score": 67.683,
+      "turnover_cr": 154.0
+    },
+    {
+      "symbol": "PETRONET",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 291.5,
+      "pivot_target": 299.6,
+      "dist_to_pivot_pct": 2.78,
+      "spread_%": 6.34,
+      "conviction_score": 61.957,
+      "turnover_cr": 55.6
+    },
+    {
+      "symbol": "SAGILITY",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 44.0,
+      "pivot_target": 45.25,
+      "dist_to_pivot_pct": 2.84,
+      "spread_%": 7.46,
+      "conviction_score": 51.0,
+      "turnover_cr": 80.7
+    },
+    {
       "symbol": "NAVINFLUOR",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 8417.5,
+      "close": 8352.5,
       "pivot_target": 8600.0,
-      "dist_to_pivot_pct": 2.17,
+      "dist_to_pivot_pct": 2.96,
       "spread_%": 7.03,
-      "conviction_score": 72.84,
-      "turnover_cr": 182.4
+      "conviction_score": 36.739,
+      "turnover_cr": 180.2
+    },
+    {
+      "symbol": "MAHABANK",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 83.16,
+      "pivot_target": 84.88,
+      "dist_to_pivot_pct": 2.07,
+      "spread_%": 7.62,
+      "conviction_score": 24.646,
+      "turnover_cr": 119.8
+    },
+    {
+      "symbol": "BAJAJHLDNG",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 10820.0,
+      "pivot_target": 11027.0,
+      "dist_to_pivot_pct": 1.91,
+      "spread_%": 5.88,
+      "conviction_score": 8.36,
+      "turnover_cr": 47.2
     }
   ]
 }
