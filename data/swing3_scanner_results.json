@@ -1,20 +1,44 @@
 {
-  "Scan_Timestamp": "2026-10-09 19:00:22 IST",
+  "Scan_Timestamp": "2026-10-12 13:59:42 IST",
   "Target_Universe": "Nifty 750 Universe",
   "Strategy_Specs": "Swing 3.0 Production (Shelf <= 8%, Conviction >= 2.5, 20 EMA Trail)",
-  "Fresh_Triggers_Count": 0,
-  "Active_Positions_Count": 1,
-  "Watchlist_Count": 9,
-  "Fresh_Triggers": [],
+  "Fresh_Triggers_Count": 1,
+  "Active_Positions_Count": 2,
+  "Watchlist_Count": 11,
+  "Fresh_Triggers": [
+    {
+      "symbol": "NIACL",
+      "date": "2026-10-12",
+      "type": "V-REVERSAL",
+      "pivot_ceiling": 167.26,
+      "close": 187.02,
+      "extended_pct": 11.81,
+      "stop_loss": 154.77,
+      "risk_%": 7.47,
+      "conviction_score": 170.423,
+      "turnover_cr": 185.7,
+      "action": "LIMIT RETEST"
+    }
+  ],
   "Active_Positions": [
     {
       "symbol": "LGEINDIA",
       "entry_date": "2026-09-25",
       "entry_price": 1719.9,
-      "current_close": 1757.0,
-      "trailing_stop_20ema": 1715.98,
-      "pnl_%": 2.16,
-      "holding_days": 10,
+      "current_close": 1732.7,
+      "trailing_stop_20ema": 1717.57,
+      "pnl_%": 0.74,
+      "holding_days": 11,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "NIACL",
+      "entry_date": "2026-10-12",
+      "entry_price": 167.26,
+      "current_close": 187.02,
+      "trailing_stop_20ema": 173.49,
+      "pnl_%": 11.81,
+      "holding_days": 0,
       "status": "HOLD"
     }
   ],
@@ -22,92 +46,112 @@
     {
       "symbol": "LAURUSLABS",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 2036.6,
-      "pivot_target": 2065.2,
-      "dist_to_pivot_pct": 1.4,
-      "spread_%": 5.79,
-      "conviction_score": 220.234,
-      "turnover_cr": 470.3
+      "close": 2069.2,
+      "pivot_target": 2069.2,
+      "dist_to_pivot_pct": 0.0,
+      "spread_%": 6.0,
+      "conviction_score": 287.476,
+      "turnover_cr": 469.2
     },
     {
-      "symbol": "RBLBANK",
+      "symbol": "DIVISLAB",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 418.0,
-      "pivot_target": 419.9,
-      "dist_to_pivot_pct": 0.45,
-      "spread_%": 4.97,
-      "conviction_score": 127.369,
-      "turnover_cr": 137.9
+      "close": 9426.0,
+      "pivot_target": 9660.0,
+      "dist_to_pivot_pct": 2.48,
+      "spread_%": 6.41,
+      "conviction_score": 199.372,
+      "turnover_cr": 430.2
     },
     {
       "symbol": "AUROPHARMA",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 1693.0,
-      "pivot_target": 1727.9,
-      "dist_to_pivot_pct": 2.06,
-      "spread_%": 5.81,
-      "conviction_score": 69.539,
-      "turnover_cr": 150.3
+      "close": 1706.9,
+      "pivot_target": 1715.0,
+      "dist_to_pivot_pct": 0.47,
+      "spread_%": 5.02,
+      "conviction_score": 122.048,
+      "turnover_cr": 149.7
     },
     {
-      "symbol": "PNB",
+      "symbol": "GESHIP",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 116.98,
-      "pivot_target": 118.01,
-      "dist_to_pivot_pct": 0.88,
-      "spread_%": 7.9,
-      "conviction_score": 67.683,
-      "turnover_cr": 154.0
+      "close": 1550.5,
+      "pivot_target": 1583.0,
+      "dist_to_pivot_pct": 2.1,
+      "spread_%": 6.23,
+      "conviction_score": 97.127,
+      "turnover_cr": 152.1
     },
     {
-      "symbol": "PETRONET",
+      "symbol": "RBLBANK",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 291.5,
-      "pivot_target": 299.6,
-      "dist_to_pivot_pct": 2.78,
-      "spread_%": 6.34,
-      "conviction_score": 61.957,
-      "turnover_cr": 55.6
-    },
-    {
-      "symbol": "SAGILITY",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 44.0,
-      "pivot_target": 45.25,
-      "dist_to_pivot_pct": 2.84,
-      "spread_%": 7.46,
-      "conviction_score": 51.0,
-      "turnover_cr": 80.7
+      "close": 417.7,
+      "pivot_target": 424.0,
+      "dist_to_pivot_pct": 1.51,
+      "spread_%": 6.0,
+      "conviction_score": 93.731,
+      "turnover_cr": 138.2
     },
     {
       "symbol": "NAVINFLUOR",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 8352.5,
-      "pivot_target": 8600.0,
-      "dist_to_pivot_pct": 2.96,
-      "spread_%": 7.03,
-      "conviction_score": 36.739,
-      "turnover_cr": 180.2
+      "close": 8561.0,
+      "pivot_target": 8605.0,
+      "dist_to_pivot_pct": 0.51,
+      "spread_%": 7.09,
+      "conviction_score": 59.297,
+      "turnover_cr": 180.0
+    },
+    {
+      "symbol": "HAL",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 4760.0,
+      "pivot_target": 4837.1,
+      "dist_to_pivot_pct": 1.62,
+      "spread_%": 6.33,
+      "conviction_score": 44.998,
+      "turnover_cr": 449.5
     },
     {
       "symbol": "MAHABANK",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 83.16,
-      "pivot_target": 84.88,
-      "dist_to_pivot_pct": 2.07,
-      "spread_%": 7.62,
-      "conviction_score": 24.646,
+      "close": 83.0,
+      "pivot_target": 84.5,
+      "dist_to_pivot_pct": 1.81,
+      "spread_%": 7.14,
+      "conviction_score": 25.792,
       "turnover_cr": 119.8
     },
     {
       "symbol": "BAJAJHLDNG",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 10820.0,
-      "pivot_target": 11027.0,
-      "dist_to_pivot_pct": 1.91,
-      "spread_%": 5.88,
-      "conviction_score": 8.36,
-      "turnover_cr": 47.2
+      "close": 10750.0,
+      "pivot_target": 10969.0,
+      "dist_to_pivot_pct": 2.04,
+      "spread_%": 5.32,
+      "conviction_score": 20.971,
+      "turnover_cr": 46.7
+    },
+    {
+      "symbol": "PNB",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 116.0,
+      "pivot_target": 117.95,
+      "dist_to_pivot_pct": 1.68,
+      "spread_%": 7.84,
+      "conviction_score": 19.515,
+      "turnover_cr": 153.3
+    },
+    {
+      "symbol": "SHYAMMETL",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 1088.5,
+      "pivot_target": 1092.8,
+      "dist_to_pivot_pct": 0.4,
+      "spread_%": 7.67,
+      "conviction_score": 14.137,
+      "turnover_cr": 56.7
     }
   ]
 }
