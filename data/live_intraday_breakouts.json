@@ -1,6 +1,6 @@
 {
-  "Scan_Timestamp": "2026-10-13 05:37:41 PM IST",
-  "Elapsed_Minutes": 375,
+  "Scan_Timestamp": "2026-10-14 03:32:10 AM IST",
+  "Elapsed_Minutes": 1,
   "Breakouts_All_Day": [],
   "Coiling": [
     {
@@ -13,7 +13,7 @@
       "stop_loss": 4485.0,
       "risk_%": 8.0,
       "dist_pivot_%": -0.12,
-      "proj_vol_pace": 0.88,
+      "proj_vol_pace": 89.32,
       "action": "WICK REJECTED"
     },
     {
@@ -26,7 +26,7 @@
       "stop_loss": 1903.664,
       "risk_%": 8.0,
       "dist_pivot_%": -0.47,
-      "proj_vol_pace": 0.67,
+      "proj_vol_pace": 66.51,
       "action": "COILING"
     },
     {
@@ -39,20 +39,7 @@
       "stop_loss": 41.0596,
       "risk_%": 8.0,
       "dist_pivot_%": -0.6,
-      "proj_vol_pace": 0.96,
-      "action": "COILING"
-    },
-    {
-      "symbol": "PREMEXPLN",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 693.9,
-      "ltp": 689.0499877929688,
-      "day_high": 690.0,
-      "stop_loss": 638.388,
-      "risk_%": 8.0,
-      "dist_pivot_%": -0.7,
-      "proj_vol_pace": 0.72,
+      "proj_vol_pace": 97.65,
       "action": "COILING"
     },
     {
@@ -65,7 +52,7 @@
       "stop_loss": 77.74000000000001,
       "risk_%": 8.0,
       "dist_pivot_%": -0.9,
-      "proj_vol_pace": 0.82,
+      "proj_vol_pace": 83.91,
       "action": "COILING"
     },
     {
@@ -78,7 +65,7 @@
       "stop_loss": 108.51400000000001,
       "risk_%": 8.0,
       "dist_pivot_%": -1.19,
-      "proj_vol_pace": 0.8,
+      "proj_vol_pace": 82.72,
       "action": "COILING"
     },
     {
@@ -91,7 +78,7 @@
       "stop_loss": 10091.48,
       "risk_%": 8.0,
       "dist_pivot_%": -1.47,
-      "proj_vol_pace": 0.62,
+      "proj_vol_pace": 61.18,
       "action": "COILING"
     },
     {
@@ -104,7 +91,7 @@
       "stop_loss": 7916.6,
       "risk_%": 8.0,
       "dist_pivot_%": -1.59,
-      "proj_vol_pace": 0.65,
+      "proj_vol_pace": 64.53,
       "action": "COILING"
     },
     {
@@ -117,33 +104,7 @@
       "stop_loss": 1577.8000000000002,
       "risk_%": 8.0,
       "dist_pivot_%": -1.77,
-      "proj_vol_pace": 1.19,
-      "action": "COILING"
-    },
-    {
-      "symbol": "IIFLCAPS",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 349.8,
-      "ltp": 342.95001220703125,
-      "day_high": 345.1000061035156,
-      "stop_loss": 321.81600000000003,
-      "risk_%": 8.0,
-      "dist_pivot_%": -1.96,
-      "proj_vol_pace": 0.46,
-      "action": "COILING"
-    },
-    {
-      "symbol": "NAUKRI",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1253.2,
-      "ltp": 1222.5999755859375,
-      "day_high": 1239.300048828125,
-      "stop_loss": 1152.9440000000002,
-      "risk_%": 8.0,
-      "dist_pivot_%": -2.44,
-      "proj_vol_pace": 1.0,
+      "proj_vol_pace": 116.55,
       "action": "COILING"
     },
     {
@@ -156,7 +117,46 @@
       "stop_loss": 1456.3600000000001,
       "risk_%": 8.0,
       "dist_pivot_%": -2.59,
-      "proj_vol_pace": 1.03,
+      "proj_vol_pace": 106.12,
+      "action": "COILING"
+    },
+    {
+      "symbol": "NAUKRI",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1253.2,
+      "ltp": NaN,
+      "day_high": 1239.300048828125,
+      "stop_loss": 1152.9440000000002,
+      "risk_%": 8.0,
+      "dist_pivot_%": NaN,
+      "proj_vol_pace": 101.24,
+      "action": "COILING"
+    },
+    {
+      "symbol": "PREMEXPLN",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 693.9,
+      "ltp": NaN,
+      "day_high": 690.0,
+      "stop_loss": 638.388,
+      "risk_%": 8.0,
+      "dist_pivot_%": NaN,
+      "proj_vol_pace": 72.19,
+      "action": "COILING"
+    },
+    {
+      "symbol": "IIFLCAPS",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 349.8,
+      "ltp": 342.95001220703125,
+      "day_high": 345.1000061035156,
+      "stop_loss": 321.81600000000003,
+      "risk_%": 8.0,
+      "dist_pivot_%": -1.96,
+      "proj_vol_pace": 46.03,
       "action": "COILING"
     },
     {
@@ -164,12 +164,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 301.25,
-      "ltp": 293.0,
+      "ltp": NaN,
       "day_high": 299.70001220703125,
       "stop_loss": 277.15000000000003,
       "risk_%": 8.0,
-      "dist_pivot_%": -2.74,
-      "proj_vol_pace": 0.83,
+      "dist_pivot_%": NaN,
+      "proj_vol_pace": 76.34,
       "action": "COILING"
     },
     {
@@ -177,12 +177,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 125.45,
-      "ltp": 121.86000061035156,
+      "ltp": NaN,
       "day_high": 122.22000122070312,
       "stop_loss": 115.414,
       "risk_%": 8.0,
-      "dist_pivot_%": -2.86,
-      "proj_vol_pace": 0.28,
+      "dist_pivot_%": NaN,
+      "proj_vol_pace": 26.98,
       "action": "COILING"
     },
     {
@@ -190,12 +190,12 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 299.6,
-      "ltp": 290.0,
+      "ltp": NaN,
       "day_high": 291.3500061035156,
       "stop_loss": 275.632,
       "risk_%": 8.0,
-      "dist_pivot_%": -3.2,
-      "proj_vol_pace": 0.63,
+      "dist_pivot_%": NaN,
+      "proj_vol_pace": 64.69,
       "action": "COILING"
     },
     {
@@ -208,7 +208,7 @@
       "stop_loss": 8887.2,
       "risk_%": 8.0,
       "dist_pivot_%": -3.88,
-      "proj_vol_pace": 0.85,
+      "proj_vol_pace": 84.44,
       "action": "COILING"
     },
     {
@@ -221,7 +221,7 @@
       "stop_loss": 769.0740000000001,
       "risk_%": 8.0,
       "dist_pivot_%": -7.83,
-      "proj_vol_pace": 0.42,
+      "proj_vol_pace": 41.53,
       "action": "COILING"
     },
     {
@@ -234,7 +234,7 @@
       "stop_loss": 390.08000000000004,
       "risk_%": 8.0,
       "dist_pivot_%": -8.48,
-      "proj_vol_pace": 11.2,
+      "proj_vol_pace": 1108.05,
       "action": "COILING"
     }
   ]
