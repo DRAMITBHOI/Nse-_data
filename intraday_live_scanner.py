@@ -31,7 +31,7 @@ def send_telegram_alert(message: str):
     try:
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=12) as resp:
             if resp.status == 200:
                 print("📡 Telegram alert dispatched successfully (HTTP 200)")
             else:
@@ -54,25 +54,29 @@ def get_market_session_elapsed():
 
 def load_comprehensive_targets():
     """
-    Ingests pre-breakout watchlists (Launchpads and V-Reversals) from Swing3 (N750) 
-    and Run2 (Non-N750) while retaining multi-day tracked candidates.
+    Directly fetches live scanner candidate feeds from GitHub repository
+    matching the exact URLs used by the Swing 3 and Run 2 iPad dashboards.
     """
     targets = {}
     
-    scanner_sources = [
-        ("data/swing3_scanner_results.json", "NIFTY 750"),
-        ("data/run2_scanner_results.json", "NON-N750"),
-        ("data/swing3_run2_results.json", "NON-N750")
+    # Exact repository endpoints
+    sources = [
+        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_scanner_results.json", "NIFTY 750"),
+        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_run2_non_nifty750_scanner_results.json", "NON-N750")
     ]
     
-    for filepath, default_univ in scanner_sources:
-        if not os.path.exists(filepath):
-            continue
+    for url, default_univ in sources:
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                d = json.load(f)
-            
+            cache_buster = f"?_ts={int(time.time() * 1000)}"
+            req = urllib.request.Request(
+                url + cache_buster,
+                headers={"User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache"}
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                d = json.loads(resp.read().decode("utf-8"))
+
             pools = []
+            # Extract across all schema keys (Coiling, Watchlist, Fresh Pre-Breakouts)
             for k in ["Coiling", "Watchlist", "Pre_Breakouts", "Pre-Breakout Watchlist", "pre_breakouts"]:
                 if k in d and isinstance(d[k], list):
                     pools.extend(d[k])
@@ -98,10 +102,11 @@ def load_comprehensive_targets():
                     "pivot_ceiling": pivot,
                     "stop_loss": stop_loss
                 }
+            print(f"✅ Loaded {len(pools)} candidates from {url.split('/')[-1]} ({default_univ})")
         except Exception as e:
-            print(f"⚠️ Error reading {filepath}: {e}")
+            print(f"⚠️ Failed to fetch {url}: {e}")
 
-    # Retain continuous multi-day setups from prior live scans
+    # Retain continuous multi-day setups from local live state
     if os.path.exists(LIVE_BREAKOUTS_FILE):
         try:
             with open(LIVE_BREAKOUTS_FILE, "r", encoding="utf-8") as f:
@@ -119,7 +124,7 @@ def load_comprehensive_targets():
         except Exception:
             pass
 
-    print(f"📋 Loaded {len(targets)} total watchlisted setups for live monitoring.")
+    print(f"📋 Total Active Live Watchlist: {len(targets)} symbols across N750 & Non-N750.")
     return targets
 
 def run_live_intraday_scan():
