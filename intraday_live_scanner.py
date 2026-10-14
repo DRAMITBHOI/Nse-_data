@@ -15,8 +15,8 @@ LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
-# Cash, Liquid ETFs, and Gold exclusions
-EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES"}
+# Cash, Liquid ETFs, and Arbitrage exclusions
+EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
 
 def send_telegram_alert(message: str):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
@@ -55,11 +55,11 @@ def get_market_session_elapsed():
 def load_comprehensive_targets():
     """
     Directly fetches live scanner candidate feeds from GitHub repository
-    matching the exact URLs used by the Swing 3 and Run 2 iPad dashboards.
+    using the verified 'Watchlist' and 'Fresh_Triggers' schema keys, and retains
+    prior pre-breakout candidates as long as their stop-loss hasn't been breached.
     """
     targets = {}
     
-    # Exact repository endpoints
     sources = [
         ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_scanner_results.json", "NIFTY 750"),
         ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_run2_non_nifty750_scanner_results.json", "NON-N750")
@@ -75,24 +75,26 @@ def load_comprehensive_targets():
             with urllib.request.urlopen(req, timeout=15) as resp:
                 d = json.loads(resp.read().decode("utf-8"))
 
-            pools = []
-            # Extract across all schema keys (Coiling, Watchlist, Fresh Pre-Breakouts)
-            for k in ["Coiling", "Watchlist", "Pre_Breakouts", "Pre-Breakout Watchlist", "pre_breakouts"]:
-                if k in d and isinstance(d[k], list):
-                    pools.extend(d[k])
+            items = list(d.get("Watchlist", []))
+            
+            fresh = d.get("Fresh_Triggers", [])
+            if isinstance(fresh, list):
+                items.extend(fresh)
 
-            for item in pools:
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
                 sym = str(item.get("symbol", "")).strip().upper()
                 if not sym or sym.endswith("BEES") or sym in EXCLUDED_SYMBOLS:
                     continue
 
-                pivot = item.get("pivot_ceiling") or item.get("pivot_target") or item.get("pivot") or 0.0
+                pivot = item.get("pivot_target") or item.get("pivot_ceiling") or item.get("pivot") or 0.0
                 pivot = float(pivot)
                 if pivot <= 0:
                     continue
 
                 stop_loss = float(item.get("stop_loss", pivot * 0.92))
-                setup = item.get("setup_class") or item.get("setup") or item.get("type") or "LAUNCHPAD COIL"
+                setup = item.get("setup_class") or item.get("type") or "LAUNCHPAD COIL"
                 universe = item.get("universe", default_univ)
 
                 targets[sym] = {
@@ -102,11 +104,11 @@ def load_comprehensive_targets():
                     "pivot_ceiling": pivot,
                     "stop_loss": stop_loss
                 }
-            print(f"✅ Loaded {len(pools)} candidates from {url.split('/')[-1]} ({default_univ})")
+            print(f"✅ Loaded {len(items)} setups from {url.split('/')[-1]} ({default_univ})")
         except Exception as e:
             print(f"⚠️ Failed to fetch {url}: {e}")
 
-    # Retain continuous multi-day setups from local live state
+    # Retain continuous multi-day setups from prior local live state (persists until SL hit)
     if os.path.exists(LIVE_BREAKOUTS_FILE):
         try:
             with open(LIVE_BREAKOUTS_FILE, "r", encoding="utf-8") as f:
@@ -114,13 +116,19 @@ def load_comprehensive_targets():
             for item in prior_state.get("Coiling", []):
                 sym = str(item.get("symbol", "")).strip().upper()
                 if sym and sym not in targets and (not sym.endswith("BEES")) and (sym not in EXCLUDED_SYMBOLS):
-                    targets[sym] = {
-                        "symbol": sym,
-                        "universe": item.get("universe", "NON-N750"),
-                        "setup": item.get("setup", "LAUNCHPAD COIL"),
-                        "pivot_ceiling": float(item.get("pivot_ceiling", 0.0)),
-                        "stop_loss": float(item.get("stop_loss", 0.0))
-                    }
+                    pivot = float(item.get("pivot_ceiling", 0.0))
+                    stop_loss = float(item.get("stop_loss", pivot * 0.92))
+                    ltp = float(item.get("ltp", pivot))
+                    
+                    # Drop candidate only if it has broken below its structural stop loss
+                    if ltp >= stop_loss and pivot > 0:
+                        targets[sym] = {
+                            "symbol": sym,
+                            "universe": item.get("universe", "NON-N750"),
+                            "setup": item.get("setup", "LAUNCHPAD COIL"),
+                            "pivot_ceiling": pivot,
+                            "stop_loss": stop_loss
+                        }
         except Exception:
             pass
 
@@ -133,7 +141,6 @@ def run_live_intraday_scan():
         print("❌ No watchlisted setups found to scan.")
         return
 
-    # Track prior alerts and consecutive hits
     prior_breakouts_map = {}
     prior_hits = {}
     if os.path.exists(LIVE_BREAKOUTS_FILE):
@@ -186,7 +193,7 @@ def run_live_intraday_scan():
             hist_vols = df["volume"].iloc[:-1].tail(20)
             sma20_vol = hist_vols.mean() if len(hist_vols) > 0 else 1.0
 
-            # Today's live candle
+            # Today's live bar
             today = df.iloc[-1]
             ltp = float(today["close"])
             day_high = float(today["high"])
@@ -202,12 +209,11 @@ def run_live_intraday_scan():
             clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
             risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 8.0
 
-            # GATES:
-            # 1. Price Clearance Gate (+0.25% above pivot)
+            # Clearance gate: +0.25% buffer
             cleared_pivot = clearance_pct >= 0.25
             wick_touched_pivot = day_high >= pivot
             
-            # 2. Asymmetric Volume Pace Gate
+            # Asymmetric volume thresholds
             pace_threshold = 1.25 if meta["universe"] == "NIFTY 750" else 0.75
             is_volume_confirmed = vol_pace >= pace_threshold
 
@@ -224,14 +230,13 @@ def run_live_intraday_scan():
                 "proj_vol_pace": vol_pace
             }
 
-            # Update consecutive hit counter
             if cleared_pivot:
                 current_hits[sym] = prior_hits.get(sym, 0) + 1
             else:
                 current_hits[sym] = 0
 
-            # ---------------- TIME-GATED CLASSIFICATION ----------------
-            if elapsed_mins >= 330:  # 02:45 PM to 03:30 PM: Closing Execution Window
+            # Time-gated classification
+            if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM: Closing Execution Window
                 if cleared_pivot and is_volume_confirmed:
                     record["action"] = "CONFIRMED BREAKOUT"
                     confirmed_breakouts.append(record)
@@ -245,11 +250,10 @@ def run_live_intraday_scan():
                     record["action"] = "COILING"
                     coiling_list.append(record)
 
-            else:  # 09:15 AM to 02:45 PM: Radar Monitoring Window
+            else:  # 09:15 AM – 02:45 PM: Radar Monitoring Window
                 if cleared_pivot and is_volume_confirmed:
                     record["action"] = "RADAR PIVOT CLEARANCE"
                     radar_candidates.append(record)
-                    # Alert radar once per stock when cleared by +0.25%
                     if sym not in prior_breakouts_map and current_hits[sym] >= 1:
                         new_alerts_to_send.append(("RADAR", record))
                         prior_breakouts_map[sym] = record
@@ -267,12 +271,11 @@ def run_live_intraday_scan():
     confirmed_breakouts.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
     radar_candidates.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
 
-    # State output
     output_payload = {
         "Scan_Timestamp": now_str,
         "Elapsed_Minutes": elapsed_mins,
         "Breakouts_All_Day": confirmed_breakouts if elapsed_mins >= 330 else radar_candidates,
-        "Coiling": coiling_list[:30],
+        "Coiling": coiling_list[:50],
         "Consecutive_Hits": current_hits
     }
 
@@ -281,7 +284,6 @@ def run_live_intraday_scan():
 
     print(f"✅ Saved live scan: {len(confirmed_breakouts)} Executions, {len(radar_candidates)} Radar, {len(coiling_list)} Coiling.")
 
-    # ---------------- TELEGRAM BROADCASTING ----------------
     # 1. Real-time individual alerts
     for alert_type, alert in new_alerts_to_send:
         if alert_type == "RADAR":
@@ -308,7 +310,7 @@ def run_live_intraday_scan():
         send_telegram_alert(msg)
         time.sleep(1)
 
-    # 2. Comprehensive Closing Monitor (Fires at 03:20–03:30 PM)
+    # 2. Comprehensive Closing Monitor (03:20–03:30 PM)
     if elapsed_mins >= 365:
         summary_msg = (
             f"📊 <b>EOD BREAKOUT EXECUTION MONITOR</b>\n"
