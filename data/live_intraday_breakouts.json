@@ -1,110 +1,72 @@
 {
-  "Scan_Timestamp": "2026-10-14 07:19:07 PM IST",
-  "Elapsed_Minutes": 375,
-  "Breakouts_All_Day": [],
+  "Scan_Timestamp": "2026-10-15 03:32:16 AM IST",
+  "Elapsed_Minutes": 1,
+  "Breakouts_All_Day": [
+    {
+      "symbol": "RAIN",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 223.0,
+      "ltp": 237.0800018310547,
+      "day_high": 239.10000610351562,
+      "stop_loss": 204.76,
+      "risk_%": 8.18,
+      "clearance_%": 6.31,
+      "proj_vol_pace": 417.8,
+      "action": "RADAR PIVOT CLEARANCE"
+    },
+    {
+      "symbol": "TANLA",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 537.9,
+      "ltp": 568.0999755859375,
+      "day_high": 572.0,
+      "stop_loss": 480.8,
+      "risk_%": 10.62,
+      "clearance_%": 5.61,
+      "proj_vol_pace": 343.78,
+      "action": "RADAR PIVOT CLEARANCE"
+    },
+    {
+      "symbol": "KENNAMET",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 4355.5,
+      "ltp": 4482.7998046875,
+      "day_high": 4495.0,
+      "stop_loss": 3958.1,
+      "risk_%": 9.12,
+      "clearance_%": 2.92,
+      "proj_vol_pace": 203.3,
+      "action": "RADAR PIVOT CLEARANCE"
+    },
+    {
+      "symbol": "BEPL",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 129.6,
+      "ltp": 130.88999938964844,
+      "day_high": 131.5,
+      "stop_loss": 120.42,
+      "risk_%": 7.08,
+      "clearance_%": 1.0,
+      "proj_vol_pace": 145.55,
+      "action": "RADAR PIVOT CLEARANCE"
+    }
+  ],
   "Coiling": [
-    {
-      "symbol": "LAURUSLABS",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 2069.2,
-      "ltp": NaN,
-      "day_high": 2057.300048828125,
-      "stop_loss": 1903.664,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.78,
-      "action": "COILING"
-    },
-    {
-      "symbol": "CLEAN",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 830.8,
-      "ltp": NaN,
-      "day_high": 826.3499755859375,
-      "stop_loss": 764.336,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.81,
-      "action": "COILING"
-    },
-    {
-      "symbol": "GESHIP",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1583.0,
-      "ltp": NaN,
-      "day_high": 1565.0,
-      "stop_loss": 1456.3600000000001,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.73,
-      "action": "COILING"
-    },
-    {
-      "symbol": "PETRONET",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 299.6,
-      "ltp": NaN,
-      "day_high": 295.04998779296875,
-      "stop_loss": 275.632,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.31,
-      "action": "COILING"
-    },
-    {
-      "symbol": "MAHABANK",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 84.5,
-      "ltp": NaN,
-      "day_high": 83.63999938964844,
-      "stop_loss": 77.74000000000001,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.15,
-      "action": "COILING"
-    },
-    {
-      "symbol": "CASTROLIND",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 202.75,
-      "ltp": NaN,
-      "day_high": 197.39999389648438,
-      "stop_loss": 186.53,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.62,
-      "action": "COILING"
-    },
-    {
-      "symbol": "NAVINFLUOR",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 8605.0,
-      "ltp": NaN,
-      "day_high": 8598.0,
-      "stop_loss": 7916.6,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.58,
-      "action": "COILING"
-    },
     {
       "symbol": "NAUKRI",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1253.2,
-      "ltp": NaN,
+      "ltp": 1220.0,
       "day_high": 1230.0,
       "stop_loss": 1152.9440000000002,
       "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.96,
+      "clearance_%": -2.65,
+      "proj_vol_pace": 95.52,
       "action": "COILING"
     },
     {
@@ -117,7 +79,7 @@
       "stop_loss": 10091.48,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.65,
+      "proj_vol_pace": 65.24,
       "action": "COILING"
     },
     {
@@ -130,7 +92,7 @@
       "stop_loss": 1443.94,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.51,
+      "proj_vol_pace": 50.61,
       "action": "COILING"
     },
     {
@@ -143,21 +105,60 @@
       "stop_loss": 233.68,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.92,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 91.83,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "DLF",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 677.5,
-      "ltp": NaN,
+      "ltp": 666.9000244140625,
       "day_high": 677.5,
       "stop_loss": 623.3000000000001,
       "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.72,
-      "action": "WICK REJECTED"
+      "clearance_%": -1.56,
+      "proj_vol_pace": 71.96,
+      "action": "WICK TESTING"
+    },
+    {
+      "symbol": "MAHABANK",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 84.5,
+      "ltp": 83.0999984741211,
+      "day_high": 83.63999938964844,
+      "stop_loss": 77.74000000000001,
+      "risk_%": 8.0,
+      "clearance_%": -1.66,
+      "proj_vol_pace": 115.32,
+      "action": "COILING"
+    },
+    {
+      "symbol": "NAVINFLUOR",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 8605.0,
+      "ltp": 8457.0,
+      "day_high": 8598.0,
+      "stop_loss": 7916.6,
+      "risk_%": 8.0,
+      "clearance_%": -1.72,
+      "proj_vol_pace": 57.74,
+      "action": "COILING"
+    },
+    {
+      "symbol": "PETRONET",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 299.6,
+      "ltp": 292.95001220703125,
+      "day_high": 295.04998779296875,
+      "stop_loss": 275.632,
+      "risk_%": 8.0,
+      "clearance_%": -2.22,
+      "proj_vol_pace": 130.69,
+      "action": "COILING"
     },
     {
       "symbol": "AIIL",
@@ -169,20 +170,7 @@
       "stop_loss": 515.2,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.7,
-      "action": "COILING"
-    },
-    {
-      "symbol": "ANANDRATHI",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 2169.9,
-      "ltp": NaN,
-      "day_high": 2125.0,
-      "stop_loss": 1996.3080000000002,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.34,
+      "proj_vol_pace": 70.29,
       "action": "COILING"
     },
     {
@@ -195,21 +183,86 @@
       "stop_loss": 450.8,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.18,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 118.04,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "HERITGFOOD",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 419.0,
-      "ltp": NaN,
+      "ltp": 414.79998779296875,
       "day_high": 419.0,
       "stop_loss": 385.48,
       "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.56,
-      "action": "WICK REJECTED"
+      "clearance_%": -1.0,
+      "proj_vol_pace": 156.35,
+      "action": "WICK TESTING"
+    },
+    {
+      "symbol": "CLEAN",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 830.8,
+      "ltp": 818.5999755859375,
+      "day_high": 826.3499755859375,
+      "stop_loss": 764.336,
+      "risk_%": 8.0,
+      "clearance_%": -1.47,
+      "proj_vol_pace": 81.22,
+      "action": "COILING"
+    },
+    {
+      "symbol": "LAURUSLABS",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 2069.2,
+      "ltp": 2036.9000244140625,
+      "day_high": 2057.300048828125,
+      "stop_loss": 1903.664,
+      "risk_%": 8.0,
+      "clearance_%": -1.56,
+      "proj_vol_pace": 78.41,
+      "action": "COILING"
+    },
+    {
+      "symbol": "ANANDRATHI",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 2169.9,
+      "ltp": 2117.199951171875,
+      "day_high": 2125.0,
+      "stop_loss": 1996.3080000000002,
+      "risk_%": 8.0,
+      "clearance_%": -2.43,
+      "proj_vol_pace": 34.03,
+      "action": "COILING"
+    },
+    {
+      "symbol": "GESHIP",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1583.0,
+      "ltp": 1543.0999755859375,
+      "day_high": 1565.0,
+      "stop_loss": 1456.3600000000001,
+      "risk_%": 8.0,
+      "clearance_%": -2.52,
+      "proj_vol_pace": 73.28,
+      "action": "COILING"
+    },
+    {
+      "symbol": "CASTROLIND",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 202.75,
+      "ltp": 196.9600067138672,
+      "day_high": 197.39999389648438,
+      "stop_loss": 186.53,
+      "risk_%": 8.0,
+      "clearance_%": -2.86,
+      "proj_vol_pace": 61.76,
+      "action": "COILING"
     },
     {
       "symbol": "VOLTAMP",
@@ -221,8 +274,8 @@
       "stop_loss": 10143.0,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 4.42,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 441.74,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "SBCL",
@@ -234,7 +287,7 @@
       "stop_loss": 1056.988,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.54,
+      "proj_vol_pace": 54.1,
       "action": "COILING"
     },
     {
@@ -247,8 +300,8 @@
       "stop_loss": 111.78,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.99,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 99.07,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "ALLCARGO",
@@ -260,8 +313,8 @@
       "stop_loss": 10.120000000000001,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.7,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 70.02,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "MBAPL",
@@ -273,7 +326,7 @@
       "stop_loss": 159.62,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.28,
+      "proj_vol_pace": 127.85,
       "action": "COILING"
     },
     {
@@ -286,8 +339,8 @@
       "stop_loss": 947.876,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.52,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 152.04,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "ARIS",
@@ -299,7 +352,7 @@
       "stop_loss": 134.68800000000002,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.76,
+      "proj_vol_pace": 76.48,
       "action": "COILING"
     },
     {
@@ -312,7 +365,7 @@
       "stop_loss": 359.72,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.39,
+      "proj_vol_pace": 138.65,
       "action": "COILING"
     },
     {
@@ -325,21 +378,8 @@
       "stop_loss": 158.97600000000003,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.46,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "AEROPLANE",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 225.5,
-      "ltp": NaN,
-      "day_high": 222.3000030517578,
-      "stop_loss": 207.46,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.93,
-      "action": "COILING"
+      "proj_vol_pace": 45.81,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "ICIL",
@@ -351,7 +391,7 @@
       "stop_loss": 438.15000000000003,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.11,
+      "proj_vol_pace": 111.14,
       "action": "COILING"
     },
     {
@@ -364,21 +404,8 @@
       "stop_loss": 373.52000000000004,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.92,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "INDGN",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 614.5,
-      "ltp": NaN,
-      "day_high": 599.75,
-      "stop_loss": 565.34,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.58,
-      "action": "COILING"
+      "proj_vol_pace": 92.44,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "MANORAMA",
@@ -390,20 +417,7 @@
       "stop_loss": 1886.0,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.51,
-      "action": "COILING"
-    },
-    {
-      "symbol": "KTKBANK",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 343.05,
-      "ltp": NaN,
-      "day_high": 343.04998779296875,
-      "stop_loss": 315.60600000000005,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 0.69,
+      "proj_vol_pace": 50.68,
       "action": "COILING"
     },
     {
@@ -416,8 +430,8 @@
       "stop_loss": 818.8000000000001,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.43,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 143.42,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "CENTUM",
@@ -429,7 +443,7 @@
       "stop_loss": 3933.0,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.67,
+      "proj_vol_pace": 67.27,
       "action": "COILING"
     },
     {
@@ -442,8 +456,8 @@
       "stop_loss": 320.16,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.72,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 71.86,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "HINDOILEXP",
@@ -455,8 +469,8 @@
       "stop_loss": 163.76000000000002,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 1.95,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 195.34,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "WELENT",
@@ -468,7 +482,7 @@
       "stop_loss": 703.248,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.32,
+      "proj_vol_pace": 31.67,
       "action": "COILING"
     },
     {
@@ -481,8 +495,8 @@
       "stop_loss": 2932.96,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.61,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 61.18,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "FEDDERSHOL",
@@ -494,34 +508,34 @@
       "stop_loss": 58.5856,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.2,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "JKPAPER",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 407.0,
-      "ltp": NaN,
-      "day_high": 407.0,
-      "stop_loss": 374.44,
-      "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 5.43,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 19.97,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "APOLLO",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 424.5,
-      "ltp": NaN,
+      "ltp": 421.70001220703125,
       "day_high": 424.5,
       "stop_loss": 390.54,
       "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.23,
-      "action": "WICK REJECTED"
+      "clearance_%": -0.66,
+      "proj_vol_pace": 123.09,
+      "action": "WICK TESTING"
+    },
+    {
+      "symbol": "KTKBANK",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 343.05,
+      "ltp": 339.20001220703125,
+      "day_high": 343.04998779296875,
+      "stop_loss": 315.60600000000005,
+      "risk_%": 8.0,
+      "clearance_%": -1.12,
+      "proj_vol_pace": 69.09,
+      "action": "COILING"
     },
     {
       "symbol": "MOTISONS",
@@ -533,7 +547,7 @@
       "stop_loss": 16.974,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.18,
+      "proj_vol_pace": 18.35,
       "action": "COILING"
     },
     {
@@ -546,20 +560,59 @@
       "stop_loss": 1426.0,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.34,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 34.2,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "SAREGAMA",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 518.65,
-      "ltp": NaN,
+      "ltp": 510.6000061035156,
       "day_high": 515.9000244140625,
       "stop_loss": 477.158,
       "risk_%": 8.0,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.07,
+      "clearance_%": -1.55,
+      "proj_vol_pace": 107.39,
+      "action": "COILING"
+    },
+    {
+      "symbol": "JKPAPER",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 407.0,
+      "ltp": 400.20001220703125,
+      "day_high": 407.0,
+      "stop_loss": 374.44,
+      "risk_%": 8.0,
+      "clearance_%": -1.67,
+      "proj_vol_pace": 542.84,
+      "action": "WICK TESTING"
+    },
+    {
+      "symbol": "AEROPLANE",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 225.5,
+      "ltp": 219.07000732421875,
+      "day_high": 222.3000030517578,
+      "stop_loss": 207.46,
+      "risk_%": 8.0,
+      "clearance_%": -2.85,
+      "proj_vol_pace": 93.33,
+      "action": "COILING"
+    },
+    {
+      "symbol": "INDGN",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 614.5,
+      "ltp": 596.9000244140625,
+      "day_high": 599.75,
+      "stop_loss": 565.34,
+      "risk_%": 8.0,
+      "clearance_%": -2.86,
+      "proj_vol_pace": 58.42,
       "action": "COILING"
     },
     {
@@ -572,21 +625,8 @@
       "stop_loss": 508.76000000000005,
       "risk_%": 8.0,
       "clearance_%": NaN,
-      "proj_vol_pace": 0.32,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "KENNAMET",
-      "universe": "NON-N750",
-      "setup": "V-REVERSAL",
-      "pivot_ceiling": 4355.5,
-      "ltp": NaN,
-      "day_high": 4495.0,
-      "stop_loss": 3958.1,
-      "risk_%": 9.12,
-      "clearance_%": NaN,
-      "proj_vol_pace": 2.03,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 31.56,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "NITINSPIN",
@@ -598,8 +638,8 @@
       "stop_loss": 579.0,
       "risk_%": 9.25,
       "clearance_%": NaN,
-      "proj_vol_pace": 2.23,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 222.87,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "STOVEKRAFT",
@@ -611,21 +651,8 @@
       "stop_loss": 775.2,
       "risk_%": 6.49,
       "clearance_%": NaN,
-      "proj_vol_pace": 3.76,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "RAIN",
-      "universe": "NON-N750",
-      "setup": "V-REVERSAL",
-      "pivot_ceiling": 223.0,
-      "ltp": NaN,
-      "day_high": 239.10000610351562,
-      "stop_loss": 204.76,
-      "risk_%": 8.18,
-      "clearance_%": NaN,
-      "proj_vol_pace": 4.18,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 376.27,
+      "action": "WICK TESTING"
     },
     {
       "symbol": "SIRCA",
@@ -637,21 +664,8 @@
       "stop_loss": 397.0,
       "risk_%": 5.02,
       "clearance_%": NaN,
-      "proj_vol_pace": 4.09,
-      "action": "WICK REJECTED"
-    },
-    {
-      "symbol": "BEPL",
-      "universe": "NON-N750",
-      "setup": "V-REVERSAL",
-      "pivot_ceiling": 129.6,
-      "ltp": NaN,
-      "day_high": 131.5,
-      "stop_loss": 120.42,
-      "risk_%": 7.08,
-      "clearance_%": NaN,
-      "proj_vol_pace": 1.45,
-      "action": "WICK REJECTED"
+      "proj_vol_pace": 409.11,
+      "action": "WICK TESTING"
     }
   ],
   "Consecutive_Hits": {
@@ -699,19 +713,12 @@
     "RACLGEAR": 0,
     "SAREGAMA": 0,
     "APOLLOPIPE": 0,
-    "KENNAMET": 0,
+    "KENNAMET": 1,
     "NITINSPIN": 0,
     "STOVEKRAFT": 0,
-    "RAIN": 0,
+    "RAIN": 1,
     "SIRCA": 0,
-    "BEPL": 0,
-    "TANLA": 0,
-    "PREMEXPLN": 0,
-    "IIFLCAPS": 0,
-    "SHADOWFAX": 0,
-    "AUROPHARMA": 0,
-    "GOLDAXIS": 0,
-    "DIVISLAB": 0,
-    "BLUESTONE": 0
+    "BEPL": 1,
+    "TANLA": 1
   }
 }
