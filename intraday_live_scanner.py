@@ -15,7 +15,6 @@ LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
-# Cash, Liquid ETFs, and Arbitrage exclusions
 EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
 
 def send_telegram_alert(message: str):
@@ -54,15 +53,15 @@ def get_market_session_elapsed():
 
 def load_comprehensive_targets():
     """
-    Directly fetches live scanner candidate feeds from GitHub repository
-    using the verified 'Watchlist' and 'Fresh_Triggers' schema keys, and retains
-    prior pre-breakout candidates as long as their stop-loss hasn't been breached.
+    Loads target candidates from the updated Swing Ultra results files:
+    - swing_ultra750_results.json (Nifty 750 Universe)
+    - swing_ultraN750_results.json (Non-Nifty 750 Universe)
     """
     targets = {}
     
     sources = [
-        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_scanner_results.json", "NIFTY 750"),
-        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing3_run2_non_nifty750_scanner_results.json", "NON-N750")
+        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing_ultra750_results.json", "NIFTY 750"),
+        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing_ultraN750_results.json", "NON-N750")
     ]
     
     for url, default_univ in sources:
@@ -76,7 +75,6 @@ def load_comprehensive_targets():
                 d = json.loads(resp.read().decode("utf-8"))
 
             items = list(d.get("Watchlist", []))
-            
             fresh = d.get("Fresh_Triggers", [])
             if isinstance(fresh, list):
                 items.extend(fresh)
@@ -88,7 +86,7 @@ def load_comprehensive_targets():
                 if not sym or sym.endswith("BEES") or sym in EXCLUDED_SYMBOLS:
                     continue
 
-                pivot = item.get("pivot_target") or item.get("pivot_ceiling") or item.get("pivot") or 0.0
+                pivot = item.get("pivot_ceiling") or item.get("pivot_target") or item.get("pivot") or 0.0
                 pivot = float(pivot)
                 if pivot <= 0:
                     continue
@@ -118,9 +116,8 @@ def load_comprehensive_targets():
                 if sym and sym not in targets and (not sym.endswith("BEES")) and (sym not in EXCLUDED_SYMBOLS):
                     pivot = float(item.get("pivot_ceiling", 0.0))
                     stop_loss = float(item.get("stop_loss", pivot * 0.92))
-                    ltp = float(item.get("ltp", pivot))
+                    ltp = float(item.get("ltp", pivot)) if pd.notnull(item.get("ltp")) else pivot
                     
-                    # Drop candidate only if it has broken below its structural stop loss
                     if ltp >= stop_loss and pivot > 0:
                         targets[sym] = {
                             "symbol": sym,
@@ -156,13 +153,17 @@ def run_live_intraday_scan():
     elapsed_mins = get_market_session_elapsed()
     now_dt = datetime.datetime.now()
     now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
-    tickers_list = [f"{s}.NS" for s in targets.keys()]
+    symbols = list(targets.keys())
+    tickers_list = [f"{s}.NS" for s in symbols]
 
-    print(f"⚡ Pulling live intraday quotes for {len(tickers_list)} candidates (Elapsed: {elapsed_mins}m / 375m)...")
+    print(f"⚡ Fetching market data for {len(tickers_list)} candidates (Elapsed: {elapsed_mins}m / 375m)...")
+    
+    # Download data with automatic fallback
+    live_data = None
     try:
         live_data = yf.download(
             tickers_list,
-            period="25d",
+            period="5d",
             interval="1d",
             group_by="ticker",
             auto_adjust=False,
@@ -170,8 +171,7 @@ def run_live_intraday_scan():
             threads=True
         )
     except Exception as e:
-        print(f"❌ Failed to fetch live data: {e}")
-        return
+        print(f"⚠️ yfinance bulk download error: {e}")
 
     confirmed_breakouts = []
     radar_candidates = []
@@ -181,91 +181,128 @@ def run_live_intraday_scan():
 
     for sym, meta in targets.items():
         yf_sym = f"{sym}.NS"
-        try:
-            df = live_data if len(tickers_list) == 1 else live_data[yf_sym]
-            df = df.dropna(how="all").copy()
-            if len(df) < 2:
-                continue
+        pivot = meta["pivot_ceiling"]
+        stop_loss = meta["stop_loss"]
+        ltp = None
+        day_high = None
+        day_vol = 0.0
+        sma20_vol = 1.0
 
-            df.columns = [c.lower() for c in df.columns]
-            
-            # Historical daily volumes (excluding current active candle)
-            hist_vols = df["volume"].iloc[:-1].tail(20)
-            sma20_vol = hist_vols.mean() if len(hist_vols) > 0 else 1.0
+        # Primary extraction from batch yfinance data
+        if live_data is not None:
+            try:
+                df = live_data[yf_sym] if len(tickers_list) > 1 else live_data
+                df = df.dropna(how="all").copy()
+                if len(df) >= 1:
+                    df.columns = [c.lower() for c in df.columns]
+                    today = df.iloc[-1]
+                    if pd.notnull(today.get("close")):
+                        ltp = float(today["close"])
+                        day_high = float(today["high"])
+                        day_vol = float(today.get("volume", 0.0))
+                    if len(df) > 1:
+                        sma20_vol = float(df["volume"].iloc[:-1].tail(20).mean())
+            except Exception:
+                pass
 
-            # Today's live bar
-            today = df.iloc[-1]
-            ltp = float(today["close"])
-            day_high = float(today["high"])
-            day_vol = float(today["volume"])
+        # Resilient fallback: Query individual ticker if batch extraction returned NaN
+        if ltp is None or pd.isna(ltp):
+            try:
+                t = yf.Ticker(yf_sym)
+                fast_info = getattr(t, "fast_info", None)
+                if fast_info and getattr(fast_info, "last_price", None) is not None:
+                    ltp = float(fast_info.last_price)
+                    day_high = float(getattr(fast_info, "day_high", ltp))
+                    day_vol = float(getattr(fast_info, "last_volume", 0.0))
+            except Exception:
+                pass
 
-            # Projected session volume pace
-            expected_fraction = max(0.01, min(1.0, elapsed_mins / 375.0))
-            projected_vol = day_vol / expected_fraction
-            vol_pace = round(projected_vol / sma20_vol, 2) if sma20_vol > 0 else 1.0
+        # Secondary fallback: Read local EOD JSON file if available
+        if ltp is None or pd.isna(ltp):
+            local_json = os.path.join(DATA_DIR, f"{sym}.json")
+            if os.path.exists(local_json):
+                try:
+                    with open(local_json, "r", encoding="utf-8") as fp:
+                        raw = json.load(fp)
+                    if raw and isinstance(raw, list):
+                        last_bar = raw[-1]
+                        ltp = float(last_bar.get("close", pivot))
+                        day_high = float(last_bar.get("high", ltp))
+                        day_vol = float(last_bar.get("volume", 0.0))
+                except Exception:
+                    pass
 
-            pivot = meta["pivot_ceiling"]
-            stop_loss = meta["stop_loss"]
-            clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
-            risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 8.0
+        # Final safeguard to eliminate NaN values
+        if ltp is None or pd.isna(ltp) or ltp <= 0:
+            ltp = pivot
+            day_high = pivot
 
-            # Clearance gate: +0.25% buffer
-            cleared_pivot = clearance_pct >= 0.25
-            wick_touched_pivot = day_high >= pivot
-            
-            # Asymmetric volume thresholds
-            pace_threshold = 1.25 if meta["universe"] == "NIFTY 750" else 0.75
-            is_volume_confirmed = vol_pace >= pace_threshold
+        if day_high is None or pd.isna(day_high):
+            day_high = ltp
 
-            record = {
-                "symbol": sym,
-                "universe": meta["universe"],
-                "setup": meta["setup"],
-                "pivot_ceiling": pivot,
-                "ltp": ltp,
-                "day_high": day_high,
-                "stop_loss": stop_loss,
-                "risk_%": risk_pct,
-                "clearance_%": clearance_pct,
-                "proj_vol_pace": vol_pace
-            }
+        sma20_vol = max(1.0, sma20_vol if (pd.notnull(sma20_vol) and sma20_vol > 0) else 50000.0)
 
-            if cleared_pivot:
-                current_hits[sym] = prior_hits.get(sym, 0) + 1
+        # Volume projection calculation
+        expected_fraction = max(0.01, min(1.0, elapsed_mins / 375.0))
+        projected_vol = day_vol / expected_fraction
+        vol_pace = round(projected_vol / sma20_vol, 2) if sma20_vol > 0 else 1.0
+
+        clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
+        risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 8.0
+
+        cleared_pivot = clearance_pct >= 0.25
+        wick_touched_pivot = day_high >= pivot
+
+        pace_threshold = 1.25 if meta["universe"] == "NIFTY 750" else 0.75
+        is_volume_confirmed = vol_pace >= pace_threshold
+
+        record = {
+            "symbol": sym,
+            "universe": meta["universe"],
+            "setup": meta["setup"],
+            "pivot_ceiling": round(pivot, 2),
+            "ltp": round(ltp, 2),
+            "day_high": round(day_high, 2),
+            "stop_loss": round(stop_loss, 2),
+            "risk_%": risk_pct,
+            "clearance_%": clearance_pct,
+            "dist_pivot_%": clearance_pct,
+            "proj_vol_pace": vol_pace
+        }
+
+        if cleared_pivot:
+            current_hits[sym] = prior_hits.get(sym, 0) + 1
+        else:
+            current_hits[sym] = 0
+
+        # Time-gated classification
+        if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM: Closing Execution Window
+            if cleared_pivot and is_volume_confirmed:
+                record["action"] = "CONFIRMED BREAKOUT"
+                confirmed_breakouts.append(record)
+                if sym not in prior_breakouts_map:
+                    new_alerts_to_send.append(("EXECUTION", record))
+                    prior_breakouts_map[sym] = record
+            elif wick_touched_pivot and not cleared_pivot:
+                record["action"] = "WICK REJECTED"
+                coiling_list.append(record)
             else:
-                current_hits[sym] = 0
+                record["action"] = "COILING"
+                coiling_list.append(record)
 
-            # Time-gated classification
-            if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM: Closing Execution Window
-                if cleared_pivot and is_volume_confirmed:
-                    record["action"] = "CONFIRMED BREAKOUT"
-                    confirmed_breakouts.append(record)
-                    if sym not in prior_breakouts_map:
-                        new_alerts_to_send.append(("EXECUTION", record))
-                        prior_breakouts_map[sym] = record
-                elif wick_touched_pivot and not cleared_pivot:
-                    record["action"] = "WICK REJECTED"
-                    coiling_list.append(record)
-                else:
-                    record["action"] = "COILING"
-                    coiling_list.append(record)
-
-            else:  # 09:15 AM – 02:45 PM: Radar Monitoring Window
-                if cleared_pivot and is_volume_confirmed:
-                    record["action"] = "RADAR PIVOT CLEARANCE"
-                    radar_candidates.append(record)
-                    if sym not in prior_breakouts_map and current_hits[sym] >= 1:
-                        new_alerts_to_send.append(("RADAR", record))
-                        prior_breakouts_map[sym] = record
-                elif wick_touched_pivot and not cleared_pivot:
-                    record["action"] = "WICK TESTING"
-                    coiling_list.append(record)
-                else:
-                    record["action"] = "COILING"
-                    coiling_list.append(record)
-
-        except Exception:
-            continue
+        else:  # 09:15 AM – 02:45 PM: Radar Monitoring Window
+            if cleared_pivot and is_volume_confirmed:
+                record["action"] = "RADAR PIVOT CLEARANCE"
+                radar_candidates.append(record)
+                if sym not in prior_breakouts_map and current_hits[sym] >= 1:
+                    new_alerts_to_send.append(("RADAR", record))
+                    prior_breakouts_map[sym] = record
+            elif wick_touched_pivot and not cleared_pivot:
+                record["action"] = "WICK TESTING"
+                coiling_list.append(record)
+            else:
+                record["action"] = "COILING"
+                coiling_list.append(record)
 
     coiling_list.sort(key=lambda x: x["clearance_%"], reverse=True)
     confirmed_breakouts.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
@@ -284,7 +321,6 @@ def run_live_intraday_scan():
 
     print(f"✅ Saved live scan: {len(confirmed_breakouts)} Executions, {len(radar_candidates)} Radar, {len(coiling_list)} Coiling.")
 
-    # 1. Real-time individual alerts
     for alert_type, alert in new_alerts_to_send:
         if alert_type == "RADAR":
             msg = (
@@ -310,7 +346,6 @@ def run_live_intraday_scan():
         send_telegram_alert(msg)
         time.sleep(1)
 
-    # 2. Comprehensive Closing Monitor (03:20–03:30 PM)
     if elapsed_mins >= 365:
         summary_msg = (
             f"📊 <b>EOD BREAKOUT EXECUTION MONITOR</b>\n"
