@@ -1,0 +1,32 @@
+name: Run Authentic Demat Backtest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy
+
+      - name: Execute Backtesting Engine
+        run: |
+          python run_production_backtest.py
+
+      - name: Commit & Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add backtest_results/
+          git commit -m "Auto-update authentic Demat backtest comparison [skip ci]" || echo "No changes to commit"
+          git push
