@@ -1,234 +1,300 @@
 import os
 import sys
-import time
+import glob
 import json
-import requests
-import pandas as pd
+import datetime
 import numpy as np
+import pandas as pd
 import yfinance as yf
 
-# --- 1. Dynamic NSE Universe Fetcher ---
-def get_universes():
-    print("📥 Fetching official NSE universes...")
-    headers = {"User-Agent": "Mozilla/5.0"}
+DATA_DIR = "data"
+MIN_TURNOVER_CR = 10.0
+
+def load_universe_lists():
     n750_symbols = set()
-    all_nse_symbols = set()
-
-    # 1. Fetch Nifty 500 + MidCap 150 + SmallCap 250 (Nifty 750 Equivalent)
-    for index_csv in ["ind_nifty500list.csv", "ind_niftysmallcap250list.csv", "ind_niftymicrocap250_list.csv"]:
-        try:
-            url = f"https://archives.nseindia.com/content/indices/{index_csv}"
-            r = requests.get(url, headers=headers, timeout=10)
-            if r.status_code == 200:
-                for line in r.text.split("\n")[1:]:
-                    p = line.split(",")
-                    if len(p) > 2:
-                        sym = p[2].strip().replace('"', "")
-                        if sym:
-                            n750_symbols.add(sym)
-                            all_nse_symbols.add(sym)
-        except Exception:
-            pass
-
-    # 2. Fetch full NSE equity list for Non-Nifty 750
-    try:
-        url_all = "https://archives.nseindia.com/content/equities/EQUITY_L.csv"
-        r = requests.get(url_all, headers=headers, timeout=10)
-        if r.status_code == 200:
-            for line in r.text.split("\n")[1:]:
-                p = line.split(",")
-                if len(p) > 1:
-                    sym = p[0].strip().replace('"', "")
-                    series = p[1].strip().replace('"', "")
-                    if series == "EQ" and sym:
-                        all_nse_symbols.add(sym)
-    except Exception:
-        pass
-
-    if not all_nse_symbols:
-        # Fallback to local repo list if offline
-        for p in ["./data/nifty750.json", "./nifty750.json"]:
-            if os.path.exists(p):
-                with open(p, "r") as f:
-                    n750_symbols = set(json.load(f))
-                    all_nse_symbols = set(n750_symbols)
+    for p in ["./data/nifty750.json", "./nifty750.json", "nifty750.json"]:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    d = json.load(f)
+                    if isinstance(d, list):
+                        n750_symbols = {str(x).strip().upper() for x in d}
+                    elif isinstance(d, dict):
+                        n750_symbols = {str(x).strip().upper() for x in d.keys()}
                 break
+            except Exception:
+                pass
 
-    non_n750_symbols = all_nse_symbols - n750_symbols
-    print(f"✅ Nifty 750 Universe: {len(n750_symbols)} stocks")
-    print(f"✅ Non-Nifty 750 Universe: {len(non_n750_symbols)} stocks")
-    return n750_symbols, non_n750_symbols
+    local_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+    excluded = {
+        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+        "fundamentals.json", "backtest_results.json", "swing3_results.json",
+        "swing3_run2_results.json", "swing3_run2_global_results.json",
+        "swing3_vs_run2_nifty750_results.json", "swing3_run2_non_nifty750_results.json",
+        "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json",
+        "backtest_hp3_report.json", "live_intraday_breakouts.json"
+    }
 
-# --- 2. Simulation Logic (Aligned to Original Dashboards) ---
-def simulate_symbol(df, is_swing3=False):
-    if len(df) < 80:
-        return []
+    all_symbols = [
+        os.path.splitext(os.path.basename(f))[0].upper()
+        for f in local_files if os.path.basename(f) not in excluded
+    ]
 
-    highs = df["High"].values
-    lows = df["Low"].values
-    closes = df["Close"].values
-    volumes = df["Volume"].values
-    
-    v_avgs = pd.Series(volumes).rolling(20).mean().values
-    ema20s = pd.Series(closes).ewm(span=20, adjust=False).mean().values
-    sma50 = pd.Series(closes).rolling(50).mean().values
-    sma200 = pd.Series(closes).rolling(200).mean().values
+    if len(all_symbols) < 50:
+        all_symbols = sorted(list(n750_symbols)) + [
+            "SIRCA", "RAIN", "NITINSPIN", "TANLA", "STOVEKRAFT", "BEPL", "CEIGALL",
+            "TEXRAIL", "RELINFRA", "URJA", "CYIENTDLM", "WEBELSOLAR", "LXCHEM", "MANINFRA"
+        ]
 
-    # Swing 3 requires Stage 2 alignment (Close > SMA50 > SMA200)
-    is_stage2 = (closes > sma50) & (sma50 > sma200)
+    return n750_symbols, all_symbols
+
+def prepare_ohlcv(df):
+    if len(df) < 60:
+        return None
+
+    df = df.copy()
+    if "Close" in df.columns:
+        df = df.rename(columns={
+            "Open": "open", "High": "high", "Low": "low",
+            "Close": "close", "Volume": "volume"
+        })
+
+    if "delivery_vol" not in df.columns:
+        df["deliv_pct"] = 45.0
+        df["delivery_vol"] = df["volume"] * 0.45
+
+    df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
+    df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
+    df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+    df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
+    df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean().fillna(35.0)
+    df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
+    df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
+    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+
+    price_diff = df["close"].diff()
+    direction = np.where(price_diff > 0, 1.0, np.where(price_diff < 0, -1.0, 0.0))
+    df["deliv_obv"] = (direction * df["delivery_vol"]).cumsum()
+    df["dobv_20max"] = df["deliv_obv"].rolling(20, min_periods=5).max()
+
+    c_range = df["high"] - df["low"]
+    df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
+
+    return df
+
+def simulate_engine(df, nifty_perf_map, mode="SWING3_LOCKED"):
+    """
+    mode:
+      - 'SWING3_LOCKED': Spread <= 8%, Conviction Score >= 2.5
+      - 'RUN2': Spread <= 13%, No Score Cutoff
+    """
+    highs = df["high"].values
+    lows = df["low"].values
+    closes = df["close"].values
+    volumes = df["volume"].values
+    vol_avgs = df["gross_vol_sma20"].values
+    deliv_vols = df["delivery_vol"].values
+    deliv_avgs = df["deliv_sma20"].values
+    deliv_pcts = df["deliv_pct"].values
+    deliv_pct_avgs = df["deliv_pct_50d"].values
+    to_50d = df["turnover_50d"].values
+    range_closes = df["range_closeness"].values
+    ema20s = df["ema_20"].values
+    sma200s = df["sma_200"].values
+    perf_60s = df["perf_60d"].values
+    demat_obvs = df["deliv_obv"].values
+    demat_obv_maxes = df["dobv_20max"].values
+    times = df.index.astype(str).values
 
     trades = []
     in_trade = False
-    entry_price = 0.0
-    current_stop = 0.0
+    entry_p = 0.0
+    initial_sl = 0.0
+    current_sl = 0.0
     entry_idx = 0
     setup_type = ""
-    consecutive_under_ema = 0
 
     for i in range(50, len(df)):
         c = closes[i]
         h = highs[i]
         l = lows[i]
         v = volumes[i]
-        v_avg = v_avgs[i] if not np.isnan(v_avgs[i]) and v_avgs[i] > 0 else 1.0
+        v_avg = vol_avgs[i]
+        dv = deliv_vols[i]
+        dv_avg = deliv_avgs[i]
+        turnover = to_50d[i]
+        dp = deliv_pcts[i]
+        dp_avg = deliv_pct_avgs[i]
+        rc = range_closes[i]
         ema = ema20s[i]
+        sma200 = sma200s[i]
+        stock_p60 = perf_60s[i]
+        t = times[i][:10]
 
+        # Exact Production Exit: Close < current_sl (20 EMA Trail)
         if in_trade:
-            # Trailing Exit: Stop loss breach OR confirmed 2-day close below 20-EMA
-            if c < ema:
-                consecutive_under_ema += 1
-            else:
-                consecutive_under_ema = 0
-
-            # Trail stop upward: higher of initial stop or 5-day trough * 0.96
-            recent_trough = lows[max(0, i - 5):i].min()
-            current_stop = max(current_stop, recent_trough * 0.96)
-
-            if l <= current_stop or consecutive_under_ema >= 2:
-                exit_price = current_stop if l <= current_stop else c
-                pnl = (exit_price - entry_price) / entry_price
+            current_sl = max(initial_sl, round(float(ema), 2))
+            if c < current_sl:
+                exit_price = c
+                pnl = (exit_price - entry_p) / entry_p
                 trades.append({
                     "setup": setup_type,
+                    "entry_price": entry_p,
+                    "exit_price": exit_price,
                     "pnl": pnl,
                     "holding_days": i - entry_idx,
                     "is_win": pnl > 0
                 })
                 in_trade = False
-                consecutive_under_ema = 0
             continue
 
-        trend_ok = is_stage2[i] if is_swing3 else True
-        if not trend_ok:
+        if turnover < MIN_TURNOVER_CR:
             continue
 
-        # SETUP 1: LAUNCHPAD (Primary Engine - Evaluated First)
-        max_spread = 0.08 if is_swing3 else 0.13
-        shelf_high = highs[max(0, i - 15):i].max()
-        shelf_low = lows[max(0, i - 15):i].min()
-        shelf_spread = (shelf_high - shelf_low) / shelf_low if shelf_low > 0 else 1.0
+        is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
+        n_perf = nifty_perf_map.get(t, 0.001)
+        is_rs = bool(stock_p60 > n_perf)
 
-        c_bo_lp = (c >= shelf_high) and (shelf_spread <= max_spread)
-        c_vol_lp = (v >= 1.30 * v_avg) and (v >= 50000)
-
-        if c_bo_lp and c_vol_lp:
-            in_trade = True
-            entry_price = shelf_high
-            current_stop = shelf_low * 0.96
-            entry_idx = i
-            setup_type = "LAUNCHPAD"
+        if not (is_stage2 and is_rs):
             continue
 
-        # SETUP 2: V-REVERSAL (Secondary Engine - Requires Deep Flush >= 18%)
-        recent_20_high = highs[max(0, i - 20):i].max()
-        flush_depth = (recent_20_high - l) / recent_20_high if recent_20_high > 0 else 0.0
+        entry_triggered = False
+        calc_entry = 0.0
+        calc_sl = 0.0
+        setup_label = ""
 
-        if flush_depth >= 0.18:
-            was_under = any(lows[k] <= ema20s[k] * 1.005 for k in range(max(0, i - 4), i))
-            prior_base_high = closes[max(0, i - 4):i].max()
-            c_rec_vr = was_under and (c >= ema) and (c >= prior_base_high)
-            c_vol_vr = (v >= 1.25 * v_avg) or (v >= 150000)
+        # 1. ENGINE 1: V-REVERSAL (FLUSH >= 18%)
+        recent_20_high = highs[i - 20:i].max()
+        if (recent_20_high - l) / recent_20_high >= 0.18:
+            recent_trough = lows[i - 5:i].min()
+            prior_3d_high = highs[i - 4:i].max()
+            c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
+            c_vol_rev = v >= (1.3 * v_avg)
+            c_deliv_rev = (dv >= 1.25 * dv_avg) or (dp >= 1.15 * dp_avg)
+            c_candle_rev = rc >= 0.55
 
-            if c_rec_vr and c_vol_vr:
-                in_trade = True
-                entry_price = c
-                current_stop = lows[max(0, i - 5):i].min() * 0.955
-                entry_idx = i
-                setup_type = "V-REVERSAL"
+            if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
+                entry_triggered = True
+                calc_entry = round(prior_3d_high, 2)
+                calc_sl = round(recent_trough * 0.995, 2)
+                setup_label = "V-REVERSAL"
+
+        # 2. ENGINE 2: LAUNCHPAD BREAKOUT
+        if not entry_triggered:
+            max_spread = 0.08 if mode == "SWING3_LOCKED" else 0.13
+            valid_lp = False
+            lp_high = 0.0
+            lp_low = 0.0
+
+            for shelf_len in range(10, 19):
+                s_high = highs[i - shelf_len:i].max()
+                s_low = lows[i - shelf_len:i].min()
+                if s_low > 0 and ((s_high - s_low) / s_low) <= max_spread:
+                    valid_lp = True
+                    lp_high = round(float(s_high), 2)
+                    lp_low = round(float(s_low), 2)
+                    break
+
+            if valid_lp:
+                base_up = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
+                base_dn = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
+                req_ratio = 1.50 if mode == "SWING3_LOCKED" else 1.15
+                base_cumul = (base_up / base_dn) if base_dn > 0 else req_ratio
+
+                c_bo = (c >= lp_high) and (h >= lp_high)
+                c_vol_bo = v >= (1.4 * v_avg)
+                c_deliv_bo = (dv >= 1.25 * dv_avg) or (dp >= 1.25 * dp_avg)
+                c_candle_bo = rc >= 0.65
+                obv_high = bool(demat_obvs[i] >= demat_obv_maxes[i - 1]) if mode == "SWING3_LOCKED" else True
+
+                if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul >= req_ratio) and obv_high:
+                    entry_triggered = True
+                    calc_entry = lp_high
+                    calc_sl = round(min(l, lp_low), 2)
+                    setup_label = "LAUNCHPAD"
+
+        if entry_triggered:
+            r_dist = calc_entry - calc_sl
+            if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
+                deliv_surge = dv / dv_avg if dv_avg > 0 else 1.0
+                rs_rat = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
+                conv_score = round(deliv_surge * max(0.1, rs_rat), 3)
+
+                # Gate check: Score >= 2.5 for Swing 3 Locked; Unconstrained for Run 2
+                score_pass = (conv_score >= 2.5) if mode == "SWING3_LOCKED" else True
+
+                if score_pass:
+                    in_trade = True
+                    entry_p = calc_entry
+                    initial_sl = calc_sl
+                    current_sl = initial_sl
+                    entry_idx = i
+                    setup_type = setup_label
 
     return trades
 
-# --- 3. Main Multi-Universe Pipeline ---
 def main():
-    print("🚀 Initializing Restored Strategy Backtest (2021 – Present)...")
-    n750_set, non_n750_set = get_universes()
-    
-    all_symbols = list(n750_set) + list(non_n750_set)
-    print(f"Total Combined Universe: {len(all_symbols)} tickers.")
+    print("🚀 Initializing Comparative Backtest (2021 – Present)...")
+    n750_set, all_symbols = load_universe_lists()
+
+    # Nifty 50 benchmark
+    nifty_df = yf.download("^NSEI", start="2020-01-01", progress=False, auto_adjust=True)
+    if isinstance(nifty_df.columns, pd.MultiIndex):
+        nifty_df.columns = nifty_df.columns.get_level_values(0)
+    nifty_df["perf_60d"] = nifty_df["Close"].pct_change(60).fillna(0)
+    nifty_perf_map = {str(k)[:10]: float(v) for k, v in nifty_df["perf_60d"].items()}
 
     buckets = {
-        "Swing 3 - N750 Launchpad": [],
-        "Swing 3 - N750 V-Reversal": [],
-        "Run 2 - N750 Launchpad": [],
-        "Run 2 - N750 V-Reversal": [],
-        "Run 2 - Non-N750 Launchpad": [],
-        "Run 2 - Non-N750 V-Reversal": []
+        "Swing 3 Locked - N750 (Spread<=8% • Score>=2.5)": [],
+        "Swing 3 Run 2 - N750 (Spread<=13% • No Score Gate)": [],
+        "Swing 3 Run 2 - Non-N750 (Spread<=13% • No Score Gate)": []
     }
 
-    # Batch download data in chunks of 60 tickers
-    batch_size = 60
-    total_batches = (len(all_symbols) + batch_size - 1) // batch_size
-
+    batch_size = 50
     for b in range(0, len(all_symbols), batch_size):
         chunk = all_symbols[b : b + batch_size]
         tickers = [f"{s}.NS" for s in chunk]
-        print(f"Processing Batch {b // batch_size + 1}/{total_batches}...")
+        print(f"Processing Batch {b // batch_size + 1}/{(len(all_symbols) + batch_size - 1) // batch_size}...")
 
         try:
-            data = yf.download(tickers, start="2021-01-01", group_by="ticker", auto_adjust=True, progress=False, threads=True)
+            data = yf.download(tickers, start="2020-06-01", group_by="ticker", auto_adjust=True, progress=False, threads=True)
         except Exception:
             continue
 
         for sym in chunk:
             try:
                 t_str = f"{sym}.NS"
-                if len(chunk) == 1:
-                    df = data.copy()
-                else:
-                    if t_str not in data or data[t_str].empty:
-                        continue
-                    df = data[t_str].dropna()
+                raw_df = data[t_str].dropna() if len(chunk) > 1 and t_str in data else (data.dropna() if len(chunk) == 1 else None)
+                if raw_df is None or len(raw_df) < 80:
+                    continue
 
-                if len(df) < 80:
+                clean_df = prepare_ohlcv(raw_df)
+                if clean_df is None:
                     continue
 
                 is_n750 = sym in n750_set
 
-                # 1. Swing 3 (Strictly N750)
                 if is_n750:
-                    sw_trades = simulate_symbol(df, is_swing3=True)
-                    for t in sw_trades:
-                        if t["setup"] == "LAUNCHPAD":
-                            buckets["Swing 3 - N750 Launchpad"].append(t)
-                        else:
-                            buckets["Swing 3 - N750 V-Reversal"].append(t)
+                    # 1. Swing 3 Locked in Nifty 750
+                    t_sw3 = simulate_engine(clean_df, nifty_perf_map, mode="SWING3_LOCKED")
+                    buckets["Swing 3 Locked - N750 (Spread<=8% • Score>=2.5)"].extend(t_sw3)
 
-                # 2. Run 2 (All Stocks)
-                r2_trades = simulate_symbol(df, is_swing3=False)
-                for t in r2_trades:
-                    prefix = "Run 2 - N750" if is_n750 else "Run 2 - Non-N750"
-                    tag = f"{prefix} {t['setup'].title()}"
-                    if tag in buckets:
-                        buckets[tag].append(t)
+                    # 2. Run 2 in Nifty 750
+                    t_r2_n750 = simulate_engine(clean_df, nifty_perf_map, mode="RUN2")
+                    buckets["Swing 3 Run 2 - N750 (Spread<=13% • No Score Gate)"].extend(t_r2_n750)
+                else:
+                    # 3. Run 2 in Non-Nifty 750
+                    t_r2_non750 = simulate_engine(clean_df, nifty_perf_map, mode="RUN2")
+                    buckets["Swing 3 Run 2 - Non-N750 (Spread<=13% • No Score Gate)"].extend(t_r2_non750)
             except Exception:
                 continue
 
-    # --- 4. Report Generation ---
     rows = []
     for k, t_list in buckets.items():
         if not t_list:
             rows.append({
-                "System & Universe": k, "Trades": 0, "Win Rate": "0.0%", "Profit Factor": 0.0,
-                "Avg Gain": "0.0%", "Avg Days": 0.0, "Max Gain": "0.0%"
+                "Configuration": k, "Trades": 0, "Win Rate": "0.0%", "Profit Factor": 0.0,
+                "Avg Gain": "0.0%", "Avg Loss": "0.0%", "Max Gain": "0.0%", "Avg Days": 0.0
             })
             continue
         df_res = pd.DataFrame(t_list)
@@ -236,28 +302,28 @@ def main():
         losses = df_res[df_res["pnl"] <= 0]
         gross_profit = wins["pnl"].sum()
         gross_loss = abs(losses["pnl"].sum())
-        pf = round(gross_profit / gross_loss, 2) if gross_loss > 0 else (round(gross_profit, 2) if gross_profit > 0 else 0.0)
+        pf = round(gross_profit / gross_loss, 2) if gross_loss > 0 else 0.0
 
         rows.append({
-            "System & Universe": k,
+            "Configuration": k,
             "Trades": len(df_res),
-            "Win Rate": f"{(len(wins) / len(df_res)) * 100:.1f}%",
+            "Win Rate": f"{(len(wins) / len(df_res)) * 100:.2f}%",
             "Profit Factor": pf,
-            "Avg Gain": f"{df_res['pnl'].mean() * 100:+.2f}%",
-            "Avg Days": round(df_res["holding_days"].mean(), 1),
-            "Max Gain": f"{df_res['pnl'].max() * 100:+.1f}%"
+            "Avg Gain": f"+{wins['pnl'].mean() * 100:.2f}%" if not wins.empty else "+0.0%",
+            "Avg Loss": f"{losses['pnl'].mean() * 100:.2f}%" if not losses.empty else "0.0%",
+            "Max Gain": f"+{df_res['pnl'].max() * 100:.2f}%",
+            "Avg Days": round(df_res["holding_days"].mean(), 1)
         })
 
     report_df = pd.DataFrame(rows)
-    table_str = report_df.to_string(index=False)
-    print("\n" + "="*85)
-    print(table_str)
-    print("="*85)
+    print("\n" + "=" * 105)
+    print(report_df.to_string(index=False))
+    print("=" * 105)
 
     os.makedirs("./backtest_results", exist_ok=True)
     report_df.to_csv("./backtest_results/latest_backtest.csv", index=False)
     with open("./backtest_results/latest_backtest.md", "w") as f:
-        f.write("# Backtest Performance Summary (2021 – Present)\n\n")
+        f.write("# Strategy Backtest Comparison (2021 – Present)\n\n")
         f.write(report_df.to_markdown(index=False))
 
 if __name__ == "__main__":
