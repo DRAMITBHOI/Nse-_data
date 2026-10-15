@@ -1,4 +1,4 @@
-name: Run Daily Swing 3.0 Scanner
+name: Run Daily Swing Ultra 750 Scanner
 
 on:
   workflow_run:
@@ -13,13 +13,15 @@ permissions:
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
-    # Run only if triggered manually OR if the upstream data update completed successfully
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 15
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Repository with LFS
         uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -31,13 +33,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy requests
 
-      - name: Execute Daily Swing 3.0 Scanner
-        run: python swing3_scanner.py
+      - name: Execute Daily Swing Ultra 750 Scanner
+        run: python Swing_ultra750.py
 
       - name: Commit & Push Scanner Output
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/swing3_scanner_results.json || true
-          git commit -m "Auto-update Swing 3.0 Daily Scanner [skip ci]" || echo "No changes to commit"
-          git push
+          git add data/swing_ultra750_results.json || true
+          git commit -m "Auto-update Swing Ultra 750 Daily Scanner [skip ci]" || echo "No changes to commit"
+          git push origin main
