@@ -2,7 +2,7 @@ name: 15-Min Intraday Live Breakout Scanner
 
 on:
   schedule:
-    # Runs every 15 mins Monday-Friday during Indian market hours (03:45 to 10:00 UTC)
+    # 09:15 AM to 03:30 PM IST corresponds to 03:45 to 10:00 UTC (Monday to Friday)
     - cron: '*/15 3-10 * * 1-5'
   workflow_dispatch:
 
@@ -10,14 +10,18 @@ concurrency:
   group: intraday-scanner-group
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   run-live-scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Repository with LFS
         uses: actions/checkout@v4
         with:
+          lfs: true
           fetch-depth: 0
 
       - name: Set up Python
@@ -42,13 +46,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Fetch remote changes cleanly to prevent merge conflicts
-          git fetch origin main
-          git checkout -B main origin/main
-          
-          # Stage and push generated data
-          if [ -f data/live_intraday_breakouts.json ]; then
-            git add -f data/live_intraday_breakouts.json
-            git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
-            git push origin main
-          fi
+          git add -f data/live_intraday_breakouts.json || true
+          git commit -m "Auto-update Cumulative Breakouts [skip ci]" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main
