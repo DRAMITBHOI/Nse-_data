@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 DATA_DIR = "data"
-RESULTS_JSON = os.path.join(DATA_DIR, "swing3_run2_non_nifty750_scanner_results.json")
+RESULTS_JSON = os.path.join(DATA_DIR, "swing_ultraN750_results.json")
 NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 MIN_TURNOVER_CR = 10.0
 
@@ -121,7 +121,7 @@ def load_nifty750_symbols():
     return set()
 
 
-def scan_stock(symbol, clean_data, nifty_perf_map):
+def scan_stock_swing_ultraN750(symbol, clean_data, nifty_perf_map):
     if len(clean_data) < 60:
         return None, None, None
 
@@ -144,6 +144,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
     current_sl = 0.0
     entry_d = ""
     entry_idx = 0
+    trade_setup = ""
 
     highs = df["high"].values
     lows = df["low"].values
@@ -178,11 +179,11 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         stock_p60 = perf_60s[i]
         t = times[i]
 
+        # RANK 1 EXIT ARCHITECTURE (Hold initial SL until 20 EMA > Entry, then trail 20 EMA)
         if in_trade:
             current_sl = max(initial_sl, round(float(ema), 2))
             if c < current_sl:
                 in_trade = False
-                continue
             continue
 
         if turnover < MIN_TURNOVER_CR:
@@ -201,6 +202,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         entry_triggered = False
         calc_entry = 0.0
         calc_sl = 0.0
+        cur_setup = ""
 
         # ENGINE 1: V-REVERSAL
         recent_20_high = highs[i - 20:i].max()
@@ -216,6 +218,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 entry_triggered = True
                 calc_entry = round(prior_3d_high, 2)
                 calc_sl = round(recent_trough * 0.995, 2)
+                cur_setup = "V-REVERSAL"
 
         # ENGINE 2: LAUNCHPAD BREAKOUT (SPREAD <= 13%)
         if not entry_triggered:
@@ -235,7 +238,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
             if valid_launchpad:
                 base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
                 base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
-                base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 2.0
+                base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else 1.15
 
                 c_bo = (c >= launchpad_high) and (h >= launchpad_high)
                 c_vol_bo = v >= (1.4 * v_avg)
@@ -246,9 +249,11 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                     entry_triggered = True
                     calc_entry = launchpad_high
                     calc_sl = round(min(l, launchpad_low), 2)
+                    cur_setup = "LAUNCHPAD"
 
         if entry_triggered:
             r_dist = calc_entry - calc_sl
+            # Stop distance gate: SL within 12% of entry
             if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
                 in_trade = True
                 entry_p = calc_entry
@@ -256,6 +261,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
                 current_sl = initial_sl
                 entry_d = t
                 entry_idx = i
+                trade_setup = cur_setup
 
     active_position = None
     if in_trade:
@@ -265,6 +271,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         pnl_pct = round(((cur_c - entry_p) / entry_p) * 100.0, 2)
         active_position = {
             "symbol": symbol,
+            "setup": trade_setup,
             "entry_date": entry_d,
             "entry_price": entry_p,
             "current_close": round(cur_c, 2),
@@ -293,7 +300,7 @@ def scan_stock(symbol, clean_data, nifty_perf_map):
         fresh_trigger = {
             "symbol": symbol,
             "date": t_today,
-            "type": "V-REVERSAL" if (entry_p != initial_sl) else "LAUNCHPAD-BO",
+            "type": trade_setup,
             "pivot_ceiling": entry_p,
             "close": round(c_today, 2),
             "extended_pct": ext_pct,
@@ -368,7 +375,8 @@ def execute_scanner():
         "fundamentals.json", "backtest_results.json", "swing3_results.json",
         "swing3_run2_results.json", "swing3_run2_global_results.json",
         "swing3_vs_run2_nifty750_results.json", "swing3_run2_non_nifty750_results.json",
-        "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json"
+        "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json",
+        "swing_ultra750_results.json", "swing_ultraN750_results.json"
     }
 
     target_files = [
@@ -387,7 +395,7 @@ def execute_scanner():
                 raw = json.load(fp)
             clean = clean_and_prepare(raw)
             if clean:
-                trig, active, watch = scan_stock(sym, clean, nifty_perf_map)
+                trig, active, watch = scan_stock_swing_ultraN750(sym, clean, nifty_perf_map)
                 if trig:
                     triggers.append(trig)
                 if active:
@@ -397,14 +405,14 @@ def execute_scanner():
         except Exception:
             continue
 
-    # Decremental Conviction Score sort for both lists
+    # Sort triggers and watchlist by conviction score
     triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
     watchlist.sort(key=lambda x: x["conviction_score"], reverse=True)
 
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Target_Universe": "Non-Nifty 750 NSE Stocks",
-        "Strategy_Specs": "Swing 3 Run 2 (Shelf <= 13%, Conviction Scoring, 20 EMA Trail Exit)",
+        "Strategy_Specs": "Swing Ultra Non750 (Shelf <= 13%, Accumulation >= 1.15, Rank 1 Exit)",
         "Fresh_Triggers_Count": len(triggers),
         "Active_Positions_Count": len(active_positions),
         "Watchlist_Count": len(watchlist),
@@ -416,7 +424,7 @@ def execute_scanner():
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"✅ Scan Complete. Fresh: {len(triggers)}, Active: {len(active_positions)}, Watchlist: {len(watchlist)}")
+    print(f"✅ Swing Ultra Non-750 Scan Complete. Fresh: {len(triggers)}, Active: {len(active_positions)}, Watchlist: {len(watchlist)}")
 
 
 if __name__ == "__main__":
