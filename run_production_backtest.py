@@ -1,11 +1,9 @@
 import os
 import glob
 import json
-import datetime
 import numpy as np
 import pandas as pd
 
-# 1. Path Resolution (Auto-detects data directory location)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 POSSIBLE_DATA_DIRS = [
     os.path.join(ROOT_DIR, "data"),
@@ -61,7 +59,7 @@ def clean_and_prepare(raw_data):
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
 
-    # Corporate Action & Split Normalization
+    # Split Multiplier Normalization
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -139,11 +137,6 @@ def load_nifty750_symbols():
     return set()
 
 def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
-    """
-    mode:
-      - 'SWING3': Spread <= 8%, Conviction Score >= 2.5
-      - 'RUN2':   Spread <= 13%, No Score Cutoff
-    """
     if len(clean_data) < 60:
         return []
 
@@ -190,7 +183,6 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
     current_sl = 0.0
     entry_idx = 0
     setup_name = ""
-    booked_half = False
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -209,30 +201,22 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # 1. Trailing & Trade Management Logic
+        # -------------------------------------------------------------
+        # RANK 1 EXIT MODEL: Never Move to BE (Hold Pivot SL, Trail EMA)
+        # -------------------------------------------------------------
         if in_trade:
-            # Shift Stop to Breakeven once gain hits +10%
-            if h >= entry_p * 1.10:
-                current_sl = max(current_sl, entry_p)
-
-            # Move trailing stop along 20 EMA
-            current_sl = max(current_sl, round(float(ema), 2))
-
-            # Check for partial profit target at +15%
-            if not booked_half and h >= entry_p * 1.15:
-                booked_half = True
-
-            # Full Exit on Close < 20 EMA / Stop Loss
+            # Current SL is highest of initial pivot stop or 20 EMA
+            current_sl = max(initial_sl, round(float(ema), 2))
+            
+            # Exit evaluated on bar Close below Stop
             if c < current_sl:
-                exit_p = c
-                base_pnl = (exit_p - entry_p) / entry_p
-                # If partial profit booked at 15%, net blend is 50% * 0.15 + 50% * base_pnl
-                final_pnl = (0.50 * 0.15 + 0.50 * base_pnl) if booked_half else base_pnl
+                exit_p = round(current_sl, 2)
+                pnl = (exit_p - entry_p) / entry_p
                 trades.append({
                     "setup": setup_name,
-                    "pnl": final_pnl,
+                    "pnl": pnl,
                     "holding_days": i - entry_idx,
-                    "is_win": final_pnl > 0
+                    "is_win": pnl >= 0.0
                 })
                 in_trade = False
             continue
@@ -255,7 +239,7 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
         calc_sl = 0.0
         cur_setup = ""
 
-        # ENGINE 1: V-REVERSAL (FLUSH >= 18%)
+        # ENGINE 1: V-REVERSAL
         recent_20_high = highs[max(0, i - 20):i].max()
         if (recent_20_high - l) / recent_20_high >= 0.18:
             recent_trough = lows[max(0, i - 5):i].min()
@@ -321,13 +305,12 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
                     current_sl = initial_sl
                     entry_idx = i
                     setup_name = cur_setup
-                    booked_half = False
 
     return trades
 
 def main():
     print("=" * 115)
-    print("🚀 Initializing Authentic Demat Delivery Production Backtesting Engine...")
+    print("🚀 Initializing Authentic Demat Delivery Production Backtesting Engine (Rank 1 Exit Architecture)...")
     print("=" * 115)
     
     nifty_perf_map = load_nifty_benchmark()
@@ -350,7 +333,7 @@ def main():
     print(f"📦 Total Stock JSON Data Files Loaded: {len(stock_files)}")
 
     if len(stock_files) == 0:
-        print("❌ ERROR: No stock data JSON files were found in DATA_DIR!")
+        print("❌ ERROR: No stock data JSON files found in DATA_DIR!")
         return
 
     buckets = {
@@ -375,7 +358,7 @@ def main():
             is_n750 = sym in nifty750_set
 
             if is_n750:
-                # 1. Swing 3 (Nifty 750 Only)
+                # 1. Swing 3 (Nifty 750)
                 t_sw3 = simulate_stock_trades(clean, nifty_perf_map, mode="SWING3")
                 for t in t_sw3:
                     buckets[f"Swing 3: N750 {t['setup'].title()}"].append(t)
