@@ -1,7 +1,7 @@
 name: Global Backtest Pipeline
 
 on:
-  workflow_dispatch: # Allows triggering with a single click in GitHub UI
+  workflow_dispatch:
 
 jobs:
   run-backtest:
@@ -16,7 +16,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install Dependencies
         run: |
