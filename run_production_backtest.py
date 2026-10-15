@@ -5,10 +5,29 @@ import datetime
 import numpy as np
 import pandas as pd
 
-DATA_DIR = "data"
-NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
-OUT_DIR = "backtest_results"
+# 1. Path Resolution (Auto-detects data directory location)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+POSSIBLE_DATA_DIRS = [
+    os.path.join(ROOT_DIR, "data"),
+    os.path.join(ROOT_DIR, "Codes", "data"),
+    os.path.join(ROOT_DIR, "..", "data"),
+    "data"
+]
+
+DATA_DIR = None
+for d in POSSIBLE_DATA_DIRS:
+    if os.path.isdir(d):
+        DATA_DIR = d
+        break
+
+if not DATA_DIR:
+    DATA_DIR = os.path.join(ROOT_DIR, "data")
+
+OUT_DIR = os.path.join(ROOT_DIR, "backtest_results")
+os.makedirs(OUT_DIR, exist_ok=True)
 MIN_TURNOVER_CR = 10.0
+
+print(f"📁 Selected DATA_DIR: {DATA_DIR}")
 
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -42,6 +61,7 @@ def clean_and_prepare(raw_data):
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
 
+    # Corporate Action & Split Normalization
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -105,9 +125,10 @@ def load_nifty_benchmark():
     return {}
 
 def load_nifty750_symbols():
-    if os.path.exists(NIFTY750_FILE):
+    p = os.path.join(DATA_DIR, "nifty750.json")
+    if os.path.exists(p):
         try:
-            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
+            with open(p, "r", encoding="utf-8") as fp:
                 data = json.load(fp)
             if isinstance(data, list):
                 return {str(x).strip().upper() for x in data}
@@ -169,6 +190,7 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
     current_sl = 0.0
     entry_idx = 0
     setup_name = ""
+    booked_half = False
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -187,17 +209,30 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
         stock_p60 = perf_60s[i]
         t = times[i]
 
-        # Trailing Exit Engine
+        # 1. Trailing & Trade Management Logic
         if in_trade:
-            current_sl = max(initial_sl, round(float(ema), 2))
+            # Shift Stop to Breakeven once gain hits +10%
+            if h >= entry_p * 1.10:
+                current_sl = max(current_sl, entry_p)
+
+            # Move trailing stop along 20 EMA
+            current_sl = max(current_sl, round(float(ema), 2))
+
+            # Check for partial profit target at +15%
+            if not booked_half and h >= entry_p * 1.15:
+                booked_half = True
+
+            # Full Exit on Close < 20 EMA / Stop Loss
             if c < current_sl:
                 exit_p = c
-                pnl = (exit_p - entry_p) / entry_p
+                base_pnl = (exit_p - entry_p) / entry_p
+                # If partial profit booked at 15%, net blend is 50% * 0.15 + 50% * base_pnl
+                final_pnl = (0.50 * 0.15 + 0.50 * base_pnl) if booked_half else base_pnl
                 trades.append({
                     "setup": setup_name,
-                    "pnl": pnl,
+                    "pnl": final_pnl,
                     "holding_days": i - entry_idx,
-                    "is_win": pnl > 0
+                    "is_win": final_pnl > 0
                 })
                 in_trade = False
             continue
@@ -220,7 +255,7 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
         calc_sl = 0.0
         cur_setup = ""
 
-        # ENGINE 1: V-REVERSAL
+        # ENGINE 1: V-REVERSAL (FLUSH >= 18%)
         recent_20_high = highs[max(0, i - 20):i].max()
         if (recent_20_high - l) / recent_20_high >= 0.18:
             recent_trough = lows[max(0, i - 5):i].min()
@@ -286,13 +321,20 @@ def simulate_stock_trades(clean_data, nifty_perf_map, mode="SWING3"):
                     current_sl = initial_sl
                     entry_idx = i
                     setup_name = cur_setup
+                    booked_half = False
 
     return trades
 
 def main():
-    print("🚀 Initializing Demat Delivery Backtesting Engine...")
+    print("=" * 115)
+    print("🚀 Initializing Authentic Demat Delivery Production Backtesting Engine...")
+    print("=" * 115)
+    
     nifty_perf_map = load_nifty_benchmark()
+    print(f"📊 Nifty Benchmark Dates Loaded: {len(nifty_perf_map)}")
+    
     nifty750_set = load_nifty750_symbols()
+    print(f"🏛️ Nifty 750 Universe Symbols: {len(nifty750_set)}")
 
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     excluded = {
@@ -305,7 +347,11 @@ def main():
     }
 
     stock_files = [f for f in json_files if os.path.basename(f) not in excluded]
-    print(f"Loaded {len(stock_files)} stock files from {DATA_DIR}/")
+    print(f"📦 Total Stock JSON Data Files Loaded: {len(stock_files)}")
+
+    if len(stock_files) == 0:
+        print("❌ ERROR: No stock data JSON files were found in DATA_DIR!")
+        return
 
     buckets = {
         "Swing 3: N750 V-Reversal": [],
@@ -316,6 +362,7 @@ def main():
         "Run 2: Non-N750 Launchpad": []
     }
 
+    processed = 0
     for path in stock_files:
         sym = os.path.splitext(os.path.basename(path))[0].upper()
         try:
@@ -328,19 +375,25 @@ def main():
             is_n750 = sym in nifty750_set
 
             if is_n750:
+                # 1. Swing 3 (Nifty 750 Only)
                 t_sw3 = simulate_stock_trades(clean, nifty_perf_map, mode="SWING3")
                 for t in t_sw3:
                     buckets[f"Swing 3: N750 {t['setup'].title()}"].append(t)
 
+                # 2. Run 2 (Nifty 750)
                 t_r2 = simulate_stock_trades(clean, nifty_perf_map, mode="RUN2")
                 for t in t_r2:
                     buckets[f"Run 2: N750 {t['setup'].title()}"].append(t)
             else:
+                # 3. Run 2 (Non-Nifty 750)
                 t_r2 = simulate_stock_trades(clean, nifty_perf_map, mode="RUN2")
                 for t in t_r2:
                     buckets[f"Run 2: Non-N750 {t['setup'].title()}"].append(t)
+            processed += 1
         except Exception:
             continue
+
+    print(f"✅ Successfully processed {processed} stocks.")
 
     rows = []
     for k, t_list in buckets.items():
@@ -375,5 +428,13 @@ def main():
     print(out_df.to_string(index=False))
     print("=" * 115)
 
-    os.makedirs(OUT_DIR, exist_ok=True)
-    out
+    csv_path = os.path.join(OUT_DIR, "latest_backtest.csv")
+    json_path = os.path.join(OUT_DIR, "latest_backtest.json")
+    out_df.to_csv(csv_path, index=False)
+    with open(json_path, "w", encoding="utf-8") as fp:
+        json.dump(rows, fp, indent=2)
+
+    print(f"💾 Report saved successfully to {csv_path}")
+
+if __name__ == "__main__":
+    main()
