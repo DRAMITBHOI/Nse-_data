@@ -12,8 +12,8 @@ DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
-TELEGRAM_BOT_TOKEN = os.environ.get("8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c", "").strip()
-TELEGRAM_CHAT_ID = os.environ.get("7860290981", "").strip()
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
 # Explicit IST Timezone (UTC + 05:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
@@ -259,46 +259,4 @@ def run_live_intraday_scan():
             "setup": meta["setup"],
             "pivot_ceiling": round(pivot, 2),
             "ltp": round(ltp, 2),
-            "day_high": round(day_high, 2),
-            "stop_loss": round(stop_loss, 2),
-            "risk_%": risk_pct,
-            "clearance_%": clearance_pct,
-            "dist_pivot_%": clearance_pct,
-            "proj_vol_pace": vol_pace
-        }
-
-        if cleared_pivot:
-            current_hits[sym] = prior_hits.get(sym, 0) + 1
-        else:
-            current_hits[sym] = 0
-
-        # Time-Gated Trade Windows
-        if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM IST: Closing Execution Window
-            if cleared_pivot and is_volume_confirmed:
-                record["action"] = "CONFIRMED BREAKOUT"
-                confirmed_breakouts.append(record)
-                if sym not in prior_breakouts_map:
-                    new_alerts_to_send.append(("EXECUTION", record))
-                    prior_breakouts_map[sym] = record
-            elif wick_touched_pivot and not cleared_pivot:
-                record["action"] = "WICK REJECTED"
-                coiling_list.append(record)
-            else:
-                record["action"] = "COILING"
-                coiling_list.append(record)
-                
-        else:  # 09:15 AM – 02:45 PM IST: Radar Clearance Window
-            if cleared_pivot and is_volume_confirmed:
-                record["action"] = "RADAR PIVOT CLEARANCE"
-                radar_candidates.append(record)
-                if sym not in prior_breakouts_map and current_hits[sym] >= 1:
-                    new_alerts_to_send.append(("RADAR", record))
-                    prior_breakouts_map[sym] = record
-            elif wick_touched_pivot and not cleared_pivot:
-                record["action"] = "WICK TESTING"
-                coiling_list.append(record)
-            else:
-                record["action"] = "COILING"
-                coiling_list.append(record)
-
-    coiling_list.sort(key=lambda
+            "day_high": round(day_high,
