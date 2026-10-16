@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import datetime
-import requests
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -12,23 +11,10 @@ ULTRA_750_FILE = os.path.join(DATA_DIR, "swing_ultra750_results.json")
 ULTRA_N750_FILE = os.path.join(DATA_DIR, "swing_ultraN750_results.json")
 AUDIT_LOG_FILE = os.path.join(DATA_DIR, "accuracy_audit_log.json")
 
-TELEGRAM_BOT_TOKEN = "8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c"
-TELEGRAM_CHAT_ID = "7860290981"
-
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 
 def get_ist_now():
     return datetime.datetime.now(IST)
-
-def send_telegram_alert(message: str):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML"}
-    try:
-        requests.post(url, json=payload, timeout=12)
-    except Exception as e:
-        print(f"❌ Telegram Error: {e}")
 
 def load_json(filepath):
     if os.path.exists(filepath):
@@ -121,26 +107,7 @@ def run_accuracy_audit():
     with open(AUDIT_LOG_FILE, "w", encoding="utf-8") as f:
         json.dump(compiled_audit, f, indent=2)
 
-    print(f"✅ Accuracy Audit Complete: Daily={daily_accuracy}% | Cumulative={cum_accuracy}%")
-
-    # 5. Send concise Telegram audit report
-    msg = (
-        f"📊 <b>EOD BREAKOUT ACCURACY AUDIT ({today_date})</b>\n\n"
-        f"• <b>3:15 PM Signals Captured</b>: {total_live}\n"
-        f"• <b>EOD Verified (Ultra 750 + N750)</b>: {len(eod_verified)}\n"
-        f"• <b>Verified Hits</b>: <b>{len(hits)}</b>\n"
-        f"• <b>Daily Precision Rate</b>: <b>{daily_accuracy}%</b>\n"
-        f"• <b>All-Time Rolling Accuracy ({len(daily_records)}d)</b>: <b>{cum_accuracy}%</b>\n\n"
-    )
-
-    if hits:
-        msg += f"🟢 <b>Confirmed Hits:</b> <code>{', '.join(hits)}</code>\n"
-    if false_positives:
-        msg += f"⚠️ <b>Late Auction Fades (False Positives):</b> <code>{', '.join(false_positives)}</code>\n"
-    if missed_breakouts:
-        msg += f"🔍 <b>Missed by Live Scanner:</b> <code>{', '.join(missed_breakouts)}</code>\n"
-
-    send_telegram_alert(msg)
+    print(f"✅ Accuracy Audit Logged (Silent): Daily={daily_accuracy}% | Cumulative={cum_accuracy}%")
 
 if __name__ == "__main__":
     run_accuracy_audit()
