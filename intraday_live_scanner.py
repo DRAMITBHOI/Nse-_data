@@ -14,9 +14,9 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 
-# Configured Telegram credentials with direct fallback
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip() or "8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c"
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip() or "7860290981"
+# Hardcoded Telegram credentials
+TELEGRAM_BOT_TOKEN = "8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c"
+TELEGRAM_CHAT_ID = "7860290981"
 
 # Explicit IST Timezone (UTC + 05:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
@@ -54,9 +54,9 @@ def get_market_session_elapsed():
 
 class LivePriceClient:
     """
-    Fetches real-time market data reliably inside GitHub Actions (Azure Datacenter).
+    Fetches real-time market data reliably inside cloud runners.
     Primary: Google Finance (Zero delay, non-blocking)
-    Fallback: Yahoo Finance JSON quote endpoint (fast query, no yfinance package hang)
+    Fallback: Yahoo Finance JSON chart endpoint
     """
     def __init__(self):
         self.session = requests.Session()
@@ -75,7 +75,6 @@ class LivePriceClient:
                 price_match = re.search(r'data-last-price="([\d\.]+)"', html)
                 if price_match:
                     ltp = float(price_match.group(1))
-
                     day_high = ltp
                     high_match = re.search(r'Day range.*?₹[\d\.,]+\s*-\s*₹([\d\.,]+)', html, re.DOTALL)
                     if high_match:
@@ -97,7 +96,7 @@ class LivePriceClient:
         except Exception:
             pass
 
-        # 2. Secondary Fallback: Direct Yahoo Finance quote query
+        # 2. Fallback: Direct Yahoo Chart Endpoint
         try:
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS?interval=1d&range=1d"
             r = self.session.get(url, timeout=5)
@@ -171,21 +170,22 @@ def run_live_intraday_scan():
         print("❌ No watchlisted setups found to scan.")
         return
 
-    prior_breakouts_map = {}
-    prior_hits = {}
+    now_dt = get_ist_now()
+    today_date = now_dt.strftime("%Y-%m-%d")
+    now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
+    elapsed_mins = get_market_session_elapsed()
+
+    alerted_today = set()
+    eod_summary_sent = False
     if os.path.exists(LIVE_BREAKOUTS_FILE):
         try:
             with open(LIVE_BREAKOUTS_FILE, "r", encoding="utf-8") as f:
-                prev_data = json.load(f)
-                for b in prev_data.get("Breakouts_All_Day", []):
-                    prior_breakouts_map[b["symbol"]] = b
-                prior_hits = prev_data.get("Consecutive_Hits", {})
+                prev = json.load(f)
+                if prev.get("Date") == today_date:
+                    alerted_today = set(prev.get("Alerted_Symbols", []))
+                    eod_summary_sent = prev.get("EOD_Summary_Sent", False)
         except Exception:
             pass
-
-    elapsed_mins = get_market_session_elapsed()
-    now_dt = get_ist_now()
-    now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
 
     print(f"⚡ Streaming Real-Time Quotes (Elapsed: {elapsed_mins}m / 375m IST)...")
     live_client = LivePriceClient()
@@ -194,7 +194,6 @@ def run_live_intraday_scan():
     radar_candidates = []
     coiling_list = []
     new_alerts_to_send = []
-    current_hits = {}
 
     for sym, meta in targets.items():
         pivot = float(meta["pivot_ceiling"])
@@ -213,7 +212,6 @@ def run_live_intraday_scan():
             day_high = quote["day_high"]
             day_vol = quote["day_vol"]
 
-        # Calculate historical 20-day volume baseline from local EOD JSON cache
         local_json = os.path.join(DATA_DIR, f"{sym}.json")
         if os.path.exists(local_json):
             try:
@@ -264,32 +262,23 @@ def run_live_intraday_scan():
             "proj_vol_pace": vol_pace
         }
 
-        if cleared_pivot:
-            current_hits[sym] = prior_hits.get(sym, 0) + 1
-        else:
-            current_hits[sym] = 0
-
-        # Time-Gated Trade Windows
         if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM IST: Closing Execution Window
             if cleared_pivot and is_volume_confirmed:
                 record["action"] = "CONFIRMED BREAKOUT"
                 confirmed_breakouts.append(record)
-                if sym not in prior_breakouts_map:
-                    new_alerts_to_send.append(("EXECUTION", record))
-                    prior_breakouts_map[sym] = record
             elif wick_touched_pivot and not cleared_pivot:
                 record["action"] = "WICK REJECTED"
                 coiling_list.append(record)
             else:
                 record["action"] = "COILING"
                 coiling_list.append(record)
-        else:  # 09:15 AM – 02:45 PM IST: Radar Clearance Window
+        else:  # 09:15 AM – 02:45 PM IST: Radar Window
             if cleared_pivot and is_volume_confirmed:
                 record["action"] = "RADAR PIVOT CLEARANCE"
                 radar_candidates.append(record)
-                if sym not in prior_breakouts_map and current_hits[sym] >= 1:
+                if sym not in alerted_today:
                     new_alerts_to_send.append(("RADAR", record))
-                    prior_breakouts_map[sym] = record
+                    alerted_today.add(sym)
             elif wick_touched_pivot and not cleared_pivot:
                 record["action"] = "WICK TESTING"
                 coiling_list.append(record)
@@ -301,65 +290,61 @@ def run_live_intraday_scan():
     confirmed_breakouts.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
     radar_candidates.sort(key=lambda x: x["proj_vol_pace"], reverse=True)
 
-    output_payload = {
-        "Scan_Timestamp": now_str,
-        "Elapsed_Minutes": elapsed_mins,
-        "Breakouts_All_Day": confirmed_breakouts if elapsed_mins >= 330 else radar_candidates,
-        "Coiling": coiling_list[:50],
-        "Consecutive_Hits": current_hits
-    }
-
-    with open(LIVE_BREAKOUTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(output_payload, f, indent=2)
-
-    print(f"✅ Saved live scan: {len(confirmed_breakouts)} Executions, {len(radar_candidates)} Radar, {len(coiling_list)} Coiling.")
-
-    # 1. Real-time individual alerts
+    # Dispatch unique intraday radar alerts
     for alert_type, alert in new_alerts_to_send:
-        if alert_type == "RADAR":
-            msg = (
-                f"👀 <b>RADAR: PIVOT CEILING CLEARED (ZERO DELAY)</b>\n"
-                f"• <b>Symbol</b>: <code>{alert['symbol']}</code> ({alert['universe']} | {alert['setup']})\n"
-                f"• <b>Pivot Ceiling</b>: ₹{alert['pivot_ceiling']:,.2f}\n"
-                f"• <b>Live NSE LTP</b>: ₹{alert['ltp']:,.2f} (<b>{alert['clearance_%']:+.2f}%</b>)\n"
-                f"• <b>Day High</b>: ₹{alert['day_high']:,.2f}\n"
-                f"• <b>Volume Pace</b>: <b>{alert['proj_vol_pace']}x SMA20</b>\n"
-                f"• <b>Stop Loss</b>: ₹{alert['stop_loss']:,.2f} (Risk: {alert['risk_%']}%)\n"
-                f"📌 <i>Holding +0.25%. Track volume into 02:45–03:15 PM execution window.</i>"
-            )
-        else:
-            msg = (
-                f"🎯 <b>CONFIRMED CLOSING BREAKOUT TRIGGER</b>\n"
-                f"• <b>Symbol</b>: <code>{alert['symbol']}</code> ({alert['universe']} | {alert['setup']})\n"
-                f"• <b>Pivot Ceiling</b>: ₹{alert['pivot_ceiling']:,.2f}\n"
-                f"• <b>Live NSE LTP</b>: ₹{alert['ltp']:,.2f} (<b>{alert['clearance_%']:+.2f}%</b>)\n"
-                f"• <b>Volume Pace</b>: <b>{alert['proj_vol_pace']}x SMA20</b>\n"
-                f"• <b>Stop Loss</b>: ₹{alert['stop_loss']:,.2f} (Risk: {alert['risk_%']}%)\n"
-                f"✅ <i>Verified close above pivot. Execute delivery entry.</i>"
-            )
+        msg = (
+            f"👀 <b>RADAR: PIVOT CEILING CLEARED (ZERO DELAY)</b>\n"
+            f"• <b>Symbol</b>: <code>{alert['symbol']}</code> ({alert['universe']} | {alert['setup']})\n"
+            f"• <b>Pivot Ceiling</b>: ₹{alert['pivot_ceiling']:,.2f}\n"
+            f"• <b>Live NSE LTP</b>: ₹{alert['ltp']:,.2f} (<b>{alert['clearance_%']:+.2f}%</b>)\n"
+            f"• <b>Day High</b>: ₹{alert['day_high']:,.2f}\n"
+            f"• <b>Volume Pace</b>: <b>{alert['proj_vol_pace']}x SMA20</b>\n"
+            f"• <b>Stop Loss</b>: ₹{alert['stop_loss']:,.2f} (Risk: {alert['risk_%']}%)\n"
+            f"📌 <i>Early trigger. Watch for hold into 03:15 PM execution window.</i>"
+        )
         send_telegram_alert(msg)
         time.sleep(1)
 
-    # 2. Daily EOD Execution Summary (03:20 PM - 03:30 PM IST)
-    if elapsed_mins >= 365:
+    # Dispatched strictly once per session between 03:15 PM and 03:30 PM IST
+    if elapsed_mins >= 360 and not eod_summary_sent:
         summary_msg = (
-            f"📊 <b>EOD BREAKOUT EXECUTION MONITOR (LIVE STREAM)</b>\n"
+            f"🎯 <b>CONFIRMED CLOSING BREAKOUTS (3:15 PM EXECUTION)</b>\n"
             f"🕒 <i>Time: {now_str}</i>\n\n"
-            f"<b>Active Confirmed Breakouts ({len(confirmed_breakouts)}):</b>\n"
         )
         if confirmed_breakouts:
+            summary_msg += f"<b>Actionable Entries ({len(confirmed_breakouts)}):</b>\n"
             for b in confirmed_breakouts:
-                summary_msg += f"🟢 <b>{b['symbol']}</b>: ₹{b['ltp']:,.2f} ({b['clearance_%']:+.2f}%) | Pace: {b['proj_vol_pace']}x\n"
+                summary_msg += (
+                    f"🟢 <b>{b['symbol']}</b>: LTP ₹{b['ltp']:,.2f} (+{b['clearance_%']}%) | "
+                    f"Pace: {b['proj_vol_pace']}x | SL: ₹{b['stop_loss']:,.2f}\n"
+                )
+            summary_msg += "\n✅ <i>Place CNC delivery orders before 03:28 PM.</i>\n"
         else:
             summary_msg += "<i>No candidates held above pivot with verified volume today.</i>\n"
 
         wicked = [c for c in coiling_list if c["action"] == "WICK REJECTED"][:5]
         if wicked:
-            summary_msg += "\n<b>⚠️ Upper Wick Rejections:</b>\n"
+            summary_msg += "\n<b>⚠️ Upper Wick Rejections (Avoid):</b>\n"
             for w in wicked:
                 summary_msg += f"🔴 {w['symbol']}: High ₹{w['day_high']:,.2f} ➔ LTP ₹{w['ltp']:,.2f} ({w['clearance_%']:+.2f}%)\n"
 
         send_telegram_alert(summary_msg)
+        eod_summary_sent = True
+
+    output_payload = {
+        "Date": today_date,
+        "Scan_Timestamp": now_str,
+        "Elapsed_Minutes": elapsed_mins,
+        "EOD_Summary_Sent": eod_summary_sent,
+        "Alerted_Symbols": list(alerted_today),
+        "Breakouts_All_Day": confirmed_breakouts if elapsed_mins >= 330 else radar_candidates,
+        "Coiling": coiling_list[:50]
+    }
+
+    with open(LIVE_BREAKOUTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(output_payload, f, indent=2)
+
+    print(f"✅ Scan completed: {len(confirmed_breakouts)} Confirmed, {len(radar_candidates)} Radar, {len(coiling_list)} Coiling.")
 
 if __name__ == "__main__":
     run_live_intraday_scan()
