@@ -53,13 +53,11 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Fetch latest remote state to prevent concurrent conflicts
-          git pull --rebase origin main
-          
+
           if [ -f data/live_intraday_breakouts.json ]; then
             git add -f data/live_intraday_breakouts.json
             git commit -m "Auto-update Cumulative Breakouts (Zero-Delay NSE) [skip ci]" || echo "No changes to commit"
+            git pull --rebase --autostash origin main
             git push origin main
           else
             echo "⚠️ No live_intraday_breakouts.json file generated to commit."
