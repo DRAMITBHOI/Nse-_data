@@ -1,0 +1,32 @@
+{
+  "Last_Updated": "2026-10-16 11:12:10 PM IST",
+  "Total_Days_Audited": 1,
+  "Cumulative_Live_Signals": 6,
+  "Cumulative_Hits": 1,
+  "Cumulative_Accuracy_Pct": 16.67,
+  "Daily_Records": [
+    {
+      "date": "2026-10-16",
+      "timestamp": "2026-10-16 11:12:10 PM IST",
+      "live_signals_count": 6,
+      "eod_verified_count": 2,
+      "hits_count": 1,
+      "false_positives_count": 5,
+      "missed_count": 1,
+      "daily_accuracy_pct": 16.67,
+      "hits": [
+        "INDHOTEL"
+      ],
+      "false_positives": [
+        "AEROPLANE",
+        "APOLLO",
+        "EXPLEOSOL",
+        "ORIENTHOT",
+        "SOUTHBANK"
+      ],
+      "missed": [
+        "ITBEES"
+      ]
+    }
+  ]
+}
