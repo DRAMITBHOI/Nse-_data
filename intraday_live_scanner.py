@@ -13,8 +13,10 @@ DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
-TELEGRAM_BOT_TOKEN = os.environ.get("8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c", "").strip()
-TELEGRAM_CHAT_ID = os.environ.get("7860290981", "").strip()
+
+# Configured Telegram credentials with direct fallback
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip() or "8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c"
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip() or "7860290981"
 
 # Explicit IST Timezone (UTC + 05:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
@@ -34,7 +36,7 @@ def send_telegram_alert(message: str):
         if r.status_code == 200:
             print("📡 Telegram alert dispatched successfully (HTTP 200)")
         else:
-            print(f"⚠️ Telegram returned status {r.status_code}")
+            print(f"⚠️ Telegram returned status {r.status_code}: {r.text}")
     except Exception as e:
         print(f"❌ Telegram API Error: {e}")
 
@@ -54,7 +56,7 @@ class LivePriceClient:
     """
     Fetches real-time market data reliably inside GitHub Actions (Azure Datacenter).
     Primary: Google Finance (Zero delay, non-blocking)
-    Fallback: yfinance fast_info
+    Fallback: Yahoo Finance JSON quote endpoint (fast query, no yfinance package hang)
     """
     def __init__(self):
         self.session = requests.Session()
@@ -67,20 +69,18 @@ class LivePriceClient:
         # 1. Primary: Google Finance NSE
         try:
             url = f"https://www.google.com/finance/quote/{symbol}:NSE"
-            r = self.session.get(url, timeout=6)
+            r = self.session.get(url, timeout=5)
             if r.status_code == 200:
                 html = r.text
                 price_match = re.search(r'data-last-price="([\d\.]+)"', html)
                 if price_match:
                     ltp = float(price_match.group(1))
 
-                    # Day High extraction
                     day_high = ltp
                     high_match = re.search(r'Day range.*?₹[\d\.,]+\s*-\s*₹([\d\.,]+)', html, re.DOTALL)
                     if high_match:
                         day_high = float(high_match.group(1).replace(",", ""))
 
-                    # Traded Volume extraction
                     day_vol = 0.0
                     vol_match = re.search(r'Volume</div><div class="P6K39c">([\d\.,MKmk]+)</div>', html)
                     if vol_match:
@@ -97,15 +97,16 @@ class LivePriceClient:
         except Exception:
             pass
 
-        # 2. Secondary Fallback: yfinance fast_info
+        # 2. Secondary Fallback: Direct Yahoo Finance quote query
         try:
-            import yfinance as yf
-            t = yf.Ticker(f"{symbol}.NS")
-            fi = getattr(t, "fast_info", None)
-            if fi:
-                ltp = float(getattr(fi, "last_price", 0) or 0)
-                day_high = float(getattr(fi, "day_high", ltp) or ltp)
-                day_vol = float(getattr(fi, "last_volume", 0) or 0)
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS?interval=1d&range=1d"
+            r = self.session.get(url, timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                meta = data.get("chart", {}).get("result", [{}])[0].get("meta", {})
+                ltp = float(meta.get("regularMarketPrice", 0) or 0)
+                day_high = float(meta.get("regularMarketDayHigh", ltp) or ltp)
+                day_vol = float(meta.get("regularMarketVolume", 0) or 0)
                 if ltp > 0:
                     return {"ltp": ltp, "day_high": max(day_high, ltp), "day_vol": day_vol}
         except Exception:
@@ -200,7 +201,7 @@ def run_live_intraday_scan():
         stop_loss = float(meta["stop_loss"])
 
         quote = live_client.fetch_live_quote(sym)
-        time.sleep(0.08)
+        time.sleep(0.06)
 
         ltp = None
         day_high = None
@@ -249,19 +250,14 @@ def run_live_intraday_scan():
         pace_threshold = 1.25 if meta["universe"] == "NIFTY 750" else 0.75
         is_volume_confirmed = bool(vol_pace >= pace_threshold)
 
-        r_pivot = round(pivot, 2)
-        r_ltp = round(ltp, 2)
-        r_high = round(day_high, 2)
-        r_sl = round(stop_loss, 2)
-
         record = {
             "symbol": sym,
             "universe": meta["universe"],
             "setup": meta["setup"],
-            "pivot_ceiling": r_pivot,
-            "ltp": r_ltp,
-            "day_high": r_high,
-            "stop_loss": r_sl,
+            "pivot_ceiling": round(pivot, 2),
+            "ltp": round(ltp, 2),
+            "day_high": round(day_high, 2),
+            "stop_loss": round(stop_loss, 2),
             "risk_%": risk_pct,
             "clearance_%": clearance_pct,
             "dist_pivot_%": clearance_pct,
@@ -318,6 +314,7 @@ def run_live_intraday_scan():
 
     print(f"✅ Saved live scan: {len(confirmed_breakouts)} Executions, {len(radar_candidates)} Radar, {len(coiling_list)} Coiling.")
 
+    # 1. Real-time individual alerts
     for alert_type, alert in new_alerts_to_send:
         if alert_type == "RADAR":
             msg = (
@@ -343,6 +340,7 @@ def run_live_intraday_scan():
         send_telegram_alert(msg)
         time.sleep(1)
 
+    # 2. Daily EOD Execution Summary (03:20 PM - 03:30 PM IST)
     if elapsed_mins >= 365:
         summary_msg = (
             f"📊 <b>EOD BREAKOUT EXECUTION MONITOR (LIVE STREAM)</b>\n"
