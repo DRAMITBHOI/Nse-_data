@@ -12,8 +12,8 @@ DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+TELEGRAM_BOT_TOKEN = os.environ.get("8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c", "").strip()
+TELEGRAM_CHAT_ID = os.environ.get("7860290981", "").strip()
 
 # Explicit IST Timezone (UTC + 05:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
