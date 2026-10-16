@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import json
 import time
 import datetime
@@ -15,6 +16,7 @@ LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 TELEGRAM_BOT_TOKEN = os.environ.get("8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("7860290981", "").strip()
 
+# Explicit IST Timezone (UTC + 05:30)
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
 
@@ -48,42 +50,67 @@ def get_market_session_elapsed():
         elapsed = int((now - market_open).total_seconds() / 60)
         return max(1, min(375, elapsed))
 
-class NSELiveClient:
+class LivePriceClient:
+    """
+    Fetches real-time market data reliably inside GitHub Actions (Azure Datacenter).
+    Primary: Google Finance (Zero delay, non-blocking)
+    Fallback: yfinance fast_info
+    """
     def __init__(self):
         self.session = requests.Session()
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/plain, */*",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer": "https://www.nseindia.com/"
-        }
-        self._init_session()
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9"
+        })
 
-    def _init_session(self):
+    def fetch_live_quote(self, symbol):
+        # 1. Primary: Google Finance NSE
         try:
-            self.session.get("https://www.nseindia.com", headers=self.headers, timeout=8)
-            time.sleep(1)
-        except Exception as e:
-            print(f"⚠️ Failed to init NSE session cookies: {e}")
-
-    def fetch_quote(self, symbol):
-        url = f"https://www.nseindia.com/api/quote-equity?symbol={urllib.parse.quote(symbol)}"
-        try:
-            r = self.session.get(url, headers=self.headers, timeout=6)
-            if r.status_code in (401, 403):
-                self._init_session()
-                r = self.session.get(url, headers=self.headers, timeout=6)
+            url = f"https://www.google.com/finance/quote/{symbol}:NSE"
+            r = self.session.get(url, timeout=6)
             if r.status_code == 200:
-                data = r.json()
-                price_info = data.get("priceInfo", {})
-                sec_info = data.get("securityWiseDP", {})
-                ltp = float(price_info.get("lastPrice", 0) or 0)
-                day_high = float(price_info.get("intraDayHighLow", {}).get("max", ltp) or ltp)
-                day_vol = float(sec_info.get("quantityTraded", 0) or data.get("preOpenMarket", {}).get("totalTradedVolume", 0) or 0)
-                if ltp > 0:
-                    return {"ltp": ltp, "day_high": day_high, "day_vol": day_vol}
+                html = r.text
+                price_match = re.search(r'data-last-price="([\d\.]+)"', html)
+                if price_match:
+                    ltp = float(price_match.group(1))
+
+                    # Day High extraction
+                    day_high = ltp
+                    high_match = re.search(r'Day range.*?₹[\d\.,]+\s*-\s*₹([\d\.,]+)', html, re.DOTALL)
+                    if high_match:
+                        day_high = float(high_match.group(1).replace(",", ""))
+
+                    # Traded Volume extraction
+                    day_vol = 0.0
+                    vol_match = re.search(r'Volume</div><div class="P6K39c">([\d\.,MKmk]+)</div>', html)
+                    if vol_match:
+                        v_str = vol_match.group(1).replace(",", "").upper()
+                        if "M" in v_str:
+                            day_vol = float(v_str.replace("M", "")) * 1_000_000
+                        elif "K" in v_str:
+                            day_vol = float(v_str.replace("K", "")) * 1_000
+                        else:
+                            day_vol = float(v_str)
+
+                    if ltp > 0:
+                        return {"ltp": ltp, "day_high": max(day_high, ltp), "day_vol": day_vol}
         except Exception:
             pass
+
+        # 2. Secondary Fallback: yfinance fast_info
+        try:
+            import yfinance as yf
+            t = yf.Ticker(f"{symbol}.NS")
+            fi = getattr(t, "fast_info", None)
+            if fi:
+                ltp = float(getattr(fi, "last_price", 0) or 0)
+                day_high = float(getattr(fi, "day_high", ltp) or ltp)
+                day_vol = float(getattr(fi, "last_volume", 0) or 0)
+                if ltp > 0:
+                    return {"ltp": ltp, "day_high": max(day_high, ltp), "day_vol": day_vol}
+        except Exception:
+            pass
+
         return None
 
 def load_comprehensive_targets():
@@ -159,8 +186,8 @@ def run_live_intraday_scan():
     now_dt = get_ist_now()
     now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
 
-    print(f"⚡ Streaming Official NSE Real-Time Quotes (Elapsed: {elapsed_mins}m / 375m IST)...")
-    nse_client = NSELiveClient()
+    print(f"⚡ Streaming Real-Time Quotes (Elapsed: {elapsed_mins}m / 375m IST)...")
+    live_client = LivePriceClient()
 
     confirmed_breakouts = []
     radar_candidates = []
@@ -172,8 +199,8 @@ def run_live_intraday_scan():
         pivot = float(meta["pivot_ceiling"])
         stop_loss = float(meta["stop_loss"])
 
-        quote = nse_client.fetch_quote(sym)
-        time.sleep(0.12)
+        quote = live_client.fetch_live_quote(sym)
+        time.sleep(0.08)
 
         ltp = None
         day_high = None
@@ -185,6 +212,7 @@ def run_live_intraday_scan():
             day_high = quote["day_high"]
             day_vol = quote["day_vol"]
 
+        # Calculate historical 20-day volume baseline from local EOD JSON cache
         local_json = os.path.join(DATA_DIR, f"{sym}.json")
         if os.path.exists(local_json):
             try:
@@ -245,7 +273,8 @@ def run_live_intraday_scan():
         else:
             current_hits[sym] = 0
 
-        if elapsed_mins >= 330:
+        # Time-Gated Trade Windows
+        if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM IST: Closing Execution Window
             if cleared_pivot and is_volume_confirmed:
                 record["action"] = "CONFIRMED BREAKOUT"
                 confirmed_breakouts.append(record)
@@ -258,7 +287,7 @@ def run_live_intraday_scan():
             else:
                 record["action"] = "COILING"
                 coiling_list.append(record)
-        else:
+        else:  # 09:15 AM – 02:45 PM IST: Radar Clearance Window
             if cleared_pivot and is_volume_confirmed:
                 record["action"] = "RADAR PIVOT CLEARANCE"
                 radar_candidates.append(record)
@@ -316,7 +345,7 @@ def run_live_intraday_scan():
 
     if elapsed_mins >= 365:
         summary_msg = (
-            f"📊 <b>EOD BREAKOUT EXECUTION MONITOR (NSE OFFICIAL)</b>\n"
+            f"📊 <b>EOD BREAKOUT EXECUTION MONITOR (LIVE STREAM)</b>\n"
             f"🕒 <i>Time: {now_str}</i>\n\n"
             f"<b>Active Confirmed Breakouts ({len(confirmed_breakouts)}):</b>\n"
         )
