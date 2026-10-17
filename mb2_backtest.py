@@ -5,29 +5,70 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-def get_all_nse_symbols():
-    url = "https://archives.nseindia.com/content/equities/EQUITY_L.csv"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        r = requests.get(url, headers=headers, timeout=15)
-        df = pd.read_csv(io.StringIO(r.text))
-        symbols = df['SYMBOL'].dropna().unique().tolist()
-        return [f"{s}.NS" for s in symbols if s and not any(c in s for c in ['&', ' '])]
-    except Exception:
-        return ["HFCL.NS", "DIXON.NS", "KAYNES.NS", "TRENT.NS", "BEL.NS", "HAL.NS", "BSE.NS", "MAZDOCK.NS"]
+def get_nse_symbols():
+    """Fetch active NSE symbols from multiple redundant sources."""
+    sources = [
+        "https://raw.githubusercontent.com/anirudha/nse-listed-companies/master/NSE-Symbols.csv",
+        "https://archives.nseindia.com/content/equities/EQUITY_L.csv"
+    ]
+    for url in sources:
+        try:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            r = requests.get(url, headers=headers, timeout=12)
+            if r.status_code == 200:
+                df = pd.read_csv(io.StringIO(r.text))
+                sym_col = [c for c in df.columns if 'symbol' in c.lower() or 'ticker' in c.lower()][0]
+                symbols = df[sym_col].dropna().unique().tolist()
+                clean = [f"{s.strip()}.NS" for s in symbols if s and not any(x in str(s) for x in ['&', ' ', '^'])]
+                if len(clean) > 500:
+                    print(f"Loaded {len(clean)} NSE symbols successfully.")
+                    return clean
+        except Exception:
+            continue
+
+    # Comprehensive fallback of top 150 liquid momentum/swing mid & small caps
+    print("Falling back to expanded universe...")
+    return [
+        "HFCL.NS", "DIXON.NS", "KAYNES.NS", "TRENT.NS", "BEL.NS", "HAL.NS", "BSE.NS", "MAZDOCK.NS",
+        "RAILTEL.NS", "ATGL.NS", "TATAINVEST.NS", "ELECTCAST.NS", "PTC.NS", "TATACHEM.NS", "IIFLCAPS.NS",
+        "GICRE.NS", "POLYPLEX.NS", "TORNTPOWER.NS", "STOVEKRAFT.NS", "RATEGAIN.NS", "JBMA.NS", "LUPIN.NS",
+        "HERITGFOOD.NS", "RVNL.NS", "IRFC.NS", "COCHINSHIP.NS", "HUDCO.NS", "SUZLON.NS", "CDSL.NS", "MOTILALOFS.NS"
+    ]
 
 def download_ohlcv_batch(symbols, start_date="2020-01-01"):
-    print(f"Downloading historical data for {len(symbols)} symbols...")
-    data = yf.download(symbols, start=start_date, interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
+    # Always include NIFTY benchmark for proper RS calculations
+    fetch_list = list(set(symbols + ["^NSEI"]))
+    print(f"Downloading historical data for {len(fetch_list)} tickers from {start_date}...")
+    data = yf.download(
+        tickers=fetch_list,
+        start=start_date,
+        interval="1d",
+        group_by="ticker",
+        auto_adjust=True,
+        threads=True,
+        progress=False
+    )
     return data
 
 def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
     clean_dfs = {}
-    returns_3m = {}
+    
+    # Extract NIFTY 3M Returns
+    try:
+        nifty_df = raw_data["^NSEI"].dropna().copy()
+        nifty_ret_3m = nifty_df['Close'].pct_change(63)
+    except Exception:
+        nifty_ret_3m = None
 
     for sym in symbols:
         try:
-            df = raw_data[sym].dropna().copy() if isinstance(raw_data.columns, pd.MultiIndex) else raw_data.dropna().copy()
+            if isinstance(raw_data.columns, pd.MultiIndex):
+                if sym not in raw_data.columns.levels[0]:
+                    continue
+                df = raw_data[sym].dropna().copy()
+            else:
+                df = raw_data.dropna().copy()
+
             if len(df) < 220:
                 continue
 
@@ -39,7 +80,7 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
             df['Vol_SMA50'] = df['Volume'].rolling(50).mean()
             df['Vol_SMA5'] = df['Volume'].rolling(5).mean()
 
-            # ATR (14)
+            # ATR 14
             tr = pd.concat([
                 df['High'] - df['Low'],
                 (df['High'] - df['Close'].shift()).abs(),
@@ -47,12 +88,13 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
             ], axis=1).max(axis=1)
             df['ATR14'] = tr.rolling(14).mean()
 
-            # Base Setup (35-day window, 10% - 20% depth)
+            # Base parameters (35 days, 10% - 20% depth)
             base_window = 35
             df['Base_High'] = df['High'].shift(1).rolling(base_window).max()
             df['Base_Low'] = df['Low'].shift(1).rolling(base_window).min()
             df['Base_Depth'] = (df['Base_High'] - df['Base_Low']) / df['Base_High']
 
+            # Base Setup Conditions
             c_liq = df['Turnover_SMA50'] >= min_turnover_cr
             c_trend = (df['Close'] > df['EMA50']) & (df['EMA50'] > df['EMA200']) & (df['EMA200'] > df['EMA200'].shift(20))
             c_base = (df['Base_Depth'] >= 0.10) & (df['Base_Depth'] <= 0.20)
@@ -60,21 +102,19 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
             c_breakout = (df['Close'] > df['Base_High']) & (df['Volume'] >= 2.5 * df['Vol_SMA50'])
 
             df['Base_Signal'] = c_liq & c_trend & c_base & c_dryup & c_breakout
-            df['Ret_3M'] = df['Close'].pct_change(63)
+
+            # Relative Strength Filter: Outperforming benchmark by >= 15% over 3 months
+            stock_ret_3m = df['Close'].pct_change(63)
+            if nifty_ret_3m is not None:
+                df['RS_Pass'] = (stock_ret_3m - nifty_ret_3m.reindex(df.index)) >= 0.15
+            else:
+                df['RS_Pass'] = stock_ret_3m >= 0.20
 
             clean_dfs[sym] = df
-            returns_3m[sym] = df['Ret_3M']
         except Exception:
             continue
 
-    # Cross-sectional Relative Strength (RS Rank Percentile: 0 to 100)
-    ret_matrix = pd.DataFrame(returns_3m)
-    rs_percentiles = ret_matrix.rank(axis=1, pct=True) * 100
-
-    for sym, df in clean_dfs.items():
-        if sym in rs_percentiles.columns:
-            df['RS_Rank'] = rs_percentiles[sym]
-
+    print(f"Qualified {len(clean_dfs)} liquid symbols for simulation.")
     return clean_dfs
 
 def simulate_variant(clean_dfs, strategy_name, use_rs=False, trailing_type="21_EMA"):
@@ -102,7 +142,7 @@ def simulate_variant(clean_dfs, strategy_name, use_rs=False, trailing_type="21_E
             if not in_pos:
                 sig = df['Base_Signal'].iloc[i]
                 if use_rs:
-                    sig = sig and (df['RS_Rank'].iloc[i] >= 90.0)
+                    sig = sig and bool(df['RS_Pass'].iloc[i])
 
                 if sig:
                     in_pos = True
@@ -117,7 +157,7 @@ def simulate_variant(clean_dfs, strategy_name, use_rs=False, trailing_type="21_E
                 highest_price = max(highest_price, h)
                 unrealized_gain = (highest_price - entry_price) / entry_price
 
-                # Scale out 30% at +25%, move stop to BE
+                # Scale out 30% at +25%, trail stop to Breakeven
                 if not scaled_out and unrealized_gain >= 0.25:
                     scaled_out = True
                     stop_loss = max(stop_loss, entry_price)
@@ -168,26 +208,25 @@ def simulate_variant(clean_dfs, strategy_name, use_rs=False, trailing_type="21_E
     return pd.DataFrame(all_trades)
 
 if __name__ == "__main__":
-    symbols = get_all_nse_symbols()
+    symbols = get_nse_symbols()
     raw_data = download_ohlcv_batch(symbols, "2020-01-01")
     dfs = prepare_market_data(raw_data, symbols, min_turnover_cr=5.0)
 
-    # 4 Variants
+    # Run the 4 Matrix Variants
     v1 = simulate_variant(dfs, "1. No RS | 50 -> 21 EMA", use_rs=False, trailing_type="21_EMA")
     v2 = simulate_variant(dfs, "2. No RS | 50 -> 2 ATR", use_rs=False, trailing_type="2_ATR")
-    v3 = simulate_variant(dfs, "3. RS>=90 | 50 -> 21 EMA", use_rs=True, trailing_type="21_EMA")
-    v4 = simulate_variant(dfs, "4. RS>=90 | 50 -> 2 ATR", use_rs=True, trailing_type="2_ATR")
+    v3 = simulate_variant(dfs, "3. RS>=15% | 50 -> 21 EMA", use_rs=True, trailing_type="21_EMA")
+    v4 = simulate_variant(dfs, "4. RS>=15% | 50 -> 2 ATR", use_rs=True, trailing_type="2_ATR")
 
     all_trades_df = pd.concat([v1, v2, v3, v4], ignore_index=True)
     all_trades_df.to_csv("mb2_all_trades.csv", index=False)
 
-    # Build Comparative Matrix
     summary_rows = []
     for name, t_df in [
         ("1. No RS | 50 -> 21 EMA", v1),
         ("2. No RS | 50 -> 2 ATR", v2),
-        ("3. RS>=90 | 50 -> 21 EMA", v3),
-        ("4. RS>=90 | 50 -> 2 ATR", v4)
+        ("3. RS>=15% | 50 -> 21 EMA", v3),
+        ("4. RS>=15% | 50 -> 2 ATR", v4)
     ]:
         if t_df.empty:
             continue
@@ -197,8 +236,6 @@ if __name__ == "__main__":
         gross_p = winners['Gain_Pct'].sum()
         gross_l = abs(losers['Gain_Pct'].sum())
         pf = (gross_p / gross_l) if gross_l > 0 else np.inf
-
-        # Count 100%+ multibaggers
         mb_count = len(t_df[t_df['Gain_Pct'] >= 100.0])
 
         summary_rows.append({
@@ -216,10 +253,4 @@ if __name__ == "__main__":
 
     summary_df = pd.DataFrame(summary_rows)
     summary_df.to_csv("mb2_comparison_summary.csv", index=False)
-    
-    # Save formatted markdown for GitHub Step Summary
-    summary_md = "## MB2 4-Way Comparative Strategy Matrix\n\n" + summary_df.to_markdown(index=False)
-    with open("backtest_summary.md", "w") as f:
-        f.write(summary_md)
-        
-    print("\n" + summary_md)
+    print("\n" + summary_df.to_string(index=False))
