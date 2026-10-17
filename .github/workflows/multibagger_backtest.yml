@@ -1,0 +1,42 @@
+name: Multibagger Momentum Backtest
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 18 * * 6'
+
+jobs:
+  run-backtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy yfinance requests tabulate
+
+      - name: Execute MB2 Backtest Engine
+        run: |
+          python mb2_backtest.py
+
+      - name: Publish Performance Comparison to GitHub Summary
+        if: always()
+        run: |
+          if [ -f backtest_summary.md ]; then
+            cat backtest_summary.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Trade Log Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multibagger-trades-log
+          path: multibagger_trades.csv
