@@ -6,7 +6,8 @@ import datetime
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
+LIVE_BREAKOUTS_V1 = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
+LIVE_BREAKOUTS_V2 = os.path.join(DATA_DIR, "live_intraday_breakouts_v2.json")
 ULTRA_750_FILE = os.path.join(DATA_DIR, "swing_ultra750_results.json")
 ULTRA_N750_FILE = os.path.join(DATA_DIR, "swing_ultraN750_results.json")
 AUDIT_LOG_FILE = os.path.join(DATA_DIR, "accuracy_audit_log.json")
@@ -21,93 +22,94 @@ def load_json(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"⚠️ Error reading {filepath}: {e}")
+        except Exception:
+            pass
     return {}
+
+def extract_breakout_symbols(source_dict):
+    signals = set()
+    for item in source_dict.get("Breakouts_All_Day", []):
+        sym = str(item.get("symbol", "")).strip().upper()
+        act = str(item.get("action", "")).strip().upper()
+        if sym and ("BREAKOUT" in act or item.get("clearance_%", 0) >= 0.25):
+            signals.add(sym)
+    return signals
 
 def run_accuracy_audit():
     now_dt = get_ist_now()
     today_date = now_dt.strftime("%Y-%m-%d")
 
-    live_data = load_json(LIVE_BREAKOUTS_FILE)
-    u750_data = load_json(ULTRA_750_FILE)
-    un750_data = load_json(ULTRA_N750_FILE)
+    v1_data = load_json(LIVE_BREAKOUTS_V1)
+    v2_data = load_json(LIVE_BREAKOUTS_V2)
+    u750 = load_json(ULTRA_750_FILE)
+    un750 = load_json(ULTRA_N750_FILE)
 
-    # 1. Collect live breakouts captured at 3:15 PM window
-    live_signals = set()
-    breakouts_all_day = live_data.get("Breakouts_All_Day", [])
-    for item in breakouts_all_day:
-        sym = str(item.get("symbol", "")).strip().upper()
-        act = str(item.get("action", "")).strip().upper()
-        if sym and ("BREAKOUT" in act or item.get("clearance_%", 0) >= 0.25):
-            live_signals.add(sym)
-
-    # 2. Collect confirmed breakouts verified by EOD Swing Ultra (750 + Non-N750)
+    # Collect EOD Swing Ultra Final Confirmed Triggers
     eod_verified = set()
-    for source in [u750_data, un750_data]:
-        fresh = source.get("Fresh_Triggers", [])
-        if isinstance(fresh, list):
-            for item in fresh:
-                if isinstance(item, dict):
-                    sym = str(item.get("symbol", "")).strip().upper()
-                    if sym:
-                        eod_verified.add(sym)
-                elif isinstance(item, str):
-                    eod_verified.add(item.strip().upper())
+    for src in [u750, un750]:
+        for key in ["Fresh_Triggers", "Breakout_Triggers"]:
+            items = src.get(key, [])
+            if isinstance(items, list):
+                for it in items:
+                    sym = it.get("symbol", "") if isinstance(it, dict) else str(it)
+                    if sym.strip():
+                        eod_verified.add(sym.strip().upper())
 
-        triggers = source.get("Breakout_Triggers", [])
-        if isinstance(triggers, list):
-            for item in triggers:
-                if isinstance(item, dict):
-                    sym = str(item.get("symbol", "")).strip().upper()
-                    if sym:
-                        eod_verified.add(sym)
+    # Evaluate Scanner 1
+    v1_sigs = extract_breakout_symbols(v1_data)
+    v1_hits = sorted(list(v1_sigs.intersection(eod_verified)))
+    v1_acc = round((len(v1_hits) / len(v1_sigs) * 100.0), 2) if v1_sigs else 100.0
 
-    # 3. Calculate Precision & Mismatches
-    hits = sorted(list(live_signals.intersection(eod_verified)))
-    false_positives = sorted(list(live_signals.difference(eod_verified)))
-    missed_breakouts = sorted(list(eod_verified.difference(live_signals)))
+    # Evaluate Scanner 2
+    v2_sigs = extract_breakout_symbols(v2_data)
+    v2_hits = sorted(list(v2_sigs.intersection(eod_verified)))
+    v2_acc = round((len(v2_hits) / len(v2_sigs) * 100.0), 2) if v2_sigs else 100.0
 
-    total_live = len(live_signals)
-    daily_accuracy = round((len(hits) / total_live * 100.0), 2) if total_live > 0 else 100.0
-
-    # 4. Update Cumulative Historical Log
     audit_history = load_json(AUDIT_LOG_FILE)
-    daily_records = audit_history.get("Daily_Records", [])
-    daily_records = [r for r in daily_records if r.get("date") != today_date]
+    records = [r for r in audit_history.get("Daily_Records", []) if r.get("date") != today_date]
 
     daily_entry = {
         "date": today_date,
-        "timestamp": now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST"),
-        "live_signals_count": total_live,
         "eod_verified_count": len(eod_verified),
-        "hits_count": len(hits),
-        "false_positives_count": len(false_positives),
-        "missed_count": len(missed_breakouts),
-        "daily_accuracy_pct": daily_accuracy,
-        "hits": hits,
-        "false_positives": false_positives,
-        "missed": missed_breakouts
+        "scanner_v1": {
+            "signals": len(v1_sigs),
+            "hits": len(v1_hits),
+            "accuracy_%": v1_acc,
+            "tickers": sorted(list(v1_sigs))
+        },
+        "scanner_v2": {
+            "signals": len(v2_sigs),
+            "hits": len(v2_hits),
+            "accuracy_%": v2_acc,
+            "tickers": sorted(list(v2_sigs))
+        },
+        "eod_verified": sorted(list(eod_verified))
     }
-    daily_records.append(daily_entry)
+    records.append(daily_entry)
 
-    cum_live = sum(r.get("live_signals_count", 0) for r in daily_records)
-    cum_hits = sum(r.get("hits_count", 0) for r in daily_records)
-    cum_accuracy = round((cum_hits / cum_live * 100.0), 2) if cum_live > 0 else 100.0
+    # Cumulative Head-to-Head Totals
+    v1_tot_sigs = sum(r.get("scanner_v1", {}).get("signals", 0) for r in records)
+    v1_tot_hits = sum(r.get("scanner_v1", {}).get("hits", 0) for r in records)
+    v1_cum_acc = round((v1_tot_hits / v1_tot_sigs * 100.0), 2) if v1_tot_sigs > 0 else 100.0
 
-    compiled_audit = {
+    v2_tot_sigs = sum(r.get("scanner_v2", {}).get("signals", 0) for r in records)
+    v2_tot_hits = sum(r.get("scanner_v2", {}).get("hits", 0) for r in records)
+    v2_cum_acc = round((v2_tot_hits / v2_tot_sigs * 100.0), 2) if v2_tot_sigs > 0 else 100.0
+
+    output_payload = {
         "Last_Updated": now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST"),
-        "Total_Days_Audited": len(daily_records),
-        "Cumulative_Live_Signals": cum_live,
-        "Cumulative_Hits": cum_hits,
-        "Cumulative_Accuracy_Pct": cum_accuracy,
-        "Daily_Records": daily_records
+        "Sessions_Audited": len(records),
+        "Cumulative_Accuracy": {
+            "Scanner_V1_%": v1_cum_acc,
+            "Scanner_V2_%": v2_cum_acc
+        },
+        "Daily_Records": records
     }
 
     with open(AUDIT_LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(compiled_audit, f, indent=2)
+        json.dump(output_payload, f, indent=2)
 
-    print(f"✅ Accuracy Audit Logged (Silent): Daily={daily_accuracy}% | Cumulative={cum_accuracy}%")
+    print(f"✅ Head-to-Head Audit Logged (Silent): V1={v1_acc}% (Cum: {v1_cum_acc}%) vs V2={v2_acc}% (Cum: {v2_cum_acc}%)")
 
 if __name__ == "__main__":
     run_accuracy_audit()
