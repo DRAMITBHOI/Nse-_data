@@ -31,7 +31,6 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
             if len(df) < 220:
                 continue
 
-            # Core Technicals
             df['Turnover_Cr'] = (df['Close'] * df['Volume']) / 1e7
             df['Turnover_SMA50'] = df['Turnover_Cr'].rolling(50).mean()
             df['EMA21'] = df['Close'].ewm(span=21, adjust=False).mean()
@@ -40,20 +39,20 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
             df['Vol_SMA50'] = df['Volume'].rolling(50).mean()
             df['Vol_SMA5'] = df['Volume'].rolling(5).mean()
 
-            # ATR (14) Calculation
-            high_low = df['High'] - df['Low']
-            high_close = (df['High'] - df['Close'].shift()).abs()
-            low_close = (df['Low'] - df['Close'].shift()).abs()
-            tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+            # ATR (14)
+            tr = pd.concat([
+                df['High'] - df['Low'],
+                (df['High'] - df['Close'].shift()).abs(),
+                (df['Low'] - df['Close'].shift()).abs()
+            ], axis=1).max(axis=1)
             df['ATR14'] = tr.rolling(14).mean()
 
-            # Base Setup
+            # Base Setup (35-day window, 10% - 20% depth)
             base_window = 35
             df['Base_High'] = df['High'].shift(1).rolling(base_window).max()
             df['Base_Low'] = df['Low'].shift(1).rolling(base_window).min()
             df['Base_Depth'] = (df['Base_High'] - df['Base_Low']) / df['Base_High']
 
-            # Base Triggers
             c_liq = df['Turnover_SMA50'] >= min_turnover_cr
             c_trend = (df['Close'] > df['EMA50']) & (df['EMA50'] > df['EMA200']) & (df['EMA200'] > df['EMA200'].shift(20))
             c_base = (df['Base_Depth'] >= 0.10) & (df['Base_Depth'] <= 0.20)
@@ -68,7 +67,7 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
         except Exception:
             continue
 
-    # Compute Daily Cross-Sectional RS Percentile Rank (0 to 100)
+    # Cross-sectional Relative Strength (RS Rank Percentile: 0 to 100)
     ret_matrix = pd.DataFrame(returns_3m)
     rs_percentiles = ret_matrix.rank(axis=1, pct=True) * 100
 
@@ -78,7 +77,7 @@ def prepare_market_data(raw_data, symbols, min_turnover_cr=5.0):
 
     return clean_dfs
 
-def simulate_engine(clean_dfs, use_rs=False, trailing_type="21_EMA"):
+def simulate_variant(clean_dfs, strategy_name, use_rs=False, trailing_type="21_EMA"):
     all_trades = []
 
     for sym, df in clean_dfs.items():
@@ -118,51 +117,44 @@ def simulate_engine(clean_dfs, use_rs=False, trailing_type="21_EMA"):
                 highest_price = max(highest_price, h)
                 unrealized_gain = (highest_price - entry_price) / entry_price
 
-                # 1. Partial Scale-Out: 30% trim at +25%, move stop to Breakeven
+                # Scale out 30% at +25%, move stop to BE
                 if not scaled_out and unrealized_gain >= 0.25:
                     scaled_out = True
                     stop_loss = max(stop_loss, entry_price)
 
-                # 2. Dual-Speed Trailing Architecture
                 exit_triggered = False
                 exit_price = c
                 exit_reason = ""
 
-                # Stop loss hit
                 if l <= stop_loss:
                     exit_triggered = True
                     exit_price = min(o, stop_loss)
                     exit_reason = "Stop Loss / BE"
                 elif i > (entry_idx + 2):
                     if unrealized_gain < 0.50:
-                        # Standard base trail: 50 EMA
                         if c < ema50:
                             exit_triggered = True
                             exit_price = c
                             exit_reason = "Trailing 50 EMA"
                     else:
-                        # High-Speed Trail (> +50% gain)
                         if trailing_type == "21_EMA":
                             if c < ema21:
                                 exit_triggered = True
                                 exit_price = c
-                                exit_reason = "Parabolic 21 EMA"
+                                exit_reason = "Dual Speed 21 EMA"
                         elif trailing_type == "2_ATR":
                             atr_stop = highest_price - (2.0 * atr)
                             if l <= atr_stop:
                                 exit_triggered = True
                                 exit_price = min(o, atr_stop)
-                                exit_reason = "Parabolic 2 ATR"
+                                exit_reason = "Dual Speed 2 ATR"
 
                 if exit_triggered:
-                    # Blended realized gain (accounting for 30% scaled out at +25% if achieved)
                     raw_exit_gain = ((exit_price - entry_price) / entry_price) * 100
-                    if scaled_out:
-                        final_gain = (0.30 * 25.0) + (0.70 * raw_exit_gain)
-                    else:
-                        final_gain = raw_exit_gain
+                    final_gain = (0.30 * 25.0 + 0.70 * raw_exit_gain) if scaled_out else raw_exit_gain
 
                     all_trades.append({
+                        'Strategy': strategy_name,
                         'Symbol': sym.replace('.NS', ''),
                         'Entry_Date': entry_date.strftime('%Y-%m-%d'),
                         'Exit_Date': current_date.strftime('%Y-%m-%d'),
@@ -175,47 +167,59 @@ def simulate_engine(clean_dfs, use_rs=False, trailing_type="21_EMA"):
 
     return pd.DataFrame(all_trades)
 
-def get_metrics(trades_df, name):
-    if trades_df.empty:
-        return {'Strategy': name, 'Trades': 0, 'Win Rate': '0%', 'PF': '0', 'Avg Gain': '0%', 'Max Gain': '0%', 'Avg Days': 0}
-    winners = trades_df[trades_df['Gain_Pct'] > 0]
-    losers = trades_df[trades_df['Gain_Pct'] <= 0]
-    wr = (len(winners) / len(trades_df)) * 100
-    gross_p = winners['Gain_Pct'].sum()
-    gross_l = abs(losers['Gain_Pct'].sum())
-    pf = (gross_p / gross_l) if gross_l > 0 else np.inf
-    
-    return {
-        'Strategy': name,
-        'Trades': len(trades_df),
-        'Win Rate': f"{wr:.2f}%",
-        'PF': f"{pf:.2f}",
-        'Avg Gain': f"{trades_df['Gain_Pct'].mean():.2f}%",
-        'Max Gain': f"+{trades_df['Gain_Pct'].max():.2f}%",
-        'Avg Days': round(trades_df['Holding_Days'].mean(), 1)
-    }
-
 if __name__ == "__main__":
     symbols = get_all_nse_symbols()
     raw_data = download_ohlcv_batch(symbols, "2020-01-01")
     dfs = prepare_market_data(raw_data, symbols, min_turnover_cr=5.0)
 
-    # Run Matrix Comparisons
-    t1 = simulate_engine(dfs, use_rs=False, trailing_type="21_EMA")
-    t2 = simulate_engine(dfs, use_rs=False, trailing_type="2_ATR")
-    t3 = simulate_engine(dfs, use_rs=True, trailing_type="21_EMA")
-    t4 = simulate_engine(dfs, use_rs=True, trailing_type="2_ATR")
+    # 4 Variants
+    v1 = simulate_variant(dfs, "1. No RS | 50 -> 21 EMA", use_rs=False, trailing_type="21_EMA")
+    v2 = simulate_variant(dfs, "2. No RS | 50 -> 2 ATR", use_rs=False, trailing_type="2_ATR")
+    v3 = simulate_variant(dfs, "3. RS>=90 | 50 -> 21 EMA", use_rs=True, trailing_type="21_EMA")
+    v4 = simulate_variant(dfs, "4. RS>=90 | 50 -> 2 ATR", use_rs=True, trailing_type="2_ATR")
 
-    m = [
-        get_metrics(t1, "No RS | 50 EMA -> 21 EMA"),
-        get_metrics(t2, "No RS | 50 EMA -> 2 ATR"),
-        get_metrics(t3, "RS >= 90 | 50 EMA -> 21 EMA"),
-        get_metrics(t4, "RS >= 90 | 50 EMA -> 2 ATR")
-    ]
-    summary_df = pd.DataFrame(m)
-    print(summary_df.to_string(index=False))
+    all_trades_df = pd.concat([v1, v2, v3, v4], ignore_index=True)
+    all_trades_df.to_csv("mb2_all_trades.csv", index=False)
 
-    # Save best candidate trades for viewing
-    best_df = t3 if not t3.empty else t1
-    best_df.to_csv("multibagger_trades.csv", index=False)
-    summary_df.to_markdown("backtest_summary.md", index=False)
+    # Build Comparative Matrix
+    summary_rows = []
+    for name, t_df in [
+        ("1. No RS | 50 -> 21 EMA", v1),
+        ("2. No RS | 50 -> 2 ATR", v2),
+        ("3. RS>=90 | 50 -> 21 EMA", v3),
+        ("4. RS>=90 | 50 -> 2 ATR", v4)
+    ]:
+        if t_df.empty:
+            continue
+        winners = t_df[t_df['Gain_Pct'] > 0]
+        losers = t_df[t_df['Gain_Pct'] <= 0]
+        wr = (len(winners) / len(t_df)) * 100
+        gross_p = winners['Gain_Pct'].sum()
+        gross_l = abs(losers['Gain_Pct'].sum())
+        pf = (gross_p / gross_l) if gross_l > 0 else np.inf
+
+        # Count 100%+ multibaggers
+        mb_count = len(t_df[t_df['Gain_Pct'] >= 100.0])
+
+        summary_rows.append({
+            'Strategy': name,
+            'Trades': len(t_df),
+            'Win Rate %': round(wr, 2),
+            'Profit Factor': round(pf, 2),
+            'Avg Return %': round(t_df['Gain_Pct'].mean(), 2),
+            'Avg Winner %': round(winners['Gain_Pct'].mean(), 2) if not winners.empty else 0,
+            'Avg Loser %': round(losers['Gain_Pct'].mean(), 2) if not losers.empty else 0,
+            'Multibaggers (>=100%)': mb_count,
+            'Max Gain %': round(t_df['Gain_Pct'].max(), 2),
+            'Avg Holding Days': round(t_df['Holding_Days'].mean(), 1)
+        })
+
+    summary_df = pd.DataFrame(summary_rows)
+    summary_df.to_csv("mb2_comparison_summary.csv", index=False)
+    
+    # Save formatted markdown for GitHub Step Summary
+    summary_md = "## MB2 4-Way Comparative Strategy Matrix\n\n" + summary_df.to_markdown(index=False)
+    with open("backtest_summary.md", "w") as f:
+        f.write(summary_md)
+        
+    print("\n" + summary_md)
