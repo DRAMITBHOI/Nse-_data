@@ -34,9 +34,12 @@ jobs:
             cat backtest_summary.md >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Upload Trade Log Artifact
+      - name: Upload Comparison Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: multibagger-trades-log
-          path: multibagger_trades.csv
+          name: mb2-comparative-study
+          path: |
+            mb2_comparison_summary.csv
+            mb2_all_trades.csv
+            backtest_summary.md
