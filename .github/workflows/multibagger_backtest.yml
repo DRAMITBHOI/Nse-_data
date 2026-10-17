@@ -18,27 +18,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pandas numpy yfinance requests tabulate
 
       - name: Execute Multibagger Backtest Engine
         run: |
           python multibagger_backtest.py
 
-      - name: Publish Performance Report to GitHub Summary
-        if: always()
-        run: |
-          if [ -f backtest_summary.md ]; then
-            cat backtest_summary.md >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Upload Trade Log Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: multibagger-trades-log
-          path: multibagger_trades.csv
+      - name: Publish
