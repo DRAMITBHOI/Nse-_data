@@ -3,7 +3,6 @@ name: Refine Exit Backtest (Distribution Machine)
 on:
   workflow_dispatch:
   schedule:
-    # Runs at 18:30 UTC (00:00 IST), after EOD bhavcopy & delivery data ingestion
     - cron: '30 18 * * 1-5'
 
 jobs:
