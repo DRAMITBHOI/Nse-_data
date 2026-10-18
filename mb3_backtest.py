@@ -37,7 +37,6 @@ def download_data_safely(symbols, start_date="2020-01-01"):
     print(f"Downloading historical data for {len(symbols)} tickers...")
     stock_data = yf.download(symbols, start=start_date, interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
     
-    # Download Nifty benchmark separately to prevent MultiIndex slicing errors
     print("Downloading Nifty 50 benchmark data...")
     nifty_raw = yf.download("^NSEI", start=start_date, interval="1d", auto_adjust=True, progress=False)
     
@@ -57,7 +56,7 @@ def prepare_data_and_signals(raw_data, nifty_df, symbols, min_turnover_cr=10.0):
             nifty_ret_60 = n_close.pct_change(60)
             nifty_gate = (n_close > n_ema50) & (n_ema20 > n_ema50)
     except Exception as e:
-        print(f"Nifty indicator notice: {e}")
+        print(f"Nifty indicator calculation notice: {e}")
 
     for sym in symbols:
         try:
@@ -108,7 +107,7 @@ def prepare_data_and_signals(raw_data, nifty_df, symbols, min_turnover_cr=10.0):
             df['Shelf_Low'] = df['Low'].shift(1).rolling(shelf_len).min()
             df['Shelf_Spread'] = (df['Shelf_High'] - df['Shelf_Low']) / df['Shelf_Low']
 
-            # VCP Micro-Compression (Last 5 days shelf spread <= 6% and half the base spread)
+            # VCP Micro-Compression (Last 5 days spread <= 6% and half of full shelf spread)
             df['Final5_High'] = df['High'].shift(1).rolling(5).max()
             df['Final5_Low'] = df['Low'].shift(1).rolling(5).min()
             df['Final5_Spread'] = (df['Final5_High'] - df['Final5_Low']) / df['Final5_Low']
