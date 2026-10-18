@@ -33,36 +33,31 @@ def get_nse_symbols():
         "HERITGFOOD.NS", "RVNL.NS", "IRFC.NS", "COCHINSHIP.NS", "HUDCO.NS", "SUZLON.NS", "CDSL.NS", "MOTILALOFS.NS"
     ]
 
-def download_ohlcv_batch(symbols, start_date="2020-01-01"):
-    fetch_list = list(set(symbols + ["^NSEI"]))
-    print(f"Downloading historical data for {len(fetch_list)} tickers from {start_date}...")
-    data = yf.download(
-        fetch_list,
-        start=start_date,
-        interval="1d",
-        group_by="ticker",
-        auto_adjust=True,
-        threads=True,
-        progress=False
-    )
-    return data
+def download_data_safely(symbols, start_date="2020-01-01"):
+    print(f"Downloading historical data for {len(symbols)} tickers...")
+    stock_data = yf.download(symbols, start=start_date, interval="1d", group_by="ticker", auto_adjust=True, threads=True, progress=False)
+    
+    # Download Nifty benchmark separately to prevent MultiIndex slicing errors
+    print("Downloading Nifty 50 benchmark data...")
+    nifty_raw = yf.download("^NSEI", start=start_date, interval="1d", auto_adjust=True, progress=False)
+    
+    return stock_data, nifty_raw
 
-def prepare_data_and_signals(raw_data, symbols, min_turnover_cr=10.0):
+def prepare_data_and_signals(raw_data, nifty_df, symbols, min_turnover_cr=10.0):
     clean_dfs = {}
 
-    # Benchmark: Nifty 50 Trend Gate & 60-day Return
-    nifty_ret_60 = None
+    # Calculate Benchmark Gate Series
     nifty_gate = None
+    nifty_ret_60 = None
     try:
-        if isinstance(raw_data.columns, pd.MultiIndex) and "^NSEI" in raw_data.columns.levels[0]:
-            nifty_df = raw_data["^NSEI"].dropna().copy()
-            nifty_ret_60 = nifty_df['Close'].pct_change(60)
-            n_ema20 = nifty_df['Close'].ewm(span=20, adjust=False).mean()
-            n_ema50 = nifty_df['Close'].ewm(span=50, adjust=False).mean()
-            nifty_gate = (nifty_df['Close'] > n_ema50) & (n_ema20 > n_ema50)
-    except Exception:
-        nifty_ret_60 = None
-        nifty_gate = None
+        if not nifty_df.empty:
+            n_close = nifty_df['Close'].squeeze()
+            n_ema20 = n_close.ewm(span=20, adjust=False).mean()
+            n_ema50 = n_close.ewm(span=50, adjust=False).mean()
+            nifty_ret_60 = n_close.pct_change(60)
+            nifty_gate = (n_close > n_ema50) & (n_ema20 > n_ema50)
+    except Exception as e:
+        print(f"Nifty indicator notice: {e}")
 
     for sym in symbols:
         try:
@@ -92,12 +87,13 @@ def prepare_data_and_signals(raw_data, symbols, min_turnover_cr=10.0):
             # Baseline 3: 60-Day Relative Strength (Stock Return > Nifty Return)
             stock_ret_60 = df['Close'].pct_change(60)
             if nifty_ret_60 is not None:
-                c_rs = stock_ret_60 > nifty_ret_60.reindex(df.index)
+                c_rs = stock_ret_60 > nifty_ret_60.reindex(df.index).fillna(0)
             else:
                 c_rs = stock_ret_60 > 0.0
 
             # Base Delivery Accumulation (CLV Demat Proxy)
-            clv = ((df['Close'] - df['Low']) - (df['High'] - df['Close'])) / (df['High'] - df['Low']).replace(0, np.nan)
+            candle_spread = (df['High'] - df['Low']).replace(0, np.nan)
+            clv = ((df['Close'] - df['Low']) - (df['High'] - df['Close'])) / candle_spread
             clv = clv.fillna(0.0)
             demat_vol = np.maximum(0, clv * df['Volume'])
             up_demat = np.where(df['Close'] > df['Close'].shift(1), demat_vol, 0)
@@ -112,23 +108,21 @@ def prepare_data_and_signals(raw_data, symbols, min_turnover_cr=10.0):
             df['Shelf_Low'] = df['Low'].shift(1).rolling(shelf_len).min()
             df['Shelf_Spread'] = (df['Shelf_High'] - df['Shelf_Low']) / df['Shelf_Low']
 
-            # VCP Micro-Compression: Final 5 sessions must be tightly compressed
+            # VCP Micro-Compression (Last 5 days shelf spread <= 6% and half the base spread)
             df['Final5_High'] = df['High'].shift(1).rolling(5).max()
             df['Final5_Low'] = df['Low'].shift(1).rolling(5).min()
             df['Final5_Spread'] = (df['Final5_High'] - df['Final5_Low']) / df['Final5_Low']
             c_vcp = (df['Final5_Spread'] <= 0.06) & (df['Final5_Spread'] <= (0.50 * df['Shelf_Spread']))
 
-            # Base Entry Criteria
+            # Base Entry Triggers
             c_shelf_spread = df['Shelf_Spread'] <= 0.18
             c_base_accum = df['Base_Delivery_Ratio'] >= 1.15
             c_clear_shelf = (df['Close'] > df['Shelf_High']) & (df['High'] > df['Shelf_High'])
             c_vol_surge = df['Volume'] >= (1.40 * df['Vol_SMA20'])
 
-            candle_range = (df['High'] - df['Low']).replace(0, np.nan)
-            df['Range_Closeness'] = ((df['Close'] - df['Low']) / candle_range).fillna(0.0)
+            df['Range_Closeness'] = ((df['Close'] - df['Low']) / candle_spread).fillna(0.0)
             c_range_closeness = df['Range_Closeness'] >= 0.65
 
-            # Common Base Trigger
             df['Base_Trigger'] = (
                 c_turnover & c_stage2 & c_rs &
                 c_shelf_spread & c_base_accum &
@@ -180,8 +174,6 @@ def simulate_mb3_variant(clean_dfs, strategy_name, use_nifty_gate=False, use_vcp
                 if sig:
                     base_low = df['Shelf_Low'].iloc[i]
                     calc_stop = min(l, base_low)
-                    
-                    # Stop capped to max 14% risk
                     max_stop_risk = c * 0.86
                     final_stop = max(calc_stop, max_stop_risk)
 
@@ -201,7 +193,7 @@ def simulate_mb3_variant(clean_dfs, strategy_name, use_nifty_gate=False, use_vcp
                 if unrealized_gain >= 0.10 and stop_loss < entry_price:
                     stop_loss = entry_price
 
-                # Take 25% profit off table at +25%
+                # Trim 25% at +25%
                 if not scaled_out and unrealized_gain >= 0.25:
                     scaled_out = True
 
@@ -209,7 +201,7 @@ def simulate_mb3_variant(clean_dfs, strategy_name, use_nifty_gate=False, use_vcp
                 exit_price = c
                 exit_reason = ""
 
-                # Stop loss / Breakeven execution
+                # Stop loss / Breakeven hit
                 if l <= stop_loss:
                     exit_triggered = True
                     exit_price = min(o, stop_loss)
@@ -244,10 +236,9 @@ def simulate_mb3_variant(clean_dfs, strategy_name, use_nifty_gate=False, use_vcp
 
 if __name__ == "__main__":
     symbols = get_nse_symbols()
-    raw_data = download_ohlcv_batch(symbols, "2020-01-01")
-    dfs = prepare_data_and_signals(raw_data, symbols, min_turnover_cr=10.0)
+    stock_data, nifty_data = download_data_safely(symbols, "2020-01-01")
+    dfs = prepare_data_and_signals(stock_data, nifty_data, symbols, min_turnover_cr=10.0)
 
-    # 4 Combinatorial Runs
     variants = [
         ("1. Nifty OFF | VCP OFF", False, False),
         ("2. Nifty OFF | VCP ON", False, True),
@@ -263,6 +254,11 @@ if __name__ == "__main__":
         all_trades_list.append(t_df)
 
         if t_df.empty:
+            summary_rows.append({
+                'Strategy': name, 'Total Trades': 0, 'Win Rate %': 0.0,
+                'Profit Factor': 0.0, 'Avg Return %': 0.0, 'Avg Winner %': 0.0,
+                'Avg Loser %': 0.0, 'Multibaggers (>=100%)': 0, 'Max Gain %': 0.0, 'Avg Holding Days': 0.0
+            })
             continue
 
         total_trades = len(t_df)
@@ -295,7 +291,7 @@ if __name__ == "__main__":
         })
 
     summary_df = pd.DataFrame(summary_rows)
-    all_trades_df = pd.concat(all_trades_list, ignore_index=True)
+    all_trades_df = pd.concat([t for t in all_trades_list if not t.empty], ignore_index=True) if any(not t.empty for t in all_trades_list) else pd.DataFrame(columns=['Strategy', 'Symbol', 'Entry_Date', 'Exit_Date', 'Gain_Pct', 'Holding_Days', 'Exit_Reason'])
 
     summary_df.to_csv("mb3_summary.csv", index=False)
     all_trades_df.to_csv("mb3_trades.csv", index=False)
