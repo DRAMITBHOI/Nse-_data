@@ -223,4 +223,84 @@ def simulate_mb3_variant(clean_dfs, strategy_name, use_nifty_gate=False, use_vcp
                         exit_reason = "Weekly Close < 50 EMA"
 
                 if exit_triggered:
-                    raw_gain = ((exit_price - entry
+                    raw_gain = ((exit_price - entry_price) / entry_price) * 100
+                    final_gain = (0.25 * 25.0 + 0.75 * raw_gain) if scaled_out else raw_gain
+
+                    trades.append({
+                        'Strategy': strategy_name,
+                        'Symbol': sym.replace('.NS', ''),
+                        'Entry_Date': entry_date.strftime('%Y-%m-%d'),
+                        'Exit_Date': current_date.strftime('%Y-%m-%d'),
+                        'Entry_Price': round(entry_price, 2),
+                        'Exit_Price': round(exit_price, 2),
+                        'Gain_Pct': round(final_gain, 2),
+                        'Holding_Days': (current_date - entry_date).days,
+                        'Scaled_Out': scaled_out,
+                        'Exit_Reason': exit_reason
+                    })
+                    in_pos = False
+
+    return pd.DataFrame(trades)
+
+if __name__ == "__main__":
+    symbols = get_nse_symbols()
+    raw_data = download_ohlcv_batch(symbols, "2020-01-01")
+    dfs = prepare_data_and_signals(raw_data, symbols, min_turnover_cr=10.0)
+
+    # 4 Combinatorial Runs
+    variants = [
+        ("1. Nifty OFF | VCP OFF", False, False),
+        ("2. Nifty OFF | VCP ON", False, True),
+        ("3. Nifty ON  | VCP OFF", True, False),
+        ("4. Nifty ON  | VCP ON", True, True)
+    ]
+
+    all_trades_list = []
+    summary_rows = []
+
+    for name, gate_on, vcp_on in variants:
+        t_df = simulate_mb3_variant(dfs, name, use_nifty_gate=gate_on, use_vcp=vcp_on)
+        all_trades_list.append(t_df)
+
+        if t_df.empty:
+            continue
+
+        total_trades = len(t_df)
+        winners = t_df[t_df['Gain_Pct'] > 0]
+        losers = t_df[t_df['Gain_Pct'] <= 0]
+
+        win_rate = (len(winners) / total_trades) * 100
+        gross_p = winners['Gain_Pct'].sum()
+        gross_l = abs(losers['Gain_Pct'].sum())
+        pf = (gross_p / gross_l) if gross_l > 0 else np.inf
+
+        avg_return = t_df['Gain_Pct'].mean()
+        avg_winner = winners['Gain_Pct'].mean() if not winners.empty else 0
+        avg_loser = losers['Gain_Pct'].mean() if not losers.empty else 0
+        mb_count = len(t_df[t_df['Gain_Pct'] >= 100.0])
+        max_gain = t_df['Gain_Pct'].max()
+        avg_holding = t_df['Holding_Days'].mean()
+
+        summary_rows.append({
+            'Strategy': name,
+            'Total Trades': total_trades,
+            'Win Rate %': round(win_rate, 2),
+            'Profit Factor': round(pf, 2),
+            'Avg Return %': round(avg_return, 2),
+            'Avg Winner %': round(avg_winner, 2),
+            'Avg Loser %': round(avg_loser, 2),
+            'Multibaggers (>=100%)': mb_count,
+            'Max Gain %': round(max_gain, 2),
+            'Avg Holding Days': round(avg_holding, 1)
+        })
+
+    summary_df = pd.DataFrame(summary_rows)
+    all_trades_df = pd.concat(all_trades_list, ignore_index=True)
+
+    summary_df.to_csv("mb3_summary.csv", index=False)
+    all_trades_df.to_csv("mb3_trades.csv", index=False)
+
+    print("\n" + "=" * 90)
+    print("                    MB3 COMPARATIVE MATRIX SUMMARY                     ")
+    print("=" * 90)
+    print(summary_df.to_string(index=False))
