@@ -26,24 +26,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy yfinance requests tabulate
 
-      - name: Execute MB2 Engine
+      - name: Execute MB3 Matrix Engine
         run: |
-          python mb2_backtest.py
+          python mb3_backtest.py
 
-      - name: Commit and Push MB2 Results
+      - name: Commit and Push MB3 Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f mb2_summary.csv mb2_tiers.csv mb2_trades.csv
-          git commit -m "Auto-update MB2 backtest results [skip ci]" || echo "No changes to commit"
+          git add -f mb3_summary.csv mb3_trades.csv
+          git commit -m "Auto-update MB3 backtest results [skip ci]" || echo "No changes to commit"
           git push origin main || echo "Git push skipped"
 
       - name: Upload Backup Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mb2-backtest-results
+          name: mb3-backtest-results
           path: |
-            mb2_summary.csv
-            mb2_tiers.csv
-            mb2_trades.csv
+            mb3_summary.csv
+            mb3_trades.csv
