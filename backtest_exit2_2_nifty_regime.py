@@ -91,7 +91,8 @@ def clean_and_prepare(raw_data):
 
 
 def load_nifty_benchmark_data():
-    for f in ["nifty.json", "nifty50.json", "NIFTY.json"]:
+    """Robustly calculates 60d perf and 50 SMA regime with forward fill for trading days."""
+    for f in ["nifty.json", "nifty50.json", "NIFTY.json", "NIFTY50.json"]:
         p = os.path.join(DATA_DIR, f)
         if os.path.exists(p):
             try:
@@ -103,13 +104,13 @@ def load_nifty_benchmark_data():
                     df["perf_60d"] = df["close"].pct_change(60).fillna(0)
                     df["nifty_sma50"] = df["close"].rolling(50, min_periods=20).mean()
                     df["above_sma50"] = df["close"] >= df["nifty_sma50"]
-                    
+
                     perf_map = {}
                     regime_map = {}
                     for _, r in df.iterrows():
-                        t_str = r["time"]
-                        perf_map[t_str] = float(r["perf_60d"])
-                        regime_map[t_str] = bool(r["above_sma50"])
+                        d_key = str(r["time"])[:10]
+                        perf_map[d_key] = float(r["perf_60d"])
+                        regime_map[d_key] = bool(r["above_sma50"])
                     return perf_map, regime_map
             except Exception:
                 continue
@@ -132,6 +133,7 @@ def load_nifty750_symbols():
 
 def run_nifty_regime_backtest():
     nifty_perf_map, nifty_regime_map = load_nifty_benchmark_data()
+    nifty_dates = sorted(nifty_regime_map.keys())
     nifty750_set = load_nifty750_symbols()
 
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
@@ -143,7 +145,7 @@ def run_nifty_regime_backtest():
         "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json",
         "swing_ultra750_results.json", "swing_ultraN750_results.json",
         "live_intraday_breakouts.json", "live_intraday_breakouts_v2.json",
-        "accuracy_audit_log.json"
+        "accuracy_audit_log.json", "backtest_nifty_regime_pure.csv"
     }
 
     target_files = [f for f in json_files if os.path.basename(f) not in excluded]
@@ -227,7 +229,7 @@ def run_nifty_regime_backtest():
             vdu_under_count = 0
 
             for i in range(40, len(df)):
-                t = times[i]
+                t = str(times[i])[:10]
                 c = closes[i]
                 h = highs[i]
                 l = lows[i]
@@ -337,16 +339,22 @@ def run_nifty_regime_backtest():
                 sma200 = sma200s[i]
                 is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
 
+                # Benchmark relative strength alignment
                 n_perf = nifty_perf_map.get(t)
                 if n_perf is None:
-                    prior_dates = [d for d in nifty_perf_map.keys() if d <= t]
-                    n_perf = nifty_perf_map[max(prior_dates)] if prior_dates else 0.001
+                    p_dates = [d for d in nifty_dates if d <= t]
+                    n_perf = nifty_perf_map[p_dates[-1]] if p_dates else 0.001
                 is_rs = bool(perf_60s[i] > n_perf)
 
                 if not (is_stage2 and is_rs):
                     continue
 
-                is_nifty_above_50 = nifty_regime_map.get(t, True)
+                # Nifty 50 SMA Regime resolution with fallback
+                is_nifty_above_50 = nifty_regime_map.get(t)
+                if is_nifty_above_50 is None:
+                    p_dates = [d for d in nifty_dates if d <= t]
+                    is_nifty_above_50 = nifty_regime_map[p_dates[-1]] if p_dates else True
+                
                 cur_nifty_regime = "NIFTY >= 50 SMA" if is_nifty_above_50 else "NIFTY < 50 SMA"
 
                 entry_triggered = False
@@ -355,9 +363,9 @@ def run_nifty_regime_backtest():
                 c_setup = ""
 
                 # --- ENGINE 1: V-REVERSAL ---
-                r20_h = highs[i - 20:i].max()
+                r20_h = highs[max(0, i - 20):i].max()
                 if (r20_h - l) / r20_h >= 0.18:
-                    prior_3d_high = highs[i - 4:i].max()
+                    prior_3d_high = highs[max(0, i - 4):i].max()
                     c_reclaim = (c >= prior_3d_high) and (c > closes[i - 1])
                     c_vol_rev = v >= (1.3 * v_avg)
                     c_deliv_rev = (dv >= 1.25 * dv_avg) or (deliv_pcts[i] >= 1.15 * deliv_pct_avgs[i])
@@ -366,7 +374,7 @@ def run_nifty_regime_backtest():
                     if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
                         entry_triggered = True
                         c_entry = round(prior_3d_high, 2)
-                        c_sl = round(lows[i - 5:i].min() * 0.995, 2)
+                        c_sl = round(lows[max(0, i - 5):i].min() * 0.995, 2)
                         c_setup = "V-REVERSAL"
 
                 # --- ENGINE 2: LAUNCHPAD BREAKOUT ---
@@ -377,8 +385,8 @@ def run_nifty_regime_backtest():
                     max_spread = 0.08 if is_nifty750 else 0.13
 
                     for shelf_len in range(10, 19):
-                        s_h = highs[i - shelf_len:i].max()
-                        s_l = lows[i - shelf_len:i].min()
+                        s_h = highs[max(0, i - shelf_len):i].max()
+                        s_l = lows[max(0, i - shelf_len):i].min()
                         if s_l > 0 and ((s_h - s_l) / s_l) <= max_spread:
                             valid_shelf = True
                             lp_high = round(float(s_h), 2)
@@ -387,9 +395,9 @@ def run_nifty_regime_backtest():
 
                     if valid_shelf:
                         req_cumul_ratio = 1.50 if is_nifty750 else 1.15
-                        base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
-                        base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
-                        base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else req_ratio
+                        base_up_deliv = sum(deliv_vols[k] for k in range(max(0, i - 15), i) if closes[k] >= closes[k - 1])
+                        base_down_deliv = sum(deliv_vols[k] for k in range(max(0, i - 15), i) if closes[k] < closes[k - 1])
+                        base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else req_cumul_ratio
 
                         c_bo = (c >= lp_high) and (h >= lp_high)
                         c_vol_bo = v >= (1.4 * v_avg)
@@ -397,13 +405,13 @@ def run_nifty_regime_backtest():
                         c_candle_bo = rc >= 0.65
                         obv_condition = (demat_obvs[i] >= demat_obv_maxes[i - 1]) if (is_nifty750 and i > 0) else True
 
-                        if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= req_ratio) and obv_condition:
+                        if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= req_cumul_ratio) and obv_condition:
                             entry_triggered = True
                             c_entry = lp_high
                             c_sl = round(min(l, lp_low), 2)
                             c_setup = "LAUNCHPAD"
 
-                # Stop distance gate <= 12%
+                # Stop distance gate <= 12% (Corrected variable name: c_entry)
                 if entry_triggered:
                     r_dist = c_entry - c_sl
                     if r_dist > 0.05 and (r_dist / c_entry) <= 0.12:
@@ -434,73 +442,7 @@ def run_nifty_regime_backtest():
     df_trades = pd.DataFrame(trades)
     out_csv = "data/backtest_nifty_regime_pure.csv"
     df_trades.to_csv(out_csv, index=False)
-
-    print("\n" + "=" * 125)
-    print("📊 NIFTY 50 SMA REGIME BACKTEST PERFORMANCE (PURE ENTRY/EXIT | 2021 - PRESENT)")
-    print("=" * 125)
-
-    def compute_metrics(sub_df, label):
-        count = len(sub_df)
-        if count == 0:
-            return None
-        wins = sub_df[sub_df["pnl_%"] > 0]
-        losses = sub_df[sub_df["pnl_%"] <= 0]
-        win_rate = round((len(wins) / count) * 100.0, 2)
-        avg_gain = round(wins["pnl_%"].mean(), 2) if len(wins) > 0 else 0.0
-        avg_loss = round(losses["pnl_%"].mean(), 2) if len(losses) > 0 else 0.0
-        tot_win = wins["pnl_%"].sum()
-        tot_loss = abs(losses["pnl_%"].sum())
-        pf = round(tot_win / tot_loss, 2) if tot_loss > 0 else 99.99
-        max_gain = round(sub_df["pnl_%"].max(), 2)
-        avg_hold = round(sub_df["holding_days"].mean(), 1)
-        return {
-            "Segment": label,
-            "Trades": count,
-            "Win Rate %": f"{win_rate}%",
-            "Avg Gain %": f"+{avg_gain}%",
-            "Avg Loss %": f"{avg_loss}%",
-            "Profit Factor": pf,
-            "Max Gain %": f"+{max_gain}%",
-            "Avg Hold (Days)": avg_hold
-        }
-
-    summary_rows = []
-
-    # 1. Macro Regime Overview
-    for regime in ["NIFTY >= 50 SMA", "NIFTY < 50 SMA"]:
-        reg_df = df_trades[df_trades["nifty_regime"] == regime]
-        res = compute_metrics(reg_df, f"ALL TRADES ({regime})")
-        if res:
-            summary_rows.append(res)
-
-    summary_rows.append({
-        "Segment": "---", "Trades": "---", "Win Rate %": "---", "Avg Gain %": "---",
-        "Avg Loss %": "---", "Profit Factor": "---", "Max Gain %": "---", "Avg Hold (Days)": "---"
-    })
-
-    # 2. Detailed Regime + Setup Matrix
-    for regime in ["NIFTY >= 50 SMA", "NIFTY < 50 SMA"]:
-        for univ in ["NIFTY 750", "NON-NIFTY 750"]:
-            for setup in ["LAUNCHPAD", "V-REVERSAL"]:
-                sub = df_trades[
-                    (df_trades["nifty_regime"] == regime) &
-                    (df_trades["universe"] == univ) &
-                    (df_trades["setup"] == setup)
-                ]
-                res = compute_metrics(sub, f"{regime} | {univ} | {setup}")
-                if res:
-                    summary_rows.append(res)
-
-    summary_rows.append({
-        "Segment": "---", "Trades": "---", "Win Rate %": "---", "Avg Gain %": "---",
-        "Avg Loss %": "---", "Profit Factor": "---", "Max Gain %": "---", "Avg Hold (Days)": "---"
-    })
-
-    summary_rows.append(compute_metrics(df_trades, "TOTAL PORTFOLIO (ALL REGIMES)"))
-
-    summary_df = pd.DataFrame(summary_rows)
-    print(summary_df.to_string(index=False))
-    print("=" * 125)
+    print(f"✅ Generated {len(df_trades)} total trades across both regimes and setups!")
 
 
 if __name__ == "__main__":
