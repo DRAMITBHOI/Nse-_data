@@ -1,9 +1,9 @@
 {
-  "Scan_Timestamp": "2026-10-20 13:36:41 IST",
+  "Scan_Timestamp": "2026-10-20 18:09:57 IST",
   "Target_Universe": "Non-Nifty 750 NSE Stocks",
-  "Strategy_Specs": "Swing Ultra Non750 (Shelf <= 13%, Accumulation >= 1.15, Rank 1 Exit)",
+  "Strategy_Specs": "Swing Ultra Non750 (Shelf <= 13%, Exit 2.2 Institutional Harvest)",
   "Fresh_Triggers_Count": 0,
-  "Active_Positions_Count": 35,
+  "Active_Positions_Count": 37,
   "Watchlist_Count": 9,
   "Fresh_Triggers": [],
   "Active_Positions": [
@@ -13,7 +13,8 @@
       "entry_date": "2026-10-15",
       "entry_price": 225.5,
       "current_close": 222.72,
-      "trailing_stop_20ema": 215.75,
+      "trailing_stop": 215.75,
+      "peak_gain_%": 4.12,
       "pnl_%": -1.23,
       "holding_days": 3,
       "status": "HOLD"
@@ -24,7 +25,8 @@
       "entry_date": "2026-10-06",
       "entry_price": 92.89,
       "current_close": 100.61,
-      "trailing_stop_20ema": 98.36,
+      "trailing_stop": 98.36,
+      "peak_gain_%": 16.56,
       "pnl_%": 8.31,
       "holding_days": 10,
       "status": "HOLD"
@@ -35,7 +37,8 @@
       "entry_date": "2025-07-10",
       "entry_price": 1018.3,
       "current_close": 1084.72,
-      "trailing_stop_20ema": 1082.74,
+      "trailing_stop": 1082.74,
+      "peak_gain_%": 6.52,
       "pnl_%": 6.52,
       "holding_days": 316,
       "status": "HOLD"
@@ -46,7 +49,8 @@
       "entry_date": "2026-09-22",
       "entry_price": 12454.0,
       "current_close": 13621.0,
-      "trailing_stop_20ema": 13460.38,
+      "trailing_stop": 13460.38,
+      "peak_gain_%": 15.82,
       "pnl_%": 9.37,
       "holding_days": 20,
       "status": "HOLD"
@@ -57,9 +61,22 @@
       "entry_date": "2026-08-10",
       "entry_price": 545.0,
       "current_close": 700.2,
-      "trailing_stop_20ema": 693.13,
+      "trailing_stop": 693.13,
+      "peak_gain_%": 34.19,
       "pnl_%": 28.48,
       "holding_days": 51,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "FCL",
+      "setup": "LAUNCHPAD",
+      "entry_date": "2026-09-07",
+      "entry_price": 52.21,
+      "current_close": 55.81,
+      "trailing_stop": 52.99,
+      "peak_gain_%": 15.84,
+      "pnl_%": 6.9,
+      "holding_days": 31,
       "status": "HOLD"
     },
     {
@@ -68,7 +85,8 @@
       "entry_date": "2026-10-06",
       "entry_price": 5300.0,
       "current_close": 5398.0,
-      "trailing_stop_20ema": 5346.95,
+      "trailing_stop": 5346.95,
+      "peak_gain_%": 6.14,
       "pnl_%": 1.85,
       "holding_days": 10,
       "status": "HOLD"
@@ -79,7 +97,8 @@
       "entry_date": "2026-10-07",
       "entry_price": 287.5,
       "current_close": 297.75,
-      "trailing_stop_20ema": 289.52,
+      "trailing_stop": 289.52,
+      "peak_gain_%": 8.16,
       "pnl_%": 3.57,
       "holding_days": 9,
       "status": "HOLD"
@@ -90,9 +109,22 @@
       "entry_date": "2026-09-21",
       "entry_price": 620.5,
       "current_close": 732.75,
-      "trailing_stop_20ema": 695.63,
+      "trailing_stop": 695.63,
+      "peak_gain_%": 19.33,
       "pnl_%": 18.09,
       "holding_days": 21,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "INDGN",
+      "setup": "LAUNCHPAD",
+      "entry_date": "2026-08-03",
+      "entry_price": 538.5,
+      "current_close": 588.3,
+      "trailing_stop": 561.71,
+      "peak_gain_%": 13.89,
+      "pnl_%": 9.25,
+      "holding_days": 56,
       "status": "HOLD"
     },
     {
@@ -101,7 +133,8 @@
       "entry_date": "2026-10-16",
       "entry_price": 34.49,
       "current_close": 34.93,
-      "trailing_stop_20ema": 32.92,
+      "trailing_stop": 32.92,
+      "peak_gain_%": 1.28,
       "pnl_%": 1.28,
       "holding_days": 2,
       "status": "HOLD"
@@ -112,9 +145,22 @@
       "entry_date": "2026-06-29",
       "entry_price": 2300.0,
       "current_close": 2408.9,
-      "trailing_stop_20ema": 2366.34,
+      "trailing_stop": 2366.34,
+      "peak_gain_%": 8.96,
       "pnl_%": 4.73,
       "holding_days": 13,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "KISSHT",
+      "setup": "LAUNCHPAD",
+      "entry_date": "2026-09-07",
+      "entry_price": 320.05,
+      "current_close": 342.7,
+      "trailing_stop": 333.47,
+      "peak_gain_%": 19.7,
+      "pnl_%": 7.08,
+      "holding_days": 31,
       "status": "HOLD"
     },
     {
@@ -123,7 +169,8 @@
       "entry_date": "2026-10-06",
       "entry_price": 193.0,
       "current_close": 212.89,
-      "trailing_stop_20ema": 197.76,
+      "trailing_stop": 197.76,
+      "peak_gain_%": 10.31,
       "pnl_%": 10.31,
       "holding_days": 10,
       "status": "HOLD"
@@ -134,7 +181,8 @@
       "entry_date": "2024-12-05",
       "entry_price": 1022.24,
       "current_close": 1127.86,
-      "trailing_stop_20ema": 1125.87,
+      "trailing_stop": 1125.87,
+      "peak_gain_%": 10.33,
       "pnl_%": 10.33,
       "holding_days": 464,
       "status": "HOLD"
@@ -145,7 +193,8 @@
       "entry_date": "2024-12-11",
       "entry_price": 1045.5,
       "current_close": 1150.14,
-      "trailing_stop_20ema": 1148.08,
+      "trailing_stop": 1148.08,
+      "peak_gain_%": 10.01,
       "pnl_%": 10.01,
       "holding_days": 459,
       "status": "HOLD"
@@ -156,7 +205,8 @@
       "entry_date": "2025-02-17",
       "entry_price": 1016.25,
       "current_close": 1103.85,
-      "trailing_stop_20ema": 1101.94,
+      "trailing_stop": 1101.94,
+      "peak_gain_%": 8.62,
       "pnl_%": 8.62,
       "holding_days": 411,
       "status": "HOLD"
@@ -167,7 +217,8 @@
       "entry_date": "2024-06-07",
       "entry_price": 102.57,
       "current_close": 116.47,
-      "trailing_stop_20ema": 116.26,
+      "trailing_stop": 116.26,
+      "peak_gain_%": 13.55,
       "pnl_%": 13.55,
       "holding_days": 584,
       "status": "HOLD"
@@ -178,7 +229,8 @@
       "entry_date": "2025-04-07",
       "entry_price": 1026.09,
       "current_close": 1108.55,
-      "trailing_stop_20ema": 1106.51,
+      "trailing_stop": 1106.51,
+      "peak_gain_%": 8.04,
       "pnl_%": 8.04,
       "holding_days": 380,
       "status": "HOLD"
@@ -189,7 +241,8 @@
       "entry_date": "2026-10-13",
       "entry_price": 137.5,
       "current_close": 141.94,
-      "trailing_stop_20ema": 136.24,
+      "trailing_stop": 136.24,
+      "peak_gain_%": 3.23,
       "pnl_%": 3.23,
       "holding_days": 5,
       "status": "HOLD"
@@ -200,7 +253,8 @@
       "entry_date": "2026-10-12",
       "entry_price": 401.9,
       "current_close": 404.2,
-      "trailing_stop_20ema": 391.43,
+      "trailing_stop": 391.43,
+      "peak_gain_%": 4.04,
       "pnl_%": 0.57,
       "holding_days": 6,
       "status": "HOLD"
@@ -211,7 +265,8 @@
       "entry_date": "2026-10-14",
       "entry_price": 638.0,
       "current_close": 646.1,
-      "trailing_stop_20ema": 622.98,
+      "trailing_stop": 622.98,
+      "peak_gain_%": 2.48,
       "pnl_%": 1.27,
       "holding_days": 4,
       "status": "HOLD"
@@ -222,7 +277,8 @@
       "entry_date": "2026-10-15",
       "entry_price": 145.0,
       "current_close": 148.99,
-      "trailing_stop_20ema": 143.39,
+      "trailing_stop": 143.39,
+      "peak_gain_%": 4.69,
       "pnl_%": 2.75,
       "holding_days": 3,
       "status": "HOLD"
@@ -233,7 +289,8 @@
       "entry_date": "2026-10-14",
       "entry_price": 223.0,
       "current_close": 224.09,
-      "trailing_stop_20ema": 219.12,
+      "trailing_stop": 219.12,
+      "peak_gain_%": 2.49,
       "pnl_%": 0.49,
       "holding_days": 4,
       "status": "HOLD"
@@ -244,7 +301,8 @@
       "entry_date": "2026-09-07",
       "entry_price": 133.1,
       "current_close": 166.13,
-      "trailing_stop_20ema": 159.43,
+      "trailing_stop": 159.43,
+      "peak_gain_%": 29.58,
       "pnl_%": 24.82,
       "holding_days": 31,
       "status": "HOLD"
@@ -255,7 +313,8 @@
       "entry_date": "2026-09-25",
       "entry_price": 49.97,
       "current_close": 64.5,
-      "trailing_stop_20ema": 59.87,
+      "trailing_stop": 59.87,
+      "peak_gain_%": 29.08,
       "pnl_%": 29.08,
       "holding_days": 17,
       "status": "HOLD"
@@ -266,7 +325,8 @@
       "entry_date": "2026-06-29",
       "entry_price": 1045.0,
       "current_close": 1061.02,
-      "trailing_stop_20ema": 1059.07,
+      "trailing_stop": 1059.07,
+      "peak_gain_%": 1.53,
       "pnl_%": 1.53,
       "holding_days": 81,
       "status": "HOLD"
@@ -277,7 +337,8 @@
       "entry_date": "2026-09-23",
       "entry_price": 268.8,
       "current_close": 414.65,
-      "trailing_stop_20ema": 355.78,
+      "trailing_stop": 359.81,
+      "peak_gain_%": 57.48,
       "pnl_%": 54.26,
       "holding_days": 19,
       "status": "HOLD"
@@ -288,7 +349,8 @@
       "entry_date": "2026-09-04",
       "entry_price": 671.0,
       "current_close": 814.0,
-      "trailing_stop_20ema": 789.92,
+      "trailing_stop": 789.92,
+      "peak_gain_%": 25.19,
       "pnl_%": 21.31,
       "holding_days": 32,
       "status": "HOLD"
@@ -299,7 +361,8 @@
       "entry_date": "2026-10-12",
       "entry_price": 231.0,
       "current_close": 319.19,
-      "trailing_stop_20ema": 263.79,
+      "trailing_stop": 263.79,
+      "peak_gain_%": 38.18,
       "pnl_%": 38.18,
       "holding_days": 6,
       "status": "HOLD"
@@ -310,7 +373,8 @@
       "entry_date": "2026-10-14",
       "entry_price": 418.0,
       "current_close": 435.0,
-      "trailing_stop_20ema": 418.62,
+      "trailing_stop": 418.62,
+      "peak_gain_%": 4.07,
       "pnl_%": 4.07,
       "holding_days": 4,
       "status": "HOLD"
@@ -321,7 +385,8 @@
       "entry_date": "2026-10-15",
       "entry_price": 50.06,
       "current_close": 54.26,
-      "trailing_stop_20ema": 49.54,
+      "trailing_stop": 49.54,
+      "peak_gain_%": 8.39,
       "pnl_%": 8.39,
       "holding_days": 3,
       "status": "HOLD"
@@ -332,7 +397,8 @@
       "entry_date": "2026-09-03",
       "entry_price": 2180.0,
       "current_close": 3683.3,
-      "trailing_stop_20ema": 3616.71,
+      "trailing_stop": 3616.71,
+      "peak_gain_%": 79.63,
       "pnl_%": 68.96,
       "holding_days": 33,
       "status": "HOLD"
@@ -343,7 +409,8 @@
       "entry_date": "2026-10-14",
       "entry_price": 829.0,
       "current_close": 842.35,
-      "trailing_stop_20ema": 824.97,
+      "trailing_stop": 824.97,
+      "peak_gain_%": 2.7,
       "pnl_%": 1.61,
       "holding_days": 4,
       "status": "HOLD"
@@ -354,7 +421,8 @@
       "entry_date": "2026-10-14",
       "entry_price": 537.9,
       "current_close": 552.35,
-      "trailing_stop_20ema": 523.18,
+      "trailing_stop": 523.18,
+      "peak_gain_%": 4.04,
       "pnl_%": 2.69,
       "holding_days": 4,
       "status": "HOLD"
@@ -365,7 +433,8 @@
       "entry_date": "2026-10-07",
       "entry_price": 1900.0,
       "current_close": 1903.4,
-      "trailing_stop_20ema": 1844.72,
+      "trailing_stop": 1844.72,
+      "peak_gain_%": 2.32,
       "pnl_%": 0.18,
       "holding_days": 9,
       "status": "HOLD"
@@ -376,20 +445,10 @@
       "entry_date": "2026-10-07",
       "entry_price": 589.7,
       "current_close": 622.75,
-      "trailing_stop_20ema": 586.23,
+      "trailing_stop": 586.23,
+      "peak_gain_%": 5.6,
       "pnl_%": 5.6,
       "holding_days": 9,
-      "status": "HOLD"
-    },
-    {
-      "symbol": "WHEELS",
-      "setup": "LAUNCHPAD",
-      "entry_date": "2026-09-03",
-      "entry_price": 1613.7,
-      "current_close": 2439.4,
-      "trailing_stop_20ema": 2288.91,
-      "pnl_%": 51.17,
-      "holding_days": 33,
       "status": "HOLD"
     }
   ],
