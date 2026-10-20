@@ -34,4 +34,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
           git add data/refine_exit_results.json data/refine_exit_trades.csv
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto: Update refined distribution exit backtest [skip ci]" && git push)
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "Auto: Update refined distribution exit backtest [skip ci]"
+            git pull --rebase origin main
+            git push origin main
+          fi
