@@ -10,13 +10,6 @@ NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 START_DATE = "2021-01-01"
 MIN_TURNOVER_CR = 10.0
 
-# Execution Configuration: "LIVE_REALISTIC" or "THEORETICAL"
-MODE = "LIVE_REALISTIC"
-
-# Live friction parameters (applied when MODE == "LIVE_REALISTIC")
-ENTRY_SLIPPAGE_PCT = 0.30       # +0.30% entry slippage over pivot ceiling
-ROUNDTRIP_FRICTION_PCT = 0.40   # 0.40% round-trip friction (STT, DP charges, SEBI, GST, Slippage)
-
 
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
@@ -98,7 +91,6 @@ def clean_and_prepare(raw_data):
 
 
 def load_nifty_benchmark_data():
-    """Loads Nifty 50 close, 60d performance, and 50 SMA regime."""
     for f in ["nifty.json", "nifty50.json", "NIFTY.json"]:
         p = os.path.join(DATA_DIR, f)
         if os.path.exists(p):
@@ -157,8 +149,7 @@ def run_nifty_regime_backtest():
     target_files = [f for f in json_files if os.path.basename(f) not in excluded]
 
     trades = []
-    print(f"🚀 Running Backtest with Exit 2.2 across {len(target_files)} symbols...")
-    print(f"⚙️ Execution Mode: {MODE} (Entry Slippage: +{ENTRY_SLIPPAGE_PCT}%, Friction: -{ROUNDTRIP_FRICTION_PCT}%)")
+    print(f"🚀 Running Pure Exit 2.2 Backtest (No Slippage/Friction) across {len(target_files)} symbols...")
 
     for idx, path in enumerate(sorted(target_files)):
         sym = os.path.splitext(os.path.basename(path))[0].upper()
@@ -249,7 +240,7 @@ def run_nifty_regime_backtest():
                 atr = atr14s[i]
 
                 # ==============================================================
-                # EXIT 2.2 ENGINE
+                # EXIT 2.2 ENGINE (PURE THEORETICAL EXECUTION)
                 # ==============================================================
                 if in_trade:
                     peak_close = max(peak_close, c)
@@ -263,7 +254,7 @@ def run_nifty_regime_backtest():
                     # 1. Catastrophe Stop
                     if c < calc_sl:
                         exit_triggered = True
-                        exit_price = min(calc_sl, c) if MODE == "LIVE_REALISTIC" else calc_sl
+                        exit_price = calc_sl
                         exit_reason = "1. Catastrophe Stop"
 
                     # 2. Climactic Churn Harvest
@@ -283,7 +274,7 @@ def run_nifty_regime_backtest():
                         trailing_cushion = max(ema, peak_close * 0.85)
                         if c < trailing_cushion:
                             exit_triggered = True
-                            exit_price = min(trailing_cushion, c) if MODE == "LIVE_REALISTIC" else trailing_cushion
+                            exit_price = trailing_cushion
                             exit_reason = "4. Mega-Runner Cushion Lock"
 
                     # 5. 20 EMA Breach Engine
@@ -291,7 +282,7 @@ def run_nifty_regime_backtest():
                         is_heavy = (v >= 1.25 * v_avg) or (dv >= 1.25 * dv_avg)
                         if is_heavy:
                             exit_triggered = True
-                            exit_price = min(ema, c) if MODE == "LIVE_REALISTIC" else ema
+                            exit_price = ema
                             exit_reason = "5A. Heavy Vol Breakdown"
                         else:
                             vdu_under_count += 1
@@ -303,7 +294,7 @@ def run_nifty_regime_backtest():
 
                             if c < active_vdu_stop:
                                 exit_triggered = True
-                                exit_price = min(active_vdu_stop, c) if MODE == "LIVE_REALISTIC" else active_vdu_stop
+                                exit_price = active_vdu_stop
                                 exit_reason = "5B. Dynamic VDU Buffer Floor"
                             elif vdu_under_count > 5:
                                 exit_triggered = True
@@ -314,8 +305,7 @@ def run_nifty_regime_backtest():
                         vdu_under_count = 0
 
                     if exit_triggered:
-                        raw_pnl = ((exit_price - entry_p) / entry_p) * 100.0
-                        net_pnl = round(raw_pnl - (ROUNDTRIP_FRICTION_PCT if MODE == "LIVE_REALISTIC" else 0.0), 2)
+                        net_pnl = round(((exit_price - entry_p) / entry_p) * 100.0, 2)
                         hold_days = i - entry_idx
                         trades.append({
                             "symbol": sym,
@@ -356,7 +346,6 @@ def run_nifty_regime_backtest():
                 if not (is_stage2 and is_rs):
                     continue
 
-                # Capture Nifty 50 SMA Regime on the Entry Date
                 is_nifty_above_50 = nifty_regime_map.get(t, True)
                 cur_nifty_regime = "NIFTY >= 50 SMA" if is_nifty_above_50 else "NIFTY < 50 SMA"
 
@@ -400,7 +389,7 @@ def run_nifty_regime_backtest():
                         req_cumul_ratio = 1.50 if is_nifty750 else 1.15
                         base_up_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] >= closes[k - 1])
                         base_down_deliv = sum(deliv_vols[k] for k in range(i - 15, i) if closes[k] < closes[k - 1])
-                        base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else req_cumul_ratio
+                        base_cumul_ratio = (base_up_deliv / base_down_deliv) if base_down_deliv > 0 else req_ratio
 
                         c_bo = (c >= lp_high) and (h >= lp_high)
                         c_vol_bo = v >= (1.4 * v_avg)
@@ -408,7 +397,7 @@ def run_nifty_regime_backtest():
                         c_candle_bo = rc >= 0.65
                         obv_condition = (demat_obvs[i] >= demat_obv_maxes[i - 1]) if (is_nifty750 and i > 0) else True
 
-                        if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= req_cumul_ratio) and obv_condition:
+                        if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= req_ratio) and obv_condition:
                             entry_triggered = True
                             c_entry = lp_high
                             c_sl = round(min(l, lp_low), 2)
@@ -426,12 +415,7 @@ def run_nifty_regime_backtest():
                             continue
 
                         in_trade = True
-                        # Apply live slippage if in realistic mode
-                        if MODE == "LIVE_REALISTIC":
-                            entry_p = round(c_entry * (1.0 + (ENTRY_SLIPPAGE_PCT / 100.0)), 2)
-                        else:
-                            entry_p = c_entry
-
+                        entry_p = c_entry
                         calc_sl = c_sl
                         entry_d = t
                         entry_idx = i
@@ -448,11 +432,11 @@ def run_nifty_regime_backtest():
         return
 
     df_trades = pd.DataFrame(trades)
-    out_csv = f"data/backtest_nifty_regime_{MODE.lower()}.csv"
+    out_csv = "data/backtest_nifty_regime_pure.csv"
     df_trades.to_csv(out_csv, index=False)
 
     print("\n" + "=" * 125)
-    print(f"📊 NIFTY 50 SMA REGIME BACKTEST PERFORMANCE ({MODE} MODE | 2021 - PRESENT)")
+    print("📊 NIFTY 50 SMA REGIME BACKTEST PERFORMANCE (PURE ENTRY/EXIT | 2021 - PRESENT)")
     print("=" * 125)
 
     def compute_metrics(sub_df, label):
@@ -512,7 +496,6 @@ def run_nifty_regime_backtest():
         "Avg Loss %": "---", "Profit Factor": "---", "Max Gain %": "---", "Avg Hold (Days)": "---"
     })
 
-    # 3. Overall Portfolio
     summary_rows.append(compute_metrics(df_trades, "TOTAL PORTFOLIO (ALL REGIMES)"))
 
     summary_df = pd.DataFrame(summary_rows)
