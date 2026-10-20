@@ -143,13 +143,33 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
+    # ATR 14 calculation for Dynamic Leeway Stop
+    prev_close = df["close"].shift(1)
+    tr1 = df["high"] - df["low"]
+    tr2 = (df["high"] - prev_close).abs()
+    tr3 = (df["low"] - prev_close).abs()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+    df["atr_14"] = tr.rolling(14, min_periods=1).mean()
+
+    # Distribution Day Tracker (Rolling 12 days)
+    is_dist_day = (
+        (df["close"] < df["close"].shift(1)) &
+        ((df["delivery_vol"] >= 1.35 * df["deliv_sma20"]) | (df["deliv_pct"] >= 1.15 * df["deliv_pct_50d"])) &
+        (df["range_closeness"] <= 0.45)
+    ).astype(int)
+    df["dist_count_12d"] = is_dist_day.rolling(12, min_periods=1).sum()
+
     in_trade = False
     entry_p = 0.0
-    initial_sl = 0.0
-    current_sl = 0.0
+    calc_sl = 0.0
     entry_d = ""
     entry_idx = 0
     trade_setup = ""
+    peak_close = 0.0
+    peak_gain_pct = 0.0
+    vdu_under_count = 0
+    last_status = "HOLD"
+    last_trailing_sl = 0.0
 
     highs = df["high"].values
     lows = df["low"].values
@@ -167,6 +187,8 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
     perf_60s = df["perf_60d"].values
     demat_obvs = df["deliv_obv"].values
     demat_obv_maxes = df["dobv_20max"].values
+    atr14s = df["atr_14"].values
+    dist_12ds = df["dist_count_12d"].values
     times = df["time"].values
 
     for i in range(40, len(df)):
@@ -185,11 +207,76 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
         sma200 = sma200s[i]
         stock_p60 = perf_60s[i]
         t = times[i]
+        atr = atr14s[i]
 
-        # RANK 1 EXIT ARCHITECTURE (Hold initial SL until 20 EMA > Entry, then trail 20 EMA)
+        # ======================================================================
+        # EXIT 2.2 ENGINE (CALIBRATED INSTITUTIONAL HARVEST)
+        # ======================================================================
         if in_trade:
-            current_sl = max(initial_sl, round(float(ema), 2))
-            if c < current_sl:
+            peak_close = max(peak_close, c)
+            curr_gain = ((c - entry_p) / entry_p) * 100.0
+            peak_gain_pct = max(peak_gain_pct, curr_gain)
+
+            exit_triggered = False
+            exit_reason = ""
+            active_stop = calc_sl
+
+            # 1. CATASTROPHE STOP (UNREALIZED GAIN < 0%)
+            if c < calc_sl:
+                exit_triggered = True
+                exit_reason = "EXIT (Catastrophe Stop)"
+                active_stop = calc_sl
+
+            # 2. CLIMACTIC CHURN EXIT (TOP HARVESTING)
+            elif (dv >= 2.0 * dv_avg) and (rc <= 0.35) and (peak_gain_pct >= 20.0):
+                exit_triggered = True
+                exit_reason = "EXIT (Climactic Churn Harvest)"
+                active_stop = c
+
+            # 3. PERSISTENT DISTRIBUTION CLUSTER EXIT (>= 3D & Close < 20 EMA)
+            elif (dist_12ds[i] >= 3) and (c < ema):
+                exit_triggered = True
+                exit_reason = "EXIT (Distribution Cluster >= 3D)"
+                active_stop = c
+
+            # 4. MEGA-RUNNER 15% CUSHION LOCK (PEAK GAIN >= +50%)
+            elif peak_gain_pct >= 50.0:
+                cushion_stop = max(ema, peak_close * 0.85)
+                active_stop = cushion_stop
+                if c < cushion_stop:
+                    exit_triggered = True
+                    exit_reason = "EXIT (Mega-Runner 15% Cushion Lock)"
+
+            # 5. 20 EMA BREACH & 5-SESSION VDU RECLAIM ENGINE (PEAK GAIN < +50%)
+            elif c < ema:
+                is_heavy = (v >= 1.25 * v_avg) or (dv >= 1.25 * dv_avg)
+                if is_heavy:
+                    exit_triggered = True
+                    exit_reason = "EXIT (Heavy Volume 20 EMA Breakdown)"
+                    active_stop = ema
+                else:
+                    vdu_under_count += 1
+                    atr_floor = ema - (1.5 * atr)
+                    pct_floor = ema * 0.95
+                    dyn_leeway = min(pct_floor, atr_floor)
+                    guaranteed_be = entry_p * 1.015
+                    active_vdu_stop = max(guaranteed_be, dyn_leeway)
+                    active_stop = active_vdu_stop
+
+                    if c < active_vdu_stop:
+                        exit_triggered = True
+                        exit_reason = "EXIT (VDU Leeway Buffer Violated)"
+                    elif vdu_under_count > 5:
+                        exit_triggered = True
+                        exit_reason = "EXIT (Failed 20 EMA Reclaim > 5 Sessions)"
+            else:
+                vdu_under_count = 0
+                active_stop = max(calc_sl, round(float(ema), 2))
+
+            last_trailing_sl = round(float(active_stop), 2)
+            last_status = exit_reason if exit_triggered else "HOLD"
+
+            if exit_triggered:
                 in_trade = False
             continue
 
@@ -208,8 +295,8 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
 
         entry_triggered = False
         calc_entry = 0.0
-        calc_sl = 0.0
         cur_setup = ""
+        c_sl = 0.0
 
         # ENGINE 1: V-REVERSAL
         recent_20_high = highs[i - 20:i].max()
@@ -224,7 +311,7 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
             if c_reclaim and c_vol_rev and c_deliv_rev and c_candle_rev:
                 entry_triggered = True
                 calc_entry = round(prior_3d_high, 2)
-                calc_sl = round(recent_trough * 0.995, 2)
+                c_sl = round(recent_trough * 0.995, 2)
                 cur_setup = "V-REVERSAL"
 
         # ENGINE 2: LAUNCHPAD BREAKOUT (SPREAD <= 8%)
@@ -256,11 +343,11 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
                 if c_bo and c_vol_bo and c_deliv_bo and c_candle_bo and (base_cumul_ratio >= 1.50) and obv_high:
                     entry_triggered = True
                     calc_entry = launchpad_high
-                    calc_sl = round(min(l, launchpad_low), 2)
+                    c_sl = round(min(l, launchpad_low), 2)
                     cur_setup = "LAUNCHPAD"
 
         if entry_triggered:
-            r_dist = calc_entry - calc_sl
+            r_dist = calc_entry - c_sl
             if r_dist > 0.05 and (r_dist / calc_entry) <= 0.12:
                 deliv_surge_ratio = dv / dv_avg if dv_avg > 0 else 1.0
                 rs_ratio = (stock_p60 / n_perf) if n_perf > 0 else (1.0 + abs(stock_p60))
@@ -269,17 +356,19 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
                 if conv_score >= 2.5:
                     in_trade = True
                     entry_p = calc_entry
-                    initial_sl = calc_sl
-                    current_sl = initial_sl
+                    calc_sl = c_sl
                     entry_d = t
                     entry_idx = i
                     trade_setup = cur_setup
+                    peak_close = c
+                    peak_gain_pct = 0.0
+                    vdu_under_count = 0
+                    last_status = "HOLD"
+                    last_trailing_sl = calc_sl
 
     active_position = None
     if in_trade:
         cur_c = closes[-1]
-        cur_ema = round(float(ema20s[-1]), 2)
-        trailing_sl = max(initial_sl, cur_ema)
         pnl_pct = round(((cur_c - entry_p) / entry_p) * 100.0, 2)
         active_position = {
             "symbol": symbol,
@@ -287,10 +376,11 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
             "entry_date": entry_d,
             "entry_price": entry_p,
             "current_close": round(cur_c, 2),
-            "trailing_stop_20ema": trailing_sl,
+            "trailing_stop": last_trailing_sl,
+            "peak_gain_%": round(peak_gain_pct, 2),
             "pnl_%": pnl_pct,
             "holding_days": len(df) - 1 - entry_idx,
-            "status": "HOLD" if cur_c >= trailing_sl else "EXIT (CLOSE < 20 EMA)"
+            "status": last_status
         }
 
     fresh_trigger = None
@@ -316,8 +406,8 @@ def scan_stock_swing_ultra750(symbol, clean_data, nifty_perf_map):
             "pivot_ceiling": entry_p,
             "close": round(c_today, 2),
             "extended_pct": ext_pct,
-            "stop_loss": initial_sl,
-            "risk_%": round(((entry_p - initial_sl) / entry_p) * 100, 2),
+            "stop_loss": calc_sl,
+            "risk_%": round(((entry_p - calc_sl) / entry_p) * 100, 2),
             "conviction_score": conviction_score,
             "turnover_cr": round(to_today, 1),
             "action": "BUY AT OPEN" if ext_pct <= 3.5 else "LIMIT RETEST"
@@ -388,7 +478,9 @@ def execute_scanner():
         "swing3_run2_results.json", "swing3_run2_global_results.json",
         "swing3_vs_run2_nifty750_results.json", "swing3_run2_non_nifty750_results.json",
         "swing3_scanner_results.json", "swing3_run2_non_nifty750_scanner_results.json",
-        "swing_ultra750_results.json"
+        "swing_ultra750_results.json", "swing_ultraN750_results.json",
+        "live_intraday_breakouts.json", "live_intraday_breakouts_v2.json",
+        "accuracy_audit_log.json"
     }
 
     target_files = [
@@ -423,7 +515,7 @@ def execute_scanner():
     payload = {
         "Scan_Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Target_Universe": "Nifty 750 Universe",
-        "Strategy_Specs": "Swing Ultra Nifty750 (Shelf <= 8%, Accumulation >= 1.50, Conviction >= 2.5, Rank 1 Exit)",
+        "Strategy_Specs": "Swing Ultra Nifty750 (Shelf <= 8%, Exit 2.2 Institutional Harvest)",
         "Fresh_Triggers_Count": len(triggers),
         "Active_Positions_Count": len(active_positions),
         "Watchlist_Count": len(watchlist),
@@ -435,7 +527,7 @@ def execute_scanner():
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    print(f"✅ Swing Ultra 750 Scan Complete. Fresh: {len(triggers)}, Active: {len(active_positions)}, Watchlist: {len(watchlist)}")
+    print(f"✅ Swing Ultra 750 (Exit 2.2) Complete. Fresh: {len(triggers)}, Active: {len(active_positions)}, Watchlist: {len(watchlist)}")
 
 
 if __name__ == "__main__":
