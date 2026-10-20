@@ -122,6 +122,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
     for col in ["open", "high", "low", "close", "volume", "delivery_vol", "deliv_pct"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # Technical Suite
     df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
     df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
     df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
@@ -132,8 +133,17 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
     df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
     df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
+    # Range Closeness
     c_range = df["high"] - df["low"]
     df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
+
+    # ATR 14
+    prev_close = df["close"].shift(1)
+    tr1 = df["high"] - df["low"]
+    tr2 = (df["high"] - prev_close).abs()
+    tr3 = (df["low"] - prev_close).abs()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+    df["atr_14"] = tr.rolling(14, min_periods=1).mean()
 
     # Pre-calculate Distribution Days
     dist_days = np.zeros(len(df), dtype=int)
@@ -158,23 +168,25 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
     ema20s = df["ema_20"].values
     sma200s = df["sma_200"].values
     perf_60s = df["perf_60d"].values
+    atr14s = df["atr_14"].values
     times = df["time"].values
 
-    ema_trades = []
-    harvest_trades = []
-    vdu5_trades = []
+    t1_trades = []
+    t2_trades = []
+    t3_trades = []
 
     # Position 1: Pure 20 EMA
     in_t1 = False
     ep1, sl1, ed1, idx1, setup1 = 0.0, 0.0, "", 0, ""
 
-    # Position 2: Optimized Harvest (Immediate EMA exit)
+    # Position 2: Exit 2 (Original VDU 5% Buffer)
     in_t2 = False
     ep2, sl2, ed2, idx2, setup2, hc2 = 0.0, 0.0, "", 0, "", 0.0
 
-    # Position 3: VDU 5% Below EMA Buffer
+    # Position 3: Exit 2.1 (Adaptive ATR Buffer + 5-Session Reclaim + 50% Lock)
     in_t3 = False
     ep3, sl3, ed3, idx3, setup3, hc3 = 0.0, 0.0, "", 0, "", 0.0
+    vdu_under_count3 = 0
 
     for i in range(40, len(df)):
         c = closes[i]
@@ -190,19 +202,20 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
         ema20 = ema20s[i]
         sma200 = sma200s[i]
         stock_p60 = perf_60s[i]
+        atr14 = atr14s[i]
         t = times[i]
 
         is_vdu = (dv <= 0.70 * dv_avg) and (v <= 0.80 * v_avg)
         dist_cluster = int(dist_days[max(0, i - 12):i + 1].sum())
 
         # ==============================================================
-        # ENGINE 1: PURE 20 EMA (Rank 1 Baseline)
+        # 1. PURE 20 EMA (Rank 1 Baseline)
         # ==============================================================
         if in_t1:
             cur_sl1 = max(sl1, round(float(ema20), 2))
             if c < cur_sl1:
                 pnl = round(((cur_sl1 - ep1) / ep1) * 100.0, 2)
-                ema_trades.append({
+                t1_trades.append({
                     "symbol": symbol, "engine": "Pure 20 EMA", "setup": setup1,
                     "entry_date": ed1, "exit_date": t, "pnl_%": pnl,
                     "holding_days": i - idx1, "is_win": pnl > 0
@@ -210,17 +223,16 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 in_t1 = False
 
         # ==============================================================
-        # ENGINE 2: OPTIMIZED HARVEST (Direct EMA 20 Floor)
+        # 2. EXIT 2 (Original VDU 5% Buffer)
         # ==============================================================
         if in_t2:
             hc2 = max(hc2, c)
             unrealized_gain2 = (hc2 - ep2) / ep2
-            trailing_floor2 = max(sl2, round(float(ema20), 2))
 
             if c < sl2:
                 pnl = round(((sl2 - ep2) / ep2) * 100.0, 2)
-                harvest_trades.append({
-                    "symbol": symbol, "engine": "Optimized Harvest", "setup": setup2,
+                t2_trades.append({
+                    "symbol": symbol, "engine": "Exit 2 (VDU 5% Buffer)", "setup": setup2,
                     "entry_date": ed2, "exit_date": t, "pnl_%": pnl,
                     "holding_days": i - idx2, "is_win": pnl > 0
                 })
@@ -237,14 +249,21 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 exit_trig2 = True
             elif dist_cluster >= 3 and c < active_ema2:
                 exit_trig2 = True
-            elif c < trailing_floor2:
-                exit_trig2 = True
-                exit_px2 = trailing_floor2
+            elif c < ema20:
+                if not is_vdu:
+                    exit_trig2 = True
+                    exit_px2 = round(float(ema20), 2)
+                else:
+                    guaranteed_breakeven = round(ep2 * 1.015, 2)
+                    vdu_buffer_stop = max(guaranteed_breakeven, round(float(ema20 * 0.95), 2))
+                    if c < vdu_buffer_stop:
+                        exit_trig2 = True
+                        exit_px2 = vdu_buffer_stop
 
             if exit_trig2:
                 pnl = round(((exit_px2 - ep2) / ep2) * 100.0, 2)
-                harvest_trades.append({
-                    "symbol": symbol, "engine": "Optimized Harvest", "setup": setup2,
+                t2_trades.append({
+                    "symbol": symbol, "engine": "Exit 2 (VDU 5% Buffer)", "setup": setup2,
                     "entry_date": ed2, "exit_date": t, "pnl_%": pnl,
                     "holding_days": i - idx2, "is_win": pnl > 0
                 })
@@ -252,19 +271,19 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 continue
 
         # ==============================================================
-        # ENGINE 3: VDU 5% BUFFER BELOW 20 EMA (Protected Above Entry)
+        # 3. EXIT 2.1 (VDU 5% + ATR Adaptive + 5-Session Reclaim + 50% Lock)
         # ==============================================================
         if in_t3:
             hc3 = max(hc3, c)
             unrealized_gain3 = (hc3 - ep3) / ep3
 
-            # Disaster initial SL
+            # Hard catastrophe stop
             if c < sl3:
                 pnl = round(((sl3 - ep3) / ep3) * 100.0, 2)
-                vdu5_trades.append({
-                    "symbol": symbol, "engine": "VDU 5% Buffer", "setup": setup3,
-                    "entry_date": ed3, "exit_date": t, "pnl_%": pnl,
-                    "holding_days": i - idx3, "is_win": pnl > 0
+                t3_trades.append({
+                    "symbol": symbol, "engine": "Exit 2.1 (5D Reclaim + ATR)", "setup": setup3,
+                    "entry_date": ed3, "exit_date": t, "exit_reason": "INITIAL SL",
+                    "pnl_%": pnl, "holding_days": i - idx3, "is_win": pnl > 0
                 })
                 in_t3 = False
                 continue
@@ -273,39 +292,71 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
             active_ema3 = ema10 if unrealized_gain3 >= 0.25 else ema20
 
             exit_trig3 = False
+            exit_reason3 = ""
             exit_px3 = c
 
-            if is_climax3:
+            # Mega-Runner Profit Lock (Gain >= 50%)
+            if unrealized_gain3 >= 0.50:
+                mega_floor = max(round(float(ema10), 2), round(hc3 * 0.90, 2))
+                if c < mega_floor:
+                    exit_trig3 = True
+                    exit_px3 = mega_floor
+                    exit_reason3 = "MEGA-RUNNER 50%+ LOCK"
+
+            # Climax Churn Exit
+            elif is_climax3:
                 exit_trig3 = True
+                exit_reason3 = "CLIMAX CHURN"
+
+            # Clustered Distribution Breakdown
             elif dist_cluster >= 3 and c < active_ema3:
                 exit_trig3 = True
+                exit_reason3 = f"DIST CLUSTER ({dist_cluster}D) + EMA"
+
+            # 20 EMA Breach Engine
             elif c < ema20:
-                # If Volume is Heavy / Non-VDU: Exit immediately at 20 EMA
                 if not is_vdu:
+                    # Heavy volume breach: Immediate exit at 20 EMA
                     exit_trig3 = True
                     exit_px3 = round(float(ema20), 2)
+                    exit_reason3 = "EMA BREAK (HEAVY VOL)"
                 else:
-                    # Volume is DRY (VDU Pullback): Give 5% buffer below 20 EMA
-                    # PROVIDED it does not fall below Cost + 1.5% Breakeven Floor
+                    # Volume is DRY (VDU)
+                    vdu_under_count3 += 1
+
+                    # Adaptive Stop: Min of 5% and 1.5 * ATR_14
+                    atr_buffer_price = round(float(ema20 - (1.5 * atr14)), 2)
+                    pct_buffer_price = round(float(ema20 * 0.95), 2)
+                    dynamic_buffer_floor = min(pct_buffer_price, atr_buffer_price)
+
+                    # Guaranteed Breakeven clamp
                     guaranteed_breakeven = round(ep3 * 1.015, 2)
-                    vdu_buffer_stop = max(guaranteed_breakeven, round(float(ema20 * 0.95), 2))
+                    vdu_buffer_stop = max(guaranteed_breakeven, dynamic_buffer_floor)
 
                     if c < vdu_buffer_stop:
                         exit_trig3 = True
                         exit_px3 = vdu_buffer_stop
+                        exit_reason3 = "VDU ADAPTIVE BUFFER BREAK"
+                    elif vdu_under_count3 > 5:
+                        exit_trig3 = True
+                        exit_px3 = c
+                        exit_reason3 = "VDU 5-SESSION RECLAIM FAILED"
+            else:
+                # Price reclaimed back above 20 EMA: Reset reclaim counter
+                vdu_under_count3 = 0
 
             if exit_trig3:
                 pnl = round(((exit_px3 - ep3) / ep3) * 100.0, 2)
-                vdu5_trades.append({
-                    "symbol": symbol, "engine": "VDU 5% Buffer", "setup": setup3,
-                    "entry_date": ed3, "exit_date": t, "pnl_%": pnl,
-                    "holding_days": i - idx3, "is_win": pnl > 0
+                t3_trades.append({
+                    "symbol": symbol, "engine": "Exit 2.1 (5D Reclaim + ATR)", "setup": setup3,
+                    "entry_date": ed3, "exit_date": t, "exit_reason": exit_reason3,
+                    "pnl_%": pnl, "holding_days": i - idx3, "is_win": pnl > 0
                 })
                 in_t3 = False
                 continue
 
         # ==============================================================
-        # SWING ULTRA N750 ENTRY LOGIC
+        # SWING ULTRA N750 ENTRY CRITERIA
         # ==============================================================
         if to < MIN_TURNOVER_CR:
             continue
@@ -323,7 +374,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
         entry_trig = False
         calc_entry, calc_sl, cur_setup = 0.0, 0.0, ""
 
-        # Engine 1: V-Reversal
+        # Engine 1: V-Reversal Reclaim
         r20_h = highs[i - 20:i].max()
         if (r20_h - l) / r20_h >= 0.18:
             trough = lows[i - 5:i].min()
@@ -334,7 +385,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 calc_sl = round(trough * 0.995, 2)
                 cur_setup = "V-REVERSAL"
 
-        # Engine 2: Launchpad (<= 13% spread)
+        # Engine 2: Launchpad Breakout
         if not entry_trig:
             for s_len in range(10, 19):
                 s_h = highs[i - s_len:i].max()
@@ -358,15 +409,15 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 if not in_t2:
                     in_t2 = True; ep2 = calc_entry; sl2 = calc_sl; ed2 = t; idx2 = i; setup2 = cur_setup; hc2 = c
                 if not in_t3:
-                    in_t3 = True; ep3 = calc_entry; sl3 = calc_sl; ed3 = t; idx3 = i; setup3 = cur_setup; hc3 = c
+                    in_t3 = True; ep3 = calc_entry; sl3 = calc_sl; ed3 = t; idx3 = i; setup3 = cur_setup; hc3 = c; vdu_under_count3 = 0
 
-    return ema_trades, harvest_trades, vdu5_trades
+    return t1_trades, t2_trades, t3_trades
 
 def run_pipeline():
     nifty_map = load_benchmark()
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     target_files = [f for f in json_files if os.path.basename(f) not in EXCLUDED]
-    print(f"Scanning {len(target_files)} NSE stocks across 3 Exit Strategies...")
+    print(f"Scanning {len(target_files)} NSE stocks across Pure 20 EMA, Exit 2, and Exit 2.1...")
 
     all_t1, all_t2, all_t3 = [], [], []
 
@@ -403,6 +454,7 @@ def run_pipeline():
             "Average_Loss_%": round(losses["pnl_%"].mean(), 2) if len(losses) else 0,
             "Average_Holding_Days": round(df["holding_days"].mean(), 1) if tot else 0,
             "Max_Gain_%": round(df["pnl_%"].max(), 2) if tot else 0,
+            "Exit_Reasons": df["exit_reason"].value_counts().to_dict() if "exit_reason" in df.columns else {}
         }
 
     s1 = calc_stats(all_t1)
@@ -412,9 +464,9 @@ def run_pipeline():
     output = {
         "Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Pure_20_EMA": s1,
-        "Optimized_Harvest": s2,
-        "VDU_5pct_Buffer": s3,
-        "Top_15_VDU5_Winners": pd.DataFrame(all_t3).sort_values(by="pnl_%", ascending=False).head(15).to_dict(orient="records") if all_t3 else []
+        "Exit_2_VDU_5pct": s2,
+        "Exit_2_1_Refined": s3,
+        "Top_15_Exit_2_1_Winners": pd.DataFrame(all_t3).sort_values(by="pnl_%", ascending=False).head(15).to_dict(orient="records") if all_t3 else []
     }
 
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
@@ -422,19 +474,19 @@ def run_pipeline():
 
     pd.DataFrame(all_t3).to_csv(TRADES_CSV, index=False)
 
-    print("\n" + "=" * 82)
-    print("      TRI-STRATEGY COMPARATIVE STUDY: 20 EMA vs. HARVEST vs. VDU 5% BUFFER")
-    print("=" * 82)
-    print(f"{'Metric':<22} | {'Pure 20 EMA':<16} | {'Optimized Harvest':<16} | {'VDU 5% Buffer':<16}")
-    print("-" * 82)
-    print(f"{'Total Trades':<22} | {s1.get('Total_Trades',0):<16,} | {s2.get('Total_Trades',0):<16,} | {s3.get('Total_Trades',0):<16,}")
-    print(f"{'Win Rate (%)':<22} | {s1.get('Win_Rate_%',0):<16.2f}% | {s2.get('Win_Rate_%',0):<16.2f}% | {s3.get('Win_Rate_%',0):<16.2f}%")
-    print(f"{'Profit Factor (PF)':<22} | {s1.get('Profit_Factor',0):<16.2f} | {s2.get('Profit_Factor',0):<16.2f} | {s3.get('Profit_Factor',0):<16.2f}")
-    print(f"{'Avg Gain / Win':<22} | +{s1.get('Average_Gain_%',0):<15.2f}% | +{s2.get('Average_Gain_%',0):<15.2f}% | +{s3.get('Average_Gain_%',0):<15.2f}%")
-    print(f"{'Avg Loss / Loss':<22} | {s1.get('Average_Loss_%',0):<16.2f}% | {s2.get('Average_Loss_%',0):<16.2f}% | {s3.get('Average_Loss_%',0):<16.2f}%")
-    print(f"{'Max Gain':<22} | +{s1.get('Max_Gain_%',0):<15.2f}% | +{s2.get('Max_Gain_%',0):<15.2f}% | +{s3.get('Max_Gain_%',0):<15.2f}%")
-    print(f"{'Avg Hold (Days)':<22} | {s1.get('Average_Holding_Days',0):<16.1f} | {s2.get('Average_Holding_Days',0):<16.1f} | {s3.get('Average_Holding_Days',0):<16.1f}")
-    print("=" * 82)
+    print("\n" + "=" * 84)
+    print("      TRI-STRATEGY BENCHMARK: PURE 20 EMA vs. EXIT 2 vs. EXIT 2.1")
+    print("=" * 84)
+    print(f"{'Metric':<22} | {'Pure 20 EMA':<16} | {'Exit 2 (5% Buffer)':<18} | {'Exit 2.1 (Refined)':<18}")
+    print("-" * 84)
+    print(f"{'Total Trades':<22} | {s1.get('Total_Trades',0):<16,} | {s2.get('Total_Trades',0):<18,} | {s3.get('Total_Trades',0):<18,}")
+    print(f"{'Win Rate (%)':<22} | {s1.get('Win_Rate_%',0):<16.2f}% | {s2.get('Win_Rate_%',0):<18.2f}% | {s3.get('Win_Rate_%',0):<18.2f}%")
+    print(f"{'Profit Factor (PF)':<22} | {s1.get('Profit_Factor',0):<16.2f} | {s2.get('Profit_Factor',0):<18.2f} | {s3.get('Profit_Factor',0):<18.2f}")
+    print(f"{'Avg Gain / Win':<22} | +{s1.get('Average_Gain_%',0):<15.2f}% | +{s2.get('Average_Gain_%',0):<17.2f}% | +{s3.get('Average_Gain_%',0):<17.2f}%")
+    print(f"{'Avg Loss / Loss':<22} | {s1.get('Average_Loss_%',0):<16.2f}% | {s2.get('Average_Loss_%',0):<18.2f}% | {s3.get('Average_Loss_%',0):<18.2f}%")
+    print(f"{'Max Gain':<22} | +{s1.get('Max_Gain_%',0):<15.2f}% | +{s2.get('Max_Gain_%',0):<17.2f}% | +{s3.get('Max_Gain_%',0):<17.2f}%")
+    print(f"{'Avg Hold (Days)':<22} | {s1.get('Average_Holding_Days',0):<16.1f} | {s2.get('Average_Holding_Days',0):<18.1f} | {s3.get('Average_Holding_Days',0):<18.1f}")
+    print("=" * 84)
 
 if __name__ == "__main__":
     run_pipeline()
