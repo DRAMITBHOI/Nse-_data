@@ -122,7 +122,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
     for col in ["open", "high", "low", "close", "volume", "delivery_vol", "deliv_pct"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Technical Suite
+    # Technical Indicators
     df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
     df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
     df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
@@ -175,15 +175,15 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
     t2_trades = []
     t3_trades = []
 
-    # Position 1: Pure 20 EMA
+    # Engine 1: Pure 20 EMA
     in_t1 = False
     ep1, sl1, ed1, idx1, setup1 = 0.0, 0.0, "", 0, ""
 
-    # Position 2: Exit 2 (Original VDU 5% Buffer)
+    # Engine 2: Exit 2 (Original VDU 5% Buffer)
     in_t2 = False
     ep2, sl2, ed2, idx2, setup2, hc2 = 0.0, 0.0, "", 0, "", 0.0
 
-    # Position 3: Exit 2.1 (Adaptive ATR Buffer + 5-Session Reclaim + 50% Lock)
+    # Engine 3: Exit 2.2 (Calibrated Runner 15% Cushion & True Heavy Vol Gate)
     in_t3 = False
     ep3, sl3, ed3, idx3, setup3, hc3 = 0.0, 0.0, "", 0, "", 0.0
     vdu_under_count3 = 0
@@ -205,7 +205,6 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
         atr14 = atr14s[i]
         t = times[i]
 
-        is_vdu = (dv <= 0.70 * dv_avg) and (v <= 0.80 * v_avg)
         dist_cluster = int(dist_days[max(0, i - 12):i + 1].sum())
 
         # ==============================================================
@@ -232,7 +231,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
             if c < sl2:
                 pnl = round(((sl2 - ep2) / ep2) * 100.0, 2)
                 t2_trades.append({
-                    "symbol": symbol, "engine": "Exit 2 (VDU 5% Buffer)", "setup": setup2,
+                    "symbol": symbol, "engine": "Exit 2 (5% Buffer)", "setup": setup2,
                     "entry_date": ed2, "exit_date": t, "pnl_%": pnl,
                     "holding_days": i - idx2, "is_win": pnl > 0
                 })
@@ -241,6 +240,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
 
             is_climax2 = (dv >= 2.0 * dv_avg) and (rc <= 0.35) and (unrealized_gain2 >= 0.20)
             active_ema2 = ema10 if unrealized_gain2 >= 0.25 else ema20
+            is_vdu2 = (dv <= 0.70 * dv_avg) and (v <= 0.80 * v_avg)
 
             exit_trig2 = False
             exit_px2 = c
@@ -250,7 +250,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
             elif dist_cluster >= 3 and c < active_ema2:
                 exit_trig2 = True
             elif c < ema20:
-                if not is_vdu:
+                if not is_vdu2:
                     exit_trig2 = True
                     exit_px2 = round(float(ema20), 2)
                 else:
@@ -263,7 +263,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
             if exit_trig2:
                 pnl = round(((exit_px2 - ep2) / ep2) * 100.0, 2)
                 t2_trades.append({
-                    "symbol": symbol, "engine": "Exit 2 (VDU 5% Buffer)", "setup": setup2,
+                    "symbol": symbol, "engine": "Exit 2 (5% Buffer)", "setup": setup2,
                     "entry_date": ed2, "exit_date": t, "pnl_%": pnl,
                     "holding_days": i - idx2, "is_win": pnl > 0
                 })
@@ -271,7 +271,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 continue
 
         # ==============================================================
-        # 3. EXIT 2.1 (VDU 5% + ATR Adaptive + 5-Session Reclaim + 50% Lock)
+        # 3. EXIT 2.2 (CALIBRATED RUNNER EXPANSION & TRUE HEAVY-VOL GATE)
         # ==============================================================
         if in_t3:
             hc3 = max(hc3, c)
@@ -281,7 +281,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
             if c < sl3:
                 pnl = round(((sl3 - ep3) / ep3) * 100.0, 2)
                 t3_trades.append({
-                    "symbol": symbol, "engine": "Exit 2.1 (5D Reclaim + ATR)", "setup": setup3,
+                    "symbol": symbol, "engine": "Exit 2.2 (Calibrated)", "setup": setup3,
                     "entry_date": ed3, "exit_date": t, "exit_reason": "INITIAL SL",
                     "pnl_%": pnl, "holding_days": i - idx3, "is_win": pnl > 0
                 })
@@ -289,47 +289,38 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                 continue
 
             is_climax3 = (dv >= 2.0 * dv_avg) and (rc <= 0.35) and (unrealized_gain3 >= 0.20)
-            active_ema3 = ema10 if unrealized_gain3 >= 0.25 else ema20
+            
+            # Widen mega-runner clamp to 15% and anchor to 20 EMA
+            mega_floor3 = max(round(float(ema20), 2), round(hc3 * 0.85, 2)) if unrealized_gain3 >= 0.50 else 0.0
+
+            # Verified Institutional Breakdown Threshold (>= 1.25x)
+            is_true_heavy_break = (v >= 1.25 * v_avg) or (dv >= 1.25 * dv_avg)
 
             exit_trig3 = False
             exit_reason3 = ""
             exit_px3 = c
 
-            # Mega-Runner Profit Lock (Gain >= 50%)
-            if unrealized_gain3 >= 0.50:
-                mega_floor = max(round(float(ema10), 2), round(hc3 * 0.90, 2))
-                if c < mega_floor:
-                    exit_trig3 = True
-                    exit_px3 = mega_floor
-                    exit_reason3 = "MEGA-RUNNER 50%+ LOCK"
-
-            # Climax Churn Exit
+            if unrealized_gain3 >= 0.50 and c < mega_floor3:
+                exit_trig3 = True
+                exit_px3 = mega_floor3
+                exit_reason3 = "MEGA-RUNNER 15% CLAMP"
             elif is_climax3:
                 exit_trig3 = True
-                exit_reason3 = "CLIMAX CHURN"
-
-            # Clustered Distribution Breakdown
-            elif dist_cluster >= 3 and c < active_ema3:
+                exit_reason3 = "CLIMAX CHURN EXIT"
+            elif dist_cluster >= 3 and c < ema20:
                 exit_trig3 = True
-                exit_reason3 = f"DIST CLUSTER ({dist_cluster}D) + EMA"
-
-            # 20 EMA Breach Engine
+                exit_reason3 = f"DIST CLUSTER ({dist_cluster}D) BREAK"
             elif c < ema20:
-                if not is_vdu:
-                    # Heavy volume breach: Immediate exit at 20 EMA
+                if is_true_heavy_break:
                     exit_trig3 = True
                     exit_px3 = round(float(ema20), 2)
-                    exit_reason3 = "EMA BREAK (HEAVY VOL)"
+                    exit_reason3 = "EMA BREAK (TRUE HEAVY VOL)"
                 else:
-                    # Volume is DRY (VDU)
                     vdu_under_count3 += 1
-
-                    # Adaptive Stop: Min of 5% and 1.5 * ATR_14
                     atr_buffer_price = round(float(ema20 - (1.5 * atr14)), 2)
                     pct_buffer_price = round(float(ema20 * 0.95), 2)
                     dynamic_buffer_floor = min(pct_buffer_price, atr_buffer_price)
 
-                    # Guaranteed Breakeven clamp
                     guaranteed_breakeven = round(ep3 * 1.015, 2)
                     vdu_buffer_stop = max(guaranteed_breakeven, dynamic_buffer_floor)
 
@@ -342,13 +333,12 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
                         exit_px3 = c
                         exit_reason3 = "VDU 5-SESSION RECLAIM FAILED"
             else:
-                # Price reclaimed back above 20 EMA: Reset reclaim counter
                 vdu_under_count3 = 0
 
             if exit_trig3:
                 pnl = round(((exit_px3 - ep3) / ep3) * 100.0, 2)
                 t3_trades.append({
-                    "symbol": symbol, "engine": "Exit 2.1 (5D Reclaim + ATR)", "setup": setup3,
+                    "symbol": symbol, "engine": "Exit 2.2 (Calibrated)", "setup": setup3,
                     "entry_date": ed3, "exit_date": t, "exit_reason": exit_reason3,
                     "pnl_%": pnl, "holding_days": i - idx3, "is_win": pnl > 0
                 })
@@ -376,7 +366,7 @@ def backtest_tri_exits(symbol, clean_data, nifty_perf_map):
 
         # Engine 1: V-Reversal Reclaim
         r20_h = highs[i - 20:i].max()
-        if (r20_h - l) / r20_h >= 0.18:
+        if (recent_20_high := r20_h) and (recent_20_high - l) / recent_20_high >= 0.18:
             trough = lows[i - 5:i].min()
             p3_h = highs[i - 4:i].max()
             if (c >= p3_h) and (c > closes[i - 1]) and (v >= 1.3 * v_avg) and (dv >= 1.25 * dv_avg) and (rc >= 0.55):
@@ -417,7 +407,7 @@ def run_pipeline():
     nifty_map = load_benchmark()
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     target_files = [f for f in json_files if os.path.basename(f) not in EXCLUDED]
-    print(f"Scanning {len(target_files)} NSE stocks across Pure 20 EMA, Exit 2, and Exit 2.1...")
+    print(f"Scanning {len(target_files)} NSE stocks across Pure 20 EMA, Exit 2, and Exit 2.2...")
 
     all_t1, all_t2, all_t3 = [], [], []
 
@@ -464,9 +454,9 @@ def run_pipeline():
     output = {
         "Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "Pure_20_EMA": s1,
-        "Exit_2_VDU_5pct": s2,
-        "Exit_2_1_Refined": s3,
-        "Top_15_Exit_2_1_Winners": pd.DataFrame(all_t3).sort_values(by="pnl_%", ascending=False).head(15).to_dict(orient="records") if all_t3 else []
+        "Exit_2_Original": s2,
+        "Exit_2_2_Calibrated": s3,
+        "Top_15_Exit_2_2_Winners": pd.DataFrame(all_t3).sort_values(by="pnl_%", ascending=False).head(15).to_dict(orient="records") if all_t3 else []
     }
 
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
@@ -475,9 +465,9 @@ def run_pipeline():
     pd.DataFrame(all_t3).to_csv(TRADES_CSV, index=False)
 
     print("\n" + "=" * 84)
-    print("      TRI-STRATEGY BENCHMARK: PURE 20 EMA vs. EXIT 2 vs. EXIT 2.1")
+    print("      TRI-STRATEGY BENCHMARK: PURE 20 EMA vs. EXIT 2 vs. EXIT 2.2")
     print("=" * 84)
-    print(f"{'Metric':<22} | {'Pure 20 EMA':<16} | {'Exit 2 (5% Buffer)':<18} | {'Exit 2.1 (Refined)':<18}")
+    print(f"{'Metric':<22} | {'Pure 20 EMA':<16} | {'Exit 2 (Original)':<18} | {'Exit 2.2 (Calibrated)':<18}")
     print("-" * 84)
     print(f"{'Total Trades':<22} | {s1.get('Total_Trades',0):<16,} | {s2.get('Total_Trades',0):<18,} | {s3.get('Total_Trades',0):<18,}")
     print(f"{'Win Rate (%)':<22} | {s1.get('Win_Rate_%',0):<16.2f}% | {s2.get('Win_Rate_%',0):<18.2f}% | {s3.get('Win_Rate_%',0):<18.2f}%")
