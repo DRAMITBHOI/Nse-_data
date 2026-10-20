@@ -1,5 +1,5 @@
 {
-  "Last_Updated": "2026-10-20 01:02:07 AM IST",
+  "Last_Updated": "2026-10-20 07:09:29 PM IST",
   "Sessions_Audited": 4,
   "Cumulative_Accuracy": {
     "Scanner_V1_%": 0.0,
@@ -75,12 +75,10 @@
       "date": "2026-10-20",
       "eod_verified_count": 0,
       "scanner_v1": {
-        "signals": 1,
+        "signals": 0,
         "hits": 0,
-        "accuracy_%": 0.0,
-        "tickers": [
-          "CEIGALL"
-        ]
+        "accuracy_%": 100.0,
+        "tickers": []
       },
       "scanner_v2": {
         "signals": 0,
