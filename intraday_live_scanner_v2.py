@@ -13,12 +13,15 @@ DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_V2_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts_v2.json")
+ACTIVE_PORTFOLIO_FILE = os.path.join(DATA_DIR, "active_portfolio_positions.json")
 
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
 
+
 def get_ist_now():
     return datetime.datetime.now(IST)
+
 
 def get_market_session_elapsed():
     now = get_ist_now()
@@ -32,17 +35,8 @@ def get_market_session_elapsed():
         elapsed = int((now - market_open).total_seconds() / 60)
         return max(1, min(375, elapsed))
 
-# ==============================================================================
-# IMPROVEMENT 2: Authentic U-Curve Time-Weighted Volume Pace Curve
-# ==============================================================================
+
 def get_u_curve_expected_volume_fraction(elapsed_mins):
-    """
-    Intraday Volume U-Distribution in Indian Equity Markets:
-    - 0-75m   (09:15 - 10:30): Morning opening drive (~32% of total day's volume)
-    - 75-225m (10:30 - 01:00): Midday consolidation/lull (+28% -> 60% cumulative)
-    - 225-330m(01:00 - 02:45): Afternoon pre-positioning (+20% -> 80% cumulative)
-    - 330-375m(02:45 - 03:30): Heavy closing institutional auction surge (+20% -> 100%)
-    """
     if elapsed_mins <= 0:
         return 0.02
     elif elapsed_mins <= 75:
@@ -53,6 +47,7 @@ def get_u_curve_expected_volume_fraction(elapsed_mins):
         return 0.60 + ((elapsed_mins - 225.0) / 105.0) * 0.20
     else:
         return 0.80 + ((elapsed_mins - 330.0) / 45.0) * 0.20
+
 
 class LivePriceClient:
     def __init__(self):
@@ -114,14 +109,8 @@ class LivePriceClient:
 
         return None
 
-# ==============================================================================
-# IMPROVEMENT 3: Live Nifty 50 Market Breadth Gate
-# ==============================================================================
+
 def get_nifty50_market_sentiment(client: LivePriceClient):
-    """
-    Fetches live NIFTY 50 change %.
-    If broad market is tumbling (down > 0.60%), we raise volume hurdles.
-    """
     try:
         url = "https://www.google.com/finance/quote/NIFTY_50:INDEXNSE"
         r = client.session.get(url, timeout=5)
@@ -131,15 +120,12 @@ def get_nifty50_market_sentiment(client: LivePriceClient):
             if match and prev_match:
                 curr = float(match.group(1))
                 prev = float(prev_match.group(1).replace(",", ""))
-                chg_pct = round(((curr - prev) / prev) * 100.0, 2)
-                return chg_pct
+                return round(((curr - prev) / prev) * 100.0, 2)
     except Exception:
         pass
     return 0.0
 
-# ==============================================================================
-# IMPROVEMENT 4: Shelf Tightness & Consolidation Quality Extraction
-# ==============================================================================
+
 def load_comprehensive_targets():
     targets = {}
     sources = [
@@ -168,8 +154,6 @@ def load_comprehensive_targets():
                     stop_loss = float(item.get("stop_loss", pivot * 0.92))
                     setup = item.get("setup_class") or item.get("type") or "LAUNCHPAD COIL"
                     universe = item.get("universe", default_univ)
-                    
-                    # Extract shelf tightness and volatility spread
                     spread_pct = float(item.get("spread_%", item.get("shelf_spread_%", 6.0)) or 6.0)
 
                     targets[sym] = {
@@ -207,6 +191,7 @@ def load_comprehensive_targets():
 
     return targets
 
+
 def run_live_intraday_scan_v2():
     targets = load_comprehensive_targets()
     if not targets:
@@ -218,9 +203,6 @@ def run_live_intraday_scan_v2():
     now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
     elapsed_mins = get_market_session_elapsed()
 
-    # ==========================================================================
-    # IMPROVEMENT 5: Multi-Tick Persistence Tracker
-    # ==========================================================================
     prior_consecutive_hits = {}
     if os.path.exists(LIVE_BREAKOUTS_V2_FILE):
         try:
@@ -300,53 +282,40 @@ def run_live_intraday_scan_v2():
         clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
         drop_from_high_pct = round(((day_high - ltp) / day_high) * 100.0, 2) if day_high > 0 else 0.0
 
-        # Dynamic Stop Loss
-        if is_v_reversal:
-            effective_sl = max(structural_sl, round(day_low * 0.995, 2))
-        else:
-            effective_sl = structural_sl
-
+        effective_sl = max(structural_sl, round(day_low * 0.995, 2)) if is_v_reversal else structural_sl
         risk_pct = round(((ltp - effective_sl) / ltp) * 100.0, 2) if ltp > effective_sl else 8.0
 
-        # ======================================================================
-        # CRITERIA REFINEMENTS (Launchpad Coils vs. V-Reversals)
-        # ======================================================================
-        # 1. Base Volume Threshold
+        # Base Volume Hurdles
         if is_v_reversal:
-            base_pace = 2.0 if universe == "NIFTY 750" else 1.75
-            min_clearance = 0.40
-            max_clearance = 3.50  # Prevent buying exhausted climax runs
+            base_pace = 1.75 if universe == "NIFTY 750" else 1.50
+            min_clearance = 0.25
+            max_clearance = 4.50
         else:
-            # Launchpad Coils: tight bases require less volume, loose bases require more
-            base_pace = 1.30 if universe == "NIFTY 750" else 0.85
-            if shelf_spread > 7.0:  # Improvement 4: Wide shelf penalty
-                base_pace += 0.35
-            
-            # Improvement 1: Closing Auction Discrepancy Buffer
-            min_clearance = 0.25 if elapsed_mins < 330 else 0.50
+            base_pace = 1.25 if universe == "NIFTY 750" else 0.85
+            if shelf_spread > 7.0:
+                base_pace += 0.30
+            min_clearance = 0.25
             max_clearance = 6.00
 
-        # Improvement 3: Broad Market Drag Protection
         if is_nifty_weak:
             base_pace += 0.30
 
         is_volume_confirmed = bool(vol_pace >= base_pace)
-        cleared_pivot = bool(clearance_pct >= min_clearance and clearance_pct <= max_clearance)
-        
-        # Improvement 1b: Drop from intraday high filter (reject late closing dump)
-        max_allowed_drop = 1.25 if elapsed_mins >= 330 else 2.00
+        cleared_pivot = bool(min_clearance <= clearance_pct <= max_clearance)
+
+        # Drop from high limit (reject dumps)
+        max_allowed_drop = 1.50 if elapsed_mins >= 330 else 2.50
         no_closing_fade = bool(drop_from_high_pct <= max_allowed_drop)
         wick_touched_pivot = bool(day_high >= pivot)
 
-        # Multi-Tick Consecutive Counter (Improvement 5)
-        if cleared_pivot:
-            hits = prior_consecutive_hits.get(sym, 0) + 1
-        else:
-            hits = 0
+        # Dynamic Persistence (Option B)
+        hits = (prior_consecutive_hits.get(sym, 0) + 1) if cleared_pivot else 0
         current_consecutive_hits[sym] = hits
 
-        # During radar hours, require at least 2 ticks to confirm
-        multi_tick_confirmed = hits >= 2 if (elapsed_mins < 330 and elapsed_mins > 45) else (hits >= 1)
+        if vol_pace >= 2.50:
+            is_persistent = bool(hits >= 1)
+        else:
+            is_persistent = bool(hits >= 2)
 
         record = {
             "symbol": sym,
@@ -365,8 +334,7 @@ def run_live_intraday_scan_v2():
             "consecutive_ticks": hits
         }
 
-        # Window Classification
-        if elapsed_mins >= 330:  # 02:45 PM – 03:30 PM: Closing Execution Window
+        if elapsed_mins >= 330:
             if cleared_pivot and is_volume_confirmed and no_closing_fade:
                 record["action"] = "CONFIRMED BREAKOUT"
                 confirmed_breakouts.append(record)
@@ -376,8 +344,8 @@ def run_live_intraday_scan_v2():
             else:
                 record["action"] = "COILING"
                 coiling_list.append(record)
-        else:  # 09:15 AM – 02:45 PM: Radar Window
-            if cleared_pivot and is_volume_confirmed and no_closing_fade and multi_tick_confirmed:
+        else:
+            if cleared_pivot and is_volume_confirmed and no_closing_fade and is_persistent:
                 record["action"] = "RADAR PIVOT CLEARANCE"
                 radar_candidates.append(record)
             elif wick_touched_pivot and not cleared_pivot:
@@ -405,6 +373,7 @@ def run_live_intraday_scan_v2():
         json.dump(output_payload, f, indent=2)
 
     print(f"✅ [Scanner V2 Silent] {len(confirmed_breakouts)} Confirmed Breakouts, {len(radar_candidates)} Radar, {len(coiling_list)} Coils.")
+
 
 if __name__ == "__main__":
     run_live_intraday_scan_v2()
