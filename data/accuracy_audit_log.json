@@ -1,8 +1,8 @@
 {
-  "Last_Updated": "2026-10-20 11:46:25 PM IST",
-  "Sessions_Audited": 4,
+  "Last_Updated": "2026-10-21 07:10:32 PM IST",
+  "Sessions_Audited": 5,
   "Cumulative_Accuracy": {
-    "Scanner_V1_%": 0.0,
+    "Scanner_V1_%": 50.0,
     "Scanner_V2_%": 100.0
   },
   "Daily_Records": [
@@ -87,6 +87,27 @@
         "tickers": []
       },
       "eod_verified": []
+    },
+    {
+      "date": "2026-10-21",
+      "eod_verified_count": 1,
+      "scanner_v1": {
+        "signals": 1,
+        "hits": 1,
+        "accuracy_%": 100.0,
+        "tickers": [
+          "ANANDRATHI"
+        ]
+      },
+      "scanner_v2": {
+        "signals": 0,
+        "hits": 0,
+        "accuracy_%": 100.0,
+        "tickers": []
+      },
+      "eod_verified": [
+        "ANANDRATHI"
+      ]
     }
   ]
 }
