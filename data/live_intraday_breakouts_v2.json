@@ -1,6 +1,6 @@
 {
   "Date": "2026-10-21",
-  "Scan_Timestamp": "2026-10-21 03:36:42 PM IST",
+  "Scan_Timestamp": "2026-10-21 03:42:17 PM IST",
   "Elapsed_Minutes": 375,
   "Nifty50_Intraday_%": 0.0,
   "Consecutive_Hits": {
@@ -12,7 +12,7 @@
     "CASTROLIND": 0,
     "BOSCHLTD": 0,
     "PETRONET": 0,
-    "ANANDRATHI": 30,
+    "ANANDRATHI": 31,
     "BAJAJHLDNG": 0,
     "CRISIL": 0,
     "RATNAVEER": 0,
@@ -39,7 +39,8 @@
     "AXISBANK": 0,
     "ETHOSLTD": 0
   },
-  "Breakouts_All_Day": [
+  "Breakouts_All_Day": [],
+  "Coiling": [
     {
       "symbol": "ANANDRATHI",
       "universe": "NIFTY 750",
@@ -53,12 +54,10 @@
       "shelf_spread_%": 7.74,
       "clearance_%": 1.29,
       "drop_from_high_%": 0.0,
-      "proj_vol_pace": 1.65,
-      "consecutive_ticks": 30,
-      "action": "CONFIRMED BREAKOUT"
-    }
-  ],
-  "Coiling": [
+      "proj_vol_pace": 1.62,
+      "consecutive_ticks": 31,
+      "action": "COILING"
+    },
     {
       "symbol": "PREMEXPLN",
       "universe": "NON-N750",
@@ -140,7 +139,7 @@
       "shelf_spread_%": 4.03,
       "clearance_%": -1.54,
       "drop_from_high_%": 1.4,
-      "proj_vol_pace": 1.72,
+      "proj_vol_pace": 1.68,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -191,7 +190,7 @@
       "shelf_spread_%": 7.36,
       "clearance_%": -2.47,
       "drop_from_high_%": 2.92,
-      "proj_vol_pace": 0.79,
+      "proj_vol_pace": 0.77,
       "consecutive_ticks": 0,
       "action": "WICK REJECTED"
     },
@@ -242,7 +241,7 @@
       "shelf_spread_%": 7.53,
       "clearance_%": -2.68,
       "drop_from_high_%": 1.18,
-      "proj_vol_pace": 0.71,
+      "proj_vol_pace": 0.66,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -276,7 +275,7 @@
       "shelf_spread_%": 7.16,
       "clearance_%": -2.96,
       "drop_from_high_%": 2.49,
-      "proj_vol_pace": 1.05,
+      "proj_vol_pace": 0.98,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -293,7 +292,7 @@
       "shelf_spread_%": 7.52,
       "clearance_%": -3.02,
       "drop_from_high_%": 2.4,
-      "proj_vol_pace": 0.83,
+      "proj_vol_pace": 0.78,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -310,7 +309,7 @@
       "shelf_spread_%": 7.55,
       "clearance_%": -3.38,
       "drop_from_high_%": 2.03,
-      "proj_vol_pace": 0.44,
+      "proj_vol_pace": 0.41,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -327,7 +326,7 @@
       "shelf_spread_%": 7.53,
       "clearance_%": -3.38,
       "drop_from_high_%": 1.13,
-      "proj_vol_pace": 1.11,
+      "proj_vol_pace": 1.07,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -344,7 +343,7 @@
       "shelf_spread_%": 6.69,
       "clearance_%": -3.66,
       "drop_from_high_%": 3.24,
-      "proj_vol_pace": 0.96,
+      "proj_vol_pace": 0.9,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -480,7 +479,7 @@
       "shelf_spread_%": 5.06,
       "clearance_%": -5.58,
       "drop_from_high_%": 2.96,
-      "proj_vol_pace": 1.0,
+      "proj_vol_pace": 0.99,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -548,7 +547,7 @@
       "shelf_spread_%": 6.46,
       "clearance_%": -6.48,
       "drop_from_high_%": 2.69,
-      "proj_vol_pace": 0.74,
+      "proj_vol_pace": 0.68,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
