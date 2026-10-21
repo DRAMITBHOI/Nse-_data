@@ -1,134 +1,103 @@
 {
-  "Scan_Timestamp": "2026-10-20 13:35:43 IST",
+  "Scan_Timestamp": "2026-10-21 13:38:11 IST",
   "Target_Universe": "Nifty 750 Universe",
-  "Strategy_Specs": "Swing Ultra Nifty750 (Shelf <= 8%, Accumulation >= 1.50, Conviction >= 2.5, Rank 1 Exit)",
-  "Fresh_Triggers_Count": 0,
-  "Active_Positions_Count": 1,
-  "Watchlist_Count": 11,
-  "Fresh_Triggers": [],
+  "Strategy_Specs": "Swing Ultra Nifty750 (Shelf <= 8%, Exit 2.2 Institutional Harvest)",
+  "Fresh_Triggers_Count": 1,
+  "Active_Positions_Count": 3,
+  "Watchlist_Count": 4,
+  "Fresh_Triggers": [
+    {
+      "symbol": "ANANDRATHI",
+      "date": "2026-10-21",
+      "type": "LAUNCHPAD",
+      "pivot_ceiling": 2172.0,
+      "close": 2200.0,
+      "extended_pct": 1.29,
+      "stop_loss": 2015.9,
+      "risk_%": 7.19,
+      "conviction_score": 146.025,
+      "turnover_cr": 74.0,
+      "action": "BUY AT OPEN"
+    }
+  ],
   "Active_Positions": [
+    {
+      "symbol": "ANANDRATHI",
+      "setup": "LAUNCHPAD",
+      "entry_date": "2026-10-21",
+      "entry_price": 2172.0,
+      "current_close": 2200.0,
+      "trailing_stop": 2015.9,
+      "peak_gain_%": 0.0,
+      "pnl_%": 1.29,
+      "holding_days": 0,
+      "status": "HOLD"
+    },
     {
       "symbol": "INDHOTEL",
       "setup": "LAUNCHPAD",
       "entry_date": "2026-10-16",
       "entry_price": 752.55,
-      "current_close": 760.0,
-      "trailing_stop_20ema": 734.75,
-      "pnl_%": 0.99,
-      "holding_days": 2,
+      "current_close": 753.0,
+      "trailing_stop": 736.49,
+      "peak_gain_%": 0.99,
+      "pnl_%": 0.06,
+      "holding_days": 3,
+      "status": "HOLD"
+    },
+    {
+      "symbol": "PTCIL",
+      "setup": "LAUNCHPAD",
+      "entry_date": "2026-08-07",
+      "entry_price": 18540.0,
+      "current_close": 25115.0,
+      "trailing_stop": 24103.97,
+      "peak_gain_%": 38.7,
+      "pnl_%": 35.46,
+      "holding_days": 53,
       "status": "HOLD"
     }
   ],
   "Watchlist": [
     {
-      "symbol": "STLTECH",
-      "setup_class": "V-REVERSAL PRE-RECLAIM",
-      "close": 887.25,
-      "pivot_target": 908.8,
-      "dist_to_pivot_pct": 2.43,
-      "spread_%": 20.0,
-      "conviction_score": 707.129,
-      "turnover_cr": 162.4
-    },
-    {
-      "symbol": "LAURUSLABS",
+      "symbol": "PETRONET",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 2069.0,
-      "pivot_target": 2089.0,
-      "dist_to_pivot_pct": 0.97,
-      "spread_%": 6.69,
-      "conviction_score": 120.099,
-      "turnover_cr": 461.9
-    },
-    {
-      "symbol": "KOTAKBANK",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 442.3,
-      "pivot_target": 453.1,
-      "dist_to_pivot_pct": 2.44,
-      "spread_%": 7.55,
-      "conviction_score": 67.752,
-      "turnover_cr": 781.6
-    },
-    {
-      "symbol": "MOTHERSON",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 158.15,
-      "pivot_target": 162.77,
-      "dist_to_pivot_pct": 2.92,
-      "spread_%": 7.53,
-      "conviction_score": 56.224,
-      "turnover_cr": 188.7
-    },
-    {
-      "symbol": "SOLARINDS",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 19803.0,
-      "pivot_target": 20398.0,
-      "dist_to_pivot_pct": 3.0,
-      "spread_%": 5.06,
-      "conviction_score": 55.636,
-      "turnover_cr": 368.6
+      "close": 295.0,
+      "pivot_target": 299.6,
+      "dist_to_pivot_pct": 1.56,
+      "spread_%": 4.03,
+      "conviction_score": 108.144,
+      "turnover_cr": 59.1
     },
     {
       "symbol": "CASTROLIND",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 196.79,
-      "pivot_target": 201.25,
-      "dist_to_pivot_pct": 2.27,
-      "spread_%": 4.38,
-      "conviction_score": 45.334,
-      "turnover_cr": 51.4
-    },
-    {
-      "symbol": "BOSCHLTD",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 45195.0,
-      "pivot_target": 45885.0,
-      "dist_to_pivot_pct": 1.53,
-      "spread_%": 7.52,
-      "conviction_score": 39.462,
-      "turnover_cr": 147.9
-    },
-    {
-      "symbol": "PETRONET",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 293.65,
-      "pivot_target": 299.6,
-      "dist_to_pivot_pct": 2.03,
-      "spread_%": 4.03,
-      "conviction_score": 37.132,
-      "turnover_cr": 57.8
-    },
-    {
-      "symbol": "ANANDRATHI",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 2163.9,
-      "pivot_target": 2172.0,
-      "dist_to_pivot_pct": 0.37,
-      "spread_%": 7.74,
-      "conviction_score": 33.366,
-      "turnover_cr": 73.1
-    },
-    {
-      "symbol": "BAJAJHLDNG",
-      "setup_class": "LAUNCHPAD COIL",
-      "close": 11265.0,
-      "pivot_target": 11310.0,
-      "dist_to_pivot_pct": 0.4,
-      "spread_%": 7.16,
-      "conviction_score": 27.945,
-      "turnover_cr": 46.6
+      "close": 196.19,
+      "pivot_target": 200.58,
+      "dist_to_pivot_pct": 2.24,
+      "spread_%": 4.04,
+      "conviction_score": 62.767,
+      "turnover_cr": 50.5
     },
     {
       "symbol": "CRISIL",
       "setup_class": "LAUNCHPAD COIL",
-      "close": 4527.4,
+      "close": 4586.4,
       "pivot_target": 4649.0,
-      "dist_to_pivot_pct": 2.69,
+      "dist_to_pivot_pct": 1.36,
       "spread_%": 6.72,
-      "conviction_score": 3.618,
+      "conviction_score": 32.076,
       "turnover_cr": 19.2
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "setup_class": "LAUNCHPAD COIL",
+      "close": 1748.8,
+      "pivot_target": 1786.0,
+      "dist_to_pivot_pct": 2.13,
+      "spread_%": 6.68,
+      "conviction_score": 12.0,
+      "turnover_cr": 447.7
     }
   ]
 }
