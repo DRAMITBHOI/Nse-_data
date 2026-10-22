@@ -1,115 +1,125 @@
-import os
-import sys
+from datetime import datetime
+import glob
 import json
-import datetime
+import os
+import pandas as pd
 
 DATA_DIR = "data"
-os.makedirs(DATA_DIR, exist_ok=True)
-
-LIVE_BREAKOUTS_V1 = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
-LIVE_BREAKOUTS_V2 = os.path.join(DATA_DIR, "live_intraday_breakouts_v2.json")
-ULTRA_750_FILE = os.path.join(DATA_DIR, "swing_ultra750_results.json")
-ULTRA_N750_FILE = os.path.join(DATA_DIR, "swing_ultraN750_results.json")
 AUDIT_LOG_FILE = os.path.join(DATA_DIR, "accuracy_audit_log.json")
+V1_LOG = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
+V2_LOG = os.path.join(DATA_DIR, "live_intraday_breakouts_v2.json")
 
-IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 
-def get_ist_now():
-    return datetime.datetime.now(IST)
+def run_comprehensive_audit():
+  print("=" * 100)
+  print(
+      "🔍 COMPREHENSIVE SCANNER ACCURACY AUDIT (CONFUSION MATRIX: TPR, FNR, FPR,"
+      " TNR)"
+  )
+  print("=" * 100)
 
-def load_json(filepath):
-    if os.path.exists(filepath):
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    return {}
+  # 1. Collect EOD Ground Truth from Swing Ultra production files
+  ground_truth_positives = set()
+  ground_truth_negatives = set()
 
-def extract_breakout_symbols(source_dict):
-    signals = set()
-    for item in source_dict.get("Breakouts_All_Day", []):
-        sym = str(item.get("symbol", "")).strip().upper()
-        act = str(item.get("action", "")).strip().upper()
-        if sym and ("BREAKOUT" in act or item.get("clearance_%", 0) >= 0.25):
-            signals.add(sym)
-    return signals
+  for f_name in [
+      "swing_ultra750_results.json",
+      "swing_ultraN750_results.json",
+  ]:
+    p = os.path.join(DATA_DIR, f_name)
+    if os.path.exists(p):
+      try:
+        with open(p, "r", encoding="utf-8") as fp:
+          d = json.load(fp)
+        for item in d.get("Fresh_Triggers", []):
+          sym = str(item.get("symbol", "")).strip().upper()
+          if sym:
+            ground_truth_positives.add(sym)
+        for item in d.get("Watchlist", []):
+          sym = str(item.get("symbol", "")).strip().upper()
+          if sym and sym not in ground_truth_positives:
+            ground_truth_negatives.add(sym)
+      except Exception as e:
+        print(f"⚠️ Error reading {f_name}: {e}")
 
-def run_accuracy_audit():
-    now_dt = get_ist_now()
-    today_date = now_dt.strftime("%Y-%m-%d")
+  print(
+      f"📊 Ground Truth Today: {len(ground_truth_positives)} Verified Breakouts"
+      f" {list(ground_truth_positives)}, {len(ground_truth_negatives)} Coiling"
+      " Negatives."
+  )
 
-    v1_data = load_json(LIVE_BREAKOUTS_V1)
-    v2_data = load_json(LIVE_BREAKOUTS_V2)
-    u750 = load_json(ULTRA_750_FILE)
-    un750 = load_json(ULTRA_N750_FILE)
+  # 2. Audit V1 Scanner
+  v1_alerts = set()
+  if os.path.exists(V1_LOG):
+    try:
+      with open(V1_LOG, "r", encoding="utf-8") as fp:
+        d1 = json.load(fp)
+      v1_alerts = set(
+          d1.get("Alert1_Sent", [])
+          + [
+              x["symbol"]
+              for x in d1.get("Breakouts_All_Day", [])
+              if isinstance(x, dict)
+          ]
+      )
+    except Exception:
+      pass
 
-    # Collect EOD Swing Ultra Final Confirmed Triggers
-    eod_verified = set()
-    for src in [u750, un750]:
-        for key in ["Fresh_Triggers", "Breakout_Triggers"]:
-            items = src.get(key, [])
-            if isinstance(items, list):
-                for it in items:
-                    sym = it.get("symbol", "") if isinstance(it, dict) else str(it)
-                    if sym.strip():
-                        eod_verified.add(sym.strip().upper())
+  # 3. Audit V2 Scanner
+  v2_alerts = set()
+  if os.path.exists(V2_LOG):
+    try:
+      with open(V2_LOG, "r", encoding="utf-8") as fp:
+        d2 = json.load(fp)
+      v2_alerts = set([
+          x["symbol"]
+          for x in d2.get("Breakouts_All_Day", [])
+          if isinstance(x, dict)
+      ])
+    except Exception:
+      pass
 
-    # Evaluate Scanner 1
-    v1_sigs = extract_breakout_symbols(v1_data)
-    v1_hits = sorted(list(v1_sigs.intersection(eod_verified)))
-    v1_acc = round((len(v1_hits) / len(v1_sigs) * 100.0), 2) if v1_sigs else 100.0
+  def calculate_rates(alerts, name):
+    tp = len(alerts.intersection(ground_truth_positives))
+    fn = len(ground_truth_positives - alerts)
+    fp = len(alerts.intersection(ground_truth_negatives))
+    tn = len(ground_truth_negatives - alerts)
 
-    # Evaluate Scanner 2
-    v2_sigs = extract_breakout_symbols(v2_data)
-    v2_hits = sorted(list(v2_sigs.intersection(eod_verified)))
-    v2_acc = round((len(v2_hits) / len(v2_sigs) * 100.0), 2) if v2_sigs else 100.0
+    tpr = (tp / (tp + fn) * 100.0) if (tp + fn) > 0 else 100.0
+    fnr = (fn / (tp + fn) * 100.0) if (tp + fn) > 0 else 0.0
+    fpr = (fp / (fp + tn) * 100.0) if (fp + tn) > 0 else 0.0
+    tnr = (tn / (fp + tn) * 100.0) if (fp + tn) > 0 else 100.0
 
-    audit_history = load_json(AUDIT_LOG_FILE)
-    records = [r for r in audit_history.get("Daily_Records", []) if r.get("date") != today_date]
-
-    daily_entry = {
-        "date": today_date,
-        "eod_verified_count": len(eod_verified),
-        "scanner_v1": {
-            "signals": len(v1_sigs),
-            "hits": len(v1_hits),
-            "accuracy_%": v1_acc,
-            "tickers": sorted(list(v1_sigs))
-        },
-        "scanner_v2": {
-            "signals": len(v2_sigs),
-            "hits": len(v2_hits),
-            "accuracy_%": v2_acc,
-            "tickers": sorted(list(v2_sigs))
-        },
-        "eod_verified": sorted(list(eod_verified))
+    return {
+        "Engine": name,
+        "TP (Caught)": tp,
+        "FN (Missed)": fn,
+        "FP (Fakeouts)": fp,
+        "TN (Quiet)": tn,
+        "True Positive Rate (Sensitivity)": f"{tpr:.1f}%",
+        "False Negative Rate (Miss Rate)": f"{fnr:.1f}%",
+        "False Positive Rate (Fallout)": f"{fpr:.1f}%",
+        "True Negative Rate (Specificity)": f"{tnr:.1f}%",
     }
-    records.append(daily_entry)
 
-    # Cumulative Head-to-Head Totals
-    v1_tot_sigs = sum(r.get("scanner_v1", {}).get("signals", 0) for r in records)
-    v1_tot_hits = sum(r.get("scanner_v1", {}).get("hits", 0) for r in records)
-    v1_cum_acc = round((v1_tot_hits / v1_tot_sigs * 100.0), 2) if v1_tot_sigs > 0 else 100.0
+  matrix = [
+      calculate_rates(v1_alerts, "Scanner V1 (Live Alerts Engine)"),
+      calculate_rates(v2_alerts, "Scanner V2 (Optimized Silent Engine)"),
+  ]
 
-    v2_tot_sigs = sum(r.get("scanner_v2", {}).get("signals", 0) for r in records)
-    v2_tot_hits = sum(r.get("scanner_v2", {}).get("hits", 0) for r in records)
-    v2_cum_acc = round((v2_tot_hits / v2_tot_sigs * 100.0), 2) if v2_tot_sigs > 0 else 100.0
+  df_matrix = pd.DataFrame(matrix)
+  print("\n" + df_matrix.to_string(index=False) + "\n")
 
-    output_payload = {
-        "Last_Updated": now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST"),
-        "Sessions_Audited": len(records),
-        "Cumulative_Accuracy": {
-            "Scanner_V1_%": v1_cum_acc,
-            "Scanner_V2_%": v2_cum_acc
-        },
-        "Daily_Records": records
-    }
+  # Persist to disk
+  out_audit = {
+      "Date": datetime.now().strftime("%Y-%m-%d"),
+      "Audit_Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+      "Ground_Truth_Positives": list(ground_truth_positives),
+      "Audit_Summary": matrix,
+  }
+  with open(AUDIT_LOG_FILE, "w", encoding="utf-8") as fp:
+    json.dump(out_audit, fp, indent=2)
 
-    with open(AUDIT_LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(output_payload, f, indent=2)
-
-    print(f"✅ Head-to-Head Audit Logged (Silent): V1={v1_acc}% (Cum: {v1_cum_acc}%) vs V2={v2_acc}% (Cum: {v2_cum_acc}%)")
 
 if __name__ == "__main__":
-    run_accuracy_audit()
+  run_comprehensive_audit()
