@@ -1,132 +1,31 @@
 {
-  "Last_Updated": "2026-10-22 07:12:36 PM IST",
-  "Sessions_Audited": 6,
-  "Cumulative_Accuracy": {
-    "Scanner_V1_%": 50.0,
-    "Scanner_V2_%": 100.0
-  },
-  "Daily_Records": [
+  "Date": "2026-10-22",
+  "Audit_Timestamp": "2026-10-22 15:04:01 IST",
+  "Ground_Truth_Positives": [
+    "CRISIL"
+  ],
+  "Audit_Summary": [
     {
-      "date": "2026-10-16",
-      "timestamp": "2026-10-16 11:12:10 PM IST",
-      "live_signals_count": 6,
-      "eod_verified_count": 2,
-      "hits_count": 1,
-      "false_positives_count": 5,
-      "missed_count": 1,
-      "daily_accuracy_pct": 16.67,
-      "hits": [
-        "INDHOTEL"
-      ],
-      "false_positives": [
-        "AEROPLANE",
-        "APOLLO",
-        "EXPLEOSOL",
-        "ORIENTHOT",
-        "SOUTHBANK"
-      ],
-      "missed": [
-        "ITBEES"
-      ]
+      "Engine": "Scanner V1 (Live Alerts Engine)",
+      "TP (Caught)": 1,
+      "FN (Missed)": 0,
+      "FP (Fakeouts)": 1,
+      "TN (Quiet)": 7,
+      "True Positive Rate (Sensitivity)": "100.0%",
+      "False Negative Rate (Miss Rate)": "0.0%",
+      "False Positive Rate (Fallout)": "12.5%",
+      "True Negative Rate (Specificity)": "87.5%"
     },
     {
-      "date": "2026-10-17",
-      "timestamp": "2026-10-17 12:29:37 AM IST",
-      "live_signals_count": 6,
-      "eod_verified_count": 2,
-      "hits_count": 1,
-      "false_positives_count": 5,
-      "missed_count": 1,
-      "daily_accuracy_pct": 16.67,
-      "hits": [
-        "INDHOTEL"
-      ],
-      "false_positives": [
-        "AEROPLANE",
-        "APOLLO",
-        "EXPLEOSOL",
-        "ORIENTHOT",
-        "SOUTHBANK"
-      ],
-      "missed": [
-        "ITBEES"
-      ]
-    },
-    {
-      "date": "2026-10-19",
-      "eod_verified_count": 0,
-      "scanner_v1": {
-        "signals": 1,
-        "hits": 0,
-        "accuracy_%": 0.0,
-        "tickers": [
-          "CEIGALL"
-        ]
-      },
-      "scanner_v2": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "eod_verified": []
-    },
-    {
-      "date": "2026-10-20",
-      "eod_verified_count": 0,
-      "scanner_v1": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "scanner_v2": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "eod_verified": []
-    },
-    {
-      "date": "2026-10-21",
-      "eod_verified_count": 1,
-      "scanner_v1": {
-        "signals": 1,
-        "hits": 1,
-        "accuracy_%": 100.0,
-        "tickers": [
-          "ANANDRATHI"
-        ]
-      },
-      "scanner_v2": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "eod_verified": [
-        "ANANDRATHI"
-      ]
-    },
-    {
-      "date": "2026-10-22",
-      "eod_verified_count": 1,
-      "scanner_v1": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "scanner_v2": {
-        "signals": 0,
-        "hits": 0,
-        "accuracy_%": 100.0,
-        "tickers": []
-      },
-      "eod_verified": [
-        "CRISIL"
-      ]
+      "Engine": "Scanner V2 (Optimized Silent Engine)",
+      "TP (Caught)": 0,
+      "FN (Missed)": 1,
+      "FP (Fakeouts)": 0,
+      "TN (Quiet)": 8,
+      "True Positive Rate (Sensitivity)": "0.0%",
+      "False Negative Rate (Miss Rate)": "100.0%",
+      "False Positive Rate (Fallout)": "0.0%",
+      "True Negative Rate (Specificity)": "100.0%"
     }
   ]
 }
