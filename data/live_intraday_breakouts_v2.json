@@ -1,10 +1,9 @@
 {
   "Date": "2026-10-22",
-  "Scan_Timestamp": "2026-10-22 09:02:22 AM IST",
+  "Scan_Timestamp": "2026-10-22 09:07:23 AM IST",
   "Elapsed_Minutes": 1,
   "Nifty50_Intraday_%": 0.0,
   "Consecutive_Hits": {
-    "ANANDRATHI": 1,
     "PREMEXPLN": 0,
     "SAREGAMA": 0,
     "GNA": 0,
@@ -39,25 +38,7 @@
     "STLTECH": 0,
     "MANINDS": 0
   },
-  "Breakouts_All_Day": [
-    {
-      "symbol": "ANANDRATHI",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 2172.0,
-      "ltp": 2200.0,
-      "day_high": 2200.0,
-      "day_low": 2164.9,
-      "stop_loss": 1998.24,
-      "risk_%": 9.17,
-      "shelf_spread_%": 7.74,
-      "clearance_%": 1.29,
-      "drop_from_high_%": 0.0,
-      "proj_vol_pace": 28.86,
-      "consecutive_ticks": 1,
-      "action": "RADAR PIVOT CLEARANCE"
-    }
-  ],
+  "Breakouts_All_Day": [],
   "Coiling": [
     {
       "symbol": "PREMEXPLN",
