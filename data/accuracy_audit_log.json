@@ -1,28 +1,30 @@
 {
-  "Last_Updated": "2026-10-23 13:42:55 IST",
+  "Last_Updated": "2026-10-23 18:07:25 IST",
   "Total_Sessions_Audited": 2,
   "Latest_Session_Date": "2026-10-23",
-  "Latest_Ground_Truth": [],
+  "Latest_Ground_Truth": [
+    "ANTELOPUS"
+  ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 1,
       "FP (Fakeouts)": 0,
       "TN (Quiet)": 6,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 1,
       "FP (Fakeouts)": 0,
       "TN (Quiet)": 6,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     }
@@ -30,17 +32,17 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 0,
+      "Total_FN": 1,
       "Total_FP": 1,
       "Total_TN": 13,
-      "Cumulative_TPR": "100.0%",
-      "Cumulative_FNR": "0.0%",
+      "Cumulative_TPR": "50.0%",
+      "Cumulative_FNR": "50.0%",
       "Cumulative_FPR": "7.1%",
       "Cumulative_TNR": "92.9%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 1,
+      "Total_FN": 2,
       "Total_FP": 0,
       "Total_TN": 14,
       "Cumulative_TPR": "0.0%",
@@ -79,25 +81,27 @@
     },
     {
       "date": "2026-10-23",
-      "ground_truth_count": 0,
-      "ground_truth_symbols": [],
+      "ground_truth_count": 1,
+      "ground_truth_symbols": [
+        "ANTELOPUS"
+      ],
       "v1": {
         "tp": 0,
-        "fn": 0,
+        "fn": 1,
         "fp": 0,
         "tn": 6,
-        "tpr": 100.0,
-        "fnr": 0.0,
+        "tpr": 0.0,
+        "fnr": 100.0,
         "fpr": 0.0,
         "tnr": 100.0
       },
       "v2": {
         "tp": 0,
-        "fn": 0,
+        "fn": 1,
         "fp": 0,
         "tn": 6,
-        "tpr": 100.0,
-        "fnr": 0.0,
+        "tpr": 0.0,
+        "fnr": 100.0,
         "fpr": 0.0,
         "tnr": 100.0
       }
