@@ -1,60 +1,91 @@
 {
-  "Date": "2026-10-22",
-  "Scan_Timestamp": "2026-10-22 03:57:03 PM IST",
-  "Elapsed_Minutes": 375,
-  "EOD_Summary_Sent": true,
+  "Date": "2026-10-23",
+  "Scan_Timestamp": "2026-10-23 09:02:18 AM IST",
+  "Elapsed_Minutes": 1,
+  "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "BAJAJHLDNG",
     "CRISIL"
   ],
   "Alert2_Sent": [],
-  "Prior_Alert_Highs": {
-    "BAJAJHLDNG": 11359.0,
-    "CRISIL": 4715.0
+  "Benchmark_Highs": {
+    "BAJAJHLDNG": 11420.0,
+    "CRISIL": 4805.0,
+    "SAREGAMA": 519.35
   },
-  "Consecutive_Hits": {
-    "PREMEXPLN": 0,
-    "SAREGAMA": 0,
-    "IIFLCAPS": 0,
-    "CASTROLIND": 0,
-    "ZYDUSLIFE": 0,
-    "GNA": 0,
-    "GODREJAGRO": 0,
-    "PETRONET": 0,
-    "SAPPHIRE": 0,
-    "KOTAKBANK": 0,
-    "INDGN": 0,
-    "BOSCHLTD": 0,
-    "CHALET": 0,
-    "NAUKRI": 0,
-    "LAURUSLABS": 0,
-    "ARTEMISMED": 0,
-    "CEIGALL": 0,
-    "MOTHERSON": 0,
-    "ARVSMART": 0,
-    "EPL": 0,
-    "AXISBANK": 0,
-    "RSL": 0,
-    "CGCL": 0,
-    "LUMAXIND": 0,
-    "EXPLEOSOL": 0
+  "Master_Confirmed_Breakouts": {
+    "CRISIL": {
+      "symbol": "CRISIL",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 4649.0,
+      "ltp": 4777.2,
+      "day_high": 4805.0,
+      "day_low": 4485.0,
+      "stop_loss": 4356.1,
+      "risk_%": 6.3,
+      "clearance_%": 2.76,
+      "proj_vol_pace": 85.81,
+      "action": "CONFIRMED BREAKOUT"
+    }
   },
-  "Breakouts_All_Day": [],
+  "Breakouts_All_Day": [
+    {
+      "symbol": "CRISIL",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 4649.0,
+      "ltp": 4777.2,
+      "day_high": 4805.0,
+      "day_low": 4485.0,
+      "stop_loss": 4356.1,
+      "risk_%": 6.3,
+      "clearance_%": 2.76,
+      "proj_vol_pace": 85.81,
+      "action": "CONFIRMED BREAKOUT"
+    }
+  ],
   "Coiling": [
+    {
+      "symbol": "BAJAJHLDNG",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 11310.0,
+      "ltp": 11293.0,
+      "day_high": 11420.0,
+      "day_low": 10834.0,
+      "stop_loss": 10405.2,
+      "risk_%": 8.0,
+      "clearance_%": -0.15,
+      "proj_vol_pace": 57.25,
+      "action": "WICK REJECTED"
+    },
     {
       "symbol": "PREMEXPLN",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 694.55,
+      "pivot_ceiling": 695.0,
       "ltp": 692.5,
       "day_high": 694.9,
       "day_low": 689.05,
-      "stop_loss": 638.99,
+      "stop_loss": 639.4,
       "risk_%": 8.0,
-      "clearance_%": -0.3,
-      "proj_vol_pace": 0.79,
-      "consecutive_ticks": 0,
-      "action": "WICK REJECTED"
+      "clearance_%": -0.36,
+      "proj_vol_pace": 15.24,
+      "action": "COILING"
+    },
+    {
+      "symbol": "CASTROLIND",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 199.72,
+      "ltp": 197.38,
+      "day_high": 199.0,
+      "day_low": 194.82,
+      "stop_loss": 183.74,
+      "risk_%": 8.0,
+      "clearance_%": -1.17,
+      "proj_vol_pace": 20.73,
+      "action": "COILING"
     },
     {
       "symbol": "SAREGAMA",
@@ -67,8 +98,7 @@
       "stop_loss": 474.63,
       "risk_%": 8.0,
       "clearance_%": -1.36,
-      "proj_vol_pace": 1.37,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 24.73,
       "action": "WICK REJECTED"
     },
     {
@@ -82,38 +112,49 @@
       "stop_loss": 321.95,
       "risk_%": 8.0,
       "clearance_%": -1.54,
-      "proj_vol_pace": 0.92,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 17.47,
       "action": "COILING"
     },
     {
-      "symbol": "CASTROLIND",
+      "symbol": "ADANIPORTS",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 201.25,
-      "ltp": 197.38,
-      "day_high": 199.0,
-      "day_low": 194.82,
-      "stop_loss": 185.15,
+      "pivot_ceiling": 1784.9,
+      "ltp": 1750.0,
+      "day_high": 1750.0,
+      "day_low": 1715.3,
+      "stop_loss": 1642.11,
       "risk_%": 8.0,
-      "clearance_%": -1.92,
-      "proj_vol_pace": 1.13,
-      "consecutive_ticks": 0,
+      "clearance_%": -1.96,
+      "proj_vol_pace": 9.92,
+      "action": "COILING"
+    },
+    {
+      "symbol": "GODREJAGRO",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 649.1,
+      "ltp": 633.0,
+      "day_high": 638.05,
+      "day_low": 609.6,
+      "stop_loss": 597.17,
+      "risk_%": 8.0,
+      "clearance_%": -2.48,
+      "proj_vol_pace": 11.97,
       "action": "COILING"
     },
     {
       "symbol": "ZYDUSLIFE",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1167.4,
+      "pivot_ceiling": 1166.9,
       "ltp": 1135.0,
       "day_high": 1138.5,
       "day_low": 1100.3,
-      "stop_loss": 1074.01,
+      "stop_loss": 1073.55,
       "risk_%": 8.0,
-      "clearance_%": -2.78,
-      "proj_vol_pace": 0.85,
-      "consecutive_ticks": 0,
+      "clearance_%": -2.73,
+      "proj_vol_pace": 16.23,
       "action": "COILING"
     },
     {
@@ -127,23 +168,7 @@
       "stop_loss": 502.23,
       "risk_%": 8.0,
       "clearance_%": -2.92,
-      "proj_vol_pace": 0.27,
-      "consecutive_ticks": 0,
-      "action": "COILING"
-    },
-    {
-      "symbol": "GODREJAGRO",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 652.1,
-      "ltp": 633.0,
-      "day_high": 638.05,
-      "day_low": 609.6,
-      "stop_loss": 599.93,
-      "risk_%": 8.0,
-      "clearance_%": -2.93,
-      "proj_vol_pace": 0.5,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 9.34,
       "action": "COILING"
     },
     {
@@ -157,8 +182,7 @@
       "stop_loss": 275.63,
       "risk_%": 8.0,
       "clearance_%": -3.07,
-      "proj_vol_pace": 0.81,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 14.89,
       "action": "COILING"
     },
     {
@@ -172,8 +196,7 @@
       "stop_loss": 185.9,
       "risk_%": 8.0,
       "clearance_%": -3.08,
-      "proj_vol_pace": 4.01,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 64.16,
       "action": "COILING"
     },
     {
@@ -187,8 +210,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": -3.55,
-      "proj_vol_pace": 0.57,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 10.64,
       "action": "COILING"
     },
     {
@@ -202,8 +224,7 @@
       "stop_loss": 563.04,
       "risk_%": 8.0,
       "clearance_%": -3.91,
-      "proj_vol_pace": 0.8,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 14.92,
       "action": "COILING"
     },
     {
@@ -217,8 +238,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": -3.96,
-      "proj_vol_pace": 0.48,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 9.07,
       "action": "COILING"
     },
     {
@@ -232,8 +252,7 @@
       "stop_loss": 784.71,
       "risk_%": 8.0,
       "clearance_%": -3.96,
-      "proj_vol_pace": 0.55,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 10.51,
       "action": "COILING"
     },
     {
@@ -247,8 +266,7 @@
       "stop_loss": 1167.66,
       "risk_%": 8.0,
       "clearance_%": -4.07,
-      "proj_vol_pace": 0.71,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 14.14,
       "action": "COILING"
     },
     {
@@ -262,8 +280,7 @@
       "stop_loss": 1921.88,
       "risk_%": 8.0,
       "clearance_%": -4.14,
-      "proj_vol_pace": 1.09,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 20.24,
       "action": "COILING"
     },
     {
@@ -277,8 +294,7 @@
       "stop_loss": 285.2,
       "risk_%": 8.0,
       "clearance_%": -4.27,
-      "proj_vol_pace": 0.15,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 2.85,
       "action": "COILING"
     },
     {
@@ -292,8 +308,7 @@
       "stop_loss": 364.32,
       "risk_%": 8.0,
       "clearance_%": -4.82,
-      "proj_vol_pace": 1.11,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 20.09,
       "action": "COILING"
     },
     {
@@ -307,8 +322,7 @@
       "stop_loss": 149.75,
       "risk_%": 8.0,
       "clearance_%": -4.99,
-      "proj_vol_pace": 0.73,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 14.41,
       "action": "COILING"
     },
     {
@@ -322,8 +336,7 @@
       "stop_loss": 574.08,
       "risk_%": 8.0,
       "clearance_%": -5.37,
-      "proj_vol_pace": 0.32,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 6.56,
       "action": "COILING"
     },
     {
@@ -337,8 +350,7 @@
       "stop_loss": 219.88,
       "risk_%": 8.0,
       "clearance_%": -5.53,
-      "proj_vol_pace": 0.79,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 14.66,
       "action": "COILING"
     },
     {
@@ -352,8 +364,7 @@
       "stop_loss": 1190.3,
       "risk_%": 8.0,
       "clearance_%": -6.32,
-      "proj_vol_pace": 1.26,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 23.73,
       "action": "COILING"
     },
     {
@@ -367,8 +378,7 @@
       "stop_loss": 170.11,
       "risk_%": 8.0,
       "clearance_%": -6.53,
-      "proj_vol_pace": 0.41,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 7.68,
       "action": "COILING"
     },
     {
@@ -382,8 +392,7 @@
       "stop_loss": 233.68,
       "risk_%": 8.0,
       "clearance_%": -6.63,
-      "proj_vol_pace": 2.5,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 42.09,
       "action": "COILING"
     },
     {
@@ -397,8 +406,7 @@
       "stop_loss": 5152.0,
       "risk_%": 8.0,
       "clearance_%": -6.77,
-      "proj_vol_pace": 0.55,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 10.19,
       "action": "COILING"
     },
     {
@@ -412,8 +420,7 @@
       "stop_loss": 838.12,
       "risk_%": 8.0,
       "clearance_%": -7.5,
-      "proj_vol_pace": 1.34,
-      "consecutive_ticks": 0,
+      "proj_vol_pace": 24.18,
       "action": "COILING"
     }
   ]
