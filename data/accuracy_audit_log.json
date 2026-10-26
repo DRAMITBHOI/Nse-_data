@@ -1,28 +1,30 @@
 {
-  "Last_Updated": "2026-10-26 13:40:23 IST",
+  "Last_Updated": "2026-10-26 19:35:44 IST",
   "Total_Sessions_Audited": 3,
   "Latest_Session_Date": "2026-10-26",
-  "Latest_Ground_Truth": [],
+  "Latest_Ground_Truth": [
+    "CARBORUNIV"
+  ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
-      "FP (Fakeouts)": 1,
-      "TN (Quiet)": 3,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
-      "FPR (Fallout)": "25.0%",
-      "TNR (Specificity)": "75.0%"
+      "FN (Missed)": 1,
+      "FP (Fakeouts)": 0,
+      "TN (Quiet)": 7,
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
+      "FPR (Fallout)": "0.0%",
+      "TNR (Specificity)": "100.0%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 1,
       "FP (Fakeouts)": 0,
-      "TN (Quiet)": 4,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TN (Quiet)": 7,
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     }
@@ -30,19 +32,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 1,
-      "Total_FP": 2,
-      "Total_TN": 16,
-      "Cumulative_TPR": "50.0%",
-      "Cumulative_FNR": "50.0%",
-      "Cumulative_FPR": "11.1%",
-      "Cumulative_TNR": "88.9%"
+      "Total_FN": 2,
+      "Total_FP": 1,
+      "Total_TN": 20,
+      "Cumulative_TPR": "33.3%",
+      "Cumulative_FNR": "66.7%",
+      "Cumulative_FPR": "4.8%",
+      "Cumulative_TNR": "95.2%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 2,
+      "Total_FN": 3,
       "Total_FP": 0,
-      "Total_TN": 18,
+      "Total_TN": 21,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -106,25 +108,27 @@
     },
     {
       "date": "2026-10-26",
-      "ground_truth_count": 0,
-      "ground_truth_symbols": [],
+      "ground_truth_count": 1,
+      "ground_truth_symbols": [
+        "CARBORUNIV"
+      ],
       "v1": {
         "tp": 0,
-        "fn": 0,
-        "fp": 1,
-        "tn": 3,
-        "tpr": 100.0,
-        "fnr": 0.0,
-        "fpr": 25.0,
-        "tnr": 75.0
+        "fn": 1,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
       },
       "v2": {
         "tp": 0,
-        "fn": 0,
+        "fn": 1,
         "fp": 0,
-        "tn": 4,
-        "tpr": 100.0,
-        "fnr": 0.0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
         "fpr": 0.0,
         "tnr": 100.0
       }
