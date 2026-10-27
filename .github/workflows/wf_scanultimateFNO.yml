@@ -25,9 +25,6 @@ jobs:
           pip install pandas numpy requests
 
       - name: Execute Ultimate FNO Scanner
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python Scan_ultimateFNO.py
 
