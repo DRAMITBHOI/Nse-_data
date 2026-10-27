@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import glob
-import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -10,37 +9,8 @@ from datetime import datetime
 # ---------------------------------------------------------
 # CONFIGURATION & ENVIRONMENT
 # ---------------------------------------------------------
-DATA_DIR = "Codes/data"
 RESULTS_JSON = "fno_champion_scan_results.json"
 MIN_TURNOVER_CR = 10.0
-
-# Telegram Bot Credentials (loads from Actions secrets or Carnets local file)
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
-
-if not TELEGRAM_BOT_TOKEN and os.path.exists("local_secrets.json"):
-    try:
-        with open("local_secrets.json", "r") as fp:
-            secrets = json.load(fp)
-            TELEGRAM_BOT_TOKEN = secrets.get("TELEGRAM_BOT_TOKEN", "")
-            TELEGRAM_CHAT_ID = secrets.get("TELEGRAM_CHAT_ID", "")
-    except Exception:
-        pass
-
-def send_telegram_alert(message: str):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
-    try:
-        requests.post(url, json=payload, timeout=8)
-    except Exception as e:
-        print(f"⚠️ Telegram dispatch failed: {e}")
 
 # ---------------------------------------------------------
 # DATA NORMALIZATION & STOCK SPLIT HANDLING
@@ -112,7 +82,7 @@ def run_scanner():
     all_json = glob.glob("**/*.json", recursive=True)
     nifty_map = load_nifty_benchmark(all_json)
 
-    # Resolve all genuine stock files
+    # Discover and deduplicate genuine stock files
     stock_map = {}
     for p in all_json:
         bname = os.path.basename(p)
@@ -251,22 +221,11 @@ def run_scanner():
     with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
         json.dump(payload, fp, indent=2)
 
-    # Terminal output
+    # Console display only
     print("\n" + "=" * 90)
     print(f"🎯 1. CONFIRMED F&O BREAKOUTS ({len(fresh_triggers)}):")
     if fresh_triggers:
         print(pd.DataFrame(fresh_triggers).to_string(index=False))
-        # Format Telegram Dispatch
-        tg_msg = f"🚀 <b>ULTIMATE F&O BREAKOUT ALERT</b>\n🕒 <i>{payload['scan_time']}</i>\n\n"
-        for t in fresh_triggers:
-            tg_msg += (
-                f"🔥 <b>#{t['symbol']}</b> (Clearance: {t['extended_%']})\n"
-                f"• Close: <b>{t['close']}</b> (Pivot: {t['pivot_ceiling']})\n"
-                f"• Stop Loss: <b>{t['stop_loss']}</b> (Risk: {t['risk_%']})\n"
-                f"• Deliv Surge: <b>{t['delivery_surge']}</b> | Acc: <b>{t['accumulation_ratio']}x</b>\n"
-                f"• Shelf Spread: {t['shelf_spread_%']} | Exit: <b>Exit 2.2 Trail</b>\n\n"
-            )
-        send_telegram_alert(tg_msg)
     else:
         print("No breakouts confirmed today meeting strict accumulation gates.")
 
