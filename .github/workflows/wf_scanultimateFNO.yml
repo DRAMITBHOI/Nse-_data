@@ -1,0 +1,40 @@
+name: Ultimate FNO Breakout Scanner
+
+on:
+  schedule:
+    # 09:50 UTC = 15:20 IST (Mon-Fri)
+    - cron: '50 9 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-fno-scanner:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy requests
+
+      - name: Execute Ultimate FNO Scanner
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python Scan_ultimateFNO.py
+
+      - name: Commit & Push Scanner Results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions Scanner"
+          git add fno_champion_scan_results.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Ultimate FNO scan results [skip ci]" && git push)
