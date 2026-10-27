@@ -54,5 +54,6 @@ jobs:
             echo "No changes in breakout registers or logs to commit."
           else
             git commit -m "Auto-update live breakout scan registers [skip ci]"
-            git push
+            git pull --rebase origin main
+            git push origin main
           fi
