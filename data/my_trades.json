@@ -6,7 +6,13 @@
     "hard_sl": 142.0,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "exit_alert_sent": true,
+    "exit_price": 143.2,
+    "exit_reason": "5B. Dynamic VDU Floor Breach (LTP \u20b9143.20 < Floor \u20b9150.83)",
+    "peak_gain_%": 0.0,
+    "peak_close": 148.6,
+    "vdu_under_count": 1
   },
   {
     "symbol": "PETRONET",
@@ -15,7 +21,10 @@
     "hard_sl": 290.5,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "peak_gain_%": 0.0,
+    "peak_close": 297.0,
+    "vdu_under_count": 0
   },
   {
     "symbol": "NITINSPIN",
@@ -24,7 +33,13 @@
     "hard_sl": 591.0,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "exit_alert_sent": true,
+    "exit_price": 610.85,
+    "exit_reason": "5B. Dynamic VDU Floor Breach (LTP \u20b9610.85 < Floor \u20b9645.11)",
+    "peak_gain_%": 0.0,
+    "peak_close": 635.58,
+    "vdu_under_count": 1
   },
   {
     "symbol": "AEROPLANE",
@@ -33,7 +48,13 @@
     "hard_sl": 207.5,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "exit_alert_sent": true,
+    "exit_price": 209.27,
+    "exit_reason": "5B. Dynamic VDU Floor Breach (LTP \u20b9209.27 < Floor \u20b9243.00)",
+    "peak_gain_%": 0.0,
+    "peak_close": 239.41,
+    "vdu_under_count": 1
   },
   {
     "symbol": "APOLLO",
@@ -42,7 +63,10 @@
     "hard_sl": 391.92,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "peak_gain_%": 1.65,
+    "peak_close": 440.75,
+    "vdu_under_count": 0
   },
   {
     "symbol": "INDHOTEL",
@@ -51,7 +75,10 @@
     "hard_sl": 692.3,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "peak_gain_%": 3.51,
+    "peak_close": 803.05,
+    "vdu_under_count": 0
   },
   {
     "symbol": "ANADRATHI",
@@ -69,6 +96,9 @@
     "hard_sl": 4356.1,
     "trail_type": "20EMA",
     "qty": 1,
-    "status": "OPEN"
+    "status": "OPEN",
+    "peak_gain_%": 2.08,
+    "peak_close": 4720.0,
+    "vdu_under_count": 0
   }
 ]
