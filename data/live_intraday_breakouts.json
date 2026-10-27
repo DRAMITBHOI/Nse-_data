@@ -1,7 +1,7 @@
 {
   "Date": "2026-10-27",
-  "Scan_Timestamp": "2026-10-27 03:17:17 PM IST",
-  "Elapsed_Minutes": 362,
+  "Scan_Timestamp": "2026-10-27 03:20:11 PM IST",
+  "Elapsed_Minutes": 365,
   "EOD_Summary_Sent": true,
   "Alert1_Sent": [
     "LAURUSLABS"
@@ -50,14 +50,28 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1565.0,
-      "ltp": 1557.4,
+      "ltp": 1557.0,
       "day_high": 1577.9,
       "day_low": 1527.2,
       "stop_loss": 1439.8,
       "risk_%": 8.0,
-      "clearance_%": -0.49,
-      "proj_vol_pace": 1.1,
+      "clearance_%": -0.51,
+      "proj_vol_pace": 1.15,
       "action": "WICK REJECTED"
+    },
+    {
+      "symbol": "SAPPHIRE",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL PRE-RECLAIM",
+      "pivot_ceiling": 202.07,
+      "ltp": 200.5,
+      "day_high": 201.47,
+      "day_low": 193.26,
+      "stop_loss": 185.9,
+      "risk_%": 8.0,
+      "clearance_%": -0.78,
+      "proj_vol_pace": 0.59,
+      "action": "COILING"
     },
     {
       "symbol": "BOSCHLTD",
@@ -70,21 +84,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": -0.8,
-      "proj_vol_pace": 1.22,
-      "action": "COILING"
-    },
-    {
-      "symbol": "SAPPHIRE",
-      "universe": "NON-N750",
-      "setup": "V-REVERSAL PRE-RECLAIM",
-      "pivot_ceiling": 202.07,
-      "ltp": 200.4,
-      "day_high": 201.47,
-      "day_low": 193.26,
-      "stop_loss": 185.9,
-      "risk_%": 8.0,
-      "clearance_%": -0.83,
-      "proj_vol_pace": 0.59,
+      "proj_vol_pace": 1.2,
       "action": "COILING"
     },
     {
@@ -92,13 +92,27 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 515.9,
-      "ltp": 509.85,
-      "day_high": 510.35,
+      "ltp": 510.3,
+      "day_high": 510.95,
       "day_low": 481.4,
       "stop_loss": 474.63,
       "risk_%": 8.0,
-      "clearance_%": -1.17,
-      "proj_vol_pace": 0.75,
+      "clearance_%": -1.09,
+      "proj_vol_pace": 0.77,
+      "action": "COILING"
+    },
+    {
+      "symbol": "CARBORUNIV",
+      "universe": "NIFTY 750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 1114.2,
+      "ltp": 1098.6,
+      "day_high": 1102.9,
+      "day_low": 1063.3,
+      "stop_loss": 982.36,
+      "risk_%": 11.83,
+      "clearance_%": -1.4,
+      "proj_vol_pace": 1.38,
       "action": "COILING"
     },
     {
@@ -112,7 +126,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": -1.71,
-      "proj_vol_pace": 0.4,
+      "proj_vol_pace": 0.39,
       "action": "COILING"
     },
     {
@@ -120,27 +134,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 612.0,
-      "ltp": 601.55,
+      "ltp": 601.1,
       "day_high": 607.4,
       "day_low": 593.3,
       "stop_loss": 563.04,
       "risk_%": 8.0,
-      "clearance_%": -1.71,
-      "proj_vol_pace": 2.0,
-      "action": "COILING"
-    },
-    {
-      "symbol": "CARBORUNIV",
-      "universe": "NIFTY 750",
-      "setup": "V-REVERSAL",
-      "pivot_ceiling": 1114.2,
-      "ltp": 1094.4,
-      "day_high": 1102.9,
-      "day_low": 1063.3,
-      "stop_loss": 982.36,
-      "risk_%": 11.83,
       "clearance_%": -1.78,
-      "proj_vol_pace": 1.39,
+      "proj_vol_pace": 2.0,
       "action": "COILING"
     },
     {
@@ -148,12 +148,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 349.95,
-      "ltp": 342.6,
-      "day_high": 342.9,
+      "ltp": 342.9,
+      "day_high": 342.95,
       "day_low": 338.05,
       "stop_loss": 321.95,
       "risk_%": 8.0,
-      "clearance_%": -2.1,
+      "clearance_%": -2.01,
       "proj_vol_pace": 1.61,
       "action": "COILING"
     },
@@ -168,7 +168,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": -2.38,
-      "proj_vol_pace": 0.84,
+      "proj_vol_pace": 0.82,
       "action": "COILING"
     },
     {
@@ -176,12 +176,12 @@
       "universe": "NON-N750",
       "setup": "V-REVERSAL PRE-RECLAIM",
       "pivot_ceiling": 310.0,
-      "ltp": 300.15,
+      "ltp": 300.7,
       "day_high": 304.1,
       "day_low": 286.1,
       "stop_loss": 285.2,
       "risk_%": 8.0,
-      "clearance_%": -3.18,
+      "clearance_%": -3.0,
       "proj_vol_pace": 0.42,
       "action": "COILING"
     },
@@ -196,7 +196,7 @@
       "stop_loss": 275.26,
       "risk_%": 8.0,
       "clearance_%": -3.23,
-      "proj_vol_pace": 0.66,
+      "proj_vol_pace": 0.65,
       "action": "COILING"
     },
     {
@@ -210,7 +210,7 @@
       "stop_loss": 149.75,
       "risk_%": 8.0,
       "clearance_%": -3.67,
-      "proj_vol_pace": 0.81,
+      "proj_vol_pace": 0.79,
       "action": "COILING"
     },
     {
@@ -224,7 +224,7 @@
       "stop_loss": 1167.66,
       "risk_%": 8.0,
       "clearance_%": -3.89,
-      "proj_vol_pace": 0.56,
+      "proj_vol_pace": 0.55,
       "action": "COILING"
     },
     {
@@ -232,13 +232,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 396.0,
-      "ltp": 379.9,
+      "ltp": 380.15,
       "day_high": 383.75,
       "day_low": 372.45,
       "stop_loss": 364.32,
       "risk_%": 8.0,
-      "clearance_%": -4.07,
-      "proj_vol_pace": 0.33,
+      "clearance_%": -4.0,
+      "proj_vol_pace": 0.32,
       "action": "COILING"
     },
     {
@@ -252,7 +252,7 @@
       "stop_loss": 10405.2,
       "risk_%": 8.0,
       "clearance_%": -4.31,
-      "proj_vol_pace": 2.01,
+      "proj_vol_pace": 1.98,
       "action": "COILING"
     },
     {
@@ -260,13 +260,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 852.95,
-      "ltp": 812.6,
-      "day_high": 814.0,
+      "ltp": 811.2,
+      "day_high": 814.9,
       "day_low": 785.45,
       "stop_loss": 784.71,
       "risk_%": 8.0,
-      "clearance_%": -4.73,
-      "proj_vol_pace": 0.3,
+      "clearance_%": -4.89,
+      "proj_vol_pace": 0.31,
       "action": "COILING"
     },
     {
@@ -274,13 +274,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 199.72,
-      "ltp": 189.0,
+      "ltp": 189.1,
       "day_high": 191.28,
       "day_low": 186.23,
       "stop_loss": 183.74,
       "risk_%": 8.0,
-      "clearance_%": -5.37,
-      "proj_vol_pace": 2.24,
+      "clearance_%": -5.32,
+      "proj_vol_pace": 2.27,
       "action": "COILING"
     },
     {
@@ -294,21 +294,7 @@
       "stop_loss": 1190.3,
       "risk_%": 8.0,
       "clearance_%": -5.97,
-      "proj_vol_pace": 0.8,
-      "action": "COILING"
-    },
-    {
-      "symbol": "EPL",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 239.0,
-      "ltp": 223.8,
-      "day_high": 225.81,
-      "day_low": 220.55,
-      "stop_loss": 219.88,
-      "risk_%": 8.0,
-      "clearance_%": -6.36,
-      "proj_vol_pace": 0.59,
+      "proj_vol_pace": 0.79,
       "action": "COILING"
     },
     {
@@ -316,13 +302,27 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 624.0,
-      "ltp": 582.35,
+      "ltp": 584.05,
       "day_high": 586.4,
       "day_low": 570.3,
       "stop_loss": 574.08,
       "risk_%": 8.0,
-      "clearance_%": -6.67,
+      "clearance_%": -6.4,
       "proj_vol_pace": 0.32,
+      "action": "COILING"
+    },
+    {
+      "symbol": "EPL",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 239.0,
+      "ltp": 223.61,
+      "day_high": 225.81,
+      "day_low": 220.55,
+      "stop_loss": 219.88,
+      "risk_%": 8.0,
+      "clearance_%": -6.44,
+      "proj_vol_pace": 0.6,
       "action": "COILING"
     },
     {
@@ -330,13 +330,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 254.0,
-      "ltp": 233.99,
+      "ltp": 233.86,
       "day_high": 238.19,
       "day_low": 230.7,
       "stop_loss": 233.68,
       "risk_%": 8.0,
-      "clearance_%": -7.88,
-      "proj_vol_pace": 1.01,
+      "clearance_%": -7.93,
+      "proj_vol_pace": 1.0,
       "action": "COILING"
     },
     {
@@ -344,13 +344,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 649.1,
-      "ltp": 585.7,
+      "ltp": 585.0,
       "day_high": 623.2,
       "day_low": 582.8,
       "stop_loss": 597.17,
       "risk_%": 8.0,
-      "clearance_%": -9.77,
-      "proj_vol_pace": 1.3,
+      "clearance_%": -9.88,
+      "proj_vol_pace": 1.31,
       "action": "COILING"
     },
     {
@@ -358,13 +358,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 5600.0,
-      "ltp": 5046.0,
+      "ltp": 5039.5,
       "day_high": 5078.0,
       "day_low": 4915.0,
       "stop_loss": 5152.0,
       "risk_%": 8.0,
-      "clearance_%": -9.89,
-      "proj_vol_pace": 0.88,
+      "clearance_%": -10.01,
+      "proj_vol_pace": 0.87,
       "action": "COILING"
     },
     {
@@ -372,13 +372,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 911.0,
-      "ltp": 811.0,
+      "ltp": 813.9,
       "day_high": 821.9,
       "day_low": 802.65,
       "stop_loss": 838.12,
       "risk_%": 8.0,
-      "clearance_%": -10.98,
-      "proj_vol_pace": 0.56,
+      "clearance_%": -10.66,
+      "proj_vol_pace": 0.55,
       "action": "COILING"
     },
     {
@@ -386,13 +386,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 184.9,
-      "ltp": 162.96,
+      "ltp": 163.18,
       "day_high": 167.69,
       "day_low": 162.5,
       "stop_loss": 170.11,
       "risk_%": 8.0,
-      "clearance_%": -11.87,
-      "proj_vol_pace": 0.34,
+      "clearance_%": -11.75,
+      "proj_vol_pace": 0.35,
       "action": "COILING"
     },
     {
@@ -400,12 +400,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 695.0,
-      "ltp": 588.0,
+      "ltp": 586.8,
       "day_high": 631.5,
       "day_low": 586.0,
       "stop_loss": 639.4,
       "risk_%": 8.0,
-      "clearance_%": -15.4,
+      "clearance_%": -15.57,
       "proj_vol_pace": 0.97,
       "action": "COILING"
     }
