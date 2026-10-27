@@ -14,14 +14,26 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 MY_TRADES_FILE = os.path.join(DATA_DIR, "my_trades.json")
+NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
 
-# Hardcoded Telegram credentials
-TELEGRAM_BOT_TOKEN = "8796649927:AAHOx-1Fc_IyIttdQboQc0ul9qsM0g35O9c"
-TELEGRAM_CHAT_ID = "7860290981"
+# Secure Token Retrieval: Env Secrets first -> local_secrets.json fallback
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
-# Explicit IST Timezone (UTC + 05:30)
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    secrets_path = "local_secrets.json"
+    if os.path.exists(secrets_path):
+        try:
+            with open(secrets_path, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+                TELEGRAM_BOT_TOKEN = cfg.get("8659551805:AAGc436Ii25qrFvcrxh2Iu4kDbVRxKu344k", TELEGRAM_BOT_TOKEN)
+                TELEGRAM_CHAT_ID = cfg.get("7860290981", TELEGRAM_CHAT_ID)
+        except Exception:
+            pass
+
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
+WATCHLIST_MAX_AGE_DAYS = 5
 
 
 def get_ist_now():
@@ -35,9 +47,11 @@ def send_telegram_alert(message: str):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML", "disable_web_page_preview": True}
     try:
-        requests.post(url, json=payload, timeout=12)
+        r = requests.post(url, json=payload, timeout=12)
+        if not r.json().get("ok"):
+            print(f"❌ Telegram API Error: {r.text}")
     except Exception as e:
-        print(f"❌ Telegram API Error: {e}")
+        print(f"❌ Telegram Dispatch Error: {e}")
 
 
 def get_market_session_elapsed():
@@ -128,16 +142,13 @@ def clean_and_prepare(raw_data):
         return []
     date_map = {}
     for r in raw_data:
-        if not isinstance(r, dict):
-            continue
+        if not isinstance(r, dict): continue
         raw_t = str(r.get("time", "")).strip()
-        if not raw_t:
-            continue
+        if not raw_t: continue
         d_str = raw_t[:10]
         try:
             c = float(r.get("close", 0) or 0)
-            if c <= 0:
-                continue
+            if c <= 0: continue
             entry = {
                 "time": d_str,
                 "open": float(r.get("open", c) or c),
@@ -256,29 +267,29 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
         exit_triggered = False
         exit_rule = ""
 
-        # Rule 1: Catastrophe Stop
+        # 1. Catastrophe Stop
         if ltp < catastrophe_sl:
             exit_triggered = True
             exit_rule = f"1. Catastrophe SL Breach (LTP ₹{ltp:,.2f} < Hard SL ₹{catastrophe_sl:,.2f})"
 
-        # Rule 2: Climactic Churn Harvest
+        # 2. Climactic Churn Harvest
         elif peak_gain_pct >= 20.0 and vol_pace >= 2.0 and range_closeness <= 0.35:
             exit_triggered = True
             exit_rule = f"2. Climactic Churn Harvest (Peak +{peak_gain_pct:.1f}%, Vol Pace {vol_pace:.1f}x)"
 
-        # Rule 3: Distribution Cluster Breakdown
+        # 3. Distribution Cluster Breakdown
         elif dist_count_12d >= 3 and ltp < ema20:
             exit_triggered = True
             exit_rule = f"3. Distribution Cluster Breakdown ({dist_count_12d} Dist Days & LTP < 20 EMA ₹{ema20:,.2f})"
 
-        # Rule 4: Mega-Runner 15% Cushion Lock
+        # 4. Mega-Runner 15% Cushion Lock
         elif peak_gain_pct >= 50.0:
             cushion_stop = max(ema20, peak_close * 0.85)
             if ltp < cushion_stop:
                 exit_triggered = True
                 exit_rule = f"4. Mega-Runner 15% Cushion Lock (LTP ₹{ltp:,.2f} < Cushion ₹{cushion_stop:,.2f})"
 
-        # Rule 5: 20 EMA Breakdown Engine
+        # 5. 20 EMA Breakdown Engine
         elif ltp < ema20:
             if vol_pace >= 1.25:
                 exit_triggered = True
@@ -331,62 +342,85 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
         pass
 
 
-def load_comprehensive_targets():
-    targets = {}
-    sources = [
-        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing_ultra750_results.json", "NIFTY 750"),
-        ("https://raw.githubusercontent.com/DRAMITBHOI/Nse-_data/main/data/swing_ultraN750_results.json", "NON-N750")
-    ]
-    for url, default_univ in sources:
+def load_nifty750_symbols():
+    if os.path.exists(NIFTY750_FILE):
         try:
-            r = requests.get(url + f"?_ts={int(time.time() * 1000)}", headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
-            if r.status_code == 200:
-                d = r.json()
-                items = list(d.get("Watchlist", [])) + list(d.get("Fresh_Triggers", []))
-                for item in items:
-                    if not isinstance(item, dict):
-                        continue
-                    sym = str(item.get("symbol", "")).strip().upper()
-                    if not sym or sym.endswith("BEES") or sym in EXCLUDED_SYMBOLS:
-                        continue
-                    p_str = str(item.get("pivot_ceiling") or item.get("pivot_target") or item.get("pivot") or "0").replace("₹", "").replace(",", "").strip()
-                    pivot = float(p_str)
-                    if pivot <= 0:
-                        continue
-                    sl_str = str(item.get("stop_loss", pivot * 0.92)).replace("₹", "").replace(",", "").strip()
-                    stop_loss = float(sl_str)
-                    setup = item.get("setup_class") or item.get("type") or item.get("setup") or "LAUNCHPAD COIL"
-                    universe = item.get("universe", default_univ)
-                    spread_pct = float(str(item.get("spread_%", "6.0")).replace("%", "") or 6.0)
+            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, list):
+                return {str(x).strip().upper() for x in data}
+            if isinstance(data, dict):
+                return {str(x).strip().upper() for x in data.keys()}
+        except Exception:
+            pass
+    return set()
 
-                    targets[sym] = {
-                        "symbol": sym,
-                        "universe": universe,
-                        "setup": setup,
-                        "pivot_ceiling": pivot,
-                        "stop_loss": stop_loss,
-                        "shelf_spread_%": spread_pct
-                    }
+
+def load_comprehensive_targets(n750_set):
+    """
+    Loads candidates strictly generated by Swing Ultra 750 & Swing Ultra Non-750.
+    Retains candidates up to 5 days, pruning setups whose structural floor is broken.
+    """
+    targets = {}
+    today_dt = get_ist_now().date()
+    sources = [
+        (os.path.join(DATA_DIR, "swing_ultra750_results.json"), "NIFTY 750"),
+        (os.path.join(DATA_DIR, "swing_ultraN750_results.json"), "NON-N750")
+    ]
+
+    for fpath, default_univ in sources:
+        if not os.path.exists(fpath):
+            continue
+        try:
+            with open(fpath, "r", encoding="utf-8") as fp:
+                d = json.load(fp)
+            items = list(d.get("Watchlist", [])) + list(d.get("Fresh_Triggers", []))
+            for item in items:
+                sym = str(item.get("symbol", "")).strip().upper()
+                if not sym or sym.endswith("BEES") or sym in EXCLUDED_SYMBOLS:
+                    continue
+                p_str = str(item.get("pivot_ceiling") or item.get("pivot_target") or item.get("pivot") or "0").replace("₹", "").replace(",", "").strip()
+                pivot = float(p_str)
+                if pivot <= 0: continue
+                sl_str = str(item.get("stop_loss", pivot * 0.92)).replace("₹", "").replace(",", "").strip()
+                stop_loss = float(sl_str)
+                spread_pct = float(str(item.get("spread_%", "6.0")).replace("%", "") or 6.0)
+                setup = item.get("setup_class") or item.get("type") or "LAUNCHPAD COIL"
+                univ = "NIFTY 750" if (n750_set and sym in n750_set) else default_univ
+
+                targets[sym] = {
+                    "symbol": sym,
+                    "universe": univ,
+                    "setup": setup,
+                    "pivot_ceiling": pivot,
+                    "stop_loss": stop_loss,
+                    "shelf_spread_%": spread_pct,
+                    "added_date": str(today_dt)
+                }
         except Exception:
             pass
 
+    # Carry forward historical watchlists up to 5 sessions
     if os.path.exists(LIVE_BREAKOUTS_FILE):
         try:
             with open(LIVE_BREAKOUTS_FILE, "r", encoding="utf-8") as f:
                 prev = json.load(f)
-            for item in prev.get("Coiling", []):
-                sym = item.get("symbol", "").upper()
-                if sym and sym not in targets and sym not in EXCLUDED_SYMBOLS:
+            historical_watchlist = prev.get("Active_MultiDay_Watchlist", {})
+            for sym, item in historical_watchlist.items():
+                if sym in targets or sym in EXCLUDED_SYMBOLS:
+                    continue
+                try:
+                    entry_dt = datetime.datetime.strptime(item.get("added_date", str(today_dt)), "%Y-%m-%d").date()
+                    age_days = (today_dt - entry_dt).days
+                except Exception:
+                    age_days = 99
+
+                # Check if still within 5 session window
+                if age_days <= WATCHLIST_MAX_AGE_DAYS:
                     pivot = float(item.get("pivot_ceiling", 0))
+                    sl = float(item.get("stop_loss", pivot * 0.92))
                     if pivot > 0:
-                        targets[sym] = {
-                            "symbol": sym,
-                            "universe": item.get("universe", "NON-N750"),
-                            "setup": item.get("setup", "LAUNCHPAD COIL"),
-                            "pivot_ceiling": pivot,
-                            "stop_loss": float(item.get("stop_loss", pivot * 0.92)),
-                            "shelf_spread_%": float(item.get("shelf_spread_%", 6.0))
-                        }
+                        targets[sym] = item
         except Exception:
             pass
 
@@ -394,13 +428,15 @@ def load_comprehensive_targets():
 
 
 def run_live_intraday_scan():
-    targets = load_comprehensive_targets()
     now_dt = get_ist_now()
     today_date = now_dt.strftime("%Y-%m-%d")
     now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
     elapsed_mins = get_market_session_elapsed()
 
-    # Load persistent state
+    n750_set = load_nifty750_symbols()
+    targets = load_comprehensive_targets(n750_set)
+
+    # State variables
     alert1_sent = set()
     alert2_sent = set()
     benchmark_highs = {}
@@ -422,17 +458,18 @@ def run_live_intraday_scan():
 
     live_client = LivePriceClient()
 
-    # Step 1: Monitor Active Positions for Exit 2.2 Triggers
+    # Step 1: Monitor Active Trades for Exit 2.2
     monitor_exit2_2_active_positions(live_client, elapsed_mins)
 
     if not targets:
-        print("❌ No watchlisted setups found to scan.")
+        print("❌ No institutional candidates currently eligible for scanning.")
         return
 
     expected_fraction = get_u_curve_expected_volume_fraction(elapsed_mins)
 
     radar_candidates = []
     coiling_list = []
+    multi_day_watchlist = {}
 
     for sym, meta in targets.items():
         pivot = float(meta["pivot_ceiling"])
@@ -482,6 +519,12 @@ def run_live_intraday_scan():
         day_high = max(day_high or ltp, ltp)
         day_low = min(day_low or ltp, ltp)
 
+        # PRUNE INVALIDATED SETUPS: If price breaks below base stop floor, purge it from multi-day tracking
+        if ltp < stop_loss:
+            continue
+
+        multi_day_watchlist[sym] = meta
+
         sma20_vol = max(1.0, sma20_vol)
         proj_vol = day_vol / expected_fraction
         vol_pace = round(proj_vol / sma20_vol, 2) if sma20_vol > 0 else 1.0
@@ -489,23 +532,22 @@ def run_live_intraday_scan():
         clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
         risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 8.0
 
-        # Dedicated Volume Thresholds: Accessible morning hurdle so 9:50 AM breakouts are not blocked
+        # Universe Aligned Volume Hurdle
         is_v_reversal = "V-REVERSAL" in setup
         if is_v_reversal:
-            pace_threshold = 1.40 if universe == "NIFTY 750" else 1.25
+            pace_threshold = 1.30 if universe == "NIFTY 750" else 1.20
         else:
             if elapsed_mins <= 60:
                 pace_threshold = 1.05 if universe == "NIFTY 750" else 0.80
             else:
                 pace_threshold = 1.20 if universe == "NIFTY 750" else 0.85
                 if shelf_spread > 7.0:
-                    pace_threshold += 0.25
+                    pace_threshold += 0.20
 
         is_vol_confirmed = bool(vol_pace >= pace_threshold)
         cleared_pivot = bool(clearance_pct >= 0.15)
         wick_touched = bool(day_high >= pivot)
 
-        # Continually track the benchmark session high
         if wick_touched or cleared_pivot:
             if sym not in benchmark_highs:
                 benchmark_highs[sym] = round(day_high, 2)
@@ -534,39 +576,36 @@ def run_live_intraday_scan():
             radar_candidates.append(record)
             master_confirmed_breakouts[sym] = record
 
-            # Dispatched on SINGLE TICK (No 2-tick requirement in V1)
             if sym not in alert1_sent:
                 ref_h = benchmark_highs.get(sym, day_high)
                 msg1 = (
-                    f"👀 <b>RADAR: PIVOT CEILING CLEARED (ZERO DELAY)</b>\n"
+                    f"👀 <b>RADAR: INSTITUTIONAL BREAKOUT CONFIRMED</b>\n"
                     f"• <b>Symbol</b>: <code>#{sym}</code> ({universe} | {setup})\n"
                     f"• <b>Pivot Ceiling</b>: ₹{pivot:,.2f}\n"
                     f"• <b>Live NSE LTP</b>: ₹{ltp:,.2f} (<b>{clearance_pct:+.2f}%</b>)\n"
                     f"• <b>Session Day High</b>: ₹{day_high:,.2f}\n"
                     f"• <b>Volume Pace</b>: <b>{vol_pace}x SMA20</b>\n"
                     f"• <b>Stop Loss</b>: ₹{stop_loss:,.2f} (Risk: {risk_pct}%)\n"
-                    f"📌 <i>Alert 1 dispatched on tick 1. Watching for day-high break of ₹{ref_h:,.2f}.</i>"
+                    f"📌 <i>Alert 1 dispatched on tick 1. Tracking for continuation above ₹{ref_h:,.2f}.</i>"
                 )
                 send_telegram_alert(msg1)
                 alert1_sent.add(sym)
                 time.sleep(1)
 
         # ----------------------------------------------------------------------
-        # ALERT 2: AUTONOMOUS DAY-HIGH BREAK (Fires Even if Alert 1 Was Missed!)
+        # ALERT 2: AUTONOMOUS DAY-HIGH BREAK
         # ----------------------------------------------------------------------
         if sym not in alert2_sent and sym in benchmark_highs:
             prior_ref_high = float(benchmark_highs[sym])
-            
-            # Condition: Price pushes through prior day high by >= +0.15% with volume pace >= 1.25x
             if ltp >= (prior_ref_high * 1.0015) and ltp > pivot and is_vol_confirmed:
                 record["action"] = "CONFIRMED BREAKOUT"
                 master_confirmed_breakouts[sym] = record
 
                 msg2 = (
-                    f"🚀 <b>2ND ALERT, DAY HIGH CROSS (MOMENTUM EXPANSION)</b>\n"
+                    f"🚀 <b>2ND ALERT: DAY HIGH BREAK (EXPANSION)</b>\n"
                     f"• <b>Symbol</b>: <code>#{sym}</code> ({universe} | {setup})\n"
                     f"• <b>Prior Day High Broken</b>: ₹{prior_ref_high:,.2f}\n"
-                    f"• <b>New Live NSE LTP</b>: ₹{ltp:,.2f} (<b>+{round(((ltp - pivot)/pivot)*100, 2):.2f}% above pivot</b>)\n"
+                    f"• <b>New Live NSE LTP</b>: ₹{ltp:,.2f} (<b>+{round(((ltp - pivot)/pivot)*100, 2):.2f}%</b>)\n"
                     f"• <b>New Day High</b>: ₹{day_high:,.2f}\n"
                     f"• <b>Volume Pace</b>: <b>{vol_pace}x SMA20</b>\n"
                     f"• <b>Stop Loss</b>: ₹{stop_loss:,.2f}\n"
@@ -577,7 +616,7 @@ def run_live_intraday_scan():
                 benchmark_highs[sym] = round(day_high, 2)
                 time.sleep(1)
 
-        # Watchlist Coiling
+        # Watchlist Coiling & Rejection State
         if not cleared_pivot:
             record["action"] = "WICK REJECTED" if wick_touched else "COILING"
             coiling_list.append(record)
@@ -586,7 +625,7 @@ def run_live_intraday_scan():
     final_confirmed = list(master_confirmed_breakouts.values())
 
     # --------------------------------------------------------------------------
-    # 03:15 PM EOD CLOSING SUMMARY (GUARANTEED RETENTION OF ALL BREAKOUTS)
+    # 03:15 PM EOD CLOSING SUMMARY (CNC DELIVERY EXECUTION)
     # --------------------------------------------------------------------------
     if elapsed_mins >= 360 and not eod_summary_sent:
         summary_msg = (
@@ -623,6 +662,7 @@ def run_live_intraday_scan():
         "Benchmark_Highs": benchmark_highs,
         "Master_Confirmed_Breakouts": master_confirmed_breakouts,
         "Breakouts_All_Day": final_confirmed,
+        "Active_MultiDay_Watchlist": multi_day_watchlist,
         "Coiling": coiling_list[:50]
     }
 
