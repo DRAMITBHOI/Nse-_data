@@ -1,0 +1,99 @@
+name: Diagnostic Telegram Ping Test
+
+on:
+  workflow_dispatch: # Allows manual trigger via the "Run workflow" button
+
+jobs:
+  ping-telegram:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify Secrets & Send Direct Ping
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 - << 'EOF'
+          import os
+          import json
+          import urllib.request
+          import urllib.parse
+
+          token = os.environ.get("BOT_TOKEN", "").strip()
+          chat_id = os.environ.get("CHAT_ID", "").strip()
+
+          print("=" * 60)
+          print("GITHUB SECRETS DIAGNOSTIC CHECK")
+          print("=" * 60)
+
+          # 1. Inspect Secret Formats (without exposing plain text)
+          if not token:
+              print("❌ ERROR: TELEGRAM_BOT_TOKEN is completely missing or empty in GitHub Secrets!")
+          else:
+              masked_token = token[:5] + "..." + token[-4:] if len(token) > 10 else "INVALID_LENGTH"
+              print(f"✅ TELEGRAM_BOT_TOKEN present (Length: {len(token)}, Masked: {masked_token})")
+
+          if not chat_id:
+              print("❌ ERROR: TELEGRAM_CHAT_ID is completely missing or empty in GitHub Secrets!")
+          else:
+              masked_chat = chat_id[:2] + "***" + chat_id[-2:] if len(chat_id) > 4 else "***"
+              print(f"✅ TELEGRAM_CHAT_ID present (Length: {len(chat_id)}, Masked: {masked_chat})")
+
+          if not token or not chat_id:
+              print("\n🚨 Action halted: Fill the secrets at Settings -> Secrets and variables -> Actions")
+              exit(1)
+
+          # 2. Test Bot Identity (getMe API)
+          print("\n--- Verifying Bot Identity with Telegram API ---")
+          get_me_url = f"https://api.telegram.org/bot{token}/getMe"
+          try:
+              req = urllib.request.Request(get_me_url, headers={"User-Agent": "GitHubActions-Tester"})
+              with urllib.request.urlopen(req, timeout=10) as resp:
+                  bot_data = json.loads(resp.read().decode("utf-8"))
+                  if bot_data.get("ok"):
+                      user = bot_data.get("result", {})
+                      print(f"✅ Bot Connected Successfully!")
+                      print(f"   Bot Username: @{user.get('username')}")
+                      print(f"   Bot Display Name: {user.get('first_name')}")
+                  else:
+                      print("❌ getMe response not ok:", bot_data)
+          except urllib.error.HTTPError as e:
+              err_body = e.read().decode("utf-8")
+              print(f"❌ Telegram Authentication Failed (HTTP {e.code}): {err_body}")
+              exit(1)
+          except Exception as e:
+              print(f"❌ Network/Connection Error: {e}")
+              exit(1)
+
+          # 3. Dispatch Live Test Alert (sendMessage API)
+          print("\n--- Sending Live Test Message to Telegram ---")
+          test_msg = "🚨 **GitHub Actions Test Alert**\n\nYour GitHub repository secrets are properly connected to this bot and ready to deliver live breakout triggers."
+          send_url = f"https://api.telegram.org/bot{token}/sendMessage"
+          payload = json.dumps({
+              "chat_id": chat_id,
+              "text": test_msg,
+              "parse_mode": "Markdown"
+          }).encode("utf-8")
+
+          try:
+              post_req = urllib.request.Request(
+                  send_url,
+                  data=payload,
+                  headers={"Content-Type": "application/json", "User-Agent": "GitHubActions-Tester"}
+              )
+              with urllib.request.urlopen(post_req, timeout=10) as resp:
+                  result = json.loads(resp.read().decode("utf-8"))
+                  if result.get("ok"):
+                      print("🚀 SUCCESS! Alert dispatched and delivered to your phone.")
+                  else:
+                      print("❌ API reported failure:", result)
+          except urllib.error.HTTPError as e:
+              err_body = e.read().decode("utf-8")
+              print(f"❌ Failed to deliver message (HTTP {e.code}): {err_body}")
+              if e.code == 400:
+                  print("👉 Note: Error 400 usually indicates an incorrect TELEGRAM_CHAT_ID or you haven't pressed /start on the bot.")
+              exit(1)
+          except Exception as e:
+              print(f"❌ Message sending failed: {e}")
+              exit(1)
+          EOF
