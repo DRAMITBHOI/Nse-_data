@@ -1,50 +1,48 @@
 {
-  "Last_Updated": "2026-10-28 13:39:04 IST",
+  "Last_Updated": "2026-10-28 19:08:45 IST",
   "Total_Sessions_Audited": 5,
   "Latest_Session_Date": "2026-10-28",
-  "Latest_Ground_Truth": [
-    "ENTERO"
-  ],
+  "Latest_Ground_Truth": [],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
-      "TP (Caught)": 1,
+      "TP (Caught)": 0,
       "FN (Missed)": 0,
-      "FP (Fakeouts)": 1,
-      "TN (Quiet)": 9,
+      "FP (Fakeouts)": 0,
+      "TN (Quiet)": 8,
       "TPR (Sensitivity)": "100.0%",
       "FNR (Miss Rate)": "0.0%",
-      "FPR (Fallout)": "10.0%",
-      "TNR (Specificity)": "90.0%"
+      "FPR (Fallout)": "0.0%",
+      "TNR (Specificity)": "100.0%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 1,
+      "FN (Missed)": 0,
       "FP (Fakeouts)": 0,
-      "TN (Quiet)": 10,
-      "TPR (Sensitivity)": "0.0%",
-      "FNR (Miss Rate)": "100.0%",
+      "TN (Quiet)": 8,
+      "TPR (Sensitivity)": "100.0%",
+      "FNR (Miss Rate)": "0.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     }
   ],
   "Cumulative_Metrics": {
     "Scanner_V1": {
-      "Total_TP": 2,
+      "Total_TP": 1,
       "Total_FN": 3,
-      "Total_FP": 2,
-      "Total_TN": 43,
-      "Cumulative_TPR": "40.0%",
-      "Cumulative_FNR": "60.0%",
-      "Cumulative_FPR": "4.4%",
-      "Cumulative_TNR": "95.6%"
+      "Total_FP": 1,
+      "Total_TN": 42,
+      "Cumulative_TPR": "25.0%",
+      "Cumulative_FNR": "75.0%",
+      "Cumulative_FPR": "2.3%",
+      "Cumulative_TNR": "97.7%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 5,
+      "Total_FN": 4,
       "Total_FP": 0,
-      "Total_TN": 45,
+      "Total_TN": 43,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -162,27 +160,25 @@
     },
     {
       "date": "2026-10-28",
-      "ground_truth_count": 1,
-      "ground_truth_symbols": [
-        "ENTERO"
-      ],
+      "ground_truth_count": 0,
+      "ground_truth_symbols": [],
       "v1": {
-        "tp": 1,
+        "tp": 0,
         "fn": 0,
-        "fp": 1,
-        "tn": 9,
+        "fp": 0,
+        "tn": 8,
         "tpr": 100.0,
         "fnr": 0.0,
-        "fpr": 10.0,
-        "tnr": 90.0
+        "fpr": 0.0,
+        "tnr": 100.0
       },
       "v2": {
         "tp": 0,
-        "fn": 1,
+        "fn": 0,
         "fp": 0,
-        "tn": 10,
-        "tpr": 0.0,
-        "fnr": 100.0,
+        "tn": 8,
+        "tpr": 100.0,
+        "fnr": 0.0,
         "fpr": 0.0,
         "tnr": 100.0
       }
