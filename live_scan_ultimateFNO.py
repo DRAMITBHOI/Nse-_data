@@ -6,33 +6,29 @@ import time
 import datetime
 import base64
 import glob
-import numpy as np
 import pandas as pd
 import requests
 
-# ---------------------------------------------------------
-# DIRECTORY & FILE TARGETS
-# ---------------------------------------------------------
-DATA_DIR = "Codes/data" if os.path.exists("Codes/data") else "data"
+# --------------------------------------------------------------------------
+# PATHS & CONFIGURATION (STRICT UNIFIED REPO PATHS)
+# --------------------------------------------------------------------------
+DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_fno_ultimate_breakouts.json")
 MY_TRADES_FILE = os.path.join(DATA_DIR, "my_trades.json")
 EOD_RESULTS_FILE = "fno_champion_scan_results.json"
 REPO_NAME = "DRAMITBHOI/Nse-_data"
-MIN_TURNOVER_CR = 10.0
 WATCHLIST_MAX_AGE_DAYS = 5
 
-# ---------------------------------------------------------
-# CREDENTIALS (TELEGRAM & GITHUB API)
-# ---------------------------------------------------------
+# Telegram Credentials
 DEFAULT_BOT_TOKEN = "9160227761:AAE2zmSpvqttJl3_KKl3jjyKkMg-CopgtSY"
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN_ULTIMATE", DEFAULT_BOT_TOKEN).strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID_ULTIMATE", "7860290981").strip()
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 
-# Read local_secrets.json fallback
-for sec_p in ["local_secrets.json", "../local_secrets.json"]:
+# Check local_secrets.json fallback
+for sec_p in ["local_secrets.json", "../local_secrets.json", os.path.join(DATA_DIR, "local_secrets.json")]:
     if os.path.exists(sec_p):
         try:
             with open(sec_p, "r", encoding="utf-8") as f:
@@ -45,7 +41,7 @@ for sec_p in ["local_secrets.json", "../local_secrets.json"]:
             pass
 
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
-EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
+EXCLUDED_KEYWORDS = ["BEES", "ETF", "LIQUID", "GOLD", "SILVER", "NIFTY", "SENSEX", "AXIS", "CASE", "GRW"]
 
 def get_ist_now():
     return datetime.datetime.now(IST)
@@ -99,11 +95,11 @@ def send_telegram_alert(message: str):
     except Exception as e:
         print(f"❌ Telegram Dispatch Error: {e}")
 
-# ---------------------------------------------------------
-# DIRECT GITHUB PERSISTENCE FOR ZERO-SPAM STATE MEMORY
-# ---------------------------------------------------------
+# --------------------------------------------------------------------------
+# FAILSAFE GITHUB REMOTE STATE (ZERO-SPAM MEMORY)
+# --------------------------------------------------------------------------
 def fetch_remote_state():
-    """Fetches live_fno_ultimate_breakouts.json directly from GitHub API."""
+    """Fetches state directly from GitHub API to guarantee continuity across runners."""
     if not GITHUB_TOKEN:
         return None, None
     url = f"https://api.github.com/repos/{REPO_NAME}/contents/data/live_fno_ultimate_breakouts.json"
@@ -119,7 +115,7 @@ def fetch_remote_state():
     return None, None
 
 def push_remote_state(state_data, sha=None):
-    """Pushes the updated state directly to GitHub to lock in alert memory."""
+    """Commits state immediately back to GitHub repo to lock alert sets."""
     if not GITHUB_TOKEN:
         return
     url = f"https://api.github.com/repos/{REPO_NAME}/contents/data/live_fno_ultimate_breakouts.json"
@@ -137,9 +133,9 @@ def push_remote_state(state_data, sha=None):
     except Exception:
         pass
 
-# ---------------------------------------------------------
-# PRICE CLIENT & NORMALIZATION
-# ---------------------------------------------------------
+# --------------------------------------------------------------------------
+# LIVE CLIENT
+# --------------------------------------------------------------------------
 class LivePriceClient:
     def __init__(self):
         self.session = requests.Session()
@@ -149,6 +145,7 @@ class LivePriceClient:
         })
 
     def fetch_live_quote(self, symbol):
+        # 1. Google Finance
         try:
             url = f"https://www.google.com/finance/quote/{symbol}:NSE"
             r = self.session.get(url, timeout=4)
@@ -176,6 +173,7 @@ class LivePriceClient:
         except Exception:
             pass
 
+        # 2. Yahoo Finance
         try:
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS?interval=1d&range=1d"
             r = self.session.get(url, timeout=4)
@@ -212,67 +210,53 @@ def clean_and_prepare(raw_data):
             "deliv_pct": (dv / v * 100.0) if v > 0 else 0.0
         }
     clean = [date_map[k] for k in sorted(date_map.keys())]
-    
-    known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
-    for i in range(len(clean) - 1, 0, -1):
-        prev_c = clean[i - 1]["close"]
-        curr_o = clean[i]["open"]
-        if prev_c > 0 and curr_o > 0:
-            ratio = prev_c / curr_o
-            adj = None
-            if ratio >= 1.35:
-                for k in known_multipliers:
-                    if abs(ratio - k) / k < 0.15:
-                        adj = k; break
-                if not adj and 1.70 <= ratio <= 2.30: adj = 2.0
-                elif not adj and 4.30 <= ratio <= 5.50: adj = 5.0
-            if adj:
-                for j in range(0, i):
-                    clean[j]["open"] = round(clean[j]["open"] / adj, 2)
-                    clean[j]["high"] = round(clean[j]["high"] / adj, 2)
-                    clean[j]["low"] = round(clean[j]["low"] / adj, 2)
-                    clean[j]["close"] = round(clean[j]["close"] / adj, 2)
-                    clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj
-                    clean[j]["volume"] = clean[j]["volume"] * adj
     return clean
 
-# ---------------------------------------------------------
-# TARGET BUILDER (EOD SCANNER COILS + 5-SESSION LOOKBACK)
-# ---------------------------------------------------------
-def load_all_target_candidates():
-    """Combines:
+# --------------------------------------------------------------------------
+# TARGET BUILDER: STRICT PREVIOUS 1-WEEK COILING CANDIDATES ONLY
+# --------------------------------------------------------------------------
+def load_fno_1week_coiling_targets():
+    """STRICT TARGET FILTER:
 
-    1. Today's fresh coiling candidates from Scan_ultimateFNO
-    2. Historical coiling candidates from the past 5 trading sessions
+    Only stocks that have qualified for the institutional coiling watchlist
+    in fno_champion_scan_results.json during the past 5 trading sessions.
+    No un-coiled stocks are permitted.
     """
     targets = {}
     today_dt = get_ist_now().date()
 
-    # Source 1: Check fno_champion_scan_results.json
-    eod_files = glob.glob(f"**/{EOD_RESULTS_FILE}", recursive=True)
-    if eod_files:
+    # 1. Ingest fresh targets from EOD fno_champion_scan_results.json
+    eod_matches = glob.glob(f"**/{EOD_RESULTS_FILE}", recursive=True)
+    if eod_matches:
         try:
-            with open(eod_files[0], "r", encoding="utf-8") as fp:
+            with open(eod_matches[0], "r", encoding="utf-8") as fp:
                 eod_data = json.load(fp)
-            coils = eod_data.get("coiling_watchlist", [])
+            # Combine both watchlist and fresh breakouts from EOD
+            coils = list(eod_data.get("coiling_watchlist", [])) + list(eod_data.get("confirmed_breakouts", []))
             for c in coils:
                 sym = str(c.get("symbol", "")).upper().strip()
-                if not sym or sym in EXCLUDED_SYMBOLS: continue
-                p_str = str(c.get("pivot_target", c.get("pivot_ceiling", "0"))).replace("₹", "").replace(",", "")
+                if not sym or any(k in sym for k in EXCLUDED_KEYWORDS):
+                    continue
+                p_str = str(c.get("pivot_ceiling", c.get("pivot_target", "0"))).replace("₹", "").replace(",", "")
                 pivot = float(p_str)
                 if pivot <= 0: continue
+                sl_str = str(c.get("stop_loss", pivot * 0.935)).replace("₹", "").replace(",", "")
+                stop_loss = float(sl_str)
+                spread_pct = float(str(c.get("shelf_spread_%", "6.5")).replace("%", ""))
+                acc_ratio = float(c.get("accumulation_ratio", 1.80))
+
                 targets[sym] = {
                     "symbol": sym,
                     "pivot_ceiling": pivot,
-                    "stop_loss": pivot * 0.935,
-                    "accumulation_ratio": float(c.get("accumulation_ratio", 1.8)),
-                    "shelf_spread_%": float(str(c.get("shelf_spread_%", "6.5")).replace("%", "")),
+                    "stop_loss": stop_loss,
+                    "accumulation_ratio": acc_ratio,
+                    "shelf_spread_%": spread_pct,
                     "added_date": str(today_dt)
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"⚠️ Error reading EOD results: {e}")
 
-    # Source 2: Ingest Multi-day Watchlist from live_fno_ultimate_breakouts.json (Up to 5 Days)
+    # 2. Ingest & Carry-Forward historical watchlists up to 5 trading sessions
     prior_state, _ = fetch_remote_state()
     if not prior_state and os.path.exists(LIVE_BREAKOUTS_FILE):
         try:
@@ -284,80 +268,24 @@ def load_all_target_candidates():
     if prior_state:
         hist_watchlist = prior_state.get("Active_MultiDay_Watchlist", {})
         for sym, item in hist_watchlist.items():
-            if sym in targets or sym in EXCLUDED_SYMBOLS: continue
+            if sym in targets or any(k in sym for k in EXCLUDED_KEYWORDS):
+                continue
             try:
                 entry_dt = datetime.datetime.strptime(item.get("added_date", str(today_dt)), "%Y-%m-%d").date()
-                age = (today_dt - entry_dt).days
+                age_days = (today_dt - entry_dt).days
             except Exception:
-                age = 99
-            if age <= WATCHLIST_MAX_AGE_DAYS:
-                targets[sym] = item
+                age_days = 99
 
-    # Source 3: Direct Scan of local files for active FNO shelves
-    all_json = glob.glob("**/*.json", recursive=True)
-    stock_map = {}
-    for p in all_json:
-        bname = os.path.basename(p)
-        sym = os.path.splitext(bname)[0].upper()
-        if any(k in bname.lower() for k in ["nifty", "audit", "result", "trade", "secret", "package", "checkpoint", "live"]):
-            continue
-        if sym not in stock_map or os.path.getsize(p) > os.path.getsize(stock_map[sym]):
-            stock_map[sym] = p
-
-    for sym, filepath in stock_map.items():
-        if sym in targets or sym in EXCLUDED_SYMBOLS: continue
-        try:
-            with open(filepath, "r", encoding="utf-8") as fp:
-                clean = clean_and_prepare(json.load(fp))
-        except Exception:
-            continue
-        if len(clean) < 70: continue
-
-        df = pd.DataFrame(clean)
-        closes = df["close"].values
-        highs = df["high"].values
-        lows = df["low"].values
-        delivs = df["delivery_vol"].values
-        volumes = df["volume"].values
-        i = len(df) - 1
-
-        # Base search
-        best_spread, lp_h, lp_l, best_len = 999.0, 0.0, 0.0, 15
-        shelf_found = False
-        for s_len in range(10, 23):
-            s_h = highs[max(0, i - s_len):i].max()
-            s_l = lows[max(0, i - s_len):i].min()
-            if s_l > 0:
-                spread = ((s_h - s_l) / s_l) * 100.0
-                if spread <= 8.5 and spread < best_spread:
-                    best_spread = spread
-                    lp_h = s_h
-                    lp_l = s_l
-                    best_len = s_len
-                    shelf_found = True
-
-        if not shelf_found: continue
-        base_up = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] >= closes[k - 1])
-        base_dn = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] < closes[k - 1])
-        acc_ratio = round((base_up / base_dn), 2) if base_dn > 0 else 2.50
-        if acc_ratio < 1.50: continue
-
-        sma20_v = float(np.mean(volumes[-20:])) if len(volumes) >= 20 else 50000.0
-        targets[sym] = {
-            "symbol": sym,
-            "pivot_ceiling": float(lp_h),
-            "stop_loss": float(min(lows[i], lp_l)),
-            "accumulation_ratio": acc_ratio,
-            "shelf_spread_%": round(best_spread, 2),
-            "sma20_vol": sma20_v,
-            "added_date": str(today_dt)
-        }
+            if age_days <= WATCHLIST_MAX_AGE_DAYS:
+                pivot = float(item.get("pivot_ceiling", 0))
+                if pivot > 0:
+                    targets[sym] = item
 
     return targets
 
-# ---------------------------------------------------------
-# LIVE SCANNER CORE
-# ---------------------------------------------------------
+# --------------------------------------------------------------------------
+# MAIN LIVE SCANNER ENGINE
+# --------------------------------------------------------------------------
 def run_live_fno_scan():
     now_dt = get_ist_now()
     today_date = now_dt.strftime("%Y-%m-%d")
@@ -365,10 +293,10 @@ def run_live_fno_scan():
     elapsed_mins = get_market_session_elapsed()
     market_active = is_market_open()
 
-    print(f"\n🚀 Running Live F&O Ultimate Scanner at {now_str}")
-    print(f"⏱️ Session Elapsed: {elapsed_mins}/375 mins | Market Active: {market_active}")
+    print(f"\n🚀 Running Ultimate FNO Live Scanner at {now_str}")
+    print(f"⏱️ Session Elapsed: {elapsed_mins}/375 mins | Active Market Session: {market_active}")
 
-    # Load persistent state from GitHub or local disk
+    # Step 1: Load Persistent State (From GitHub API or Disk)
     remote_state, sha = fetch_remote_state()
     state = remote_state or {}
     if not state and os.path.exists(LIVE_BREAKOUTS_FILE):
@@ -382,36 +310,75 @@ def run_live_fno_scan():
     alert2_sent = set(state.get("Alert2_Sent", [])) if state.get("Date") == today_date else set()
     benchmark_highs = state.get("Benchmark_Highs", {}) if state.get("Date") == today_date else {}
     master_confirmed = state.get("Master_Confirmed_Breakouts", {}) if state.get("Date") == today_date else {}
+    eod_summary_sent = state.get("EOD_Summary_Sent", False) if state.get("Date") == today_date else False
 
-    targets = load_all_target_candidates()
-    print(f"🎯 Monitored Target Pool: {len(targets)} stocks (including past 5 trading sessions).")
+    # Step 2: Strictly load 1-week pre-breakout targets
+    targets = load_fno_1week_coiling_targets()
+    if not targets:
+        print("❌ No 1-week coiling candidates found in EOD results.")
+        return
+
+    print(f"🎯 Monitoring {len(targets)} Certified Pre-Breakout Setups from the past 1 week:")
+    print("   ", list(targets.keys()))
 
     live_client = LivePriceClient()
     expected_fraction = get_u_curve_expected_volume_fraction(elapsed_mins)
 
     active_multiday_watchlist = {}
     coiling_list = []
-    state_changed = False
+    state_modified = False
 
     for sym, meta in targets.items():
         pivot = float(meta["pivot_ceiling"])
         stop_loss = float(meta["stop_loss"])
-        acc_ratio = float(meta["accumulation_ratio"])
-        shelf_spread = float(meta["shelf_spread_%"])
-        sma20_vol = float(meta.get("sma20_vol", 50000.0))
+        acc_ratio = float(meta.get("accumulation_ratio", 1.80))
+        shelf_spread = float(meta.get("shelf_spread_%", 6.5))
 
         quote = live_client.fetch_live_quote(sym)
-        time.sleep(0.03)
+        time.sleep(0.04)
 
-        if not quote: continue
-        ltp = quote["ltp"]
-        day_high = quote["day_high"]
-        day_low = quote["day_low"]
-        day_vol = quote["day_vol"]
+        ltp = None
+        day_high = None
+        day_low = None
+        day_vol = 0.0
+        sma20_vol = 50000.0
 
-        # Prune if structurally invalidated below shelf floor
-        if ltp < stop_loss * 0.98:
+        if quote:
+            ltp = quote["ltp"]
+            day_high = quote["day_high"]
+            day_low = quote["day_low"]
+            day_vol = quote["day_vol"]
+
+        # Read historical 20 SMA volume
+        local_files = glob.glob(f"**/{sym}.json", recursive=True)
+        if local_files:
+            try:
+                with open(local_files[0], "r", encoding="utf-8") as fp:
+                    raw = json.load(fp)
+                clean = clean_and_prepare(raw)
+                if len(clean) >= 20:
+                    vols = [float(x.get("volume", 0) or 0) for x in clean[-20:]]
+                    if vols: sma20_vol = sum(vols) / len(vols)
+                    if ltp is None or ltp <= 0:
+                        ltp = float(clean[-1].get("close", pivot))
+                        day_high = float(clean[-1].get("high", ltp))
+                        day_low = float(clean[-1].get("low", ltp))
+            except Exception:
+                pass
+
+        if ltp is None or ltp <= 0:
+            ltp = pivot
+            day_high = pivot
+            day_low = pivot
+
+        day_high = max(day_high or ltp, ltp)
+        day_low = min(day_low or ltp, ltp)
+
+        # Disqualification: Drop if price closes below the structural base shelf floor
+        if ltp < stop_loss:
+            print(f"🗑️ Purged {sym}: Broken below base stop floor ₹{stop_loss:,.2f}")
             continue
+
         active_multiday_watchlist[sym] = meta
 
         bar_rng = day_high - day_low
@@ -427,26 +394,37 @@ def run_live_fno_scan():
         if wick_touched or cleared_pivot:
             if sym not in benchmark_highs:
                 benchmark_highs[sym] = round(day_high, 2)
-                state_changed = True
+                state_modified = True
             else:
                 benchmark_highs[sym] = round(max(benchmark_highs[sym], day_high), 2)
 
         record = {
-            "symbol": sym, "pivot_ceiling": round(pivot, 2), "ltp": round(ltp, 2),
-            "day_high": round(day_high, 2), "day_low": round(day_low, 2), "stop_loss": round(stop_loss, 2),
-            "risk_%": risk_pct, "clearance_%": clearance_pct, "accumulation_ratio": acc_ratio,
-            "shelf_spread_%": shelf_spread, "range_closeness": range_closeness, "proj_vol_pace": vol_pace
+            "symbol": sym,
+            "pivot_ceiling": round(pivot, 2),
+            "ltp": round(ltp, 2),
+            "day_high": round(day_high, 2),
+            "day_low": round(day_low, 2),
+            "stop_loss": round(stop_loss, 2),
+            "risk_%": risk_pct,
+            "clearance_%": clearance_pct,
+            "accumulation_ratio": acc_ratio,
+            "shelf_spread_%": shelf_spread,
+            "range_closeness": range_closeness,
+            "proj_vol_pace": vol_pace
         }
 
-        # Breakout qualification (Pace >= 1.60x & Range Close >= 0.65)
+        # Breakout Rule: Pace >= 1.60x AND Range Closeness >= 0.65
         is_breakout = cleared_pivot and (vol_pace >= 1.60) and (range_closeness >= 0.65)
 
-        # -------------------------------------------------------------
-        # ALERT 1: TICK 1 CEILING CLEARANCE (STRICTLY ONCE PER DAY)
-        # -------------------------------------------------------------
+        # ------------------------------------------------------------------
+        # ALERT 1: TICK 1 CEILING BREAKOUT (FIRES STRICTLY ONCE PER DAY)
+        # ------------------------------------------------------------------
         if is_breakout and market_active:
+            record["action"] = "CONFIRMED BREAKOUT"
             master_confirmed[sym] = record
+
             if sym not in alert1_sent:
+                ref_h = benchmark_highs.get(sym, day_high)
                 msg1 = (
                     f"🚀 <b>ULTIMATE F&O BREAKOUT CONFIRMED</b>\n"
                     f"• <b>Symbol</b>: <code>#{sym}</code>\n"
@@ -462,15 +440,18 @@ def run_live_fno_scan():
                 )
                 send_telegram_alert(msg1)
                 alert1_sent.add(sym)
-                state_changed = True
-                print(f"🔔 ALERT 1 SENT: #{sym}")
+                state_modified = True
+                print(f"📢 ALERT 1 DISPATCHED FOR {sym}")
 
-        # -------------------------------------------------------------
-        # ALERT 2: DAY HIGH EXPANSION (STRICTLY ONCE PER DAY)
-        # -------------------------------------------------------------
+        # ------------------------------------------------------------------
+        # ALERT 2: DAY HIGH EXPANSION (FIRES STRICTLY ONCE PER DAY)
+        # ------------------------------------------------------------------
         if sym in benchmark_highs and sym not in alert2_sent and market_active:
             prior_ref_h = float(benchmark_highs[sym])
             if ltp >= (prior_ref_h * 1.0015) and ltp > pivot and is_breakout:
+                record["action"] = "CONFIRMED BREAKOUT"
+                master_confirmed[sym] = record
+
                 msg2 = (
                     f"⚡ <b>ULTIMATE F&O 2ND ALERT: HIGH EXPANSION</b>\n"
                     f"• <b>Symbol</b>: <code>#{sym}</code>\n"
@@ -485,22 +466,56 @@ def run_live_fno_scan():
                 send_telegram_alert(msg2)
                 alert2_sent.add(sym)
                 benchmark_highs[sym] = round(day_high, 2)
-                state_changed = True
-                print(f"🔔 ALERT 2 SENT: #{sym}")
+                state_modified = True
+                print(f"📢 ALERT 2 DISPATCHED FOR {sym}")
 
         if not cleared_pivot:
             record["action"] = "WICK REJECTED" if (wick_touched and range_closeness < 0.50) else "COILING"
             coiling_list.append(record)
 
-    # Save to disk
+    coiling_list.sort(key=lambda x: x["clearance_%"], reverse=True)
+    final_confirmed = list(master_confirmed.values())
+
+    # --------------------------------------------------------------------------
+    # 03:15 PM EOD CLOSING SUMMARY (FIRES EXACTLY ONCE PER DAY)
+    # --------------------------------------------------------------------------
+    if elapsed_mins >= 360 and not eod_summary_sent:
+        summary_msg = (
+            f"🎯 <b>ULTIMATE F&O CLOSING CONFIRMATIONS (3:15 PM)</b>\n"
+            f"🕒 <i>Time: {now_str}</i>\n\n"
+        )
+        if final_confirmed:
+            summary_msg += f"<b>Actionable Entries ({len(final_confirmed)}):</b>\n"
+            for b in final_confirmed:
+                summary_msg += (
+                    f"🟢 <b>{b['symbol']}</b>: LTP ₹{b['ltp']:,.2f} (+{b['clearance_%']}%) | "
+                    f"Acc: {b['accumulation_ratio']}x | Pace: {b['proj_vol_pace']}x | SL: ₹{b['stop_loss']:,.2f}\n"
+                )
+            summary_msg += "\n✅ <i>Place CNC delivery / Hedged Futures orders before 03:28 PM IST.</i>\n"
+        else:
+            summary_msg += "<i>No F&O stocks held breakout ceiling with verified institutional volume today.</i>\n"
+
+        wicked = [c for c in coiling_list if c["action"] == "WICK REJECTED"][:5]
+        if wicked:
+            summary_msg += "\n<b>⚠️ Upper Wick Rejections (Avoid):</b>\n"
+            for w in wicked:
+                summary_msg += f"🔴 {w['symbol']}: High ₹{w['day_high']:,.2f} ➔ LTP ₹{w['ltp']:,.2f} ({w['clearance_%']:+.2f}%)\n"
+
+        send_telegram_alert(summary_msg)
+        eod_summary_sent = True
+        state_modified = True
+
+    # Step 3: Save Output & Persist Directly to GitHub
     output_payload = {
         "Date": today_date,
         "Scan_Timestamp": now_str,
         "Elapsed_Minutes": elapsed_mins,
+        "EOD_Summary_Sent": eod_summary_sent,
         "Alert1_Sent": list(alert1_sent),
         "Alert2_Sent": list(alert2_sent),
         "Benchmark_Highs": benchmark_highs,
         "Master_Confirmed_Breakouts": master_confirmed,
+        "Breakouts_All_Day": final_confirmed,
         "Active_MultiDay_Watchlist": active_multiday_watchlist,
         "Coiling_Watchlist": coiling_list[:30]
     }
@@ -508,11 +523,11 @@ def run_live_fno_scan():
     with open(LIVE_BREAKOUTS_FILE, "w", encoding="utf-8") as f:
         json.dump(output_payload, f, indent=2)
 
-    # Lock state to GitHub API to guarantee zero spam across subsequent runs
-    if state_changed or not remote_state:
+    # Lock state remotely to eliminate any runner wipe spam
+    if state_modified or not remote_state:
         push_remote_state(output_payload, sha)
 
-    print(f"✅ Live FNO Scan Complete. Alerted Today: Alert1={list(alert1_sent)} | Alert2={list(alert2_sent)}")
+    print(f"✅ Scan Complete. Alert1_Sent={list(alert1_sent)} | Alert2_Sent={list(alert2_sent)}")
 
 if __name__ == "__main__":
     run_live_fno_scan()
