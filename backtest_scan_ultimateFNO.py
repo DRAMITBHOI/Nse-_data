@@ -6,14 +6,20 @@ import pandas as pd
 from datetime import datetime
 
 # --------------------------------------------------------------------------
-# CONFIGURATION & PARAMETERS
+# CONFIGURATION & OUTPUT DIRECTORIES
 # --------------------------------------------------------------------------
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
+
 START_DATE = "2021-01-01"
 END_DATE = "2026-10-28"
 MIN_TURNOVER_CR = 10.0
 
+SUMMARY_JSON_FILE = os.path.join(DATA_DIR, "fno_ultimate_backtest_summary.json")
+TRADES_CSV_FILE = os.path.join(DATA_DIR, "fno_ultimate_backtest_trades.csv")
+
 # --------------------------------------------------------------------------
-# STRICT NSE F&O UNIVERSE WHITELIST
+# STRICT NSE F&O MASTER WHITELIST
 # --------------------------------------------------------------------------
 FNO_WHITELIST = {
     "360ONE", "ABB", "ABCAPITAL", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", 
@@ -48,9 +54,6 @@ FNO_WHITELIST = {
     "YESBANK", "ZYDUSLIFE"
 }
 
-# --------------------------------------------------------------------------
-# DATA PARSER & SPLIT ADJUSTER
-# --------------------------------------------------------------------------
 def clean_and_prepare(raw_data):
     if not raw_data or not isinstance(raw_data, list):
         return []
@@ -73,7 +76,6 @@ def clean_and_prepare(raw_data):
         }
     clean = [date_map[k] for k in sorted(date_map.keys())]
     
-    # Stock Split / Bonus Normalization
     known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
     for i in range(len(clean) - 1, 0, -1):
         prev_c = clean[i - 1]["close"]
@@ -113,18 +115,17 @@ def load_nifty_benchmark():
                 pass
     return {}
 
-# --------------------------------------------------------------------------
-# BACKTEST EXECUTION ENGINE
-# --------------------------------------------------------------------------
 def run_fno_backtest():
     print(f"🚀 Initializing Scan Ultimate F&O Empirical Backtest ({START_DATE} to {END_DATE})...")
     nifty_map = load_nifty_benchmark()
     
-    # Locate all stock files matching FNO whitelist
     all_json = glob.glob("**/*.json", recursive=True)
     stock_files = {}
     for p in all_json:
-        sym = os.path.splitext(os.path.basename(p))[0].upper()
+        bname = os.path.basename(p)
+        sym = os.path.splitext(bname)[0].upper()
+        if any(k in bname.lower() for k in ["nifty", "audit", "result", "trade", "secret", "package", "checkpoint", "live"]):
+            continue
         if sym in FNO_WHITELIST:
             if sym not in stock_files or os.path.getsize(p) > os.path.getsize(stock_files[sym]):
                 stock_files[sym] = p
@@ -175,14 +176,13 @@ def run_fno_backtest():
 
         n = len(df)
         active_in_trade = False
-        trade_entry_idx = 0
+        trade_exit_idx = 0
 
         for i in range(60, n):
             current_date = df["time"].iloc[i]
             if current_date < START_DATE or current_date > END_DATE:
                 continue
 
-            # If already holding a position in this symbol, skip scanning for new entries
             if active_in_trade:
                 if i <= trade_exit_idx:
                     continue
@@ -195,9 +195,7 @@ def run_fno_backtest():
             v0 = df["volume"].iloc[i]
             dv0 = df["delivery_vol"].iloc[i]
 
-            # -------------------------------------------------------------
-            # PRE-QUALIFICATION GATES
-            # -------------------------------------------------------------
+            # Gate 1: Liquidity & Trend
             if df["turnover_50d"].iloc[i] < MIN_TURNOVER_CR:
                 continue
             if pd.notnull(df["sma_200"].iloc[i]) and c0 < df["sma_200"].iloc[i]:
@@ -206,9 +204,7 @@ def run_fno_backtest():
             if df["perf_60d"].iloc[i] < n_perf:
                 continue
 
-            # -------------------------------------------------------------
-            # BASE SHELF SEARCH (10–22 sessions, Tightness <= 8.5%)
-            # -------------------------------------------------------------
+            # Gate 2: Base Shelf (10–22 sessions, Tightness <= 8.5%)
             highs = df["high"].values
             lows = df["low"].values
             delivs = df["delivery_vol"].values
@@ -231,38 +227,30 @@ def run_fno_backtest():
             if not shelf_found:
                 continue
 
-            # -------------------------------------------------------------
-            # INSTITUTIONAL ACCUMULATION RATIO (>= 1.50)
-            # -------------------------------------------------------------
+            # Gate 3: Institutional Accumulation Ratio (>= 1.50)
             base_up = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] >= closes[k - 1])
             base_dn = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] < closes[k - 1])
             acc_ratio = round((base_up / base_dn), 2) if base_dn > 0 else 2.50
             if acc_ratio < 1.50:
                 continue
 
-            # -------------------------------------------------------------
-            # BREAKOUT EXECUTION HURDLE (Clearance + Vol Surge + Range Close)
-            # -------------------------------------------------------------
+            # Gate 4: Breakout Execution Hurdle
             prev_deliv_sma = df["deliv_sma20"].iloc[i - 1]
             dv_surge = dv0 / prev_deliv_sma if prev_deliv_sma > 0 else 1.0
             rc = df["range_closeness"].iloc[i]
             dobv_prev = df["dobv_20max"].iloc[i - 1]
             obv_ok = df["deliv_obv"].iloc[i] >= (dobv_prev * 0.98)
-
             cleared_pivot = c0 >= (lp_h * 1.0015)
 
             if not (cleared_pivot and dv_surge >= 1.60 and rc >= 0.65 and obv_ok):
                 continue
 
-            # -------------------------------------------------------------
-            # POSITION INITIATION & EXIT 2.2 TRAILING SIMULATOR
-            # -------------------------------------------------------------
+            # Gate 5: Exit 2.2 Trailing Engine Execution
             entry_price = c0
             hard_sl = min(l0, lp_l)
             peak_price = entry_price
             peak_gain_pct = 0.0
             vdu_under_count = 0
-            exit_triggered = False
             exit_reason = "End of Data"
             exit_price = c0
             exit_idx = n - 1
@@ -270,7 +258,6 @@ def run_fno_backtest():
             for j in range(i + 1, n):
                 curr_c = df["close"].iloc[j]
                 curr_h = df["high"].iloc[j]
-                curr_l = df["low"].iloc[j]
                 curr_v = df["volume"].iloc[j]
                 curr_ema20 = df["ema_20"].iloc[j]
                 curr_atr14 = df["atr_14"].iloc[j]
@@ -282,9 +269,8 @@ def run_fno_backtest():
                 peak_gain_pct = max(peak_gain_pct, ((peak_price - entry_price) / entry_price) * 100.0)
                 vol_pace = curr_v / max(1.0, curr_sma20_v)
 
-                # Rule 1: Catastrophe Stop Loss
+                # Rule 1: Catastrophe Stop
                 if curr_c < hard_sl:
-                    exit_triggered = True
                     exit_reason = "1. Catastrophe Stop"
                     exit_price = curr_c
                     exit_idx = j
@@ -292,7 +278,6 @@ def run_fno_backtest():
 
                 # Rule 2: Climactic Churn Harvest
                 elif peak_gain_pct >= 20.0 and vol_pace >= 2.0 and curr_rc <= 0.35:
-                    exit_triggered = True
                     exit_reason = "2. Climactic Churn Harvest"
                     exit_price = curr_c
                     exit_idx = j
@@ -300,7 +285,6 @@ def run_fno_backtest():
 
                 # Rule 3: Distribution Cluster Breakdown
                 elif curr_dist10 >= 3 and curr_c < curr_ema20:
-                    exit_triggered = True
                     exit_reason = "3. Distribution Cluster"
                     exit_price = curr_c
                     exit_idx = j
@@ -310,7 +294,6 @@ def run_fno_backtest():
                 elif peak_gain_pct >= 50.0:
                     cushion = max(curr_ema20, peak_price * 0.85)
                     if curr_c < cushion:
-                        exit_triggered = True
                         exit_reason = "4. Mega-Runner Cushion Lock"
                         exit_price = curr_c
                         exit_idx = j
@@ -319,7 +302,6 @@ def run_fno_backtest():
                 # Rule 5: 20 EMA Dynamic Breakdown Engine
                 elif curr_c < curr_ema20:
                     if vol_pace >= 1.25:
-                        exit_triggered = True
                         exit_reason = "5A. Heavy Vol 20 EMA Breach"
                         exit_price = curr_c
                         exit_idx = j
@@ -333,13 +315,11 @@ def run_fno_backtest():
                         vdu_stop = max(guaranteed_be, dynamic_leeway)
 
                         if curr_c < vdu_stop:
-                            exit_triggered = True
                             exit_reason = "5B. Dynamic VDU Floor Breach"
                             exit_price = curr_c
                             exit_idx = j
                             break
                         elif vdu_under_count > 5:
-                            exit_triggered = True
                             exit_reason = "5B. 5-Session Reclaim Failure"
                             exit_price = curr_c
                             exit_idx = j
@@ -347,7 +327,6 @@ def run_fno_backtest():
                 else:
                     vdu_under_count = 0
 
-            # Record Trade
             trade_return = ((exit_price - entry_price) / entry_price) * 100.0
             holding_bars = exit_idx - i
 
@@ -359,7 +338,7 @@ def run_fno_backtest():
                 "exit_price": round(exit_price, 2),
                 "return_%": round(trade_return, 2),
                 "peak_gain_%": round(peak_gain_pct, 2),
-                "holding_bars": holding_bars,
+                "holding_bars": int(holding_bars),
                 "exit_reason": exit_reason,
                 "shelf_spread_%": round(best_spread, 2),
                 "accumulation_ratio": acc_ratio
@@ -368,9 +347,6 @@ def run_fno_backtest():
             active_in_trade = True
             trade_exit_idx = exit_idx
 
-    # -------------------------------------------------------------
-    # PERFORMANCE AUDIT COMPILATION
-    # -------------------------------------------------------------
     if not all_trades:
         print("❌ No trades triggered under the strict parameters.")
         return
@@ -392,39 +368,55 @@ def run_fno_backtest():
     print(f"Total Completed Trades      : {len(tdf)}")
     print(f"Winning Trades              : {len(wins)} ({win_rate:.2f}%)")
     print(f"Losing Trades               : {len(losses)} ({100 - win_rate:.2f}%)")
-    print(f"\nProfit Factor               : {profit_factor:.2f}")
+    print(f"Profit Factor               : {profit_factor:.2f}")
     print(f"Net Cumulative Return       : +{tdf['return_%'].sum():,.2f}%")
     print(f"Average Return / Trade      : {avg_return:+.2f}%")
     print(f"Average Gain / Winning Trade: +{avg_win:.2f}%")
     print(f"Average Loss / Losing Trade : {avg_loss:.2f}%")
     print(f"Win/Loss Payoff Ratio       : {payoff_ratio:.2f}x")
-    print(f"\nAverage Holding Period      : {tdf['holding_bars'].mean():.1f} trading sessions")
-    print(f" • Winners Held Avg         : {wins['holding_bars'].mean():.1f} sessions")
-    print(f" • Losers Cut Avg           : {losses['holding_bars'].mean():.1f} sessions")
-    print(f"\nMax Gain on Single Trade    : +{tdf['return_%'].max():.2f}% ({tdf.loc[tdf['return_%'].idxmax(), 'symbol']} on {tdf.loc[tdf['return_%'].idxmax(), 'entry_date']})")
+    print(f"Average Holding Period      : {tdf['holding_bars'].mean():.1f} trading sessions")
+    print(f"Max Gain on Single Trade    : +{tdf['return_%'].max():.2f}% ({tdf.loc[tdf['return_%'].idxmax(), 'symbol']})")
     print(f"Max Loss on Single Trade    : {tdf['return_%'].min():.2f}% ({tdf.loc[tdf['return_%'].idxmin(), 'symbol']})")
     print("=" * 80)
 
-    # Exit Breakdown
-    print("\n--- EXIT 2.2 TRIGGER BREAKDOWN ---")
+    # Save to CSV
+    tdf.to_csv(TRADES_CSV_FILE, index=False)
+
+    # Save structured summary to JSON
     exit_summary = tdf.groupby("exit_reason").agg(
         Count=("return_%", "count"),
-        Win_Rate=("return_%", lambda s: f"{(s > 0).mean() * 100:.1f}%"),
-        Avg_Return=("return_%", "mean")
-    ).reset_index()
-    print(exit_summary.to_string(index=False))
+        Win_Rate=("return_%", lambda s: round(float((s > 0).mean() * 100), 1)),
+        Avg_Return=("return_%", lambda s: round(float(s.mean()), 2))
+    ).reset_index().to_dict(orient="records")
 
-    # Top 10 Compounders
-    print("\n--- TOP 10 COMPOUNDERS HARVESTED ---")
-    top_winners = tdf.sort_values("return_%", ascending=False).head(10)[[
-        "symbol", "entry_date", "exit_date", "return_%", "peak_gain_%", "holding_bars", "exit_reason"
-    ]]
-    print(top_winners.to_string(index=False))
-    print("=" * 80)
+    top_compounders = tdf.sort_values("return_%", ascending=False).head(10).to_dict(orient="records")
 
-    # Save to disk for interactive analysis
-    tdf.to_csv("scan_ultimate_fno_backtest_results.csv", index=False)
-    print("💾 Full trade log saved to `scan_ultimate_fno_backtest_results.csv`.")
+    summary_payload = {
+        "Audit_Period": f"{START_DATE} to {END_DATE}",
+        "Audit_Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Total_Trades": int(len(tdf)),
+        "Winning_Trades": int(len(wins)),
+        "Losing_Trades": int(len(losses)),
+        "Win_Rate_%": round(win_rate, 2),
+        "Profit_Factor": round(profit_factor, 2),
+        "Net_Cumulative_Return_%": round(tdf["return_%"].sum(), 2),
+        "Average_Return_Per_Trade_%": round(avg_return, 2),
+        "Average_Win_%": round(avg_win, 2),
+        "Average_Loss_%": round(avg_loss, 2),
+        "Payoff_Ratio": round(payoff_ratio, 2),
+        "Average_Holding_Period": round(tdf["holding_bars"].mean(), 1),
+        "Winners_Held_Avg": round(wins["holding_bars"].mean(), 1),
+        "Losers_Cut_Avg": round(losses["holding_bars"].mean(), 1),
+        "Max_Gain_Single_Trade": f"+{tdf['return_%'].max():.2f}% ({tdf.loc[tdf['return_%'].idxmax(), 'symbol']})",
+        "Max_Loss_Single_Trade": f"{tdf['return_%'].min():.2f}% ({tdf.loc[tdf['return_%'].idxmin(), 'symbol']})",
+        "Exit_Reason_Breakdown": exit_summary,
+        "Top_10_Compounders": top_compounders
+    }
+
+    with open(SUMMARY_JSON_FILE, "w", encoding="utf-8") as f:
+        json.dump(summary_payload, f, indent=2)
+
+    print(f"✅ Saved results to `{SUMMARY_JSON_FILE}` and `{TRADES_CSV_FILE}`.")
 
 if __name__ == "__main__":
     run_fno_backtest()
