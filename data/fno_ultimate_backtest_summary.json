@@ -1,0 +1,201 @@
+{
+  "Audit_Period": "2021-01-01 to 2026-10-28",
+  "Audit_Timestamp": "2026-10-28 17:18:58 IST",
+  "Total_Trades": 1023,
+  "Winning_Trades": 401,
+  "Losing_Trades": 622,
+  "Win_Rate_%": 39.2,
+  "Profit_Factor": 2.0,
+  "Net_Cumulative_Return_%": 2238.32,
+  "Average_Return_Per_Trade_%": 2.19,
+  "Average_Win_%": 11.14,
+  "Average_Loss_%": -3.58,
+  "Payoff_Ratio": 3.11,
+  "Average_Holding_Period": 19.5,
+  "Winners_Held_Avg": 34.2,
+  "Losers_Cut_Avg": 10.0,
+  "Max_Gain_Single_Trade": "+110.53% (BSE)",
+  "Max_Loss_Single_Trade": "-23.05% (RECLTD)",
+  "Exit_Reason_Breakdown": [
+    {
+      "exit_reason": "1. Catastrophe Stop",
+      "Count": 18,
+      "Win_Rate": 0.0,
+      "Avg_Return": -9.52
+    },
+    {
+      "exit_reason": "2. Climactic Churn Harvest",
+      "Count": 62,
+      "Win_Rate": 100.0,
+      "Avg_Return": 25.7
+    },
+    {
+      "exit_reason": "3. Distribution Cluster",
+      "Count": 237,
+      "Win_Rate": 49.4,
+      "Avg_Return": 3.62
+    },
+    {
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "Count": 6,
+      "Win_Rate": 100.0,
+      "Avg_Return": 61.97
+    },
+    {
+      "exit_reason": "5A. Heavy Vol 20 EMA Breach",
+      "Count": 250,
+      "Win_Rate": 50.4,
+      "Avg_Return": 2.12
+    },
+    {
+      "exit_reason": "5B. 5-Session Reclaim Failure",
+      "Count": 24,
+      "Win_Rate": 100.0,
+      "Avg_Return": 7.32
+    },
+    {
+      "exit_reason": "5B. Dynamic VDU Floor Breach",
+      "Count": 421,
+      "Win_Rate": 15.7,
+      "Avg_Return": -2.66
+    },
+    {
+      "exit_reason": "End of Data",
+      "Count": 5,
+      "Win_Rate": 0.0,
+      "Avg_Return": 0.0
+    }
+  ],
+  "Top_10_Compounders": [
+    {
+      "symbol": "BSE",
+      "entry_date": "2023-06-01",
+      "exit_date": "2023-09-20",
+      "entry_price": 190.23,
+      "exit_price": 400.5,
+      "return_%": 110.53,
+      "peak_gain_%": 151.97,
+      "holding_bars": 79,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 8.31,
+      "accumulation_ratio": 2.36
+    },
+    {
+      "symbol": "COCHINSHIP",
+      "entry_date": "2024-04-01",
+      "exit_date": "2024-05-27",
+      "entry_price": 968.3,
+      "exit_price": 1971.0,
+      "return_%": 103.55,
+      "peak_gain_%": 116.87,
+      "holding_bars": 40,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 7.7,
+      "accumulation_ratio": 1.53
+    },
+    {
+      "symbol": "UNIONBANK",
+      "entry_date": "2022-10-18",
+      "exit_date": "2022-12-21",
+      "entry_price": 45.95,
+      "exit_price": 81.2,
+      "return_%": 76.71,
+      "peak_gain_%": 109.79,
+      "holding_bars": 46,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 6.22,
+      "accumulation_ratio": 1.77
+    },
+    {
+      "symbol": "HUDCO",
+      "entry_date": "2023-12-04",
+      "exit_date": "2024-01-23",
+      "entry_price": 87.9,
+      "exit_price": 149.9,
+      "return_%": 70.53,
+      "peak_gain_%": 102.84,
+      "holding_bars": 36,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 8.0,
+      "accumulation_ratio": 1.56
+    },
+    {
+      "symbol": "KALYANKJIL",
+      "entry_date": "2023-06-16",
+      "exit_date": "2023-09-13",
+      "entry_price": 131.1,
+      "exit_price": 223.3,
+      "return_%": 70.33,
+      "peak_gain_%": 99.77,
+      "holding_bars": 63,
+      "exit_reason": "3. Distribution Cluster",
+      "shelf_spread_%": 7.95,
+      "accumulation_ratio": 2.2
+    },
+    {
+      "symbol": "VEDL",
+      "entry_date": "2024-04-01",
+      "exit_date": "2024-05-22",
+      "entry_price": 115.0,
+      "exit_price": 194.8,
+      "return_%": 69.39,
+      "peak_gain_%": 76.26,
+      "holding_bars": 37,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 5.04,
+      "accumulation_ratio": 1.61
+    },
+    {
+      "symbol": "TATAPOWER",
+      "entry_date": "2021-09-15",
+      "exit_date": "2021-10-19",
+      "entry_price": 140.05,
+      "exit_price": 229.75,
+      "return_%": 64.05,
+      "peak_gain_%": 91.25,
+      "holding_bars": 24,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 5.24,
+      "accumulation_ratio": 1.7
+    },
+    {
+      "symbol": "MCX",
+      "entry_date": "2023-09-25",
+      "exit_date": "2023-12-20",
+      "entry_price": 380.46,
+      "exit_price": 622.28,
+      "return_%": 63.56,
+      "peak_gain_%": 75.79,
+      "holding_bars": 62,
+      "exit_reason": "3. Distribution Cluster",
+      "shelf_spread_%": 7.29,
+      "accumulation_ratio": 2.09
+    },
+    {
+      "symbol": "PRESTIGE",
+      "entry_date": "2023-10-05",
+      "exit_date": "2023-12-21",
+      "entry_price": 671.3,
+      "exit_price": 1064.15,
+      "return_%": 58.52,
+      "peak_gain_%": 83.42,
+      "holding_bars": 55,
+      "exit_reason": "3. Distribution Cluster",
+      "shelf_spread_%": 6.7,
+      "accumulation_ratio": 2.74
+    },
+    {
+      "symbol": "SRF",
+      "entry_date": "2021-06-08",
+      "exit_date": "2021-10-20",
+      "entry_price": 1399.56,
+      "exit_price": 2209.1,
+      "return_%": 57.84,
+      "peak_gain_%": 81.34,
+      "holding_bars": 96,
+      "exit_reason": "3. Distribution Cluster",
+      "shelf_spread_%": 5.3,
+      "accumulation_ratio": 3.53
+    }
+  ]
+}
