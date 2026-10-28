@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
@@ -28,6 +30,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN_ULTIMATE: ${{ secrets.TELEGRAM_BOT_TOKEN_ULTIMATE || '9160227761:AAE2zmSpvqttJl3_KKl3jjyKkMg-CopgtSY' }}
           TELEGRAM_CHAT_ID_ULTIMATE: ${{ secrets.TELEGRAM_CHAT_ID_ULTIMATE || '7860290981' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python live_scan_ultimateFNO.py
 
@@ -35,5 +38,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Live FNO Scanner Bot"
-          git add Codes/data/live_fno_ultimate_breakouts.json data/live_fno_ultimate_breakouts.json my_trades.json data/my_trades.json || true
+          git pull --rebase origin main || true
+          git add data/live_fno_ultimate_breakouts.json || true
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Live FNO breakout state [skip ci]" && git push)
