@@ -1,0 +1,39 @@
+name: Ultimate FNO Empirical Backtest
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Optional: runs automatically every Sunday at 18:00 UTC (11:30 PM IST)
+    - cron: '0 18 * * 0'
+
+jobs:
+  run-backtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy requests
+
+      - name: Execute FNO Ultimate Backtest
+        run: |
+          python backtest_scan_ultimateFNO.py
+
+      - name: Commit & Push Backtest Audit Artifacts
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Backtest Audit Engine"
+          git pull --rebase origin main || true
+          git add data/fno_ultimate_backtest_summary.json data/fno_ultimate_backtest_trades.csv || true
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-audit: Update FNO empirical backtest results [skip ci]" && git push)
