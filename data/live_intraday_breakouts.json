@@ -1,10 +1,11 @@
 {
   "Date": "2026-10-28",
-  "Scan_Timestamp": "2026-10-28 09:24:34 AM IST",
-  "Elapsed_Minutes": 9,
+  "Scan_Timestamp": "2026-10-28 09:27:38 AM IST",
+  "Elapsed_Minutes": 12,
   "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "ENTERO"
+    "ENTERO",
+    "ALIVUS"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -12,7 +13,7 @@
     "GRANULES": 853.5,
     "STAR": 1116.4,
     "INDGN": 607.4,
-    "ALIVUS": 1365.0,
+    "ALIVUS": 1367.8,
     "ENTERO": 1588.0
   },
   "Master_Confirmed_Breakouts": {
@@ -29,6 +30,20 @@
       "clearance_%": 2.67,
       "proj_vol_pace": 33.44,
       "action": "CONFIRMED BREAKOUT"
+    },
+    "ALIVUS": {
+      "symbol": "ALIVUS",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1357.4,
+      "ltp": 1360.0,
+      "day_high": 1367.8,
+      "day_low": 1330.4,
+      "stop_loss": 1248.81,
+      "risk_%": 8.0,
+      "clearance_%": 0.19,
+      "proj_vol_pace": 1.33,
+      "action": "CONFIRMED BREAKOUT"
     }
   },
   "Breakouts_All_Day": [
@@ -44,6 +59,20 @@
       "risk_%": 7.17,
       "clearance_%": 2.67,
       "proj_vol_pace": 33.44,
+      "action": "CONFIRMED BREAKOUT"
+    },
+    {
+      "symbol": "ALIVUS",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1357.4,
+      "ltp": 1360.0,
+      "day_high": 1367.8,
+      "day_low": 1330.4,
+      "stop_loss": 1248.81,
+      "risk_%": 8.0,
+      "clearance_%": 0.19,
+      "proj_vol_pace": 1.33,
       "action": "CONFIRMED BREAKOUT"
     }
   ],
@@ -177,31 +206,17 @@
   },
   "Coiling": [
     {
-      "symbol": "ALIVUS",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1357.4,
-      "ltp": 1357.4,
-      "day_high": 1365.0,
-      "day_low": 1330.4,
-      "stop_loss": 1248.81,
-      "risk_%": 8.0,
-      "clearance_%": 0.0,
-      "proj_vol_pace": 1.1,
-      "action": "WICK REJECTED"
-    },
-    {
       "symbol": "BOSCHLTD",
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 45885.0,
-      "ltp": 45665.0,
+      "ltp": 45530.0,
       "day_high": 45795.0,
       "day_low": 45485.0,
       "stop_loss": 42214.2,
       "risk_%": 8.0,
-      "clearance_%": -0.48,
-      "proj_vol_pace": 0.39,
+      "clearance_%": -0.77,
+      "proj_vol_pace": 0.43,
       "action": "COILING"
     },
     {
@@ -209,13 +224,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 836.95,
-      "ltp": 829.85,
+      "ltp": 827.55,
       "day_high": 835.2,
       "day_low": 824.0,
       "stop_loss": 769.99,
       "risk_%": 8.0,
-      "clearance_%": -0.85,
-      "proj_vol_pace": 0.21,
+      "clearance_%": -1.12,
+      "proj_vol_pace": 0.22,
       "action": "COILING"
     },
     {
@@ -223,13 +238,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 607.05,
-      "ltp": 598.1,
+      "ltp": 599.2,
       "day_high": 605.0,
       "day_low": 595.05,
       "stop_loss": 558.49,
       "risk_%": 8.0,
-      "clearance_%": -1.47,
-      "proj_vol_pace": 0.53,
+      "clearance_%": -1.29,
+      "proj_vol_pace": 0.52,
       "action": "COILING"
     },
     {
@@ -237,13 +252,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1107.0,
-      "ltp": 1089.0,
+      "ltp": 1082.3,
       "day_high": 1102.8,
       "day_low": 1079.1,
       "stop_loss": 1018.44,
       "risk_%": 8.0,
-      "clearance_%": -1.63,
-      "proj_vol_pace": 1.94,
+      "clearance_%": -2.23,
+      "proj_vol_pace": 1.75,
       "action": "COILING"
     },
     {
@@ -251,27 +266,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 202.2,
-      "ltp": 197.82,
+      "ltp": 197.57,
       "day_high": 199.92,
       "day_low": 196.33,
       "stop_loss": 186.02,
       "risk_%": 8.0,
-      "clearance_%": -2.17,
-      "proj_vol_pace": 0.13,
-      "action": "COILING"
-    },
-    {
-      "symbol": "ADANIPORTS",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1784.9,
-      "ltp": 1744.0,
-      "day_high": 1748.0,
-      "day_low": 1727.6,
-      "stop_loss": 1642.11,
-      "risk_%": 8.0,
       "clearance_%": -2.29,
-      "proj_vol_pace": 0.38,
+      "proj_vol_pace": 0.13,
       "action": "COILING"
     },
     {
@@ -279,12 +280,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 349.95,
-      "ltp": 341.25,
+      "ltp": 341.1,
       "day_high": 342.25,
       "day_low": 340.7,
       "stop_loss": 321.95,
       "risk_%": 8.0,
-      "clearance_%": -2.49,
+      "clearance_%": -2.53,
       "proj_vol_pace": 0.09,
       "action": "COILING"
     },
@@ -293,13 +294,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1565.0,
-      "ltp": 1523.7,
+      "ltp": 1522.8,
       "day_high": 1549.3,
-      "day_low": 1519.7,
+      "day_low": 1519.0,
       "stop_loss": 1439.8,
       "risk_%": 8.0,
-      "clearance_%": -2.64,
-      "proj_vol_pace": 0.76,
+      "clearance_%": -2.7,
+      "proj_vol_pace": 0.79,
       "action": "COILING"
     },
     {
@@ -307,13 +308,27 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 453.1,
-      "ltp": 440.65,
+      "ltp": 440.4,
       "day_high": 441.65,
       "day_low": 438.3,
       "stop_loss": 416.85,
       "risk_%": 8.0,
-      "clearance_%": -2.75,
-      "proj_vol_pace": 0.59,
+      "clearance_%": -2.8,
+      "proj_vol_pace": 0.6,
+      "action": "COILING"
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1784.9,
+      "ltp": 1735.0,
+      "day_high": 1748.0,
+      "day_low": 1727.6,
+      "stop_loss": 1642.11,
+      "risk_%": 8.0,
+      "clearance_%": -2.8,
+      "proj_vol_pace": 0.39,
       "action": "COILING"
     },
     {
@@ -321,13 +336,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 685.85,
-      "ltp": 666.05,
+      "ltp": 665.55,
       "day_high": 669.2,
       "day_low": 663.95,
       "stop_loss": 630.98,
       "risk_%": 8.0,
-      "clearance_%": -2.89,
-      "proj_vol_pace": 0.3,
+      "clearance_%": -2.96,
+      "proj_vol_pace": 0.52,
       "action": "COILING"
     },
     {
@@ -335,12 +350,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 3898.0,
-      "ltp": 3763.8,
+      "ltp": 3761.9,
       "day_high": 3780.6,
       "day_low": 3749.2,
       "stop_loss": 3586.16,
       "risk_%": 8.0,
-      "clearance_%": -3.44,
+      "clearance_%": -3.49,
       "proj_vol_pace": 0.29,
       "action": "COILING"
     },
@@ -349,13 +364,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 299.2,
-      "ltp": 287.7,
+      "ltp": 286.3,
       "day_high": 292.5,
-      "day_low": 287.25,
+      "day_low": 286.1,
       "stop_loss": 275.26,
       "risk_%": 8.0,
-      "clearance_%": -3.84,
-      "proj_vol_pace": 0.97,
+      "clearance_%": -4.31,
+      "proj_vol_pace": 0.94,
       "action": "COILING"
     }
   ]
