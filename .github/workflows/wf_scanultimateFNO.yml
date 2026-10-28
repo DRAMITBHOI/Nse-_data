@@ -1,18 +1,23 @@
 name: Ultimate FNO Breakout Scanner
 
 on:
-  schedule:
-    # 09:50 UTC = 15:20 IST (Mon-Fri)
-    - cron: '50 9 * * 1-5'
+  workflow_run:
+    workflows: ["Daily NSE Stock Update"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
-  run-fno-scanner:
+  run-fno-eod-scanner:
     runs-on: ubuntu-latest
+    # Execute only if the stock data update completed successfully
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
@@ -24,13 +29,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas numpy requests
 
-      - name: Execute Ultimate FNO Scanner
+      - name: Run EOD Ultimate FNO Scanner
+        env:
+          TELEGRAM_BOT_TOKEN_ULTIMATE: ${{ secrets.TELEGRAM_BOT_TOKEN_ULTIMATE || '9160227761:AAE2zmSpvqttJl3_KKl3jjyKkMg-CopgtSY' }}
+          TELEGRAM_CHAT_ID_ULTIMATE: ${{ secrets.TELEGRAM_CHAT_ID_ULTIMATE || '7860290981' }}
         run: |
           python Scan_ultimateFNO.py
 
-      - name: Commit & Push Scanner Results
+      - name: Commit & Push EOD FNO Champion Results
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions Scanner"
-          git add fno_champion_scan_results.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Ultimate FNO scan results [skip ci]" && git push)
+          git config --local user.name "EOD FNO Scanner Bot"
+          git pull --rebase origin main || true
+          git add data/fno_champion_scan_results.json fno_champion_scan_results.json || true
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Daily FNO champion scan results [skip ci]" && git push)
