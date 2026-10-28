@@ -2,15 +2,113 @@ import os
 import sys
 import json
 import glob
+import re
+import requests
 import numpy as np
 import pandas as pd
 from datetime import datetime
 
 # ---------------------------------------------------------
-# CONFIGURATION & ENVIRONMENT
+# CONFIGURATION & REPOSITORY PATHS
 # ---------------------------------------------------------
-RESULTS_JSON = "fno_champion_scan_results.json"
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
+RESULTS_JSON = os.path.join(DATA_DIR, "fno_champion_scan_results.json")
+ALT_RESULTS_JSON = "fno_champion_scan_results.json"
 MIN_TURNOVER_CR = 10.0
+
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN_ULTIMATE", os.environ.get("TELEGRAM_BOT_TOKEN", "9160227761:AAE2zmSpvqttJl3_KKl3jjyKkMg-CopgtSY")).strip()
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID_ULTIMATE", os.environ.get("TELEGRAM_CHAT_ID", "7860290981")).strip()
+
+if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    for sp in ["local_secrets.json", "../local_secrets.json", os.path.join(DATA_DIR, "local_secrets.json")]:
+        if os.path.exists(sp):
+            try:
+                with open(sp, "r", encoding="utf-8") as fp:
+                    cfg = json.load(fp)
+                    TELEGRAM_BOT_TOKEN = cfg.get("TELEGRAM_BOT_TOKEN_ULTIMATE", cfg.get("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN))
+                    TELEGRAM_CHAT_ID = cfg.get("TELEGRAM_CHAT_ID_ULTIMATE", cfg.get("TELEGRAM_CHAT_ID", TELEGRAM_CHAT_ID))
+            except Exception:
+                pass
+
+EXCLUDED_KEYWORDS = ["BEES", "ETF", "LIQUID", "GOLD", "SILVER", "NIFTY", "SENSEX", "AXIS", "CASE", "GRW"]
+
+def send_telegram_alert(message: str):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print(f"[SIMULATION ALERT]:\n{message}\n")
+        return
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        print(f"⚠️ Telegram dispatch failed: {e}")
+
+# ---------------------------------------------------------
+# STRICT NSE F&O UNIVERSE WHITELIST
+# ---------------------------------------------------------
+def get_fno_whitelist():
+    """Fetches the official active NSE F&O equities list.
+
+    Falls back to the complete verified master universe if offline.
+    """
+    # 1. Try online fetch from official NSE contract files
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    try:
+        url = "https://nsearchives.nseindia.com/content/fo/fo_mktlots.csv"
+        r = requests.get(url, headers=headers, timeout=5)
+        if r.status_code == 200:
+            lines = r.text.strip().split("\n")
+            symbols = set()
+            for row in lines[5:]:
+                parts = row.split(",")
+                if len(parts) >= 2:
+                    sym = parts[1].strip().upper()
+                    if sym and not any(k in sym for k in EXCLUDED_KEYWORDS):
+                        symbols.add(sym)
+            if len(symbols) >= 150:
+                return symbols
+    except Exception:
+        pass
+
+    # 2. Complete Static NSE F&O Master Universe (2026 Derivative Basket)
+    return {
+        "360ONE", "ABB", "ABCAPITAL", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", 
+        "ADANIPOWER", "ALKEM", "AMBER", "AMBUJACEM", "ANANDRATHI", "ANGELONE", "APLAPOLLO", 
+        "APOLLOHOSP", "APOLLOTYRE", "ASHOKLEY", "ASIANPAINT", "ASTRAL", "ATHERENERG", "AUBANK", 
+        "AUROPHARMA", "AXISBANK", "BAJAJ-AUTO", "BAJAJFINSV", "BAJAJHLDNG", "BAJFINANCE", 
+        "BANDHANBNK", "BANKBARODA", "BANKINDIA", "BDL", "BEL", "BHARATFORG", "BHARTIARTL", 
+        "BHEL", "BIOCON", "BLUESTARCO", "BOSCHLTD", "BPCL", "BRITANNIA", "BSE", "CAMS", 
+        "CANBK", "CANFINHOME", "CDSL", "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", 
+        "COCHINSHIP", "COFORGE", "COLPAL", "CONCOR", "CROMPTON", "CUMMINSIND", "DABUR", 
+        "DALBHARAT", "DELHIVERY", "DIVISLAB", "DIXON", "DLF", "DMART", "DRREDDY", "EICHERMOT", 
+        "ENRIN", "ESCORTS", "ETERNAL", "EXIDEIND", "FEDERALBNK", "FORCEMOT", "FORTIS", 
+        "GAIL", "GLENMARK", "GMRAIRPORT", "GODFRYPHLP", "GODREJCP", "GODREJPROP", "GRANULES", 
+        "GRASIM", "GUJGASLTD", "GVT&D", "HAL", "HAVELLS", "HCLTECH", "HDFCAMC", "HDFCBANK", 
+        "HDFCLIFE", "HEROMOTOCO", "HINDALCO", "HINDPETRO", "HINDUNILVR", "HINDZINC", "HUDCO", 
+        "HYUNDAI", "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDEA", "IDFCFIRSTB", "IEX", 
+        "IGL", "INDHOTEL", "INDIANB", "INDIGO", "INDUSINDBK", "INDUSTOWER", "INFY", "INOXWIND", 
+        "IOC", "IPCALAB", "IREDA", "IRFC", "IRCTC", "ITC", "JINDALSTEL", "JIOFIN", "JSWENERGY", 
+        "JSWSTEEL", "JUBLFOOD", "KALYANKJIL", "KAYNES", "KEI", "KFINTECH", "KOTAKBANK", 
+        "KPITTECH", "LALPATHLAB", "LAURUSLABS", "LICHSGFIN", "LICI", "LODHA", "LT", "LTF", 
+        "LTIM", "LTTS", "LUPIN", "M&M", "M&MFIN", "MANAPPURAM", "MARICO", "MARUTI", "MAXHEALTH", 
+        "MCX", "METROPOLIS", "MFSL", "MGL", "MOTHERSON", "MPHASIS", "MRF", "MUTHOOTFIN", 
+        "NATIONALUM", "NAUKRI", "NBCC", "NESTLEIND", "NHPC", "NMDC", "NTPC", "NUVAMA", 
+        "NYKAA", "OBEROIRLTY", "OFSS", "OIL", "ONGC", "PAGEIND", "PATANJALI", "PERSISTENT", 
+        "PETRONET", "PFC", "PHOENIXLTD", "PIDILITIND", "PIIND", "PNB", "PNBHOUSING", "POLICYBZR", 
+        "POLYCAB", "POONAWALLA", "POWERGRID", "PRESTIGE", "PVRINOX", "RAMCOCEM", "RBLBANK", 
+        "RECLTD", "RELIANCE", "SAIL", "SBICARD", "SBILIFE", "SBIN", "SHREECEM", "SHRIRAMFIN", 
+        "SIEMENS", "SOLARINDS", "SONACOMS", "SRF", "SUNPHARMA", "SUNTV", "SUPREMEIND", "SUZLON", 
+        "SYNGENE", "TATACHEM", "TATACOMM", "TATACONSUM", "TATAMOTORS", "TATAPOWER", "TATASTEEL", 
+        "TATATECH", "TCS", "TECHM", "TITAN", "TORNTPHARM", "TORNTPOWER", "TRENT", "TVSMOTOR", 
+        "ULTRACEMCO", "UNIONBANK", "UNITDSPR", "UPL", "VBL", "VEDL", "VOLTAS", "WIPRO", 
+        "YESBANK", "ZYDUSLIFE"
+    }
 
 # ---------------------------------------------------------
 # DATA NORMALIZATION & STOCK SPLIT HANDLING
@@ -79,23 +177,29 @@ def load_nifty_benchmark(all_files):
 # PRODUCTION SCREENER CORE
 # ---------------------------------------------------------
 def run_scanner():
+    fno_universe = get_fno_whitelist()
     all_json = glob.glob("**/*.json", recursive=True)
     nifty_map = load_nifty_benchmark(all_json)
 
-    # Discover and deduplicate genuine stock files
     stock_map = {}
     for p in all_json:
         bname = os.path.basename(p)
         sym = os.path.splitext(bname)[0].upper()
-        if any(k in bname.lower() for k in ["nifty", "audit", "result", "trade", "secret", "package", "checkpoint"]):
+        if any(k in bname.lower() for k in ["nifty", "audit", "result", "trade", "secret", "package", "checkpoint", "live"]):
             continue
+        if any(k in sym for k in EXCLUDED_KEYWORDS):
+            continue
+        # STRICT WHITELIST GATE: Only allow genuine F&O symbols
+        if sym not in fno_universe:
+            continue
+
         if sym not in stock_map or os.path.getsize(p) > os.path.getsize(stock_map[sym]):
             stock_map[sym] = p
 
     fresh_triggers = []
     pre_breakout_coils = []
 
-    print(f"🔍 Scan_ultimateFNO: Processing {len(stock_map)} stocks...")
+    print(f"🔍 Scan_ultimateFNO: Processing {len(stock_map)} Verified F&O Stocks...")
 
     for sym, filepath in sorted(stock_map.items()):
         try:
@@ -113,7 +217,6 @@ def run_scanner():
         df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
         df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
         df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
-        df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=5).mean().fillna(35.0)
         df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
         # Demat OBV
@@ -121,7 +224,6 @@ def run_scanner():
         direction = np.where(diff > 0, 1.0, np.where(diff < 0, -1.0, 0.0))
         df["deliv_obv"] = (direction * df["delivery_vol"]).cumsum()
         df["dobv_20max"] = df["deliv_obv"].rolling(20, min_periods=5).max()
-
         df["range_closeness"] = np.where(df["high"] > df["low"], (df["close"] - df["low"]) / (df["high"] - df["low"]), 0.5)
 
         closes = df["close"].values
@@ -174,7 +276,6 @@ def run_scanner():
         dv_surge = round(delivs[i] / deliv_sma20s[i - 1], 2) if deliv_sma20s[i - 1] > 0 else 1.0
         rc = round(rcs[i], 2)
         obv_ok = bool(demat_obvs[i] >= dobv_maxes[i - 1] * 0.98)
-
         cleared_pivot = bool(c0 >= lp_h)
 
         # Trigger Category 1: Active Breakout Confirmation
@@ -212,27 +313,42 @@ def run_scanner():
     fresh_triggers.sort(key=lambda x: float(x["delivery_surge"].replace("x","")), reverse=True)
     pre_breakout_coils.sort(key=lambda x: x["accumulation_ratio"], reverse=True)
 
-    # Save to disk
+    scan_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
     payload = {
-        "scan_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "scan_time": scan_time_str,
         "fresh_triggers": fresh_triggers,
         "coiling_watchlist": pre_breakout_coils
     }
-    with open(RESULTS_JSON, "w", encoding="utf-8") as fp:
-        json.dump(payload, fp, indent=2)
 
-    # Console display only
+    # Write both to data/ and root to guarantee presence across all scripts
+    for out_path in [RESULTS_JSON, ALT_RESULTS_JSON]:
+        try:
+            with open(out_path, "w", encoding="utf-8") as fp:
+                json.dump(payload, fp, indent=2)
+        except Exception:
+            pass
+
     print("\n" + "=" * 90)
     print(f"🎯 1. CONFIRMED F&O BREAKOUTS ({len(fresh_triggers)}):")
     if fresh_triggers:
         print(pd.DataFrame(fresh_triggers).to_string(index=False))
+        tg_msg = f"🚀 <b>ULTIMATE F&O EOD CONFIRMATION</b>\n🕒 <i>{scan_time_str}</i>\n\n"
+        for t in fresh_triggers:
+            tg_msg += (
+                f"🔥 <b>#{t['symbol']}</b> (Clearance: {t['extended_%']})\n"
+                f"• Close: <b>{t['close']}</b> (Pivot: {t['pivot_ceiling']})\n"
+                f"• Stop Loss: <b>{t['stop_loss']}</b> (Risk: {t['risk_%']})\n"
+                f"• Deliv Surge: <b>{t['delivery_surge']}</b> | Acc: <b>{t['accumulation_ratio']}x</b>\n"
+                f"• Shelf Spread: {t['shelf_spread_%']} | Exit: <b>Exit 2.2 Trail</b>\n\n"
+            )
+        send_telegram_alert(tg_msg)
     else:
-        print("No breakouts confirmed today meeting strict accumulation gates.")
+        print("No F&O breakouts confirmed today.")
 
     print("\n" + "=" * 90)
     print(f"👀 2. TOP COILING PRE-BREAKOUT WATCHLIST ({len(pre_breakout_coils)}):")
     if pre_breakout_coils:
-        print(pd.DataFrame(pre_breakout_coils[:12]).to_string(index=False))
+        print(pd.DataFrame(pre_breakout_coils[:15]).to_string(index=False))
     print("=" * 90)
 
 if __name__ == "__main__":
