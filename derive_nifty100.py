@@ -379,3 +379,5 @@ def run_nifty100_derivation():
 
     df_res.to_csv("data/nifty100_derivation_dump.csv", index=False)
     print("✅ Saved summary matrix to `data/nifty100_derivation_summary.json`.")
+if __name__ == "__main__":
+    run_nifty100_derivation()
