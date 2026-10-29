@@ -1,0 +1,248 @@
+{
+  "Total_Breakouts": 12587,
+  "Timestamp": "2026-10-29 19:06:33 IST",
+  "Exit_Engines": [
+    {
+      "Exit Engine": "Exit 2.2 (Multi-Tiered Trail)",
+      "Win Rate %": "40.3%",
+      "Avg Return %": "+1.36%",
+      "Profit Factor": "1.53x",
+      "Avg Holding": "21.7 bars"
+    },
+    {
+      "Exit Engine": "Fast 10 EMA Cross",
+      "Win Rate %": "38.1%",
+      "Avg Return %": "+0.61%",
+      "Profit Factor": "1.33x",
+      "Avg Holding": "10.0 bars"
+    },
+    {
+      "Exit Engine": "ATR Chandelier (2.5x ATR)",
+      "Win Rate %": "40.6%",
+      "Avg Return %": "+1.31%",
+      "Profit Factor": "1.50x",
+      "Avg Holding": "21.1 bars"
+    },
+    {
+      "Exit Engine": "Institutional Climax/Dist",
+      "Win Rate %": "48.4%",
+      "Avg Return %": "+1.95%",
+      "Profit Factor": "1.64x",
+      "Avg Holding": "33.2 bars"
+    }
+  ],
+  "Accumulation_Ratio": [
+    {
+      "acc_bin": "< 1.0 (Dist)",
+      "Trades": 2034,
+      "Winners": 598,
+      "Win_Rate": "29.4%",
+      "Avg_MFE": "+7.61%",
+      "Avg_Exit2_2": "+0.86%"
+    },
+    {
+      "acc_bin": "1.0 - 1.3",
+      "Trades": 1384,
+      "Winners": 405,
+      "Win_Rate": "29.3%",
+      "Avg_MFE": "+7.39%",
+      "Avg_Exit2_2": "+0.56%"
+    },
+    {
+      "acc_bin": "1.3 - 1.5",
+      "Trades": 920,
+      "Winners": 300,
+      "Win_Rate": "32.6%",
+      "Avg_MFE": "+8.12%",
+      "Avg_Exit2_2": "+1.17%"
+    },
+    {
+      "acc_bin": "1.5 - 1.8",
+      "Trades": 1303,
+      "Winners": 414,
+      "Win_Rate": "31.8%",
+      "Avg_MFE": "+8.21%",
+      "Avg_Exit2_2": "+1.55%"
+    },
+    {
+      "acc_bin": "1.8 - 2.2",
+      "Trades": 1422,
+      "Winners": 471,
+      "Win_Rate": "33.1%",
+      "Avg_MFE": "+8.55%",
+      "Avg_Exit2_2": "+1.42%"
+    },
+    {
+      "acc_bin": "> 2.2 (High Acc)",
+      "Trades": 5524,
+      "Winners": 1864,
+      "Win_Rate": "33.7%",
+      "Avg_MFE": "+8.84%",
+      "Avg_Exit2_2": "+1.71%"
+    }
+  ],
+  "VDU_Depth": [
+    {
+      "vdu_bin": "< 0.45x (Ultra VDU)",
+      "Trades": 5413,
+      "Winners": 1707,
+      "Win_Rate": "31.5%",
+      "Avg_MFE": "+8.42%",
+      "Avg_Exit2_2": "+1.40%"
+    },
+    {
+      "vdu_bin": "0.45x - 0.65x",
+      "Trades": 5678,
+      "Winners": 1833,
+      "Win_Rate": "32.3%",
+      "Avg_MFE": "+8.24%",
+      "Avg_Exit2_2": "+1.30%"
+    },
+    {
+      "vdu_bin": "0.65x - 0.85x",
+      "Trades": 1418,
+      "Winners": 483,
+      "Win_Rate": "34.1%",
+      "Avg_MFE": "+8.33%",
+      "Avg_Exit2_2": "+1.43%"
+    },
+    {
+      "vdu_bin": "0.85x - 1.10x",
+      "Trades": 77,
+      "Winners": 28,
+      "Win_Rate": "36.4%",
+      "Avg_MFE": "+8.54%",
+      "Avg_Exit2_2": "+0.66%"
+    },
+    {
+      "vdu_bin": "> 1.10x (Elevated)",
+      "Trades": 1,
+      "Winners": 1,
+      "Win_Rate": "100.0%",
+      "Avg_MFE": "+22.34%",
+      "Avg_Exit2_2": "+29.91%"
+    }
+  ],
+  "Delivery_Surge": [
+    {
+      "deliv_bin": "< 1.0x (Low Deliv)",
+      "Trades": 3787,
+      "Winners": 1188,
+      "Win_Rate": "31.4%",
+      "Avg_MFE": "+7.79%",
+      "Avg_Exit2_2": "+1.00%"
+    },
+    {
+      "deliv_bin": "1.0x - 1.25x",
+      "Trades": 2017,
+      "Winners": 649,
+      "Win_Rate": "32.2%",
+      "Avg_MFE": "+7.74%",
+      "Avg_Exit2_2": "+1.01%"
+    },
+    {
+      "deliv_bin": "1.25x - 1.60x",
+      "Trades": 2264,
+      "Winners": 732,
+      "Win_Rate": "32.3%",
+      "Avg_MFE": "+8.18%",
+      "Avg_Exit2_2": "+1.52%"
+    },
+    {
+      "deliv_bin": "1.60x - 2.20x",
+      "Trades": 2138,
+      "Winners": 697,
+      "Win_Rate": "32.6%",
+      "Avg_MFE": "+8.48%",
+      "Avg_Exit2_2": "+1.11%"
+    },
+    {
+      "deliv_bin": "> 2.20x (Institutional Surge)",
+      "Trades": 2381,
+      "Winners": 786,
+      "Win_Rate": "33.0%",
+      "Avg_MFE": "+9.69%",
+      "Avg_Exit2_2": "+2.29%"
+    }
+  ],
+  "Range_Closeness": [
+    {
+      "rc_bin": "< 0.50 (Wick Trap)",
+      "Trades": 1101,
+      "Winners": 362,
+      "Win_Rate": "32.9%",
+      "Avg_MFE": "+8.53%",
+      "Avg_MAE": "-6.10%",
+      "Avg_Exit2_2": "+1.23%"
+    },
+    {
+      "rc_bin": "0.50 - 0.65",
+      "Trades": 1521,
+      "Winners": 502,
+      "Win_Rate": "33.0%",
+      "Avg_MFE": "+8.58%",
+      "Avg_MAE": "-6.25%",
+      "Avg_Exit2_2": "+1.55%"
+    },
+    {
+      "rc_bin": "0.65 - 0.80",
+      "Trades": 3266,
+      "Winners": 1065,
+      "Win_Rate": "32.6%",
+      "Avg_MFE": "+8.53%",
+      "Avg_MAE": "-6.35%",
+      "Avg_Exit2_2": "+1.30%"
+    },
+    {
+      "rc_bin": "0.80 - 1.00 (Marubozu)",
+      "Trades": 6699,
+      "Winners": 2123,
+      "Win_Rate": "31.7%",
+      "Avg_MFE": "+8.15%",
+      "Avg_MAE": "-6.17%",
+      "Avg_Exit2_2": "+1.37%"
+    }
+  ],
+  "Base_Spread": [
+    {
+      "spread_bin": "< 5% (Ultra Tight)",
+      "Trades": 2120,
+      "Winners": 620,
+      "Win_Rate": "29.2%",
+      "Avg_MFE": "+6.53%",
+      "Avg_Exit2_2": "+1.18%"
+    },
+    {
+      "spread_bin": "5% - 7%",
+      "Trades": 2998,
+      "Winners": 896,
+      "Win_Rate": "29.9%",
+      "Avg_MFE": "+7.27%",
+      "Avg_Exit2_2": "+0.96%"
+    },
+    {
+      "spread_bin": "7% - 8.5%",
+      "Trades": 1964,
+      "Winners": 622,
+      "Win_Rate": "31.7%",
+      "Avg_MFE": "+7.78%",
+      "Avg_Exit2_2": "+0.95%"
+    },
+    {
+      "spread_bin": "8.5% - 11%",
+      "Trades": 2287,
+      "Winners": 775,
+      "Win_Rate": "33.9%",
+      "Avg_MFE": "+8.68%",
+      "Avg_Exit2_2": "+1.65%"
+    },
+    {
+      "spread_bin": "> 11% (Loose Base)",
+      "Trades": 3218,
+      "Winners": 1139,
+      "Win_Rate": "35.4%",
+      "Avg_MFE": "+10.59%",
+      "Avg_Exit2_2": "+1.88%"
+    }
+  ]
+}
