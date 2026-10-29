@@ -3,7 +3,7 @@ name: Ultimate FNO Empirical Backtest
 on:
   workflow_dispatch:
   schedule:
-    # Optional: runs automatically every Sunday at 18:00 UTC (11:30 PM IST)
+    # Runs Sunday at 18:00 UTC (11:30 PM IST)
     - cron: '0 18 * * 0'
 
 jobs:
