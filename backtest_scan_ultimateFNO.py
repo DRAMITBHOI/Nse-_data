@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 # --------------------------------------------------------------------------
-# CONFIGURATION & OUTPUT DIRECTORIES
+# CONFIGURATION & REPOSITORY PATHS
 # --------------------------------------------------------------------------
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -116,7 +116,7 @@ def load_nifty_benchmark():
     return {}
 
 def run_fno_backtest():
-    print(f"🚀 Initializing Scan Ultimate F&O Empirical Backtest ({START_DATE} to {END_DATE})...")
+    print(f"🚀 Initializing Scan Ultimate F&O Empirical Audit ({START_DATE} to {END_DATE})...")
     nifty_map = load_nifty_benchmark()
     
     all_json = glob.glob("**/*.json", recursive=True)
@@ -134,7 +134,7 @@ def run_fno_backtest():
 
     all_trades = []
 
-    for sym, fpath in stock_files.items():
+    for sym, fpath in sorted(stock_files.items()):
         try:
             with open(fpath, "r", encoding="utf-8") as fp:
                 clean = clean_and_prepare(json.load(fp))
@@ -178,11 +178,12 @@ def run_fno_backtest():
         active_in_trade = False
         trade_exit_idx = 0
 
-        for i in range(60, n):
+        for i in range(60, n - 2):
             current_date = df["time"].iloc[i]
             if current_date < START_DATE or current_date > END_DATE:
                 continue
 
+            # Skip forward until previous position has fully exited
             if active_in_trade:
                 if i <= trade_exit_idx:
                     continue
@@ -195,6 +196,9 @@ def run_fno_backtest():
             v0 = df["volume"].iloc[i]
             dv0 = df["delivery_vol"].iloc[i]
 
+            # -------------------------------------------------------------
+            # EXACT NIFTY 100 GATES
+            # -------------------------------------------------------------
             # Gate 1: Liquidity & Trend
             if df["turnover_50d"].iloc[i] < MIN_TURNOVER_CR:
                 continue
@@ -227,14 +231,14 @@ def run_fno_backtest():
             if not shelf_found:
                 continue
 
-            # Gate 3: Institutional Accumulation Ratio (>= 1.50)
+            # Gate 3: Accumulation Ratio Gate (>= 1.50)
             base_up = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] >= closes[k - 1])
             base_dn = sum(delivs[k] for k in range(max(0, i - best_len), i) if closes[k] < closes[k - 1])
             acc_ratio = round((base_up / base_dn), 2) if base_dn > 0 else 2.50
             if acc_ratio < 1.50:
                 continue
 
-            # Gate 4: Breakout Execution Hurdle
+            # Gate 4: Breakout Execution Hurdle (Clearance + Vol Surge + Range Close)
             prev_deliv_sma = df["deliv_sma20"].iloc[i - 1]
             dv_surge = dv0 / prev_deliv_sma if prev_deliv_sma > 0 else 1.0
             rc = df["range_closeness"].iloc[i]
@@ -245,7 +249,9 @@ def run_fno_backtest():
             if not (cleared_pivot and dv_surge >= 1.60 and rc >= 0.65 and obv_ok):
                 continue
 
-            # Gate 5: Exit 2.2 Trailing Engine Execution
+            # -------------------------------------------------------------
+            # EXACT EXIT 2.2 TRAILING ENGINE (CORRECTED DYNAMIC LEEDS)
+            # -------------------------------------------------------------
             entry_price = c0
             hard_sl = min(l0, lp_l)
             peak_price = entry_price
@@ -269,7 +275,7 @@ def run_fno_backtest():
                 peak_gain_pct = max(peak_gain_pct, ((peak_price - entry_price) / entry_price) * 100.0)
                 vol_pace = curr_v / max(1.0, curr_sma20_v)
 
-                # Rule 1: Catastrophe Stop
+                # Rule 1: Catastrophe Stop Loss
                 if curr_c < hard_sl:
                     exit_reason = "1. Catastrophe Stop"
                     exit_price = curr_c
@@ -311,10 +317,14 @@ def run_fno_backtest():
                         atr_floor = curr_ema20 - (1.5 * curr_atr14)
                         pct_floor = curr_ema20 * 0.95
                         dynamic_leeway = min(pct_floor, atr_floor)
-                        guaranteed_be = entry_price * 1.015
-                        vdu_stop = max(guaranteed_be, dynamic_leeway)
 
-                        if curr_c < vdu_stop:
+                        # Break-even is granted ONLY after the position earns an initial +5.0% cushion
+                        if peak_gain_pct >= 5.0:
+                            active_vdu_stop = max(entry_price * 1.01, dynamic_leeway)
+                        else:
+                            active_vdu_stop = dynamic_leeway
+
+                        if curr_c < active_vdu_stop:
                             exit_reason = "5B. Dynamic VDU Floor Breach"
                             exit_price = curr_c
                             exit_idx = j
@@ -347,10 +357,6 @@ def run_fno_backtest():
             active_in_trade = True
             trade_exit_idx = exit_idx
 
-    if not all_trades:
-        print("❌ No trades triggered under the strict parameters.")
-        return
-
     tdf = pd.DataFrame(all_trades).sort_values("entry_date").reset_index(drop=True)
     wins = tdf[tdf["return_%"] > 0]
     losses = tdf[tdf["return_%"] <= 0]
@@ -375,14 +381,12 @@ def run_fno_backtest():
     print(f"Average Loss / Losing Trade : {avg_loss:.2f}%")
     print(f"Win/Loss Payoff Ratio       : {payoff_ratio:.2f}x")
     print(f"Average Holding Period      : {tdf['holding_bars'].mean():.1f} trading sessions")
-    print(f"Max Gain on Single Trade    : +{tdf['return_%'].max():.2f}% ({tdf.loc[tdf['return_%'].idxmax(), 'symbol']})")
-    print(f"Max Loss on Single Trade    : {tdf['return_%'].min():.2f}% ({tdf.loc[tdf['return_%'].idxmin(), 'symbol']})")
     print("=" * 80)
 
     # Save to CSV
     tdf.to_csv(TRADES_CSV_FILE, index=False)
 
-    # Save structured summary to JSON
+    # Compile structured summary
     exit_summary = tdf.groupby("exit_reason").agg(
         Count=("return_%", "count"),
         Win_Rate=("return_%", lambda s: round(float((s > 0).mean() * 100), 1)),
