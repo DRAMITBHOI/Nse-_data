@@ -1,16 +1,16 @@
 {
   "Date": "2026-10-29",
-  "Scan_Timestamp": "2026-10-29 09:39:32 AM IST",
-  "Elapsed_Minutes": 24,
+  "Scan_Timestamp": "2026-10-29 09:42:32 AM IST",
+  "Elapsed_Minutes": 27,
   "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "ALIVUS",
-    "BOSCHLTD",
-    "ENTERO",
-    "63MOONS",
     "GESHIP",
+    "BOSCHLTD",
+    "63MOONS",
+    "ENTERO",
+    "ADANIPORTS",
     "GRANULES",
-    "ADANIPORTS"
+    "ALIVUS"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -65,7 +65,7 @@
       "stop_loss": 1248.81,
       "risk_%": 8.0,
       "clearance_%": 3.45,
-      "proj_vol_pace": 6.27,
+      "proj_vol_pace": 5.81,
       "action": "CONFIRMED BREAKOUT"
     },
     "ENTERO": {
@@ -93,7 +93,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 1.06,
-      "proj_vol_pace": 2.77,
+      "proj_vol_pace": 2.57,
       "action": "CONFIRMED BREAKOUT"
     },
     "63MOONS": {
@@ -121,7 +121,7 @@
       "stop_loss": 1439.8,
       "risk_%": 8.0,
       "clearance_%": 3.0,
-      "proj_vol_pace": 2.58,
+      "proj_vol_pace": 2.39,
       "action": "CONFIRMED BREAKOUT"
     }
   },
@@ -165,7 +165,7 @@
       "stop_loss": 1248.81,
       "risk_%": 8.0,
       "clearance_%": 3.45,
-      "proj_vol_pace": 6.27,
+      "proj_vol_pace": 5.81,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -193,7 +193,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 1.06,
-      "proj_vol_pace": 2.77,
+      "proj_vol_pace": 2.57,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -221,7 +221,7 @@
       "stop_loss": 1439.8,
       "risk_%": 8.0,
       "clearance_%": 3.0,
-      "proj_vol_pace": 2.58,
+      "proj_vol_pace": 2.39,
       "action": "CONFIRMED BREAKOUT"
     }
   ],
@@ -383,7 +383,7 @@
       "stop_loss": 769.99,
       "risk_%": 8.0,
       "clearance_%": -0.05,
-      "proj_vol_pace": 0.17,
+      "proj_vol_pace": 0.15,
       "action": "WICK REJECTED"
     },
     {
@@ -397,7 +397,7 @@
       "stop_loss": 874.0,
       "risk_%": 8.0,
       "clearance_%": -0.53,
-      "proj_vol_pace": 3.34,
+      "proj_vol_pace": 3.09,
       "action": "WICK REJECTED"
     },
     {
@@ -411,7 +411,7 @@
       "stop_loss": 321.95,
       "risk_%": 8.0,
       "clearance_%": -0.56,
-      "proj_vol_pace": 49.29,
+      "proj_vol_pace": 45.68,
       "action": "COILING"
     },
     {
@@ -425,7 +425,7 @@
       "stop_loss": 1018.44,
       "risk_%": 8.0,
       "clearance_%": -0.89,
-      "proj_vol_pace": 0.88,
+      "proj_vol_pace": 0.81,
       "action": "COILING"
     },
     {
@@ -439,7 +439,7 @@
       "stop_loss": 186.02,
       "risk_%": 8.0,
       "clearance_%": -1.04,
-      "proj_vol_pace": 0.15,
+      "proj_vol_pace": 0.14,
       "action": "COILING"
     },
     {
@@ -453,7 +453,7 @@
       "stop_loss": 558.81,
       "risk_%": 8.0,
       "clearance_%": -1.69,
-      "proj_vol_pace": 0.23,
+      "proj_vol_pace": 0.22,
       "action": "COILING"
     },
     {
@@ -467,7 +467,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": -1.85,
-      "proj_vol_pace": 0.38,
+      "proj_vol_pace": 0.35,
       "action": "COILING"
     },
     {
@@ -481,7 +481,7 @@
       "stop_loss": 888.63,
       "risk_%": 8.0,
       "clearance_%": -2.06,
-      "proj_vol_pace": 0.16,
+      "proj_vol_pace": 0.15,
       "action": "COILING"
     },
     {
@@ -495,7 +495,7 @@
       "stop_loss": 630.98,
       "risk_%": 8.0,
       "clearance_%": -2.71,
-      "proj_vol_pace": 0.49,
+      "proj_vol_pace": 0.45,
       "action": "COILING"
     },
     {
@@ -509,7 +509,7 @@
       "stop_loss": 3586.16,
       "risk_%": 8.0,
       "clearance_%": -3.77,
-      "proj_vol_pace": 0.73,
+      "proj_vol_pace": 0.67,
       "action": "WICK REJECTED"
     },
     {
@@ -523,7 +523,7 @@
       "stop_loss": 275.26,
       "risk_%": 8.0,
       "clearance_%": -5.13,
-      "proj_vol_pace": 0.63,
+      "proj_vol_pace": 0.58,
       "action": "COILING"
     }
   ]
