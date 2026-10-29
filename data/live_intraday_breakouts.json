@@ -1,18 +1,18 @@
 {
   "Date": "2026-10-29",
-  "Scan_Timestamp": "2026-10-29 03:24:29 PM IST",
-  "Elapsed_Minutes": 369,
+  "Scan_Timestamp": "2026-10-29 03:27:34 PM IST",
+  "Elapsed_Minutes": 372,
   "EOD_Summary_Sent": true,
   "Alert1_Sent": [
-    "BOSCHLTD",
-    "63MOONS",
-    "ALIVUS",
-    "KOTAKBANK",
-    "ENTERO",
-    "GESHIP",
     "GRANULES",
+    "ADANIPORTS",
+    "GESHIP",
+    "BOSCHLTD",
     "SAPPHIRE",
-    "ADANIPORTS"
+    "63MOONS",
+    "ENTERO",
+    "KOTAKBANK",
+    "ALIVUS"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -41,7 +41,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": 3.02,
-      "proj_vol_pace": 1.24,
+      "proj_vol_pace": 1.23,
       "action": "CONFIRMED BREAKOUT"
     },
     "GRANULES": {
@@ -63,12 +63,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1357.4,
-      "ltp": 1396.0,
+      "ltp": 1392.9,
       "day_high": 1437.4,
       "day_low": 1385.0,
       "stop_loss": 1248.81,
       "risk_%": 8.0,
-      "clearance_%": 2.84,
+      "clearance_%": 2.62,
       "proj_vol_pace": 2.78,
       "action": "CONFIRMED BREAKOUT"
     },
@@ -97,7 +97,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 4.76,
-      "proj_vol_pace": 2.68,
+      "proj_vol_pace": 2.64,
       "action": "CONFIRMED BREAKOUT"
     },
     "63MOONS": {
@@ -119,12 +119,12 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1565.0,
-      "ltp": 1613.8,
+      "ltp": 1614.3,
       "day_high": 1647.0,
       "day_low": 1562.8,
       "stop_loss": 1439.8,
       "risk_%": 8.0,
-      "clearance_%": 3.12,
+      "clearance_%": 3.15,
       "proj_vol_pace": 2.03,
       "action": "CONFIRMED BREAKOUT"
     },
@@ -139,7 +139,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": 1.08,
-      "proj_vol_pace": 1.62,
+      "proj_vol_pace": 1.6,
       "action": "CONFIRMED BREAKOUT"
     },
     "SAPPHIRE": {
@@ -169,7 +169,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": 3.02,
-      "proj_vol_pace": 1.24,
+      "proj_vol_pace": 1.23,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -191,12 +191,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1357.4,
-      "ltp": 1396.0,
+      "ltp": 1392.9,
       "day_high": 1437.4,
       "day_low": 1385.0,
       "stop_loss": 1248.81,
       "risk_%": 8.0,
-      "clearance_%": 2.84,
+      "clearance_%": 2.62,
       "proj_vol_pace": 2.78,
       "action": "CONFIRMED BREAKOUT"
     },
@@ -225,7 +225,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 4.76,
-      "proj_vol_pace": 2.68,
+      "proj_vol_pace": 2.64,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -247,12 +247,12 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1565.0,
-      "ltp": 1613.8,
+      "ltp": 1614.3,
       "day_high": 1647.0,
       "day_low": 1562.8,
       "stop_loss": 1439.8,
       "risk_%": 8.0,
-      "clearance_%": 3.12,
+      "clearance_%": 3.15,
       "proj_vol_pace": 2.03,
       "action": "CONFIRMED BREAKOUT"
     },
@@ -267,7 +267,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": 1.08,
-      "proj_vol_pace": 1.62,
+      "proj_vol_pace": 1.6,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -437,13 +437,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 202.2,
-      "ltp": 201.03,
+      "ltp": 201.22,
       "day_high": 202.87,
       "day_low": 193.91,
       "stop_loss": 186.02,
       "risk_%": 8.0,
-      "clearance_%": -0.58,
-      "proj_vol_pace": 1.39,
+      "clearance_%": -0.48,
+      "proj_vol_pace": 1.37,
       "action": "WICK REJECTED"
     },
     {
@@ -451,13 +451,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 349.95,
-      "ltp": 347.7,
+      "ltp": 347.6,
       "day_high": 349.4,
       "day_low": 346.6,
       "stop_loss": 321.95,
       "risk_%": 8.0,
-      "clearance_%": -0.64,
-      "proj_vol_pace": 16.44,
+      "clearance_%": -0.67,
+      "proj_vol_pace": 16.23,
       "action": "COILING"
     },
     {
@@ -465,12 +465,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1107.0,
-      "ltp": 1096.9,
+      "ltp": 1097.5,
       "day_high": 1105.0,
       "day_low": 1087.4,
       "stop_loss": 1018.44,
       "risk_%": 8.0,
-      "clearance_%": -0.91,
+      "clearance_%": -0.86,
       "proj_vol_pace": 0.74,
       "action": "COILING"
     },
@@ -479,13 +479,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 3898.0,
-      "ltp": 3857.0,
+      "ltp": 3850.9,
       "day_high": 3925.0,
       "day_low": 3709.5,
       "stop_loss": 3586.16,
       "risk_%": 8.0,
-      "clearance_%": -1.05,
-      "proj_vol_pace": 1.59,
+      "clearance_%": -1.21,
+      "proj_vol_pace": 1.58,
       "action": "WICK REJECTED"
     },
     {
@@ -493,13 +493,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 950.0,
-      "ltp": 936.1,
+      "ltp": 935.0,
       "day_high": 966.6,
       "day_low": 921.0,
       "stop_loss": 874.0,
       "risk_%": 8.0,
-      "clearance_%": -1.46,
-      "proj_vol_pace": 1.03,
+      "clearance_%": -1.58,
+      "proj_vol_pace": 1.04,
       "action": "WICK REJECTED"
     },
     {
@@ -507,12 +507,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 965.9,
-      "ltp": 950.2,
+      "ltp": 950.4,
       "day_high": 956.1,
       "day_low": 937.3,
       "stop_loss": 888.63,
       "risk_%": 8.0,
-      "clearance_%": -1.63,
+      "clearance_%": -1.6,
       "proj_vol_pace": 0.18,
       "action": "COILING"
     },
@@ -521,12 +521,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 607.4,
-      "ltp": 593.55,
+      "ltp": 593.7,
       "day_high": 599.0,
       "day_low": 588.9,
       "stop_loss": 558.81,
       "risk_%": 8.0,
-      "clearance_%": -2.28,
+      "clearance_%": -2.26,
       "proj_vol_pace": 0.46,
       "action": "COILING"
     },
@@ -541,7 +541,7 @@
       "stop_loss": 275.26,
       "risk_%": 8.0,
       "clearance_%": -3.84,
-      "proj_vol_pace": 0.85,
+      "proj_vol_pace": 0.84,
       "action": "COILING"
     }
   ]
