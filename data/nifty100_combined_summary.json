@@ -1,0 +1,201 @@
+{
+  "Audit_Period": "2021-01-01 to 2026-10-28",
+  "Audit_Timestamp": "2026-10-29 19:53:11 IST",
+  "Total_Trades": 787,
+  "Winning_Trades": 440,
+  "Losing_Trades": 347,
+  "Win_Rate_%": 55.91,
+  "Profit_Factor": 3.72,
+  "Net_Cumulative_Return_%": 3255.58,
+  "Average_Return_Per_Trade_%": 4.14,
+  "Average_Win_%": 10.12,
+  "Average_Loss_%": -3.45,
+  "Payoff_Ratio": 2.93,
+  "Average_Holding_Period": 24.1,
+  "Winners_Held_Avg": 32.8,
+  "Losers_Cut_Avg": 13.0,
+  "Max_Gain_Single_Trade": "+108.03% (HINDZINC)",
+  "Max_Loss_Single_Trade": "-22.40% (RECLTD)",
+  "Exit_Reason_Breakdown": [
+    {
+      "exit_reason": "1. Catastrophe Stop",
+      "Count": 33,
+      "Win_Rate": 0.0,
+      "Avg_Return": -8.82
+    },
+    {
+      "exit_reason": "2. Climactic Churn Harvest",
+      "Count": 61,
+      "Win_Rate": 100.0,
+      "Avg_Return": 25.19
+    },
+    {
+      "exit_reason": "3. Distribution Cluster",
+      "Count": 242,
+      "Win_Rate": 55.8,
+      "Avg_Return": 3.78
+    },
+    {
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "Count": 5,
+      "Win_Rate": 100.0,
+      "Avg_Return": 59.17
+    },
+    {
+      "exit_reason": "5A. Heavy Vol 20 EMA Breach",
+      "Count": 279,
+      "Win_Rate": 53.0,
+      "Avg_Return": 2.28
+    },
+    {
+      "exit_reason": "5B. 5-Session Reclaim Failure",
+      "Count": 72,
+      "Win_Rate": 52.8,
+      "Avg_Return": 2.12
+    },
+    {
+      "exit_reason": "5B. Dynamic VDU Floor Breach",
+      "Count": 91,
+      "Win_Rate": 53.8,
+      "Avg_Return": 0.02
+    },
+    {
+      "exit_reason": "End of Data",
+      "Count": 4,
+      "Win_Rate": 100.0,
+      "Avg_Return": 2.28
+    }
+  ],
+  "Top_10_Compounders": [
+    {
+      "symbol": "HINDZINC",
+      "entry_date": "2024-04-03",
+      "exit_date": "2024-05-30",
+      "entry_price": 320.38,
+      "exit_price": 666.5,
+      "return_%": 108.03,
+      "peak_gain_%": 152.11,
+      "holding_bars": 41,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 10.27,
+      "accumulation_ratio": 2.01
+    },
+    {
+      "symbol": "VEDL",
+      "entry_date": "2024-04-01",
+      "exit_date": "2024-05-22",
+      "entry_price": 110.16,
+      "exit_price": 194.8,
+      "return_%": 76.83,
+      "peak_gain_%": 84.01,
+      "holding_bars": 37,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 5.04,
+      "accumulation_ratio": 1.61
+    },
+    {
+      "symbol": "TATAPOWER",
+      "entry_date": "2021-09-15",
+      "exit_date": "2021-10-19",
+      "entry_price": 135.65,
+      "exit_price": 229.75,
+      "return_%": 69.37,
+      "peak_gain_%": 97.46,
+      "holding_bars": 24,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 5.24,
+      "accumulation_ratio": 1.7
+    },
+    {
+      "symbol": "AUROPHARMA",
+      "entry_date": "2023-04-12",
+      "exit_date": "2023-08-23",
+      "entry_price": 549.12,
+      "exit_price": 838.85,
+      "return_%": 52.76,
+      "peak_gain_%": 61.66,
+      "holding_bars": 95,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 8.65,
+      "accumulation_ratio": 15.47
+    },
+    {
+      "symbol": "JSWSTEEL",
+      "entry_date": "2021-03-30",
+      "exit_date": "2021-05-24",
+      "entry_price": 452.93,
+      "exit_price": 681.45,
+      "return_%": 50.45,
+      "peak_gain_%": 70.67,
+      "holding_bars": 39,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 10.3,
+      "accumulation_ratio": 2.63
+    },
+    {
+      "symbol": "IRFC",
+      "entry_date": "2023-09-01",
+      "exit_date": "2023-09-18",
+      "entry_price": 50.93,
+      "exit_price": 76.6,
+      "return_%": 50.4,
+      "peak_gain_%": 81.33,
+      "holding_bars": 11,
+      "exit_reason": "4. Mega-Runner Cushion Lock",
+      "shelf_spread_%": 9.59,
+      "accumulation_ratio": 2.53
+    },
+    {
+      "symbol": "ZYDUSLIFE",
+      "entry_date": "2023-12-07",
+      "exit_date": "2024-04-12",
+      "entry_price": 650.02,
+      "exit_price": 962.15,
+      "return_%": 48.02,
+      "peak_gain_%": 58.72,
+      "holding_bars": 91,
+      "exit_reason": "3. Distribution Cluster",
+      "shelf_spread_%": 5.36,
+      "accumulation_ratio": 3.89
+    },
+    {
+      "symbol": "JSWENERGY",
+      "entry_date": "2021-04-09",
+      "exit_date": "2021-06-03",
+      "entry_price": 92.94,
+      "exit_price": 136.15,
+      "return_%": 46.49,
+      "peak_gain_%": 59.03,
+      "holding_bars": 39,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 10.87,
+      "accumulation_ratio": 3.11
+    },
+    {
+      "symbol": "HEROMOTOCO",
+      "entry_date": "2023-11-16",
+      "exit_date": "2024-02-12",
+      "entry_price": 3200.79,
+      "exit_price": 4687.5,
+      "return_%": 46.45,
+      "peak_gain_%": 54.62,
+      "holding_bars": 62,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 5.08,
+      "accumulation_ratio": 1.83
+    },
+    {
+      "symbol": "TRENT",
+      "entry_date": "2023-10-27",
+      "exit_date": "2024-01-30",
+      "entry_price": 1413.85,
+      "exit_price": 2036.63,
+      "return_%": 44.05,
+      "peak_gain_%": 55.37,
+      "holding_bars": 67,
+      "exit_reason": "2. Climactic Churn Harvest",
+      "shelf_spread_%": 8.87,
+      "accumulation_ratio": 1.79
+    }
+  ]
+}
