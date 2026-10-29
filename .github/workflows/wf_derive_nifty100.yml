@@ -32,5 +32,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "Derivation Bot"
           git pull --rebase origin main || true
-          git add data/nifty100_derivation_dump.csv || true
+          git add data/nifty100_derivation_summary.json data/nifty100_derivation_dump.csv || true
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-audit: Update Nifty 100 derivation matrix [skip ci]" && git push)
