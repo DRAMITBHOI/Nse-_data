@@ -1,65 +1,39 @@
 {
-  "scan_time": "2026-10-28 16:07:30 IST",
-  "fresh_triggers": [],
+  "scan_time": "2026-10-29 13:35:46 IST",
+  "fresh_triggers": [
+    {
+      "symbol": "ADANIPORTS",
+      "pivot_ceiling": "\u20b91784.90",
+      "close": "\u20b91872.00",
+      "extended_%": "+4.88%",
+      "stop_loss": "\u20b91687.90",
+      "risk_%": "9.83%",
+      "accumulation_ratio": 1.86,
+      "delivery_surge": "1.77x",
+      "range_closeness": 1.0,
+      "shelf_spread_%": "5.7%",
+      "action": "BUY (EXIT 2.2 TRAIL)"
+    }
+  ],
   "coiling_watchlist": [
     {
-      "symbol": "PVRINOX",
-      "close": "\u20b91445.30",
-      "pivot_target": "\u20b91475.80",
-      "dist_to_pivot": "2.11%",
-      "accumulation_ratio": 7.45,
-      "delivery_surge_today": "2.18x",
-      "shelf_spread_%": "8.3%",
-      "action": "COILING WATCHLIST"
-    },
-    {
-      "symbol": "CASHIETF",
-      "close": "\u20b91086.01",
-      "pivot_target": "\u20b91106.41",
-      "dist_to_pivot": "1.88%",
-      "accumulation_ratio": 2.5,
-      "delivery_surge_today": "0.18x",
-      "shelf_spread_%": "2.1%",
-      "action": "COILING WATCHLIST"
-    },
-    {
-      "symbol": "LIQUID1",
-      "close": "\u20b91129.16",
-      "pivot_target": "\u20b91134.69",
-      "dist_to_pivot": "0.49%",
-      "accumulation_ratio": 2.5,
-      "delivery_surge_today": "0.83x",
-      "shelf_spread_%": "1.6%",
-      "action": "COILING WATCHLIST"
-    },
-    {
-      "symbol": "LIQUIDBETF",
-      "close": "\u20b91105.09",
-      "pivot_target": "\u20b91105.27",
-      "dist_to_pivot": "0.02%",
-      "accumulation_ratio": 2.5,
-      "delivery_surge_today": "0.61x",
-      "shelf_spread_%": "0.3%",
-      "action": "COILING WATCHLIST"
-    },
-    {
-      "symbol": "SBILIQETF",
-      "close": "\u20b91062.25",
-      "pivot_target": "\u20b91070.60",
-      "dist_to_pivot": "0.79%",
-      "accumulation_ratio": 2.5,
-      "delivery_surge_today": "2.11x",
-      "shelf_spread_%": "1.0%",
-      "action": "COILING WATCHLIST"
-    },
-    {
-      "symbol": "GESHIP",
-      "close": "\u20b91559.90",
-      "pivot_target": "\u20b91577.90",
-      "dist_to_pivot": "1.15%",
-      "accumulation_ratio": 2.26,
+      "symbol": "MPHASIS",
+      "close": "\u20b92561.30",
+      "pivot_target": "\u20b92618.40",
+      "dist_to_pivot": "2.23%",
+      "accumulation_ratio": 3.45,
       "delivery_surge_today": "0.53x",
-      "shelf_spread_%": "8.1%",
+      "shelf_spread_%": "8.0%",
+      "action": "COILING WATCHLIST"
+    },
+    {
+      "symbol": "PETRONET",
+      "close": "\u20b9289.15",
+      "pivot_target": "\u20b9299.20",
+      "dist_to_pivot": "3.48%",
+      "accumulation_ratio": 1.78,
+      "delivery_surge_today": "0.87x",
+      "shelf_spread_%": "7.1%",
       "action": "COILING WATCHLIST"
     }
   ]
