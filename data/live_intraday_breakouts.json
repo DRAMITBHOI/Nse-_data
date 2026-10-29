@@ -1,18 +1,18 @@
 {
   "Date": "2026-10-29",
-  "Scan_Timestamp": "2026-10-29 03:33:27 PM IST",
+  "Scan_Timestamp": "2026-10-29 03:36:36 PM IST",
   "Elapsed_Minutes": 375,
   "EOD_Summary_Sent": true,
   "Alert1_Sent": [
+    "GESHIP",
+    "63MOONS",
+    "BOSCHLTD",
+    "KOTAKBANK",
+    "SAPPHIRE",
+    "ADANIPORTS",
     "GRANULES",
     "ENTERO",
-    "ADANIPORTS",
-    "KOTAKBANK",
-    "GESHIP",
-    "SAPPHIRE",
-    "63MOONS",
-    "ALIVUS",
-    "BOSCHLTD"
+    "ALIVUS"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -41,7 +41,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": 3.66,
-      "proj_vol_pace": 1.29,
+      "proj_vol_pace": 1.25,
       "action": "CONFIRMED BREAKOUT"
     },
     "GRANULES": {
@@ -97,7 +97,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 4.88,
-      "proj_vol_pace": 2.66,
+      "proj_vol_pace": 2.63,
       "action": "CONFIRMED BREAKOUT"
     },
     "63MOONS": {
@@ -139,7 +139,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": 1.3,
-      "proj_vol_pace": 1.63,
+      "proj_vol_pace": 1.6,
       "action": "CONFIRMED BREAKOUT"
     },
     "SAPPHIRE": {
@@ -169,7 +169,7 @@
       "stop_loss": 42214.2,
       "risk_%": 8.0,
       "clearance_%": 3.66,
-      "proj_vol_pace": 1.29,
+      "proj_vol_pace": 1.25,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -225,7 +225,7 @@
       "stop_loss": 1642.11,
       "risk_%": 8.0,
       "clearance_%": 4.88,
-      "proj_vol_pace": 2.66,
+      "proj_vol_pace": 2.63,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -267,7 +267,7 @@
       "stop_loss": 416.85,
       "risk_%": 8.0,
       "clearance_%": 1.3,
-      "proj_vol_pace": 1.63,
+      "proj_vol_pace": 1.6,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -499,7 +499,7 @@
       "stop_loss": 3586.16,
       "risk_%": 8.0,
       "clearance_%": -0.97,
-      "proj_vol_pace": 1.6,
+      "proj_vol_pace": 1.59,
       "action": "WICK REJECTED"
     },
     {
@@ -555,7 +555,7 @@
       "stop_loss": 275.26,
       "risk_%": 8.0,
       "clearance_%": -3.36,
-      "proj_vol_pace": 0.86,
+      "proj_vol_pace": 0.84,
       "action": "COILING"
     }
   ]
