@@ -283,12 +283,12 @@ def run_nifty100_derivation():
                     "raw_win": int(mfe >= 8.0 and mae >= -6.0)
                 })
 
-    df_res = pd.DataFrame(breakouts)
+        df_res = pd.DataFrame(breakouts)
     print("\n" + "=" * 90)
     print(f"📊 NIFTY 100 EMPIRICAL FEATURE ANALYSIS ({len(df_res):,} TOTAL BREAKOUTS)")
     print("=" * 90)
 
-    # Section 1: Exit Engine Comparison
+    # 1. Exit Engine Comparison
     engines = [
         ("Exit 2.2 (Multi-Tiered Trail)", "pnl_exit2_2", "bars_exit2_2"),
         ("Fast 10 EMA Cross", "pnl_fast10", "bars_fast10"),
@@ -296,83 +296,86 @@ def run_nifty100_derivation():
         ("Institutional Climax/Dist", "pnl_climax", "bars_climax")
     ]
     eng_rows = []
+    total_breakouts = len(df_res)
     for name, p_col, b_col in engines:
         wins = df_res[df_res[p_col] > 0][p_col]
         losses = df_res[df_res[p_col] <= 0][p_col]
-        wr = (len(wins) / len(df_res)) * 100.0
+        wr = (len(wins) / total_breakouts) * 100.0
         avg_ret = df_res[p_col].mean()
         pf = wins.sum() / abs(losses.sum()) if abs(losses.sum()) > 0 else 99.0
         avg_bars = df_res[b_col].mean()
-        eng_rows.append({"Exit Engine": name, "Win Rate": f"{wr:.1f}%", "Avg Return": f"{avg_ret:+.2f}%", "Profit Factor": f"{pf:.2f}", "Avg Holding": f"{avg_bars:.1f} bars"})
-    print("\n--- 1. EXIT ENGINE COMPARISON (ALL NIFTY 100 TRADES) ---")
-    print(pd.DataFrame(eng_rows).to_string(index=False))
+        eng_rows.append({"Exit Engine": name, "Win Rate %": f"{wr:.1f}%", "Avg Return %": f"{avg_ret:+.2f}%", "Profit Factor": f"{pf:.2f}x", "Avg Holding": f"{avg_bars:.1f} bars"})
 
-    # Section 2: Accumulation Ratio
+    # 2. Accumulation Ratio
     df_res["acc_bin"] = pd.cut(df_res["acc_ratio"], bins=[-np.inf, 1.0, 1.3, 1.5, 1.8, 2.2, np.inf],
                                labels=["< 1.0 (Dist)", "1.0 - 1.3", "1.3 - 1.5", "1.5 - 1.8", "1.8 - 2.2", "> 2.2 (High Acc)"])
-    print("\n--- 2. ACCUMULATION RATIO: SEPARATING WINNERS FROM TRAPS ---")
     acc_t = df_res.groupby("acc_bin", observed=False).agg(
         Trades=("raw_win", "count"),
         Winners=("raw_win", "sum"),
         Win_Rate=("raw_win", lambda s: f"{s.mean() * 100:.1f}%"),
-        Avg_MFE=("mfe", lambda s: f"{s.mean():.6f}"),
-        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():.6f}")
-    ).reset_index()
-    print(acc_t.to_string(index=False))
+        Avg_MFE=("mfe", lambda s: f"+{s.mean():.2f}%"),
+        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():+.2f}%")
+    ).reset_index().to_dict(orient="records")
 
-    # Section 3: VDU Depth
+    # 3. VDU Depth
     df_res["vdu_bin"] = pd.cut(df_res["vdu_depth"], bins=[-np.inf, 0.45, 0.65, 0.85, 1.10, np.inf],
                                labels=["< 0.45x (Ultra VDU)", "0.45x - 0.65x", "0.65x - 0.85x", "0.85x - 1.10x", "> 1.10x (Elevated)"])
-    print("\n--- 3. VOLUME DRY-UP (VDU) DEPTH BEFORE BREAKOUT ---")
     vdu_t = df_res.groupby("vdu_bin", observed=False).agg(
         Trades=("raw_win", "count"),
+        Winners=("raw_win", "sum"),
         Win_Rate=("raw_win", lambda s: f"{s.mean() * 100:.1f}%"),
-        Avg_MFE=("mfe", lambda s: f"{s.mean():.6f}"),
-        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():.6f}")
-    ).reset_index()
-    print(vdu_t.to_string(index=False))
+        Avg_MFE=("mfe", lambda s: f"+{s.mean():.2f}%"),
+        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():+.2f}%")
+    ).reset_index().to_dict(orient="records")
 
-    # Section 4: Delivery Surge
+    # 4. Delivery Surge
     df_res["deliv_bin"] = pd.cut(df_res["dv_surge"], bins=[-np.inf, 1.0, 1.25, 1.6, 2.2, np.inf],
                                   labels=["< 1.0x (Low Deliv)", "1.0x - 1.25x", "1.25x - 1.60x", "1.60x - 2.20x", "> 2.20x (Institutional Surge)"])
-    print("\n--- 4. BREAKOUT DAY DELIVERY VOLUME SURGE ---")
     deliv_t = df_res.groupby("deliv_bin", observed=False).agg(
         Trades=("raw_win", "count"),
+        Winners=("raw_win", "sum"),
         Win_Rate=("raw_win", lambda s: f"{s.mean() * 100:.1f}%"),
-        Avg_MFE=("mfe", lambda s: f"{s.mean():.6f}"),
-        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():.6f}")
-    ).reset_index()
-    print(deliv_t.to_string(index=False))
+        Avg_MFE=("mfe", lambda s: f"+{s.mean():.2f}%"),
+        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():+.2f}%")
+    ).reset_index().to_dict(orient="records")
 
-    # Section 5: Range Closeness
+    # 5. Range Closeness
     df_res["rc_bin"] = pd.cut(df_res["rc"], bins=[-np.inf, 0.50, 0.65, 0.80, np.inf],
                                 labels=["< 0.50 (Wick Trap)", "0.50 - 0.65", "0.65 - 0.80", "0.80 - 1.00 (Marubozu)"])
-    print("\n--- 5. RANGE CLOSENESS (CANDLE QUALITY & WICK TRAP GATING) ---")
     rc_t = df_res.groupby("rc_bin", observed=False).agg(
         Trades=("raw_win", "count"),
+        Winners=("raw_win", "sum"),
         Win_Rate=("raw_win", lambda s: f"{s.mean() * 100:.1f}%"),
-        Avg_MFE=("mfe", lambda s: f"{s.mean():.6f}"),
-        Avg_MAE=("mae", lambda s: f"{s.mean():.6f}"),
-        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():.6f}")
-    ).reset_index()
-    print(rc_t.to_string(index=False))
+        Avg_MFE=("mfe", lambda s: f"+{s.mean():.2f}%"),
+        Avg_MAE=("mae", lambda s: f"{s.mean():.2f}%"),
+        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():+.2f}%")
+    ).reset_index().to_dict(orient="records")
 
-    # Section 6: Shelf Spread
+    # 6. Base Shelf Spread
     df_res["spread_bin"] = pd.cut(df_res["spread"], bins=[-np.inf, 5.0, 7.0, 8.5, 11.0, np.inf],
                                     labels=["< 5% (Ultra Tight)", "5% - 7%", "7% - 8.5%", "8.5% - 11%", "> 11% (Loose Base)"])
-    print("\n--- 6. BASE SHELF SPREAD % (CONSOLIDATION TIGHTNESS) ---")
     spread_t = df_res.groupby("spread_bin", observed=False).agg(
         Trades=("raw_win", "count"),
+        Winners=("raw_win", "sum"),
         Win_Rate=("raw_win", lambda s: f"{s.mean() * 100:.1f}%"),
-        Avg_MFE=("mfe", lambda s: f"{s.mean():.6f}"),
-        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():.6f}")
-    ).reset_index()
-    print(spread_t.to_string(index=False))
-    print("=" * 90)
+        Avg_MFE=("mfe", lambda s: f"+{s.mean():.2f}%"),
+        Avg_Exit2_2=("pnl_exit2_2", lambda s: f"{s.mean():+.2f}%")
+    ).reset_index().to_dict(orient="records")
 
-    # Save artifact
+    # Package into a lightweight (< 2 KB) JSON payload
+    summary_payload = {
+        "Total_Breakouts": total_breakouts,
+        "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "Exit_Engines": eng_rows,
+        "Accumulation_Ratio": acc_t,
+        "VDU_Depth": vdu_t,
+        "Delivery_Surge": deliv_t,
+        "Range_Closeness": rc_t,
+        "Base_Spread": spread_t
+    }
+
+    with open("data/nifty100_derivation_summary.json", "w", encoding="utf-8") as f:
+        json.dump(summary_payload, f, indent=2)
+
     df_res.to_csv("data/nifty100_derivation_dump.csv", index=False)
-    print("💾 Saved raw table dump to `data/nifty100_derivation_dump.csv`.")
-
-if __name__ == "__main__":
-    run_nifty100_derivation()
+    print("✅ Saved summary matrix to `data/nifty100_derivation_summary.json`.")
