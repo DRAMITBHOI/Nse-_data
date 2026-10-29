@@ -1,28 +1,31 @@
 {
-  "Last_Updated": "2026-10-28 19:08:45 IST",
-  "Total_Sessions_Audited": 5,
-  "Latest_Session_Date": "2026-10-28",
-  "Latest_Ground_Truth": [],
+  "Last_Updated": "2026-10-29 13:40:02 IST",
+  "Total_Sessions_Audited": 6,
+  "Latest_Session_Date": "2026-10-29",
+  "Latest_Ground_Truth": [
+    "SAREGAMA",
+    "ASIANENE"
+  ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
-      "FP (Fakeouts)": 0,
-      "TN (Quiet)": 8,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
-      "FPR (Fallout)": "0.0%",
-      "TNR (Specificity)": "100.0%"
+      "FN (Missed)": 2,
+      "FP (Fakeouts)": 4,
+      "TN (Quiet)": 13,
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
+      "FPR (Fallout)": "23.5%",
+      "TNR (Specificity)": "76.5%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 2,
       "FP (Fakeouts)": 0,
-      "TN (Quiet)": 8,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TN (Quiet)": 17,
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     }
@@ -30,19 +33,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 3,
-      "Total_FP": 1,
-      "Total_TN": 42,
-      "Cumulative_TPR": "25.0%",
-      "Cumulative_FNR": "75.0%",
-      "Cumulative_FPR": "2.3%",
-      "Cumulative_TNR": "97.7%"
+      "Total_FN": 5,
+      "Total_FP": 5,
+      "Total_TN": 55,
+      "Cumulative_TPR": "16.7%",
+      "Cumulative_FNR": "83.3%",
+      "Cumulative_FPR": "8.3%",
+      "Cumulative_TNR": "91.7%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 4,
+      "Total_FN": 6,
       "Total_FP": 0,
-      "Total_TN": 43,
+      "Total_TN": 60,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -179,6 +182,34 @@
         "tn": 8,
         "tpr": 100.0,
         "fnr": 0.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-10-29",
+      "ground_truth_count": 2,
+      "ground_truth_symbols": [
+        "SAREGAMA",
+        "ASIANENE"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 2,
+        "fp": 4,
+        "tn": 13,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 23.5,
+        "tnr": 76.5
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 2,
+        "fp": 0,
+        "tn": 17,
+        "tpr": 0.0,
+        "fnr": 100.0,
         "fpr": 0.0,
         "tnr": 100.0
       }
