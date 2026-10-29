@@ -1,67 +1,67 @@
 {
   "Audit_Period": "2021-01-01 to 2026-10-28",
-  "Audit_Timestamp": "2026-10-28 17:18:58 IST",
-  "Total_Trades": 1023,
-  "Winning_Trades": 401,
-  "Losing_Trades": 622,
-  "Win_Rate_%": 39.2,
-  "Profit_Factor": 2.0,
-  "Net_Cumulative_Return_%": 2238.32,
-  "Average_Return_Per_Trade_%": 2.19,
-  "Average_Win_%": 11.14,
-  "Average_Loss_%": -3.58,
-  "Payoff_Ratio": 3.11,
-  "Average_Holding_Period": 19.5,
-  "Winners_Held_Avg": 34.2,
-  "Losers_Cut_Avg": 10.0,
+  "Audit_Timestamp": "2026-10-29 12:37:41 IST",
+  "Total_Trades": 998,
+  "Winning_Trades": 425,
+  "Losing_Trades": 573,
+  "Win_Rate_%": 42.59,
+  "Profit_Factor": 1.97,
+  "Net_Cumulative_Return_%": 2349.16,
+  "Average_Return_Per_Trade_%": 2.35,
+  "Average_Win_%": 11.2,
+  "Average_Loss_%": -4.21,
+  "Payoff_Ratio": 2.66,
+  "Average_Holding_Period": 22.9,
+  "Winners_Held_Avg": 35.8,
+  "Losers_Cut_Avg": 13.3,
   "Max_Gain_Single_Trade": "+110.53% (BSE)",
   "Max_Loss_Single_Trade": "-23.05% (RECLTD)",
   "Exit_Reason_Breakdown": [
     {
       "exit_reason": "1. Catastrophe Stop",
-      "Count": 18,
+      "Count": 67,
       "Win_Rate": 0.0,
-      "Avg_Return": -9.52
+      "Avg_Return": -9.14
     },
     {
       "exit_reason": "2. Climactic Churn Harvest",
-      "Count": 62,
+      "Count": 66,
       "Win_Rate": 100.0,
-      "Avg_Return": 25.7
+      "Avg_Return": 25.41
     },
     {
       "exit_reason": "3. Distribution Cluster",
-      "Count": 237,
-      "Win_Rate": 49.4,
-      "Avg_Return": 3.62
+      "Count": 285,
+      "Win_Rate": 44.6,
+      "Avg_Return": 2.44
     },
     {
       "exit_reason": "4. Mega-Runner Cushion Lock",
-      "Count": 6,
+      "Count": 7,
       "Win_Rate": 100.0,
-      "Avg_Return": 61.97
+      "Avg_Return": 61.18
     },
     {
       "exit_reason": "5A. Heavy Vol 20 EMA Breach",
-      "Count": 250,
-      "Win_Rate": 50.4,
-      "Avg_Return": 2.12
+      "Count": 370,
+      "Win_Rate": 38.1,
+      "Avg_Return": 0.55
     },
     {
       "exit_reason": "5B. 5-Session Reclaim Failure",
-      "Count": 24,
-      "Win_Rate": 100.0,
-      "Avg_Return": 7.32
+      "Count": 73,
+      "Win_Rate": 41.1,
+      "Avg_Return": 0.31
     },
     {
       "exit_reason": "5B. Dynamic VDU Floor Breach",
-      "Count": 421,
-      "Win_Rate": 15.7,
-      "Avg_Return": -2.66
+      "Count": 126,
+      "Win_Rate": 42.9,
+      "Avg_Return": -0.5
     },
     {
       "exit_reason": "End of Data",
-      "Count": 5,
+      "Count": 4,
       "Win_Rate": 0.0,
       "Avg_Return": 0.0
     }
