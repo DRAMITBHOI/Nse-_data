@@ -1,0 +1,70 @@
+{
+  "Audit_Period": "2021-01-01 to 2026-10-28",
+  "Audit_Timestamp": "2026-10-30 08:45:36 IST",
+  "Total_Trades": 595,
+  "Winning_Trades": 314,
+  "Losing_Trades": 281,
+  "Win_Rate_%": 52.77,
+  "Profit_Factor": 3.34,
+  "Net_Cumulative_Return_%": 2295.96,
+  "Average_Return_Per_Trade_%": 3.86,
+  "Average_Gain_Per_Win_%": 10.44,
+  "Average_Loss_Per_Loss_%": -3.5,
+  "Max_Gain_%": 105.27,
+  "Max_Gain_Symbol": "HINDZINC",
+  "Max_Loss_%": -18.35,
+  "Max_Loss_Symbol": "TORNTPHARM",
+  "Avg_Holding_Period": 21.4,
+  "Winners_Avg_Holding": 30.3,
+  "Losers_Avg_Holding": 11.5,
+  "Exit_Breakdown": [
+    {
+      "exit_reason": "1. Catastrophe Stop",
+      "Count": 9,
+      "Win_Rate": 0.0,
+      "Avg_Return": -10.3
+    },
+    {
+      "exit_reason": "2. Day-25 Momentum Cut",
+      "Count": 35,
+      "Win_Rate": 88.6,
+      "Avg_Return": 2.72
+    },
+    {
+      "exit_reason": "3. Climactic Churn Harvest",
+      "Count": 40,
+      "Win_Rate": 100.0,
+      "Avg_Return": 24.35
+    },
+    {
+      "exit_reason": "4. Distribution Cluster (4 in 12)",
+      "Count": 76,
+      "Win_Rate": 56.6,
+      "Avg_Return": 6.6
+    },
+    {
+      "exit_reason": "5. Mega-Runner Cushion Lock",
+      "Count": 6,
+      "Win_Rate": 100.0,
+      "Avg_Return": 52.93
+    },
+    {
+      "exit_reason": "6A. 20 EMA Breach Confirmed",
+      "Count": 376,
+      "Win_Rate": 45.7,
+      "Avg_Return": 1.44
+    },
+    {
+      "exit_reason": "6B. Dynamic Floor Breach",
+      "Count": 49,
+      "Win_Rate": 36.7,
+      "Avg_Return": -0.98
+    },
+    {
+      "exit_reason": "End of Data",
+      "Count": 4,
+      "Win_Rate": 100.0,
+      "Avg_Return": 1.83
+    }
+  ]
+}
