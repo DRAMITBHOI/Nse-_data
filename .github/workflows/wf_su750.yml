@@ -1,20 +1,16 @@
-name: Run Daily Swing Ultra 750 Scanner
+name: Run Daily Swing Ultra 750
 
 on:
-  workflow_run:
-    workflows: ["Daily NSE Stock Update"]
-    types:
-      - completed
   workflow_dispatch:
-
-permissions:
-  contents: write
+  schedule:
+    - cron: '35 10 * * 1-5'  # 4:05 PM IST Monday-Friday
 
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    timeout-minutes: 15
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository with LFS
@@ -26,7 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
@@ -34,12 +30,24 @@ jobs:
           pip install pandas numpy requests
 
       - name: Execute Daily Swing Ultra 750 Scanner
-        run: python Swing_ultra750.py
+        run: |
+          python swing_ultra750.py
 
       - name: Commit & Push Scanner Output
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/swing_ultra750_results.json || true
-          git commit -m "Auto-update Swing Ultra 750 Daily Scanner [skip ci]" || echo "No changes to commit"
-          git push origin main
+          
+          # Stage all updated results, logs, and data files
+          git add -A
+          
+          # Check if there are changes to commit
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "Auto-update Swing Ultra 750 Daily Scanner [skip ci]"
+            
+            # Rebase cleanly against any remote edits before pushing
+            git pull --rebase --autostash origin main
+            git push origin main
+          else
+            echo "No changes detected to commit."
+          fi
