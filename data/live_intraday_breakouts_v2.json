@@ -1,18 +1,17 @@
 {
-  "Date": "2026-10-29",
-  "Scan_Timestamp": "2026-10-29 03:57:22 PM IST",
-  "Elapsed_Minutes": 375,
+  "Date": "2026-10-30",
+  "Scan_Timestamp": "2026-10-30 09:02:37 AM IST",
+  "Elapsed_Minutes": 1,
   "Nifty50_Intraday_%": 0.0,
   "Consecutive_Hits": {
-    "DLF": 11,
+    "DLF": 1,
     "IIFLCAPS": 0,
     "INDGN": 0,
     "PETRONET": 0,
     "AXISBANK": 0,
     "CASTROLIND": 0
   },
-  "Breakouts_All_Day": [],
-  "Coiling": [
+  "Breakouts_All_Day": [
     {
       "symbol": "DLF",
       "universe": "NIFTY 750",
@@ -26,10 +25,12 @@
       "shelf_spread_%": 7.36,
       "clearance_%": 1.98,
       "drop_from_high_%": 0.24,
-      "proj_vol_pace": 1.02,
-      "consecutive_ticks": 11,
-      "action": "COILING"
-    },
+      "proj_vol_pace": 20.3,
+      "consecutive_ticks": 1,
+      "action": "RADAR PIVOT CLEARANCE"
+    }
+  ],
+  "Coiling": [
     {
       "symbol": "IIFLCAPS",
       "universe": "NON-N750",
@@ -43,7 +44,7 @@
       "shelf_spread_%": 2.28,
       "clearance_%": -0.63,
       "drop_from_high_%": 0.47,
-      "proj_vol_pace": 16.03,
+      "proj_vol_pace": 172.52,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -60,7 +61,7 @@
       "shelf_spread_%": 7.83,
       "clearance_%": -3.03,
       "drop_from_high_%": 0.93,
-      "proj_vol_pace": 0.46,
+      "proj_vol_pace": 8.99,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -77,7 +78,7 @@
       "shelf_spread_%": 4.03,
       "clearance_%": -3.49,
       "drop_from_high_%": 0.0,
-      "proj_vol_pace": 0.84,
+      "proj_vol_pace": 15.63,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -94,7 +95,7 @@
       "shelf_spread_%": 6.46,
       "clearance_%": -5.32,
       "drop_from_high_%": 0.24,
-      "proj_vol_pace": 0.62,
+      "proj_vol_pace": 11.65,
       "consecutive_ticks": 0,
       "action": "COILING"
     },
@@ -111,7 +112,7 @@
       "shelf_spread_%": 4.38,
       "clearance_%": -6.77,
       "drop_from_high_%": 0.71,
-      "proj_vol_pace": 1.6,
+      "proj_vol_pace": 29.08,
       "consecutive_ticks": 0,
       "action": "COILING"
     }
