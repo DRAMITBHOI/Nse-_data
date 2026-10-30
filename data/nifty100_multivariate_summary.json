@@ -1,0 +1,226 @@
+{
+  "Total_Breakouts": 11351,
+  "Timestamp": "2026-10-30 07:20:54 IST",
+  "Shelf_Spread": [
+    {
+      "Range": "<5% (Ultra-Tight)",
+      "Trades": 1878,
+      "Hurdle_WR_%": 29.3,
+      "Std_Exit2.2_WR_%": 38.6,
+      "D25_Exit2.2_WR_%": 39.1,
+      "D25_PF": 1.69,
+      "Avg_Return_%": 1.13
+    },
+    {
+      "Range": "5.0-8.5% (Optimal)",
+      "Trades": 4477,
+      "Hurdle_WR_%": 30.9,
+      "Std_Exit2.2_WR_%": 37.7,
+      "D25_Exit2.2_WR_%": 38.6,
+      "D25_PF": 1.43,
+      "Avg_Return_%": 0.97
+    },
+    {
+      "Range": "8.5-11.0% (Wide)",
+      "Trades": 2045,
+      "Hurdle_WR_%": 34.2,
+      "Std_Exit2.2_WR_%": 41.0,
+      "D25_Exit2.2_WR_%": 42.1,
+      "D25_PF": 1.74,
+      "Avg_Return_%": 1.81
+    },
+    {
+      "Range": ">11% (Loose)",
+      "Trades": 2726,
+      "Hurdle_WR_%": 36.3,
+      "Std_Exit2.2_WR_%": 40.8,
+      "D25_Exit2.2_WR_%": 42.1,
+      "D25_PF": 1.66,
+      "Avg_Return_%": 1.97
+    }
+  ],
+  "Clearance_Pct": [
+    {
+      "Range": "<0.5% (Poke)",
+      "Trades": 751,
+      "Hurdle_WR_%": 29.6,
+      "Std_Exit2.2_WR_%": 36.0,
+      "D25_Exit2.2_WR_%": 36.6,
+      "D25_PF": 1.39,
+      "Avg_Return_%": 0.7
+    },
+    {
+      "Range": "0.5-1.0% (Light)",
+      "Trades": 2335,
+      "Hurdle_WR_%": 29.9,
+      "Std_Exit2.2_WR_%": 37.8,
+      "D25_Exit2.2_WR_%": 38.6,
+      "D25_PF": 1.47,
+      "Avg_Return_%": 0.98
+    },
+    {
+      "Range": "1.0-1.5% (Firm)",
+      "Trades": 2209,
+      "Hurdle_WR_%": 31.3,
+      "Std_Exit2.2_WR_%": 37.3,
+      "D25_Exit2.2_WR_%": 38.3,
+      "D25_PF": 1.47,
+      "Avg_Return_%": 1.05
+    },
+    {
+      "Range": ">=1.5% (Impulse)",
+      "Trades": 6031,
+      "Hurdle_WR_%": 34.5,
+      "Std_Exit2.2_WR_%": 41.2,
+      "D25_Exit2.2_WR_%": 42.2,
+      "D25_PF": 1.69,
+      "Avg_Return_%": 1.82
+    }
+  ],
+  "Range_Closeness": [
+    {
+      "Range": "<0.50 (Wick Trap)",
+      "Trades": 1077,
+      "Hurdle_WR_%": 32.7,
+      "Std_Exit2.2_WR_%": 39.4,
+      "D25_Exit2.2_WR_%": 40.2,
+      "D25_PF": 1.48,
+      "Avg_Return_%": 1.19
+    },
+    {
+      "Range": "0.50-0.65 (Average)",
+      "Trades": 1438,
+      "Hurdle_WR_%": 33.6,
+      "Std_Exit2.2_WR_%": 39.3,
+      "D25_Exit2.2_WR_%": 40.3,
+      "D25_PF": 1.66,
+      "Avg_Return_%": 1.6
+    },
+    {
+      "Range": "0.65-0.80 (Strong)",
+      "Trades": 2945,
+      "Hurdle_WR_%": 33.1,
+      "Std_Exit2.2_WR_%": 40.3,
+      "D25_Exit2.2_WR_%": 41.4,
+      "D25_PF": 1.69,
+      "Avg_Return_%": 1.66
+    },
+    {
+      "Range": ">=0.80 (Marubozu)",
+      "Trades": 5891,
+      "Hurdle_WR_%": 32.0,
+      "Std_Exit2.2_WR_%": 38.9,
+      "D25_Exit2.2_WR_%": 39.9,
+      "D25_PF": 1.56,
+      "Avg_Return_%": 1.32
+    }
+  ],
+  "VDU_Depth": [
+    {
+      "Range": "<0.40x (Extreme VDU)",
+      "Trades": 3408,
+      "Hurdle_WR_%": 31.9,
+      "Std_Exit2.2_WR_%": 39.0,
+      "D25_Exit2.2_WR_%": 39.7,
+      "D25_PF": 1.6,
+      "Avg_Return_%": 1.59
+    },
+    {
+      "Range": "0.40-0.65x (Healthy)",
+      "Trades": 6549,
+      "Hurdle_WR_%": 32.8,
+      "Std_Exit2.2_WR_%": 39.1,
+      "D25_Exit2.2_WR_%": 40.2,
+      "D25_PF": 1.6,
+      "Avg_Return_%": 1.37
+    },
+    {
+      "Range": "0.65-0.85x (Mild)",
+      "Trades": 1320,
+      "Hurdle_WR_%": 33.4,
+      "Std_Exit2.2_WR_%": 42.0,
+      "D25_Exit2.2_WR_%": 43.3,
+      "D25_PF": 1.6,
+      "Avg_Return_%": 1.35
+    },
+    {
+      "Range": ">0.85x (No VDU)",
+      "Trades": 74,
+      "Hurdle_WR_%": 25.7,
+      "Std_Exit2.2_WR_%": 35.1,
+      "D25_Exit2.2_WR_%": 35.1,
+      "D25_PF": 1.22,
+      "Avg_Return_%": 0.68
+    }
+  ],
+  "Accumulation_Ratio": [
+    {
+      "Range": "<1.0 (Dist)",
+      "Trades": 3286,
+      "Hurdle_WR_%": 32.8,
+      "Std_Exit2.2_WR_%": 38.6,
+      "D25_Exit2.2_WR_%": 39.3,
+      "D25_PF": 1.66,
+      "Avg_Return_%": 1.49
+    },
+    {
+      "Range": "1.0-1.3 (Neutral)",
+      "Trades": 1466,
+      "Hurdle_WR_%": 31.2,
+      "Std_Exit2.2_WR_%": 40.1,
+      "D25_Exit2.2_WR_%": 41.1,
+      "D25_PF": 1.59,
+      "Avg_Return_%": 1.32
+    },
+    {
+      "Range": "1.3-1.5 (Mild Acc)",
+      "Trades": 895,
+      "Hurdle_WR_%": 32.6,
+      "Std_Exit2.2_WR_%": 37.3,
+      "D25_Exit2.2_WR_%": 38.5,
+      "D25_PF": 1.47,
+      "Avg_Return_%": 1.18
+    },
+    {
+      "Range": "1.5-1.8 (Strong Acc)",
+      "Trades": 1038,
+      "Hurdle_WR_%": 31.4,
+      "Std_Exit2.2_WR_%": 39.9,
+      "D25_Exit2.2_WR_%": 40.7,
+      "D25_PF": 1.49,
+      "Avg_Return_%": 1.16
+    },
+    {
+      "Range": ">1.8 (Institutional)",
+      "Trades": 4664,
+      "Hurdle_WR_%": 33.1,
+      "Std_Exit2.2_WR_%": 40.0,
+      "D25_Exit2.2_WR_%": 41.1,
+      "D25_PF": 1.61,
+      "Avg_Return_%": 1.54
+    }
+  ],
+  "Distribution_Rule_Comparison": [
+    {
+      "Rule": "Baseline (3 in 10 Days)",
+      "Win_Rate_%": 40.4,
+      "Profit_Factor": 1.6,
+      "Avg_Return_%": 1.43,
+      "Dist_Exits": 2591
+    },
+    {
+      "Rule": "Balanced (4 in 12 Days)",
+      "Win_Rate_%": 40.5,
+      "Profit_Factor": 1.61,
+      "Avg_Return_%": 1.46,
+      "Dist_Exits": 1383
+    },
+    {
+      "Rule": "Institutional Leeway (5 in 15 Days)",
+      "Win_Rate_%": 40.6,
+      "Profit_Factor": 1.61,
+      "Avg_Return_%": 1.46,
+      "Dist_Exits": 940
+    }
+  ]
+}
