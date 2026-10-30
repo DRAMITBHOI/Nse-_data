@@ -1,35 +1,16 @@
 {
   "Date": "2026-10-30",
-  "Scan_Timestamp": "2026-10-30 09:02:37 AM IST",
+  "Scan_Timestamp": "2026-10-30 09:07:16 AM IST",
   "Elapsed_Minutes": 1,
   "Nifty50_Intraday_%": 0.0,
   "Consecutive_Hits": {
-    "DLF": 1,
     "IIFLCAPS": 0,
     "INDGN": 0,
     "PETRONET": 0,
     "AXISBANK": 0,
     "CASTROLIND": 0
   },
-  "Breakouts_All_Day": [
-    {
-      "symbol": "DLF",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 680.85,
-      "ltp": 694.35,
-      "day_high": 696.0,
-      "day_low": 665.0,
-      "stop_loss": 626.38,
-      "risk_%": 9.79,
-      "shelf_spread_%": 7.36,
-      "clearance_%": 1.98,
-      "drop_from_high_%": 0.24,
-      "proj_vol_pace": 20.3,
-      "consecutive_ticks": 1,
-      "action": "RADAR PIVOT CLEARANCE"
-    }
-  ],
+  "Breakouts_All_Day": [],
   "Coiling": [
     {
       "symbol": "IIFLCAPS",
