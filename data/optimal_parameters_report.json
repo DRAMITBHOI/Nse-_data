@@ -1,0 +1,128 @@
+{
+  "total_breakouts_analyzed": 38994,
+  "baseline_win_rate_pct": 57.45,
+  "feature_metrics": [
+    {
+      "key": "base_length",
+      "feature": "Base Length (Bars)",
+      "winner_median": 8.0,
+      "loser_median": 8.0,
+      "winner_p25_p75": "8.0 - 8.0"
+    },
+    {
+      "key": "base_spread_pct",
+      "feature": "Base Spread (%)",
+      "winner_median": 8.69,
+      "loser_median": 7.31,
+      "winner_p25_p75": "6.37 - 11.71"
+    },
+    {
+      "key": "vdu_ratio",
+      "feature": "Volume Dry-Up (VDU) Ratio",
+      "winner_median": 0.41,
+      "loser_median": 0.44,
+      "winner_p25_p75": "0.3 - 0.52"
+    },
+    {
+      "key": "vcp_atr_ratio",
+      "feature": "VCP ATR Ratio (5d/14d)",
+      "winner_median": 1.08,
+      "loser_median": 1.02,
+      "winner_p25_p75": "0.94 - 1.23"
+    },
+    {
+      "key": "vol_surge",
+      "feature": "Trigger Volume Surge (x)",
+      "winner_median": 1.72,
+      "loser_median": 1.31,
+      "winner_p25_p75": "1.1 - 2.89"
+    },
+    {
+      "key": "deliv_vol_surge",
+      "feature": "Delivery Volume Surge (x)",
+      "winner_median": 1.6,
+      "loser_median": 1.28,
+      "winner_p25_p75": "1.06 - 2.49"
+    },
+    {
+      "key": "deliv_pct_surge",
+      "feature": "Delivery % Surge (x)",
+      "winner_median": 0.9,
+      "loser_median": 0.95,
+      "winner_p25_p75": "0.72 - 1.06"
+    },
+    {
+      "key": "accum_ratio",
+      "feature": "Base Accumulation Ratio",
+      "winner_median": 2.09,
+      "loser_median": 2.03,
+      "winner_p25_p75": "1.26 - 3.68"
+    },
+    {
+      "key": "range_closeness",
+      "feature": "Candle Range Closeness",
+      "winner_median": 0.8,
+      "loser_median": 0.78,
+      "winner_p25_p75": "0.66 - 0.88"
+    },
+    {
+      "key": "rs_stock_nifty",
+      "feature": "60d Excess Return vs Nifty",
+      "winner_median": 0.13,
+      "loser_median": 0.1,
+      "winner_p25_p75": "0.03 - 0.26"
+    },
+    {
+      "key": "dist_to_120h_pct",
+      "feature": "Ceiling Distance to 120d High (%)",
+      "winner_median": 5.43,
+      "loser_median": 5.55,
+      "winner_p25_p75": "0.13 - 13.07"
+    },
+    {
+      "key": "risk_pct",
+      "feature": "Initial Stop Loss Distance (%)",
+      "winner_median": 8.0,
+      "loser_median": 6.82,
+      "winner_p25_p75": "5.99 - 10.49"
+    }
+  ],
+  "exit_model_benchmarks": [
+    {
+      "model_key": "pnl_exit22",
+      "model_name": "Exit 2.2 Engine (Current Baseline)",
+      "win_rate_%": 46.19,
+      "average_return_%": 3.68,
+      "profit_factor": 2.73,
+      "expectancy_pct": 3.68,
+      "max_drawdown_trade_%": -24.81
+    },
+    {
+      "model_key": "pnl_ema20",
+      "model_name": "Pure 20 EMA Close Trail",
+      "win_rate_%": 45.98,
+      "average_return_%": 3.42,
+      "profit_factor": 3.0,
+      "expectancy_pct": 3.42,
+      "max_drawdown_trade_%": -23.72
+    },
+    {
+      "model_key": "pnl_ema10",
+      "model_name": "Pure 10 EMA Close Trail",
+      "win_rate_%": 49.28,
+      "average_return_%": 2.51,
+      "profit_factor": 2.95,
+      "expectancy_pct": 2.51,
+      "max_drawdown_trade_%": -23.72
+    },
+    {
+      "model_key": "pnl_staged_2r",
+      "model_name": "Staged 2R Partial + Breakeven + 20 EMA",
+      "win_rate_%": 52.09,
+      "average_return_%": 4.0,
+      "profit_factor": 2.14,
+      "expectancy_pct": 4.0,
+      "max_drawdown_trade_%": -28.94
+    }
+  ]
+}
