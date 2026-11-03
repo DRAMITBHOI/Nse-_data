@@ -1,28 +1,30 @@
 {
-  "Last_Updated": "2026-11-02 22:33:42 IST",
-  "Total_Sessions_Audited": 8,
-  "Latest_Session_Date": "2026-11-02",
-  "Latest_Ground_Truth": [],
+  "Last_Updated": "2026-11-03 13:42:27 IST",
+  "Total_Sessions_Audited": 9,
+  "Latest_Session_Date": "2026-11-03",
+  "Latest_Ground_Truth": [
+    "GALAXYSURF"
+  ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 1,
       "FP (Fakeouts)": 1,
       "TN (Quiet)": 10,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "9.1%",
       "TNR (Specificity)": "90.9%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 0,
+      "FN (Missed)": 1,
       "FP (Fakeouts)": 0,
       "TN (Quiet)": 11,
-      "TPR (Sensitivity)": "100.0%",
-      "FNR (Miss Rate)": "0.0%",
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
       "TNR (Specificity)": "100.0%"
     }
@@ -30,19 +32,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 6,
-      "Total_FP": 6,
-      "Total_TN": 70,
-      "Cumulative_TPR": "14.3%",
-      "Cumulative_FNR": "85.7%",
-      "Cumulative_FPR": "7.9%",
-      "Cumulative_TNR": "92.1%"
+      "Total_FN": 7,
+      "Total_FP": 7,
+      "Total_TN": 80,
+      "Cumulative_TPR": "12.5%",
+      "Cumulative_FNR": "87.5%",
+      "Cumulative_FPR": "8.0%",
+      "Cumulative_TNR": "92.0%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 7,
+      "Total_FN": 8,
       "Total_FP": 0,
-      "Total_TN": 76,
+      "Total_TN": 87,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -259,6 +261,33 @@
         "tn": 11,
         "tpr": 100.0,
         "fnr": 0.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-03",
+      "ground_truth_count": 1,
+      "ground_truth_symbols": [
+        "GALAXYSURF"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 1,
+        "fp": 1,
+        "tn": 10,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 9.1,
+        "tnr": 90.9
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 1,
+        "fp": 0,
+        "tn": 11,
+        "tpr": 0.0,
+        "fnr": 100.0,
         "fpr": 0.0,
         "tnr": 100.0
       }
