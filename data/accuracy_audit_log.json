@@ -1,28 +1,31 @@
 {
-  "Last_Updated": "2026-11-03 13:42:27 IST",
-  "Total_Sessions_Audited": 9,
-  "Latest_Session_Date": "2026-11-03",
+  "Last_Updated": "2026-11-04 13:39:45 IST",
+  "Total_Sessions_Audited": 10,
+  "Latest_Session_Date": "2026-11-04",
   "Latest_Ground_Truth": [
-    "GALAXYSURF"
+    "WELENT",
+    "VINCOFE",
+    "PARAGMILK",
+    "FCL"
   ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 1,
-      "FP (Fakeouts)": 1,
-      "TN (Quiet)": 10,
+      "FN (Missed)": 4,
+      "FP (Fakeouts)": 4,
+      "TN (Quiet)": 5,
       "TPR (Sensitivity)": "0.0%",
       "FNR (Miss Rate)": "100.0%",
-      "FPR (Fallout)": "9.1%",
-      "TNR (Specificity)": "90.9%"
+      "FPR (Fallout)": "44.4%",
+      "TNR (Specificity)": "55.6%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 1,
+      "FN (Missed)": 4,
       "FP (Fakeouts)": 0,
-      "TN (Quiet)": 11,
+      "TN (Quiet)": 9,
       "TPR (Sensitivity)": "0.0%",
       "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
@@ -32,19 +35,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 7,
-      "Total_FP": 7,
-      "Total_TN": 80,
-      "Cumulative_TPR": "12.5%",
-      "Cumulative_FNR": "87.5%",
-      "Cumulative_FPR": "8.0%",
-      "Cumulative_TNR": "92.0%"
+      "Total_FN": 11,
+      "Total_FP": 11,
+      "Total_TN": 85,
+      "Cumulative_TPR": "8.3%",
+      "Cumulative_FNR": "91.7%",
+      "Cumulative_FPR": "11.5%",
+      "Cumulative_TNR": "88.5%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 8,
+      "Total_FN": 12,
       "Total_FP": 0,
-      "Total_TN": 87,
+      "Total_TN": 96,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -286,6 +289,36 @@
         "fn": 1,
         "fp": 0,
         "tn": 11,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-04",
+      "ground_truth_count": 4,
+      "ground_truth_symbols": [
+        "WELENT",
+        "VINCOFE",
+        "PARAGMILK",
+        "FCL"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 4,
+        "fp": 4,
+        "tn": 5,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 44.4,
+        "tnr": 55.6
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 4,
+        "fp": 0,
+        "tn": 9,
         "tpr": 0.0,
         "fnr": 100.0,
         "fpr": 0.0,
