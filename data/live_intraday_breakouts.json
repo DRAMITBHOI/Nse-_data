@@ -1,37 +1,65 @@
 {
-  "Date": "2026-11-03",
-  "Scan_Timestamp": "2026-11-03 03:59:07 PM IST",
-  "Elapsed_Minutes": 375,
-  "EOD_Summary_Sent": true,
+  "Date": "2026-11-04",
+  "Scan_Timestamp": "2026-11-04 09:00:51 AM IST",
+  "Elapsed_Minutes": 1,
+  "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "KSHINTL",
-    "ADANIPORTS",
-    "KOTAKBANK",
-    "63MOONS",
-    "BHARTIHEXA",
-    "SAREGAMA",
-    "DLF",
     "INDGN",
+    "DLF",
+    "SAREGAMA",
+    "KOTAKBANK",
+    "ADANIPORTS",
+    "BHARTIHEXA",
+    "GALAXYSURF",
     "MBAPL"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
     "BHARTIHEXA": 1759.0,
-    "KSHINTL": 969.05,
-    "AHCL": 26.34,
-    "MBAPL": 189.77,
-    "63MOONS": 981.85,
-    "INDGN": 638.0,
-    "SAPPHIRE": 206.22,
-    "SAREGAMA": 565.0,
-    "KOTAKBANK": 465.95,
-    "DLF": 710.5,
-    "ADANIPORTS": 1875.2,
+    "CEIGALL": 400.0,
+    "YATHARTH": 1003.2,
+    "GALAXYSURF": 2258.7,
     "SEAMECLTD": 1656.0,
+    "KSHINTL": 969.05,
+    "AHCL": 25.92,
+    "MBAPL": 189.77,
+    "63MOONS": 969.6,
+    "INDGN": 630.85,
     "LMW": 17100.0,
-    "CEIGALL": 400.0
+    "SAREGAMA": 565.0,
+    "KOTAKBANK": 464.65,
+    "DLF": 710.5,
+    "ADANIPORTS": 1875.2
   },
   "Master_Confirmed_Breakouts": {
+    "BHARTIHEXA": {
+      "symbol": "BHARTIHEXA",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1695.5,
+      "ltp": 1704.7,
+      "day_high": 1759.0,
+      "day_low": 1680.7,
+      "stop_loss": 1559.86,
+      "risk_%": 8.0,
+      "clearance_%": 0.54,
+      "proj_vol_pace": 24.73,
+      "action": "CONFIRMED BREAKOUT"
+    },
+    "GALAXYSURF": {
+      "symbol": "GALAXYSURF",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 2200.0,
+      "ltp": 2246.6,
+      "day_high": 2258.7,
+      "day_low": 2165.6,
+      "stop_loss": 2084.72,
+      "risk_%": 5.24,
+      "clearance_%": 2.12,
+      "proj_vol_pace": 33.22,
+      "action": "CONFIRMED BREAKOUT"
+    },
     "MBAPL": {
       "symbol": "MBAPL",
       "universe": "NON-N750",
@@ -43,21 +71,7 @@
       "stop_loss": 160.45,
       "risk_%": 8.0,
       "clearance_%": 5.52,
-      "proj_vol_pace": 1.22,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    "63MOONS": {
-      "symbol": "63MOONS",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 950.0,
-      "ltp": 969.0,
-      "day_high": 969.0,
-      "day_low": 969.0,
-      "stop_loss": 874.0,
-      "risk_%": 8.0,
-      "clearance_%": 2.0,
-      "proj_vol_pace": 19.61,
+      "proj_vol_pace": 22.01,
       "action": "CONFIRMED BREAKOUT"
     },
     "INDGN": {
@@ -71,7 +85,7 @@
       "stop_loss": 558.81,
       "risk_%": 8.0,
       "clearance_%": 0.89,
-      "proj_vol_pace": 1.95,
+      "proj_vol_pace": 33.68,
       "action": "CONFIRMED BREAKOUT"
     },
     "SAREGAMA": {
@@ -85,7 +99,7 @@
       "stop_loss": 477.15,
       "risk_%": 9.63,
       "clearance_%": 6.48,
-      "proj_vol_pace": 2.22,
+      "proj_vol_pace": 38.04,
       "action": "CONFIRMED BREAKOUT"
     },
     "KOTAKBANK": {
@@ -93,13 +107,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 453.1,
-      "ltp": 460.0,
-      "day_high": 460.0,
-      "day_low": 460.0,
+      "ltp": 464.65,
+      "day_high": 464.65,
+      "day_low": 455.4,
       "stop_loss": 416.85,
       "risk_%": 8.0,
-      "clearance_%": 1.52,
-      "proj_vol_pace": 16.04,
+      "clearance_%": 2.55,
+      "proj_vol_pace": 14.71,
       "action": "CONFIRMED BREAKOUT"
     },
     "DLF": {
@@ -113,7 +127,7 @@
       "stop_loss": 630.98,
       "risk_%": 8.0,
       "clearance_%": 3.38,
-      "proj_vol_pace": 1.65,
+      "proj_vol_pace": 30.71,
       "action": "CONFIRMED BREAKOUT"
     },
     "ADANIPORTS": {
@@ -121,45 +135,45 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1784.9,
-      "ltp": 1861.8,
+      "ltp": 1866.9,
       "day_high": 1875.2,
       "day_low": 1843.7,
       "stop_loss": 1642.11,
       "risk_%": 8.0,
-      "clearance_%": 4.31,
-      "proj_vol_pace": 1.2,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    "KSHINTL": {
-      "symbol": "KSHINTL",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 950.8,
-      "ltp": 957.9,
-      "day_high": 963.7,
-      "day_low": 940.0,
-      "stop_loss": 874.74,
-      "risk_%": 8.0,
-      "clearance_%": 0.75,
-      "proj_vol_pace": 0.81,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    "BHARTIHEXA": {
-      "symbol": "BHARTIHEXA",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1695.5,
-      "ltp": 1710.0,
-      "day_high": 1719.6,
-      "day_low": 1680.7,
-      "stop_loss": 1559.86,
-      "risk_%": 8.0,
-      "clearance_%": 0.86,
-      "proj_vol_pace": 1.13,
+      "clearance_%": 4.59,
+      "proj_vol_pace": 19.98,
       "action": "CONFIRMED BREAKOUT"
     }
   },
   "Breakouts_All_Day": [
+    {
+      "symbol": "BHARTIHEXA",
+      "universe": "NIFTY 750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1695.5,
+      "ltp": 1704.7,
+      "day_high": 1759.0,
+      "day_low": 1680.7,
+      "stop_loss": 1559.86,
+      "risk_%": 8.0,
+      "clearance_%": 0.54,
+      "proj_vol_pace": 24.73,
+      "action": "CONFIRMED BREAKOUT"
+    },
+    {
+      "symbol": "GALAXYSURF",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 2200.0,
+      "ltp": 2246.6,
+      "day_high": 2258.7,
+      "day_low": 2165.6,
+      "stop_loss": 2084.72,
+      "risk_%": 5.24,
+      "clearance_%": 2.12,
+      "proj_vol_pace": 33.22,
+      "action": "CONFIRMED BREAKOUT"
+    },
     {
       "symbol": "MBAPL",
       "universe": "NON-N750",
@@ -171,21 +185,7 @@
       "stop_loss": 160.45,
       "risk_%": 8.0,
       "clearance_%": 5.52,
-      "proj_vol_pace": 1.22,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    {
-      "symbol": "63MOONS",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 950.0,
-      "ltp": 969.0,
-      "day_high": 969.0,
-      "day_low": 969.0,
-      "stop_loss": 874.0,
-      "risk_%": 8.0,
-      "clearance_%": 2.0,
-      "proj_vol_pace": 19.61,
+      "proj_vol_pace": 22.01,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -199,7 +199,7 @@
       "stop_loss": 558.81,
       "risk_%": 8.0,
       "clearance_%": 0.89,
-      "proj_vol_pace": 1.95,
+      "proj_vol_pace": 33.68,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -213,7 +213,7 @@
       "stop_loss": 477.15,
       "risk_%": 9.63,
       "clearance_%": 6.48,
-      "proj_vol_pace": 2.22,
+      "proj_vol_pace": 38.04,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -221,13 +221,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 453.1,
-      "ltp": 460.0,
-      "day_high": 460.0,
-      "day_low": 460.0,
+      "ltp": 464.65,
+      "day_high": 464.65,
+      "day_low": 455.4,
       "stop_loss": 416.85,
       "risk_%": 8.0,
-      "clearance_%": 1.52,
-      "proj_vol_pace": 16.04,
+      "clearance_%": 2.55,
+      "proj_vol_pace": 14.71,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -241,7 +241,7 @@
       "stop_loss": 630.98,
       "risk_%": 8.0,
       "clearance_%": 3.38,
-      "proj_vol_pace": 1.65,
+      "proj_vol_pace": 30.71,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -249,41 +249,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1784.9,
-      "ltp": 1861.8,
+      "ltp": 1866.9,
       "day_high": 1875.2,
       "day_low": 1843.7,
       "stop_loss": 1642.11,
       "risk_%": 8.0,
-      "clearance_%": 4.31,
-      "proj_vol_pace": 1.2,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    {
-      "symbol": "KSHINTL",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 950.8,
-      "ltp": 957.9,
-      "day_high": 963.7,
-      "day_low": 940.0,
-      "stop_loss": 874.74,
-      "risk_%": 8.0,
-      "clearance_%": 0.75,
-      "proj_vol_pace": 0.81,
-      "action": "CONFIRMED BREAKOUT"
-    },
-    {
-      "symbol": "BHARTIHEXA",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1695.5,
-      "ltp": 1710.0,
-      "day_high": 1719.6,
-      "day_low": 1680.7,
-      "stop_loss": 1559.86,
-      "risk_%": 8.0,
-      "clearance_%": 0.86,
-      "proj_vol_pace": 1.13,
+      "clearance_%": 4.59,
+      "proj_vol_pace": 19.98,
       "action": "CONFIRMED BREAKOUT"
     }
   ],
@@ -295,16 +267,7 @@
       "pivot_ceiling": 1695.5,
       "stop_loss": 1559.8600000000001,
       "shelf_spread_%": 7.92,
-      "added_date": "2026-11-03"
-    },
-    "ENTERO": {
-      "symbol": "ENTERO",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1609.5,
-      "stop_loss": 1480.74,
-      "shelf_spread_%": 12.23,
-      "added_date": "2026-11-03"
+      "added_date": "2026-11-04"
     },
     "CEIGALL": {
       "symbol": "CEIGALL",
@@ -313,25 +276,16 @@
       "pivot_ceiling": 400.0,
       "stop_loss": 368.0,
       "shelf_spread_%": 12.95,
-      "added_date": "2026-11-03"
+      "added_date": "2026-11-04"
     },
-    "MARKSANS": {
-      "symbol": "MARKSANS",
+    "YATHARTH": {
+      "symbol": "YATHARTH",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 318.8,
-      "stop_loss": 293.29600000000005,
-      "shelf_spread_%": 12.77,
-      "added_date": "2026-11-03"
-    },
-    "WINDLAS": {
-      "symbol": "WINDLAS",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 936.4,
-      "stop_loss": 861.488,
-      "shelf_spread_%": 9.14,
-      "added_date": "2026-11-03"
+      "pivot_ceiling": 999.7,
+      "stop_loss": 919.724,
+      "shelf_spread_%": 12.2,
+      "added_date": "2026-11-04"
     },
     "IIFLCAPS": {
       "symbol": "IIFLCAPS",
@@ -340,6 +294,69 @@
       "pivot_ceiling": 349.4,
       "stop_loss": 321.448,
       "shelf_spread_%": 4.88,
+      "added_date": "2026-11-04"
+    },
+    "MARKSANS": {
+      "symbol": "MARKSANS",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 318.8,
+      "stop_loss": 293.29600000000005,
+      "shelf_spread_%": 12.77,
+      "added_date": "2026-11-04"
+    },
+    "KPL": {
+      "symbol": "KPL",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 3729.0,
+      "stop_loss": 3430.6800000000003,
+      "shelf_spread_%": 12.48,
+      "added_date": "2026-11-04"
+    },
+    "ENTERO": {
+      "symbol": "ENTERO",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1609.5,
+      "stop_loss": 1480.74,
+      "shelf_spread_%": 12.23,
+      "added_date": "2026-11-04"
+    },
+    "PGIL": {
+      "symbol": "PGIL",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1302.4,
+      "stop_loss": 1198.208,
+      "shelf_spread_%": 11.97,
+      "added_date": "2026-11-04"
+    },
+    "SEDEMAC": {
+      "symbol": "SEDEMAC",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 3246.9,
+      "stop_loss": 2987.148,
+      "shelf_spread_%": 7.87,
+      "added_date": "2026-11-04"
+    },
+    "GALAXYSURF": {
+      "symbol": "GALAXYSURF",
+      "universe": "NON-N750",
+      "setup": "V-REVERSAL",
+      "pivot_ceiling": 2200.0,
+      "stop_loss": 2084.72,
+      "shelf_spread_%": 6.0,
+      "added_date": "2026-11-04"
+    },
+    "WINDLAS": {
+      "symbol": "WINDLAS",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 936.4,
+      "stop_loss": 861.488,
+      "shelf_spread_%": 9.14,
       "added_date": "2026-11-03"
     },
     "SEAMECLTD": {
@@ -377,15 +394,6 @@
       "stop_loss": 23.02,
       "shelf_spread_%": 6.0,
       "added_date": "2026-11-02"
-    },
-    "SEDEMAC": {
-      "symbol": "SEDEMAC",
-      "universe": "NON-N750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 3261.0,
-      "stop_loss": 3000.1200000000003,
-      "shelf_spread_%": 8.34,
-      "added_date": "2026-10-30"
     },
     "MBAPL": {
       "symbol": "MBAPL",
@@ -517,7 +525,7 @@
       "stop_loss": 874.74,
       "risk_%": 8.0,
       "clearance_%": -0.01,
-      "proj_vol_pace": 0.7,
+      "proj_vol_pace": 13.45,
       "action": "WICK REJECTED"
     },
     {
@@ -531,7 +539,7 @@
       "stop_loss": 321.45,
       "risk_%": 8.0,
       "clearance_%": -0.41,
-      "proj_vol_pace": 3.29,
+      "proj_vol_pace": 53.05,
       "action": "COILING"
     },
     {
@@ -545,7 +553,7 @@
       "stop_loss": 15640.0,
       "risk_%": 8.0,
       "clearance_%": -0.43,
-      "proj_vol_pace": 0.83,
+      "proj_vol_pace": 15.18,
       "action": "WICK REJECTED"
     },
     {
@@ -559,7 +567,7 @@
       "stop_loss": 368.0,
       "risk_%": 8.0,
       "clearance_%": -0.7,
-      "proj_vol_pace": 1.72,
+      "proj_vol_pace": 30.34,
       "action": "WICK REJECTED"
     },
     {
@@ -573,21 +581,21 @@
       "stop_loss": 293.3,
       "risk_%": 8.0,
       "clearance_%": -1.1,
-      "proj_vol_pace": 0.62,
+      "proj_vol_pace": 12.64,
       "action": "COILING"
     },
     {
       "symbol": "SEDEMAC",
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 3261.0,
+      "pivot_ceiling": 3246.9,
       "ltp": 3207.6,
       "day_high": 3228.0,
       "day_low": 3122.5,
-      "stop_loss": 3000.12,
+      "stop_loss": 2987.15,
       "risk_%": 8.0,
-      "clearance_%": -1.64,
-      "proj_vol_pace": 0.75,
+      "clearance_%": -1.21,
+      "proj_vol_pace": 14.22,
       "action": "COILING"
     },
     {
@@ -601,7 +609,7 @@
       "stop_loss": 1480.74,
       "risk_%": 8.0,
       "clearance_%": -1.75,
-      "proj_vol_pace": 0.55,
+      "proj_vol_pace": 10.28,
       "action": "COILING"
     },
     {
@@ -615,7 +623,21 @@
       "stop_loss": 23.02,
       "risk_%": 10.98,
       "clearance_%": -1.78,
-      "proj_vol_pace": 0.64,
+      "proj_vol_pace": 12.38,
+      "action": "WICK REJECTED"
+    },
+    {
+      "symbol": "YATHARTH",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 999.7,
+      "ltp": 981.85,
+      "day_high": 1003.2,
+      "day_low": 914.0,
+      "stop_loss": 919.72,
+      "risk_%": 8.0,
+      "clearance_%": -1.79,
+      "proj_vol_pace": 65.64,
       "action": "WICK REJECTED"
     },
     {
@@ -629,7 +651,35 @@
       "stop_loss": 3586.16,
       "risk_%": 8.0,
       "clearance_%": -2.36,
-      "proj_vol_pace": 0.43,
+      "proj_vol_pace": 8.22,
+      "action": "COILING"
+    },
+    {
+      "symbol": "KPL",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 3729.0,
+      "ltp": 3630.9,
+      "day_high": 3669.9,
+      "day_low": 3506.3,
+      "stop_loss": 3430.68,
+      "risk_%": 8.0,
+      "clearance_%": -2.63,
+      "proj_vol_pace": 11.84,
+      "action": "COILING"
+    },
+    {
+      "symbol": "PGIL",
+      "universe": "NON-N750",
+      "setup": "LAUNCHPAD COIL",
+      "pivot_ceiling": 1302.4,
+      "ltp": 1267.1,
+      "day_high": 1291.4,
+      "day_low": 1246.2,
+      "stop_loss": 1198.21,
+      "risk_%": 8.0,
+      "clearance_%": -2.71,
+      "proj_vol_pace": 13.83,
       "action": "COILING"
     },
     {
@@ -643,7 +693,7 @@
       "stop_loss": 888.63,
       "risk_%": 8.0,
       "clearance_%": -2.81,
-      "proj_vol_pace": 0.21,
+      "proj_vol_pace": 3.96,
       "action": "COILING"
     },
     {
@@ -657,7 +707,7 @@
       "stop_loss": 874.0,
       "risk_%": 8.0,
       "clearance_%": -3.34,
-      "proj_vol_pace": 0.37,
+      "proj_vol_pace": 6.85,
       "action": "WICK REJECTED"
     },
     {
@@ -671,7 +721,7 @@
       "stop_loss": 1522.6,
       "risk_%": 8.0,
       "clearance_%": -3.55,
-      "proj_vol_pace": 0.95,
+      "proj_vol_pace": 18.27,
       "action": "WICK REJECTED"
     },
     {
@@ -685,7 +735,7 @@
       "stop_loss": 186.41,
       "risk_%": 8.0,
       "clearance_%": -3.58,
-      "proj_vol_pace": 0.37,
+      "proj_vol_pace": 7.0,
       "action": "COILING"
     },
     {
@@ -699,7 +749,7 @@
       "stop_loss": 7033.86,
       "risk_%": 8.0,
       "clearance_%": -4.12,
-      "proj_vol_pace": 0.78,
+      "proj_vol_pace": 14.65,
       "action": "COILING"
     },
     {
@@ -713,7 +763,7 @@
       "stop_loss": 372.13,
       "risk_%": 10.55,
       "clearance_%": -4.27,
-      "proj_vol_pace": 0.4,
+      "proj_vol_pace": 7.47,
       "action": "COILING"
     },
     {
@@ -727,7 +777,7 @@
       "stop_loss": 761.76,
       "risk_%": 8.0,
       "clearance_%": -4.66,
-      "proj_vol_pace": 0.51,
+      "proj_vol_pace": 10.51,
       "action": "COILING"
     },
     {
@@ -741,7 +791,7 @@
       "stop_loss": 861.49,
       "risk_%": 8.0,
       "clearance_%": -6.07,
-      "proj_vol_pace": 0.43,
+      "proj_vol_pace": 8.27,
       "action": "COILING"
     }
   ]
