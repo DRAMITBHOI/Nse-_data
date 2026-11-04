@@ -104,7 +104,7 @@ def load_nifty_benchmark():
                     for _, r in df.iterrows():
                         res[str(r["time"])[:10]] = {
                             "perf_60d": float(r["perf_60d"]),
-                            "above_50ema": float(r["close"]) >= float(r["ema_50"])
+                            "above_50ema": float(r["close"]) >= float(r["ema_50"]),
                         }
                     return res
             except Exception:
@@ -133,19 +133,30 @@ def extract_v_reversals():
 
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     excluded = {
-        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
-        "fundamentals.json", "backtest_results.json", "swing_ultra750_results.json",
-        "swing_ultraN750_results.json", "live_intraday_breakouts.json",
-        "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json"
+        "nifty750.json",
+        "nifty50.json",
+        "nifty.json",
+        "NIFTY.json",
+        "NIFTY50.json",
+        "fundamentals.json",
+        "backtest_results.json",
+        "swing_ultra750_results.json",
+        "swing_ultraN750_results.json",
+        "live_intraday_breakouts.json",
+        "live_intraday_breakouts_v2.json",
+        "accuracy_audit_log.json",
+        "my_trades.json",
     }
 
     records = []
-    print(f"🔬 Extracting candidate V-Reversals across {len(json_files)} files...")
+    print(f"🔬 Extracting V-Reversals across ALL {len(json_files)} symbols (Nifty 750 + Non-N750)...")
 
     for path in sorted(json_files):
         sym = os.path.splitext(os.path.basename(path))[0].upper()
-        if sym in excluded or (n750_set and sym not in n750_set):
+        if sym in excluded:
             continue
+
+        is_n750 = 1 if (n750_set and sym in n750_set) else 0
 
         try:
             with open(path, "r", encoding="utf-8") as fp:
@@ -166,7 +177,10 @@ def extract_v_reversals():
 
             # ATR 14
             prev_close = df["close"].shift(1)
-            tr = pd.concat([df["high"] - df["low"], (df["high"] - prev_close).abs(), (df["low"] - prev_close).abs()], axis=1).max(axis=1)
+            tr = pd.concat(
+                [df["high"] - df["low"], (df["high"] - prev_close).abs(), (df["low"] - prev_close).abs()],
+                axis=1,
+            ).max(axis=1)
             df["atr_14"] = tr.rolling(14, min_periods=1).mean()
 
             c_range = df["high"] - df["low"]
@@ -174,9 +188,12 @@ def extract_v_reversals():
 
             # 12-day Distribution Count
             is_dist_day = (
-                (df["close"] < df["close"].shift(1)) &
-                ((df["delivery_vol"] >= 1.35 * df["deliv_sma20"]) | (df["deliv_pct"] >= 1.15 * df["deliv_pct_50d"])) &
-                (df["range_closeness"] <= 0.45)
+                (df["close"] < df["close"].shift(1))
+                & (
+                    (df["delivery_vol"] >= 1.35 * df["deliv_sma20"])
+                    | (df["deliv_pct"] >= 1.15 * df["deliv_pct_50d"])
+                )
+                & (df["range_closeness"] <= 0.45)
             ).astype(int)
             df["dist_count_12d"] = is_dist_day.rolling(12, min_periods=1).sum()
 
@@ -201,7 +218,6 @@ def extract_v_reversals():
             for i in range(50, len(df) - 45):
                 t = str(times[i])[:10]
                 c = closes[i]
-                h = highs[i]
                 l = lows[i]
                 v = volumes[i]
                 v_avg = vol_avgs[i]
@@ -209,43 +225,34 @@ def extract_v_reversals():
                 dv_avg = deliv_avgs[i]
                 sma200 = sma200s[i]
 
-                # Relaxed pre-filter: Minimum turnover >= ₹5 Cr and above/near 200 SMA
-                if to_50d[i] < 5.0 or (pd.notnull(sma200) and c < sma200 * 0.90):
+                # Relaxed pre-filter: Minimum turnover >= ₹2 Cr (to allow non-N750 liquidity) and above/near 200 SMA
+                if to_50d[i] < 2.0 or (pd.notnull(sma200) and c < sma200 * 0.90):
                     continue
 
                 # --- 1. CAPITULATION DEPTH CHECK ---
-                recent_20_h = highs[max(0, i - 20):i].max()
+                recent_20_h = highs[max(0, i - 20) : i].max()
                 if recent_20_h <= 0:
                     continue
                 drop_depth_pct = ((recent_20_h - l) / recent_20_h) * 100.0
 
-                # Capture candidate drops of >= 9% (relaxed from 18%)
+                # Capture candidate drops of >= 9%
                 if drop_depth_pct < 9.0:
                     continue
 
                 # --- 2. MULTI-HORIZON SWING RECLAIM CHECKS ---
-                prior_2d_h = highs[max(0, i - 2):i].max()
-                prior_3d_h = highs[max(0, i - 4):i].max()
-                prior_5d_h = highs[max(0, i - 6):i].max()
+                prior_2d_h = highs[max(0, i - 2) : i].max()
+                prior_3d_h = highs[max(0, i - 4) : i].max()
+                prior_5d_h = highs[max(0, i - 6) : i].max()
 
                 reclaims_2d = int(c >= prior_2d_h and c > closes[i - 1])
                 reclaims_3d = int(c >= prior_3d_h and c > closes[i - 1])
                 reclaims_5d = int(c >= prior_5d_h and c > closes[i - 1])
 
-                # Require at least the 2-day or 3-day swing high to be reclaimed
                 if not (reclaims_2d or reclaims_3d):
                     continue
 
-                # Standard entry reference: prior 3-day high (or close if higher)
                 entry_price = round(max(prior_3d_h, closes[i - 1]), 2)
-                
-                # Compare 3 Stop Loss Candidates:
-                sl_5d = round(lows[max(0, i - 5):i + 1].min() * 0.995, 2)
-                sl_3d = round(lows[max(0, i - 3):i + 1].min() * 0.995, 2)
-                sl_bar = round(l * 0.995, 2)
-
-                # Primary test uses 5-day structural low
-                sl_price = sl_5d
+                sl_price = round(lows[max(0, i - 5) : i + 1].min() * 0.995, 2)
                 r_dist = entry_price - sl_price
                 if r_dist <= 0 or (r_dist / entry_price) > 0.16:
                     continue
@@ -256,8 +263,7 @@ def extract_v_reversals():
                 deliv_vol_surge = round(dv / dv_avg, 2) if dv_avg > 0 else 1.0
                 deliv_pct_surge = round(deliv_pcts[i] / deliv_pct_avgs[i], 2) if deliv_pct_avgs[i] > 0 else 1.0
 
-                # Capitulation Low Signature (volume ratio at the lowest bar in drop)
-                drop_low_idx = max(0, i - 5) + int(np.argmin(lows[max(0, i - 5):i + 1]))
+                drop_low_idx = max(0, i - 5) + int(np.argmin(lows[max(0, i - 5) : i + 1]))
                 washout_vol_ratio = round(volumes[drop_low_idx] / vol_avgs[drop_low_idx], 2) if vol_avgs[drop_low_idx] > 0 else 1.0
 
                 # Relative Strength vs Nifty
@@ -269,17 +275,17 @@ def extract_v_reversals():
                 conv_score = round(deliv_vol_surge * max(0.1, 1.0 + rs_stock_nifty), 3)
 
                 # --- 4. FORWARD EXECUTION SIMULATION (UP TO 45 SESSIONS) ---
-                fwd_highs = highs[i + 1: i + 46]
-                fwd_lows = lows[i + 1: i + 46]
-                fwd_closes = closes[i + 1: i + 46]
-                fwd_opens = opens[i + 1: i + 46]
-                fwd_ema20 = ema20s[i + 1: i + 46]
-                fwd_vols = volumes[i + 1: i + 46]
-                fwd_v_avgs = vol_avgs[i + 1: i + 46]
-                fwd_dv = deliv_vols[i + 1: i + 46]
-                fwd_dv_avgs = deliv_avgs[i + 1: i + 46]
-                fwd_rc = range_closes[i + 1: i + 46]
-                fwd_dist12 = dist_12ds[i + 1: i + 46]
+                fwd_highs = highs[i + 1 : i + 46]
+                fwd_lows = lows[i + 1 : i + 46]
+                fwd_closes = closes[i + 1 : i + 46]
+                fwd_opens = opens[i + 1 : i + 46]
+                fwd_ema20 = ema20s[i + 1 : i + 46]
+                fwd_vols = volumes[i + 1 : i + 46]
+                fwd_v_avgs = vol_avgs[i + 1 : i + 46]
+                fwd_dv = deliv_vols[i + 1 : i + 46]
+                fwd_dv_avgs = deliv_avgs[i + 1 : i + 46]
+                fwd_rc = range_closes[i + 1 : i + 46]
+                fwd_dist12 = dist_12ds[i + 1 : i + 46]
 
                 mfe_pct = 0.0
                 mae_pct = 0.0
@@ -303,7 +309,6 @@ def extract_v_reversals():
                     if cur_drop < mae_pct:
                         mae_pct = cur_drop
 
-                    # Stop breach: overnight gap or intraday low touch
                     if cur_o < sl_price or cur_l <= sl_price:
                         if day_idx < 15 and hit_target_6pct_in_15 == 0:
                             stopped_out_before_target = 1
@@ -326,22 +331,29 @@ def extract_v_reversals():
                     peak_g = max(peak_g, c_gain)
 
                     if co < sl_price:
-                        pnl_exit22 = ((co - entry_price) / entry_price) * 100.0; break
+                        pnl_exit22 = ((co - entry_price) / entry_price) * 100.0
+                        break
                     elif cl <= sl_price:
-                        pnl_exit22 = ((sl_price - entry_price) / entry_price) * 100.0; break
+                        pnl_exit22 = ((sl_price - entry_price) / entry_price) * 100.0
+                        break
                     elif (fwd_dv[d] >= 2.0 * fwd_dv_avgs[d]) and (fwd_rc[d] <= 0.35) and (peak_g >= 20.0):
-                        pnl_exit22 = c_gain; break
+                        pnl_exit22 = c_gain
+                        break
                     elif (fwd_dist12[d] >= 3) and (cc < fwd_ema20[d]):
-                        pnl_exit22 = c_gain; break
+                        pnl_exit22 = c_gain
+                        break
                     elif peak_g >= 50.0 and cc < max(fwd_ema20[d], p_close * 0.85):
-                        pnl_exit22 = c_gain; break
+                        pnl_exit22 = c_gain
+                        break
                     elif cc < fwd_ema20[d]:
                         if (fwd_vols[d] >= 1.25 * fwd_v_avgs[d]) or (fwd_dv[d] >= 1.25 * fwd_dv_avgs[d]):
-                            pnl_exit22 = c_gain; break
+                            pnl_exit22 = c_gain
+                            break
                         else:
                             vdu_under += 1
                             if vdu_under > 5:
-                                pnl_exit22 = c_gain; break
+                                pnl_exit22 = c_gain
+                                break
                     if d == len(fwd_closes) - 1:
                         pnl_exit22 = c_gain
 
@@ -357,23 +369,36 @@ def extract_v_reversals():
                     if co < active_sl:
                         fill = co
                         ret = ((fill - entry_price) / entry_price) * 100.0
-                        pnl_staged = (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret) if t1_hit else ret
+                        pnl_staged = (
+                            (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret)
+                            if t1_hit
+                            else ret
+                        )
                         break
                     elif cl <= active_sl:
                         fill = active_sl
                         ret = ((fill - entry_price) / entry_price) * 100.0
-                        pnl_staged = (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret) if t1_hit else ret
+                        pnl_staged = (
+                            (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret)
+                            if t1_hit
+                            else ret
+                        )
                         break
                     elif t1_hit and cc < fwd_ema20[d]:
                         ret = ((cc - entry_price) / entry_price) * 100.0
-                        pnl_staged = (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret)
+                        pnl_staged = 0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret
                         break
                     if d == len(fwd_closes) - 1:
                         ret = ((cc - entry_price) / entry_price) * 100.0
-                        pnl_staged = (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret) if t1_hit else ret
+                        pnl_staged = (
+                            (0.5 * ((target_2r - entry_price) / entry_price) * 100.0 + 0.5 * ret)
+                            if t1_hit
+                            else ret
+                        )
 
                 records.append({
                     "symbol": sym,
+                    "is_n750": is_n750,
                     "trigger_date": t,
                     "entry_price": entry_price,
                     "sl_price": sl_price,
@@ -394,14 +419,19 @@ def extract_v_reversals():
                     "bar_of_max_gain": bar_of_max_gain,
                     "is_successful": is_successful,
                     "pnl_exit22": round(pnl_exit22, 2),
-                    "pnl_staged_2r": round(pnl_staged, 2)
+                    "pnl_staged_2r": round(pnl_staged, 2),
                 })
         except Exception:
             continue
 
     df_out = pd.DataFrame(records)
     df_out.to_csv(OUTPUT_CSV, index=False)
-    print(f"✅ V-Reversal Extraction Complete! Saved {len(df_out)} candidate setups to {OUTPUT_CSV}")
+    print(f"✅ V-Reversal Extraction Complete! Saved {len(df_out):,} setups to {OUTPUT_CSV}")
+    if "is_n750" in df_out.columns:
+        n750_c = int((df_out["is_n750"] == 1).sum())
+        non_n750_c = int((df_out["is_n750"] == 0).sum())
+        print(f"   • Nifty 750 setups: {n750_c:,}")
+        print(f"   • Non-Nifty 750 setups: {non_n750_c:,}")
 
 
 if __name__ == "__main__":
