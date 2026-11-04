@@ -1,26 +1,26 @@
 {
   "Date": "2026-11-04",
-  "Scan_Timestamp": "2026-11-04 03:03:50 PM IST",
-  "Elapsed_Minutes": 348,
+  "Scan_Timestamp": "2026-11-04 03:06:37 PM IST",
+  "Elapsed_Minutes": 351,
   "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "KOTAKBANK",
-    "BHARTIHEXA",
-    "GALAXYSURF",
-    "ADANIPORTS",
-    "MARKSANS",
     "CEIGALL",
+    "ADANIPORTS",
+    "GALAXYSURF",
+    "BHARTIHEXA",
+    "KOTAKBANK",
     "INDGN",
     "SAREGAMA",
     "PGIL",
-    "KDDL",
     "YATHARTH",
-    "KPL",
-    "DLF",
+    "MARKSANS",
     "LMW",
-    "MBAPL",
     "IIFLCAPS",
-    "ENTERO"
+    "DLF",
+    "MBAPL",
+    "ENTERO",
+    "KDDL",
+    "KPL"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -100,7 +100,7 @@
       "stop_loss": 558.81,
       "risk_%": 8.0,
       "clearance_%": 2.09,
-      "proj_vol_pace": 1.69,
+      "proj_vol_pace": 1.67,
       "action": "CONFIRMED BREAKOUT"
     },
     "SAREGAMA": {
@@ -114,7 +114,7 @@
       "stop_loss": 477.15,
       "risk_%": 9.63,
       "clearance_%": 20.08,
-      "proj_vol_pace": 58.7,
+      "proj_vol_pace": 57.83,
       "action": "CONFIRMED BREAKOUT"
     },
     "KOTAKBANK": {
@@ -136,13 +136,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 685.85,
-      "ltp": 719.0,
+      "ltp": 719.1,
       "day_high": 724.0,
       "day_low": 703.1,
       "stop_loss": 630.98,
       "risk_%": 8.0,
-      "clearance_%": 4.83,
-      "proj_vol_pace": 1.49,
+      "clearance_%": 4.85,
+      "proj_vol_pace": 1.47,
       "action": "CONFIRMED BREAKOUT"
     },
     "ADANIPORTS": {
@@ -150,13 +150,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1784.9,
-      "ltp": 1902.7,
+      "ltp": 1902.5,
       "day_high": 1921.3,
       "day_low": 1857.3,
       "stop_loss": 1642.11,
       "risk_%": 8.0,
-      "clearance_%": 6.6,
-      "proj_vol_pace": 1.35,
+      "clearance_%": 6.59,
+      "proj_vol_pace": 1.33,
       "action": "CONFIRMED BREAKOUT"
     },
     "YATHARTH": {
@@ -164,13 +164,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 999.7,
-      "ltp": 1028.9,
+      "ltp": 1026.65,
       "day_high": 1036.0,
       "day_low": 988.85,
       "stop_loss": 919.72,
       "risk_%": 8.0,
-      "clearance_%": 2.92,
-      "proj_vol_pace": 2.09,
+      "clearance_%": 2.7,
+      "proj_vol_pace": 2.05,
       "action": "CONFIRMED BREAKOUT"
     },
     "IIFLCAPS": {
@@ -192,13 +192,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1609.5,
-      "ltp": 1663.1,
+      "ltp": 1661.1,
       "day_high": 1665.4,
       "day_low": 1585.0,
       "stop_loss": 1480.74,
       "risk_%": 8.0,
-      "clearance_%": 3.33,
-      "proj_vol_pace": 1.32,
+      "clearance_%": 3.21,
+      "proj_vol_pace": 1.3,
       "action": "CONFIRMED BREAKOUT"
     },
     "MARKSANS": {
@@ -248,13 +248,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1302.4,
-      "ltp": 1326.9,
+      "ltp": 1327.0,
       "day_high": 1343.8,
       "day_low": 1255.0,
       "stop_loss": 1198.21,
       "risk_%": 8.0,
-      "clearance_%": 1.88,
-      "proj_vol_pace": 1.5,
+      "clearance_%": 1.89,
+      "proj_vol_pace": 1.48,
       "action": "CONFIRMED BREAKOUT"
     },
     "KPL": {
@@ -276,13 +276,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 400.0,
-      "ltp": 402.3,
+      "ltp": 403.5,
       "day_high": 405.9,
       "day_low": 392.3,
       "stop_loss": 368.0,
       "risk_%": 8.0,
-      "clearance_%": 0.58,
-      "proj_vol_pace": 1.58,
+      "clearance_%": 0.88,
+      "proj_vol_pace": 1.56,
       "action": "CONFIRMED BREAKOUT"
     }
   },
@@ -340,7 +340,7 @@
       "stop_loss": 558.81,
       "risk_%": 8.0,
       "clearance_%": 2.09,
-      "proj_vol_pace": 1.69,
+      "proj_vol_pace": 1.67,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -354,7 +354,7 @@
       "stop_loss": 477.15,
       "risk_%": 9.63,
       "clearance_%": 20.08,
-      "proj_vol_pace": 58.7,
+      "proj_vol_pace": 57.83,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -376,13 +376,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 685.85,
-      "ltp": 719.0,
+      "ltp": 719.1,
       "day_high": 724.0,
       "day_low": 703.1,
       "stop_loss": 630.98,
       "risk_%": 8.0,
-      "clearance_%": 4.83,
-      "proj_vol_pace": 1.49,
+      "clearance_%": 4.85,
+      "proj_vol_pace": 1.47,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -390,13 +390,13 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1784.9,
-      "ltp": 1902.7,
+      "ltp": 1902.5,
       "day_high": 1921.3,
       "day_low": 1857.3,
       "stop_loss": 1642.11,
       "risk_%": 8.0,
-      "clearance_%": 6.6,
-      "proj_vol_pace": 1.35,
+      "clearance_%": 6.59,
+      "proj_vol_pace": 1.33,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -404,13 +404,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 999.7,
-      "ltp": 1028.9,
+      "ltp": 1026.65,
       "day_high": 1036.0,
       "day_low": 988.85,
       "stop_loss": 919.72,
       "risk_%": 8.0,
-      "clearance_%": 2.92,
-      "proj_vol_pace": 2.09,
+      "clearance_%": 2.7,
+      "proj_vol_pace": 2.05,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -432,13 +432,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1609.5,
-      "ltp": 1663.1,
+      "ltp": 1661.1,
       "day_high": 1665.4,
       "day_low": 1585.0,
       "stop_loss": 1480.74,
       "risk_%": 8.0,
-      "clearance_%": 3.33,
-      "proj_vol_pace": 1.32,
+      "clearance_%": 3.21,
+      "proj_vol_pace": 1.3,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -488,13 +488,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 1302.4,
-      "ltp": 1326.9,
+      "ltp": 1327.0,
       "day_high": 1343.8,
       "day_low": 1255.0,
       "stop_loss": 1198.21,
       "risk_%": 8.0,
-      "clearance_%": 1.88,
-      "proj_vol_pace": 1.5,
+      "clearance_%": 1.89,
+      "proj_vol_pace": 1.48,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -516,13 +516,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 400.0,
-      "ltp": 402.3,
+      "ltp": 403.5,
       "day_high": 405.9,
       "day_low": 392.3,
       "stop_loss": 368.0,
       "risk_%": 8.0,
-      "clearance_%": 0.58,
-      "proj_vol_pace": 1.58,
+      "clearance_%": 0.88,
+      "proj_vol_pace": 1.56,
       "action": "CONFIRMED BREAKOUT"
     }
   ],
@@ -768,13 +768,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 3729.0,
-      "ltp": 3729.0,
+      "ltp": 3732.8,
       "day_high": 3783.0,
       "day_low": 3583.1,
       "stop_loss": 3430.68,
       "risk_%": 8.0,
-      "clearance_%": 0.0,
-      "proj_vol_pace": 1.16,
+      "clearance_%": 0.1,
+      "proj_vol_pace": 1.14,
       "action": "WICK REJECTED"
     },
     {
@@ -788,7 +788,7 @@
       "stop_loss": 321.45,
       "risk_%": 8.0,
       "clearance_%": -0.1,
-      "proj_vol_pace": 0.73,
+      "proj_vol_pace": 0.72,
       "action": "WICK REJECTED"
     },
     {
@@ -802,7 +802,7 @@
       "stop_loss": 3586.16,
       "risk_%": 8.0,
       "clearance_%": -0.14,
-      "proj_vol_pace": 1.1,
+      "proj_vol_pace": 1.08,
       "action": "WICK REJECTED"
     },
     {
@@ -816,7 +816,7 @@
       "stop_loss": 372.13,
       "risk_%": 10.55,
       "clearance_%": -2.24,
-      "proj_vol_pace": 0.56,
+      "proj_vol_pace": 0.55,
       "action": "COILING"
     },
     {
@@ -838,13 +838,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 950.0,
-      "ltp": 923.0,
+      "ltp": 923.3,
       "day_high": 947.3,
       "day_low": 903.05,
       "stop_loss": 874.0,
       "risk_%": 8.0,
-      "clearance_%": -2.84,
-      "proj_vol_pace": 0.5,
+      "clearance_%": -2.81,
+      "proj_vol_pace": 0.49,
       "action": "COILING"
     },
     {
@@ -858,7 +858,7 @@
       "stop_loss": 7033.86,
       "risk_%": 8.0,
       "clearance_%": -3.35,
-      "proj_vol_pace": 0.81,
+      "proj_vol_pace": 0.8,
       "action": "COILING"
     },
     {
@@ -866,13 +866,13 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 3246.9,
-      "ltp": 3100.0,
+      "ltp": 3098.8,
       "day_high": 3111.0,
       "day_low": 2910.0,
       "stop_loss": 2987.15,
       "risk_%": 8.0,
-      "clearance_%": -4.52,
-      "proj_vol_pace": 3.47,
+      "clearance_%": -4.56,
+      "proj_vol_pace": 3.42,
       "action": "COILING"
     },
     {
@@ -886,7 +886,7 @@
       "stop_loss": 186.41,
       "risk_%": 8.0,
       "clearance_%": -4.67,
-      "proj_vol_pace": 0.52,
+      "proj_vol_pace": 0.51,
       "action": "COILING"
     },
     {
@@ -900,7 +900,7 @@
       "stop_loss": 293.3,
       "risk_%": 8.0,
       "clearance_%": -5.05,
-      "proj_vol_pace": 5.48,
+      "proj_vol_pace": 5.39,
       "action": "WICK REJECTED"
     },
     {
@@ -908,12 +908,12 @@
       "universe": "NON-N750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 936.4,
-      "ltp": 874.9,
+      "ltp": 874.6,
       "day_high": 889.3,
       "day_low": 867.55,
       "stop_loss": 861.49,
       "risk_%": 8.0,
-      "clearance_%": -6.57,
+      "clearance_%": -6.6,
       "proj_vol_pace": 0.5,
       "action": "COILING"
     }
