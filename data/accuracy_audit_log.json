@@ -1,31 +1,30 @@
 {
-  "Last_Updated": "2026-11-04 20:36:39 IST",
-  "Total_Sessions_Audited": 10,
-  "Latest_Session_Date": "2026-11-04",
+  "Last_Updated": "2026-11-05 13:39:26 IST",
+  "Total_Sessions_Audited": 11,
+  "Latest_Session_Date": "2026-11-05",
   "Latest_Ground_Truth": [
-    "VINCOFE",
-    "FCL",
-    "WELENT",
-    "PARAGMILK"
+    "MUFIN",
+    "BIRLACABLE",
+    "NIFTYBEES"
   ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 0,
-      "FN (Missed)": 4,
+      "FN (Missed)": 3,
       "FP (Fakeouts)": 4,
-      "TN (Quiet)": 5,
+      "TN (Quiet)": 13,
       "TPR (Sensitivity)": "0.0%",
       "FNR (Miss Rate)": "100.0%",
-      "FPR (Fallout)": "44.4%",
-      "TNR (Specificity)": "55.6%"
+      "FPR (Fallout)": "23.5%",
+      "TNR (Specificity)": "76.5%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
       "TP (Caught)": 0,
-      "FN (Missed)": 4,
+      "FN (Missed)": 3,
       "FP (Fakeouts)": 0,
-      "TN (Quiet)": 9,
+      "TN (Quiet)": 17,
       "TPR (Sensitivity)": "0.0%",
       "FNR (Miss Rate)": "100.0%",
       "FPR (Fallout)": "0.0%",
@@ -35,19 +34,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 1,
-      "Total_FN": 11,
-      "Total_FP": 11,
-      "Total_TN": 85,
-      "Cumulative_TPR": "8.3%",
-      "Cumulative_FNR": "91.7%",
-      "Cumulative_FPR": "11.5%",
-      "Cumulative_TNR": "88.5%"
+      "Total_FN": 14,
+      "Total_FP": 15,
+      "Total_TN": 98,
+      "Cumulative_TPR": "6.7%",
+      "Cumulative_FNR": "93.3%",
+      "Cumulative_FPR": "13.3%",
+      "Cumulative_TNR": "86.7%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 12,
+      "Total_FN": 15,
       "Total_FP": 0,
-      "Total_TN": 96,
+      "Total_TN": 113,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -319,6 +318,35 @@
         "fn": 4,
         "fp": 0,
         "tn": 9,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-05",
+      "ground_truth_count": 3,
+      "ground_truth_symbols": [
+        "MUFIN",
+        "BIRLACABLE",
+        "NIFTYBEES"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 4,
+        "tn": 13,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 23.5,
+        "tnr": 76.5
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 17,
         "tpr": 0.0,
         "fnr": 100.0,
         "fpr": 0.0,
