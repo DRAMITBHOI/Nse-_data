@@ -1,32 +1,13 @@
 {
   "Date": "2026-11-06",
-  "Scan_Timestamp": "2026-11-06 02:07:25 PM IST",
-  "Elapsed_Minutes": 292,
+  "Scan_Timestamp": "2026-11-06 02:12:09 PM IST",
+  "Elapsed_Minutes": 297,
   "Nifty50_Intraday_%": 0.0,
   "Consecutive_Hits": {
-    "AXISBANK": 4,
     "IIFLCAPS": 0,
     "CASTROLIND": 0
   },
-  "Breakouts_All_Day": [
-    {
-      "symbol": "AXISBANK",
-      "universe": "NIFTY 750",
-      "setup": "LAUNCHPAD COIL",
-      "pivot_ceiling": 1293.8,
-      "ltp": 1304.6,
-      "day_high": 1304.9,
-      "day_low": 1272.1,
-      "stop_loss": 1190.3,
-      "risk_%": 8.76,
-      "shelf_spread_%": 6.46,
-      "clearance_%": 0.83,
-      "drop_from_high_%": 0.02,
-      "proj_vol_pace": 1.25,
-      "consecutive_ticks": 4,
-      "action": "RADAR PIVOT CLEARANCE"
-    }
-  ],
+  "Breakouts_All_Day": [],
   "Coiling": [
     {
       "symbol": "IIFLCAPS",
@@ -41,7 +22,7 @@
       "shelf_spread_%": 2.28,
       "clearance_%": -0.06,
       "drop_from_high_%": 0.29,
-      "proj_vol_pace": 0.63,
+      "proj_vol_pace": 0.62,
       "consecutive_ticks": 0,
       "action": "WICK TESTING"
     },
@@ -50,15 +31,15 @@
       "universe": "NIFTY 750",
       "setup": "LAUNCHPAD COIL",
       "pivot_ceiling": 201.25,
-      "ltp": 191.06,
+      "ltp": 191.11,
       "day_high": 194.8,
       "day_low": 190.0,
       "stop_loss": 185.15,
-      "risk_%": 3.09,
+      "risk_%": 3.12,
       "shelf_spread_%": 4.38,
-      "clearance_%": -5.06,
-      "drop_from_high_%": 1.92,
-      "proj_vol_pace": 2.98,
+      "clearance_%": -5.04,
+      "drop_from_high_%": 1.89,
+      "proj_vol_pace": 2.94,
       "consecutive_ticks": 0,
       "action": "COILING"
     }
