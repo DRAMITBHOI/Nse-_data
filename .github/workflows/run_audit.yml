@@ -1,0 +1,33 @@
+name: Run Full Gap-Down Audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install pandas numpy
+
+      - name: Execute Full Gap-Down Audit
+        run: python gap_down_audit.py
+
+      - name: Commit & Push Audit Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add gap_down_audit_results.json
+          git commit -m "Complete Universe Gap-Down Audit Results [skip ci]" || echo "No changes"
+          git push origin main
