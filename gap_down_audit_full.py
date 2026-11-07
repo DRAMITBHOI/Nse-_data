@@ -1,0 +1,549 @@
+import os
+import glob
+import json
+import time
+import base64
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+import numpy as np
+import pandas as pd
+from datetime import datetime
+
+DATA_DIR = "data"
+AUDIT_RESULTS_OUT = "gap_down_audit_full_results.json"
+GITHUB_USER = "DRAMITBHOI"
+GITHUB_REPO = "Nse-_data"
+BRANCH = "main"
+GITHUB_TOKEN = "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"
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+
+def sync_all_symbols_from_github():
+    """
+    Checks if local data/ has the full universe (1,800+ JSONs).
+    If only a partial set exists (e.g. 99 files), fetches the GitHub Git Tree
+    and downloads all missing stock JSON files via high-speed parallel workers.
+    """
+    local_files = {f.upper() for f in os.listdir(DATA_DIR) if f.endswith(".json")}
+    print(f"📁 Local 'data/' folder currently contains {len(local_files)} JSON files.")
+
+    # Fetch Git Tree to get the full list of files in DRAMITBHOI/Nse-_data/data
+    tree_url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/git/trees/{BRANCH}?recursive=1"
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "FullAuditWorker",
+    }
+    try:
+        req = urllib.request.Request(tree_url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            tree_data = json.loads(resp.read().decode("utf-8"))
+        
+        all_remote_files = [
+            item["path"] for item in tree_data.get("tree", [])
+            if item["path"].startswith("data/") and item["path"].endswith(".json")
+        ]
+        print(f"🌐 Remote GitHub repository contains {len(all_remote_files)} data JSON files.")
+        
+        missing = [
+            p for p in all_remote_files 
+            if os.path.basename(p).upper() not in local_files
+        ]
+        
+        if missing:
+            print(f"⚡ Downloading {len(missing)} missing symbol files in parallel (16 threads)...")
+            def download_file(rel_path):
+                filename = os.path.basename(rel_path)
+                save_path = os.path.join(DATA_DIR, filename)
+                raw_url = f"https://raw.githubusercontent.com/{GITHUB_USER}/{GITHUB_REPO}/{BRANCH}/{rel_path}"
+                try:
+                    r = urllib.request.Request(raw_url, headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(r, timeout=10) as s_resp:
+                        content = s_resp.read()
+                    with open(save_path, "wb") as fp:
+                        fp.write(content)
+                    return True
+                except Exception:
+                    return False
+
+            with ThreadPoolExecutor(max_workers=16) as executor:
+                results = list(executor.map(download_file, missing))
+            print(f"✅ Successfully downloaded {sum(results)} / {len(missing)} symbols.")
+        else:
+            print("✅ All remote symbols are already present locally.")
+    except Exception as e:
+        print(f"ℹ Git tree sync skipped or failed ({e}). Proceeding with available files.")
+
+
+def clean_and_prepare(raw_data):
+    if not raw_data or not isinstance(raw_data, list):
+        return []
+    date_map = {}
+    for r in raw_data:
+        if not isinstance(r, dict):
+            continue
+        raw_t = str(r.get("time", "")).strip()
+        if not raw_t:
+            continue
+        d_str = raw_t[:10]
+        try:
+            c = float(r.get("close", 0) or 0)
+            if c <= 0:
+                continue
+            entry = {
+                "time": d_str,
+                "open": float(r.get("open", c) or c),
+                "high": float(r.get("high", c) or c),
+                "low": float(r.get("low", c) or c),
+                "close": c,
+                "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                "volume": float(r.get("volume", 0) or 0),
+                "deliv_pct": float(r.get("deliv_pct", 0) or 0),
+            }
+            if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                date_map[d_str] = entry
+        except Exception:
+            continue
+
+    clean = [date_map[k] for k in sorted(date_map.keys())]
+
+    known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
+    for i in range(len(clean) - 1, 0, -1):
+        prev_c = clean[i - 1]["close"]
+        curr_o = clean[i]["open"]
+        if prev_c > 0 and curr_o > 0:
+            ratio = prev_c / curr_o
+            adj_factor = None
+            if ratio >= 1.35:
+                for k in known_multipliers:
+                    if abs(ratio - k) / k < 0.15:
+                        adj_factor = k
+                        break
+                if not adj_factor and 1.70 <= ratio <= 2.30:
+                    adj_factor = 2.0
+                elif not adj_factor and 4.30 <= ratio <= 5.50:
+                    adj_factor = 5.0
+                elif not adj_factor and 8.50 <= ratio <= 11.50:
+                    adj_factor = 10.0
+            if adj_factor:
+                for j in range(0, i):
+                    clean[j]["open"] = round(clean[j]["open"] / adj_factor, 2)
+                    clean[j]["high"] = round(clean[j]["high"] / adj_factor, 2)
+                    clean[j]["low"] = round(clean[j]["low"] / adj_factor, 2)
+                    clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
+                    clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
+                    clean[j]["volume"] = clean[j]["volume"] * adj_factor
+
+    running_vol = 50000.0
+    for i in range(len(clean)):
+        v = clean[i]["volume"]
+        dv = clean[i]["delivery_vol"]
+        pct = clean[i]["deliv_pct"]
+        if v > 0:
+            running_vol = 0.9 * running_vol + 0.1 * v
+        else:
+            clean[i]["volume"] = running_vol
+            v = running_vol
+        if dv <= 0:
+            clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
+            clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
+        elif dv > v:
+            clean[i]["delivery_vol"] = v
+            clean[i]["deliv_pct"] = 100.0
+
+    return clean
+
+
+def load_nifty_benchmark():
+    for f in ["nifty.json", "nifty50.json", "NIFTY.json", "NIFTY50.json"]:
+        p = os.path.join(DATA_DIR, f)
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as fp:
+                    raw = json.load(fp)
+                clean = clean_and_prepare(raw)
+                if len(clean) > 50:
+                    df = pd.DataFrame(clean)
+                    df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+                    return {str(r["time"])[:10]: float(r["perf_60d"]) for _, r in df.iterrows()}
+            except Exception:
+                continue
+    return {}
+
+
+def load_nifty750_symbols():
+    p = os.path.join(DATA_DIR, "nifty750.json")
+    if os.path.exists(p):
+        try:
+            with open(p, "r", encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, list):
+                return {str(x).strip().upper() for x in data}
+            if isinstance(data, dict):
+                return {str(x).strip().upper() for x in data.keys()}
+        except Exception:
+            pass
+    return set()
+
+
+def run_full_gap_down_audit():
+    print("=" * 80)
+    print("🔬 RUNNING FULL UNIVERSE GAP-DOWN AUDIT (COMBINATION 7)")
+    print("=" * 80)
+
+    # Step 1: Ensure full database is synced locally
+    sync_all_symbols_from_github()
+
+    nifty_perf_map = load_nifty_benchmark()
+    nifty_dates = sorted(nifty_perf_map.keys())
+    n750_set = load_nifty750_symbols()
+
+    json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+    excluded = {
+        "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+        "fundamentals.json", "backtest_results.json", "swing_ultra750_results.json",
+        "swing_ultraN750_results.json", "live_intraday_breakouts.json",
+        "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json",
+        "gap_down_audit_results.json", "gap_down_audit_full_results.json"
+    }
+
+    target_files = [p for p in sorted(json_files) if os.path.basename(p) not in excluded]
+    print(f"📊 Auditing {len(target_files)} symbols...")
+
+    gap_events = []
+    total_trades_evaluated = 0
+
+    for idx, path in enumerate(target_files):
+        sym = os.path.splitext(os.path.basename(path))[0].upper()
+        if (idx + 1) % 250 == 0:
+            print(f"  ...processed {idx + 1}/{len(target_files)} symbols ({total_trades_evaluated} trades found so far)")
+        try:
+            with open(path, "r", encoding="utf-8") as fp:
+                raw = json.load(fp)
+            clean = clean_and_prepare(raw)
+            if len(clean) < 60:
+                continue
+
+            df = pd.DataFrame(clean)
+            df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
+            df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
+            df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+            df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
+            df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean().fillna(35.0)
+            df["ema_10"] = df["close"].ewm(span=10, adjust=False).mean()
+            df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
+            df["ema_50"] = df["close"].ewm(span=50, adjust=False).mean()
+            df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
+            df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+
+            # ATR 14
+            prev_close = df["close"].shift(1)
+            tr = pd.concat([df["high"] - df["low"], (df["high"] - prev_close).abs(), (df["low"] - prev_close).abs()], axis=1).max(axis=1)
+            df["atr_14"] = tr.rolling(14, min_periods=1).mean()
+
+            c_range = df["high"] - df["low"]
+            df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
+
+            highs = df["high"].values
+            lows = df["low"].values
+            opens = df["open"].values
+            closes = df["close"].values
+            volumes = df["volume"].values
+            vol_avgs = df["gross_vol_sma20"].values
+            deliv_vols = df["delivery_vol"].values
+            deliv_avgs = df["deliv_sma20"].values
+            deliv_pcts = df["deliv_pct"].values
+            deliv_pct_avgs = df["deliv_pct_50d"].values
+            to_50d = df["turnover_50d"].values
+            range_closes = df["range_closeness"].values
+            ema10s = df["ema_10"].values
+            ema20s = df["ema_20"].values
+            ema50s = df["ema_50"].values
+            sma200s = df["sma_200"].values
+            perf_60s = df["perf_60d"].values
+            atr14s = df["atr_14"].values
+            times = df["time"].values
+
+            is_n750 = sym in n750_set
+            min_turnover = 10.0 if is_n750 else 5.0
+            base_spread_min = 6.0 if is_n750 else 8.0
+            base_spread_max = 12.0 if is_n750 else 18.0
+            vdu_thresh = 0.45 if is_n750 else 0.42
+            prox_max = 0.028 if is_n750 else 0.030
+            vr_drop_min = 14.5 if is_n750 else 16.0
+            vr_drop_max = 25.0 if is_n750 else 28.0
+            vr_rc_min = 0.80 if is_n750 else 0.78
+            vr_deliv_min = 1.15 if is_n750 else 1.20
+
+            in_trade = False
+            entry_p = 0.0
+            calc_sl = 0.0
+            active_stop = 0.0
+            entry_d = ""
+            entry_idx = 0
+            trade_setup = ""
+            hit_milestone = False
+            t1_target_p = 0.0
+
+            for i in range(40, len(df)):
+                t = str(times[i])[:10]
+                o = opens[i]
+                c = closes[i]
+                h = highs[i]
+                l = lows[i]
+                v = volumes[i]
+                v_avg = vol_avgs[i]
+                dv = deliv_vols[i]
+                dv_avg = deliv_avgs[i]
+                rc = range_closes[i]
+                ema20 = ema20s[i]
+                ema50 = ema50s[i]
+                atr = atr14s[i]
+
+                if in_trade:
+                    # DETECT GAP-DOWN EVENT AT 9:15 AM
+                    if o < active_stop:
+                        gap_depth_pct = round(((active_stop - o) / active_stop) * 100.0, 2)
+                        prev_c = closes[i - 1]
+                        gap_from_prev_c_pct = round(((prev_c - o) / prev_c) * 100.0, 2)
+                        
+                        is_reclaim = bool(c >= active_stop)
+                        intraday_slippage_pct = round(((c - o) / o) * 100.0, 2)
+                        intraday_worst_low_pct = round(((l - o) / o) * 100.0, 2)
+                        held_above_50ema = bool(o >= ema50)
+
+                        gap_events.append({
+                            "symbol": sym,
+                            "universe": "NIFTY 750" if is_n750 else "NON-N750",
+                            "date": t,
+                            "setup": trade_setup,
+                            "phase": "POST_1.5R_RUNNER" if hit_milestone else "PRE_1.5R_INITIAL_SL",
+                            "entry_price": entry_p,
+                            "active_stop": active_stop,
+                            "open_price": o,
+                            "close_price": c,
+                            "low_price": l,
+                            "gap_depth_pct": gap_depth_pct,
+                            "gap_from_prev_c_pct": gap_from_prev_c_pct,
+                            "is_reclaim": is_reclaim,
+                            "held_above_50ema": held_above_50ema,
+                            "intraday_close_vs_open_pct": intraday_slippage_pct,
+                            "intraday_worst_vs_open_pct": intraday_worst_low_pct,
+                        })
+
+                        in_trade = False
+                        continue
+
+                    # Standard trade execution
+                    if not hit_milestone and l <= active_stop:
+                        in_trade = False
+                        continue
+                    else:
+                        if not hit_milestone and h >= t1_target_p:
+                            hit_milestone = True
+                            active_stop = max(active_stop, round(entry_p * 1.005, 2))
+                        if hit_milestone:
+                            active_stop = max(active_stop, ema20)
+                            if c < ema20:
+                                in_trade = False
+                                continue
+
+                # Entry evaluation
+                if to_50d[i] < min_turnover:
+                    continue
+
+                sma200 = sma200s[i]
+                is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
+                n_perf = nifty_perf_map.get(t)
+                if n_perf is None:
+                    p_dates = [d for d in nifty_dates if d <= t]
+                    n_perf = nifty_perf_map[p_dates[-1]] if p_dates else 0.001
+                is_rs = bool(perf_60s[i] > n_perf)
+
+                if not (is_stage2 and is_rs):
+                    continue
+
+                entry_triggered = False
+                c_entry = 0.0
+                c_sl = 0.0
+                c_setup = ""
+
+                # V-Reversal
+                recent_20_h = highs[max(0, i - 20) : i].max()
+                if recent_20_h > 0:
+                    drop_depth = ((recent_20_h - l) / recent_20_h) * 100.0
+                    if vr_drop_min <= drop_depth <= vr_drop_max:
+                        prior_3d_h = highs[max(0, i - 3) : i].max()
+                        prior_3d_l = lows[max(0, i - 3) : i].min()
+                        c_reclaim = (c >= prior_3d_h) and (c > closes[i - 1])
+                        c_deliv_rev = (dv >= vr_deliv_min * dv_avg) or (deliv_pcts[i] >= 1.15 * deliv_pct_avgs[i])
+                        c_candle_rev = rc >= vr_rc_min
+
+                        if c_reclaim and c_deliv_rev and c_candle_rev:
+                            v_sl = round(prior_3d_l * 0.995, 2)
+                            v_risk = ((prior_3d_h - v_sl) / prior_3d_h) * 100.0
+                            if 0.5 <= v_risk <= 5.0:
+                                entry_triggered = True
+                                c_entry = round(prior_3d_h + 0.05, 2)
+                                c_sl = v_sl
+                                c_setup = "V-REVERSAL"
+
+                # Cheat Entry
+                if not entry_triggered:
+                    for shelf_len in range(10, 19):
+                        s_h = highs[max(0, i - shelf_len) : i].max()
+                        s_l = lows[max(0, i - shelf_len) : i].min()
+                        spread = ((s_h - s_l) / s_l) * 100.0 if s_l > 0 else 99.0
+                        if s_l > 0 and (base_spread_min <= spread <= base_spread_max):
+                            base_df_vols = volumes[max(0, i - 15) : i]
+                            lowest_5d_vol = pd.Series(base_df_vols).rolling(5, min_periods=1).mean().min() if len(base_df_vols) > 0 else v_avg
+                            vdu_ok = (lowest_5d_vol / v_avg <= vdu_thresh) if v_avg > 0 else False
+
+                            prev_h = highs[i - 1]
+                            prev_l = lows[i - 1]
+                            prev_range = prev_h - prev_l
+                            prev_atr = atr14s[i - 1]
+                            cheat_candle_ok = (prev_atr > 0) and (prev_range / prev_atr <= 0.65)
+                            prox = (s_h - closes[i - 1]) / s_h if s_h > 0 else 1.0
+                            prox_ok = 0.010 <= prox <= prox_max
+                            above_10ema = closes[i - 1] >= ema10s[i - 1]
+
+                            if vdu_ok and cheat_candle_ok and prox_ok and above_10ema:
+                                cheat_entry = round(prev_h + 0.05, 2)
+                                cheat_sl = round(prev_l * 0.995, 2)
+                                compressed_risk = ((cheat_entry - cheat_sl) / cheat_entry) * 100.0
+                                if (h >= cheat_entry) and (0.5 <= compressed_risk <= 4.5):
+                                    entry_triggered = True
+                                    c_entry = cheat_entry
+                                    c_sl = cheat_sl
+                                    c_setup = "CHEAT BREAKOUT"
+                                    break
+
+                if entry_triggered:
+                    r_dist = c_entry - c_sl
+                    risk_pct = (r_dist / c_entry) * 100.0
+                    deliv_surge = dv / dv_avg if dv_avg > 0 else 1.0
+                    rs_ratio = (perf_60s[i] / n_perf) if n_perf > 0 else (1.0 + abs(perf_60s[i]))
+                    conv_score = round(deliv_surge * max(0.1, rs_ratio), 3)
+
+                    if is_n750 and c_setup == "CHEAT BREAKOUT" and conv_score < 2.30:
+                        continue
+
+                    total_trades_evaluated += 1
+                    in_trade = True
+                    entry_p = c_entry
+                    calc_sl = c_sl
+                    active_stop = c_sl
+                    trade_setup = c_setup
+                    hit_milestone = False
+                    t1_pct = min(1.5 * risk_pct, 6.0)
+                    t1_target_p = round(entry_p * (1.0 + t1_pct / 100.0), 2)
+        except Exception:
+            continue
+
+    total_gaps = len(gap_events)
+    if total_gaps == 0:
+        print("⚠ No gap-down events detected in dataset.")
+        return
+
+    df_gaps = pd.DataFrame(gap_events)
+    reclaims = df_gaps[df_gaps["is_reclaim"] == True]
+    breakdowns = df_gaps[df_gaps["is_reclaim"] == False]
+
+    overall_reclaim_pct = round((len(reclaims) / total_gaps) * 100.0, 1)
+    overall_breakdown_pct = round((len(breakdowns) / total_gaps) * 100.0, 1)
+
+    shallow = df_gaps[df_gaps["gap_depth_pct"] <= 1.5]
+    moderate = df_gaps[(df_gaps["gap_depth_pct"] > 1.5) & (df_gaps["gap_depth_pct"] <= 3.0)]
+    severe = df_gaps[df_gaps["gap_depth_pct"] > 3.0]
+
+    held_50 = df_gaps[df_gaps["held_above_50ema"] == True]
+    broke_50 = df_gaps[df_gaps["held_above_50ema"] == False]
+
+    pre_15r = df_gaps[df_gaps["phase"] == "PRE_1.5R_INITIAL_SL"]
+    post_15r = df_gaps[df_gaps["phase"] == "POST_1.5R_RUNNER"]
+
+    def calc_stats(sub_df):
+        n = len(sub_df)
+        if n == 0:
+            return {"count": 0, "shakeout_pct": 0, "breakdown_pct": 0, "avg_further_loss": 0}
+        rec = sub_df[sub_df["is_reclaim"] == True]
+        brk = sub_df[sub_df["is_reclaim"] == False]
+        avg_further = brk["intraday_close_vs_open_pct"].mean() if len(brk) > 0 else 0.0
+        return {
+            "count": n,
+            "shakeout_pct": round((len(rec) / n) * 100.0, 1),
+            "breakdown_pct": round((len(brk) / n) * 100.0, 1),
+            "avg_further_loss": round(avg_further, 2)
+        }
+
+    stats_shallow = calc_stats(shallow)
+    stats_moderate = calc_stats(moderate)
+    stats_severe = calc_stats(severe)
+    stats_held50 = calc_stats(held_50)
+    stats_broke50 = calc_stats(broke_50)
+    stats_pre15r = calc_stats(pre_15r)
+    stats_post15r = calc_stats(post_15r)
+
+    print("\n" + "=" * 80)
+    print("📈 COMPLETE NSE UNIVERSE GAP-DOWN AUDIT RESULTS")
+    print("=" * 80)
+    print(f"Total Combination 7 Trades Evaluated: {total_trades_evaluated:,}")
+    print(f"Total Gap-Down Sessions (Open < Stop): {total_gaps:,} ({round(total_gaps / max(1, total_trades_evaluated) * 100, 1)}% of trades)")
+    print("-" * 80)
+    print(f"• True Structural Breakdowns (Cascaded / Closed < Stop): {len(breakdowns):,} ({overall_breakdown_pct}%)")
+    print(f"• Institutional Shakeouts (Reclaimed / Closed >= Stop):  {len(reclaims):,} ({overall_reclaim_pct}%)")
+    print(f"• Average Additional Damage on Unreclaimed Breakdowns:   {breakdowns['intraday_close_vs_open_pct'].mean():.2f}% below open")
+    print(f"• Worst-Case Intraday Plummet on Breakdowns:             {breakdowns['intraday_worst_vs_open_pct'].min():.2f}%")
+    print("=" * 80)
+
+    print("\n📊 MATRIX 1: GAP-DOWN DEPTH (How deep did it gap past the stop?)")
+    print(f"  [Shallow Gap: <= 1.5% Below Stop]  -> Count: {stats_shallow['count']:,} | Shakeout: {stats_shallow['shakeout_pct']}% | Breakdown: {stats_shallow['breakdown_pct']}% | Avg Further Loss: {stats_shallow['avg_further_loss']}%")
+    print(f"  [Moderate Gap: 1.5% to 3.0%]       -> Count: {stats_moderate['count']:,} | Shakeout: {stats_moderate['shakeout_pct']}% | Breakdown: {stats_moderate['breakdown_pct']}% | Avg Further Loss: {stats_moderate['avg_further_loss']}%")
+    print(f"  [Severe Gap: > 3.0% Below Stop]    -> Count: {stats_severe['count']:,} | Shakeout: {stats_severe['shakeout_pct']}% | Breakdown: {stats_severe['breakdown_pct']}% | Avg Further Loss: {stats_severe['avg_further_loss']}%")
+
+    print("\n📊 MATRIX 2: PRIMARY TREND INTEGRITY (Did the open hold above Daily 50 EMA?)")
+    print(f"  [Held >= Daily 50 EMA at Open]     -> Count: {stats_held50['count']:,} | Shakeout: {stats_held50['shakeout_pct']}% | Breakdown: {stats_held50['breakdown_pct']}%")
+    print(f"  [Broke < Daily 50 EMA at Open]     -> Count: {stats_broke50['count']:,} | Shakeout: {stats_broke50['shakeout_pct']}% | Breakdown: {stats_broke50['breakdown_pct']}% (HIGH DANGER)")
+
+    print("\n📊 MATRIX 3: TRADE PHASE (Initial Stop vs. 20 EMA Runner Trail)")
+    print(f"  [Pre-1.5R (Initial Hard Stop)]     -> Count: {stats_pre15r['count']:,} | Shakeout: {stats_pre15r['shakeout_pct']}% | Breakdown: {stats_pre15r['breakdown_pct']}%")
+    print(f"  [Post-1.5R (20 EMA Runner Trail)]  -> Count: {stats_post15r['count']:,} | Shakeout: {stats_post15r['shakeout_pct']}% | Breakdown: {stats_post15r['breakdown_pct']}%")
+    print("=" * 80)
+
+    payload = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "total_trades": total_trades_evaluated,
+        "total_gaps": total_gaps,
+        "overall": {
+            "breakdowns": len(breakdowns),
+            "breakdown_pct": overall_breakdown_pct,
+            "shakeouts": len(reclaims),
+            "shakeout_pct": overall_reclaim_pct,
+            "avg_breakdown_further_loss_pct": round(float(breakdowns['intraday_close_vs_open_pct'].mean()), 2) if len(breakdowns) > 0 else 0.0,
+            "worst_breakdown_loss_pct": round(float(breakdowns['intraday_worst_vs_open_pct'].min()), 2) if len(breakdowns) > 0 else 0.0,
+        },
+        "depth_matrix": {
+            "shallow_le_1_5pct": stats_shallow,
+            "moderate_1_5_to_3pct": stats_moderate,
+            "severe_gt_3pct": stats_severe,
+        },
+        "trend_integrity_matrix": {
+            "held_above_50ema": stats_held50,
+            "broke_below_50ema": stats_broke50,
+        },
+        "trade_phase_matrix": {
+            "pre_1_5r_initial_sl": stats_pre15r,
+            "post_1_5r_runner": stats_post15r,
+        }
+    }
+
+    with open(AUDIT_RESULTS_OUT, "w", encoding="utf-8") as fp:
+        json.dump(payload, fp, indent=2)
+
+    print(f"💾 Full audit breakdown saved to '{AUDIT_RESULTS_OUT}'.")
+
+
+if __name__ == "__main__":
+    run_full_gap_down_audit()
