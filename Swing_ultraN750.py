@@ -6,44 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 DATA_DIR = "data"
-NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
-RESULTS_OUT = os.path.join(DATA_DIR, "swing_ultraN750_results.json")
-MIN_TURNOVER_CR = 5.0  # ₹5 Crore floor for Non-N750 High-Beta
-
-CONFIG_NON750 = {
-    "min_turnover_cr": 5.0,
-    # Strategy 2: Launchpad Coiling & Cheat Entry (Non-N750 Parameters)
-    "lp_base_min": 8.0,
-    "lp_base_max": 18.0,
-    "lp_base_len_min": 10,
-    "lp_base_len_max": 18,
-    "lp_vdu_ratio": 0.42,
-    "lp_cheat_atr_ratio": 0.65,
-    "lp_cheat_prox_min": 0.010,
-    "lp_cheat_prox_max": 0.030,
-    "lp_risk_cap": 4.5,
-    
-    # Coiling Pipeline Disqualification Gates
-    "coiling_max_staleness_days": 25,
-    "coiling_max_dist_days": 2,
-    
-    # V-Shaped Recovery
-    "vr_drop_min": 16.0,
-    "vr_drop_max": 28.0,
-    "vr_drop_len_min": 8,
-    "vr_drop_len_max": 25,
-    "vr_range_close_min": 0.78,
-    "vr_conv_min": 2.30,
-    "vr_deliv_surge_min": 1.20,
-    "vr_risk_cap": 5.0,
-    
-    # Combination 7 Exit Rules (Strategy 1 + Exit 3)
-    "escalator_harvest_pct": 0.20,
-    "escalator_r_mult": 1.5,
-    "escalator_cap_pct": 6.0,
-    "breakeven_cushion": 0.005,
-    "runner_trail_ema": 20
-}
+RESULTS_FILE = "swing_ultraN750_results.json"
 
 
 def clean_and_prepare(raw_data):
@@ -143,9 +106,10 @@ def load_nifty_benchmark():
 
 
 def load_nifty750_symbols():
-    if os.path.exists(NIFTY750_FILE):
+    p = os.path.join(DATA_DIR, "nifty750.json")
+    if os.path.exists(p):
         try:
-            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
+            with open(p, "r", encoding="utf-8") as fp:
                 data = json.load(fp)
             if isinstance(data, list):
                 return {str(x).strip().upper() for x in data}
@@ -157,29 +121,37 @@ def load_nifty750_symbols():
 
 
 def run_swing_ultraN750():
+    print("=" * 85)
+    print("🚀 SWING ULTRA NON-750 (COMBINATION 7 - INTEGRATED GAP-DOWN PROTOCOL)")
+    print("   Universe: High-Growth Micro & Small Caps Outside Nifty 750 (Turnover >= ₹5 Cr/d)")
+    print("=" * 85)
+
+    n750_set = load_nifty750_symbols()
     nifty_perf_map = load_nifty_benchmark()
     nifty_dates = sorted(nifty_perf_map.keys())
-    n750_set = load_nifty750_symbols()
 
     json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
     excluded = {
         "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
         "fundamentals.json", "backtest_results.json", "swing_ultra750_results.json",
         "swing_ultraN750_results.json", "live_intraday_breakouts.json",
-        "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json"
+        "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json",
+        "gap_down_audit_results.json", "gap_down_audit_full_results.json"
     }
 
-    fresh_triggers = []
-    active_coiling_watchlist = []
-    active_trailing_positions = []
+    target_files = [p for p in sorted(json_files) if os.path.basename(p) not in excluded]
+    # Filter strictly for symbols outside Nifty 750
+    if n750_set:
+        target_files = [p for p in target_files if os.path.splitext(os.path.basename(p))[0].upper() not in n750_set]
 
-    print(f"🚀 Running Swing Ultra Non-Nifty 750 (Combination 7 + Coiling State Pipeline) across {len(json_files)} symbols...")
+    print(f"📊 Processing {len(target_files)} Non-Nifty 750 stocks...")
 
-    for path in sorted(json_files):
+    trades = []
+    shakeouts_absorbed = 0
+    severe_gaps_cut = 0
+
+    for path in target_files:
         sym = os.path.splitext(os.path.basename(path))[0].upper()
-        if sym in excluded or sym in n750_set:
-            continue
-
         try:
             with open(path, "r", encoding="utf-8") as fp:
                 raw = json.load(fp)
@@ -199,11 +171,9 @@ def run_swing_ultraN750():
             df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
             df["perf_60d"] = df["close"].pct_change(60).fillna(0)
 
-            # ATR 14
-            prev_close = df["close"].shift(1)
-            tr = pd.concat([df["high"] - df["low"], (df["high"] - prev_close).abs(), (df["low"] - prev_close).abs()], axis=1).max(axis=1)
+            prev_c = df["close"].shift(1)
+            tr = pd.concat([df["high"] - df["low"], (df["high"] - prev_c).abs(), (df["low"] - prev_c).abs()], axis=1).max(axis=1)
             df["atr_14"] = tr.rolling(14, min_periods=1).mean()
-
             c_range = df["high"] - df["low"]
             df["range_closeness"] = np.where(c_range > 0, (df["close"] - df["low"]) / c_range, 0.50)
 
@@ -231,13 +201,11 @@ def run_swing_ultraN750():
             entry_p = 0.0
             calc_sl = 0.0
             active_stop = 0.0
-            entry_d = ""
-            entry_idx = 0
             trade_setup = ""
-            conv_score_val = 1.0
-            conv_mult_str = "1.0x"
             hit_milestone = False
-            harvested_pct = 0.0
+            t1_target_p = 0.0
+            entry_d = ""
+            conv_tag = ""
 
             for i in range(40, len(df)):
                 t = str(times[i])[:10]
@@ -251,74 +219,92 @@ def run_swing_ultraN750():
                 dv_avg = deliv_avgs[i]
                 rc = range_closes[i]
                 ema20 = ema20s[i]
-                ema10 = ema10s[i]
                 ema50 = ema50s[i]
                 atr = atr14s[i]
 
-                # ==============================================================
-                # 1. COMBINATION 7 TRAILING & EXIT ENGINE
-                # ==============================================================
                 if in_trade:
-                    current_gain_pct = ((c - entry_p) / entry_p) * 100.0
-                    r_dist = entry_p - calc_sl
-                    t1_pct = min(CONFIG_NON750["escalator_r_mult"] * ((r_dist / entry_p) * 100.0), CONFIG_NON750["escalator_cap_pct"])
-                    t1_target_price = entry_p * (1.0 + t1_pct / 100.0)
-
                     exit_triggered = False
+                    exit_p = c
                     exit_reason = ""
 
+                    # ==============================================================
+                    # BIFURCATED GAP-DOWN PROTOCOL (9:15 AM vs 9:30 AM LEEWAY)
+                    # ==============================================================
                     if o < active_stop:
-                        exit_triggered = True
-                        exit_reason = "1. Gap-Down Breach at 9:15 AM Open"
-                    elif not hit_milestone and l <= active_stop:
-                        exit_triggered = True
-                        exit_reason = "2. Initial Hard Stop Hit"
-                    else:
-                        if not hit_milestone and h >= t1_target_price:
-                            hit_milestone = True
-                            harvested_pct = CONFIG_NON750["escalator_harvest_pct"]
-                            active_stop = max(active_stop, round(entry_p * (1.0 + CONFIG_NON750["breakeven_cushion"]), 2))
+                        gap_depth_pct = ((active_stop - o) / active_stop) * 100.0
+                        is_severe = (gap_depth_pct > 2.0) or (o < ema50)
 
-                        if hit_milestone:
-                            active_stop = max(active_stop, ema20)
-                            if c < ema20:
+                        if is_severe:
+                            exit_triggered = True
+                            exit_p = o
+                            exit_reason = "Gap-Down Severe / 50 EMA Breakdown (9:15 AM)"
+                            severe_gaps_cut += 1
+                        else:
+                            # Shallow gap (<= 2.0%) holding >= 50 EMA
+                            if c >= active_stop:
+                                # Reclaimed by close: SHAKEOUT ABSORBED. Position survives!
+                                shakeouts_absorbed += 1
+                            else:
+                                # Failed to reclaim by 9:30 AM: Exit executed
                                 exit_triggered = True
-                                exit_reason = "3. Daily Session Close Below 20 EMA"
+                                exit_p = round(o * 0.988, 2)  # modeled with 9:30 AM failure slippage
+                                exit_reason = "Gap-Down Leeway Failed (9:30 AM)"
 
-                    if i == len(df) - 1 and not exit_triggered:
-                        holding_days = i - entry_idx
-                        active_trailing_positions.append({
-                            "symbol": sym,
-                            "setup": trade_setup,
-                            "entry_date": entry_d,
-                            "entry_price": round(float(entry_p), 2),
-                            "current_close": round(float(c), 2),
-                            "active_stop": round(float(active_stop), 2),
-                            "trailing_stop_20ema": round(float(ema20), 2),
-                            "hard_sl": round(float(calc_sl), 2),
-                            "pnl_%": round(float(current_gain_pct), 2),
-                            "hit_milestone_15r": hit_milestone,
-                            "harvested_pct": f"{int(harvested_pct * 100)}%",
-                            "conviction_score": conv_score_val,
-                            "conv_multiplier": conv_mult_str,
-                            "days": int(holding_days),
-                            "holding_days": int(holding_days),
-                            "status": "RUNNER TRAILING (20 EMA)" if hit_milestone else "ACTIVE (PRE-1.5R)"
-                        })
+                    # Standard Intraday SL (if not exited on gap)
+                    if not exit_triggered:
+                        if not hit_milestone and l <= active_stop:
+                            exit_triggered = True
+                            exit_p = active_stop
+                            exit_reason = "Hard SL Hit"
+                        else:
+                            # Partial Profit Milestone Check
+                            if not hit_milestone and h >= t1_target_p:
+                                hit_milestone = True
+                                active_stop = max(active_stop, round(entry_p * 1.005, 2))
+
+                            if hit_milestone:
+                                active_stop = max(active_stop, ema20)
+                                if c < ema20:
+                                    exit_triggered = True
+                                    exit_p = c
+                                    exit_reason = "Daily Close < 20 EMA"
 
                     if exit_triggered:
+                        if hit_milestone:
+                            t1_gain = ((t1_target_p - entry_p) / entry_p) * 100.0
+                            runner_gain = ((exit_p - entry_p) / entry_p) * 100.0
+                            blended_gain = (0.20 * t1_gain) + (0.80 * runner_gain)
+                        else:
+                            blended_gain = ((exit_p - entry_p) / entry_p) * 100.0
+
+                        risk_pct = ((entry_p - calc_sl) / entry_p) * 100.0
+                        r_mult = blended_gain / risk_pct if risk_pct > 0 else 0.0
+
+                        trades.append({
+                            "symbol": sym,
+                            "entry_date": entry_d,
+                            "exit_date": t,
+                            "setup": trade_setup,
+                            "conviction": conv_tag,
+                            "entry_price": entry_p,
+                            "exit_price": exit_p,
+                            "gain_pct": round(blended_gain, 2),
+                            "r_mult": round(r_mult, 2),
+                            "exit_reason": exit_reason,
+                            "hold_days": (pd.to_datetime(t) - pd.to_datetime(entry_d)).days,
+                            "hit_milestone": hit_milestone,
+                        })
                         in_trade = False
                     continue
 
-                # ==============================================================
-                # 2. ENTRY SCANNER
-                # ==============================================================
-                if to_50d[i] < MIN_TURNOVER_CR:
+                # -------------------------------------------------------------
+                # ENTRY SCANNERS (Turnover >= 5 Cr for Non-Nifty 750)
+                # -------------------------------------------------------------
+                if to_50d[i] < 5.0:
                     continue
 
                 sma200 = sma200s[i]
                 is_stage2 = bool(c >= sma200) if pd.notnull(sma200) else False
-
                 n_perf = nifty_perf_map.get(t)
                 if n_perf is None:
                     p_dates = [d for d in nifty_dates if d <= t]
@@ -333,204 +319,122 @@ def run_swing_ultraN750():
                 c_sl = 0.0
                 c_setup = ""
 
-                # --- V-REVERSAL ENGINE ---
-                recent_20_h = highs[max(0, i - 20):i].max()
+                # Engine 1: V-Reversal Setup (Broader bounds for Small/Micro caps)
+                recent_20_h = highs[max(0, i - 20) : i].max()
                 if recent_20_h > 0:
                     drop_depth = ((recent_20_h - l) / recent_20_h) * 100.0
-                    if CONFIG_NON750["vr_drop_min"] <= drop_depth <= CONFIG_NON750["vr_drop_max"]:
-                        prior_3d_h = highs[max(0, i - 3):i].max()
-                        prior_3d_l = lows[max(0, i - 3):i].min()
+                    if 16.0 <= drop_depth <= 28.0:
+                        prior_3d_h = highs[max(0, i - 3) : i].max()
+                        prior_3d_l = lows[max(0, i - 3) : i].min()
                         c_reclaim = (c >= prior_3d_h) and (c > closes[i - 1])
-                        c_deliv_rev = (dv >= CONFIG_NON750["vr_deliv_surge_min"] * dv_avg) or (deliv_pcts[i] >= 1.15 * deliv_pct_avgs[i])
-                        c_candle_rev = rc >= CONFIG_NON750["vr_range_close_min"]
+                        c_deliv = (dv >= 1.20 * dv_avg) or (deliv_pcts[i] >= 1.15 * deliv_pct_avgs[i])
+                        c_candle = rc >= 0.78
 
-                        if c_reclaim and c_deliv_rev and c_candle_rev:
+                        if c_reclaim and c_deliv and c_candle:
                             v_sl = round(prior_3d_l * 0.995, 2)
                             v_risk = ((prior_3d_h - v_sl) / prior_3d_h) * 100.0
-                            if 0.5 <= v_risk <= CONFIG_NON750["vr_risk_cap"]:
+                            if 0.5 <= v_risk <= 5.0:
                                 entry_triggered = True
-                                c_entry = round(prior_3d_h, 2)
+                                c_entry = round(prior_3d_h + 0.05, 2)
                                 c_sl = v_sl
                                 c_setup = "V-REVERSAL"
 
-                # --- STRATEGY 2: LAUNCHPAD SPRINGBOARD ("CHEAT") TRIGGER ---
-                for shelf_len in range(CONFIG_NON750["lp_base_len_min"], CONFIG_NON750["lp_base_len_max"] + 1):
-                    s_h = highs[max(0, i - shelf_len):i].max()
-                    s_l = lows[max(0, i - shelf_len):i].min()
-                    spread = ((s_h - s_l) / s_l) * 100.0 if s_l > 0 else 99.0
-                    if s_l > 0 and (CONFIG_NON750["lp_base_min"] <= spread <= CONFIG_NON750["lp_base_max"]):
-                        base_df_vols = volumes[max(0, i - 15):i]
-                        lowest_5d_vol = pd.Series(base_df_vols).rolling(5, min_periods=1).mean().min() if len(base_df_vols) > 0 else v_avg
-                        vdu_ok = (lowest_5d_vol / v_avg <= CONFIG_NON750["lp_vdu_ratio"]) if v_avg > 0 else False
+                # Engine 2: Launchpad Cheat Entry (Max Spread 18%)
+                if not entry_triggered:
+                    for s_len in range(10, 19):
+                        s_h = highs[max(0, i - s_len) : i].max()
+                        s_l = lows[max(0, i - s_len) : i].min()
+                        spread = ((s_h - s_l) / s_l) * 100.0 if s_l > 0 else 99.0
+                        if s_l > 0 and (8.0 <= spread <= 18.0):
+                            base_vols = volumes[max(0, i - 15) : i]
+                            lowest_5d = pd.Series(base_vols).rolling(5, min_periods=1).mean().min() if len(base_vols) > 0 else v_avg
+                            vdu_ok = (lowest_5d / v_avg <= 0.42) if v_avg > 0 else False
 
-                        prev_range = highs[i - 1] - lows[i - 1]
-                        prev_atr = atr14s[i - 1]
-                        cheat_bar_ok = (prev_atr > 0) and (prev_range / prev_atr <= CONFIG_NON750["lp_cheat_atr_ratio"])
-                        prox = (s_h - closes[i - 1]) / s_h if s_h > 0 else 1.0
-                        prox_ok = CONFIG_NON750["lp_cheat_prox_min"] <= prox <= CONFIG_NON750["lp_cheat_prox_max"]
-                        above_10ema = closes[i - 1] >= ema10s[i - 1]
+                            prev_h = highs[i - 1]
+                            prev_l = lows[i - 1]
+                            prev_atr = atr14s[i - 1]
+                            cheat_ok = (prev_atr > 0) and ((prev_h - prev_l) / prev_atr <= 0.65)
+                            prox = (s_h - closes[i - 1]) / s_h if s_h > 0 else 1.0
+                            prox_ok = 0.010 <= prox <= 0.030
+                            above_10ema = closes[i - 1] >= ema10s[i - 1]
 
-                        cheat_entry = round(highs[i - 1] + 0.05, 2)
-                        if vdu_ok and cheat_bar_ok and prox_ok and above_10ema and (h >= cheat_entry):
-                            cheat_sl = round(lows[i - 1] * 0.995, 2)
-                            compressed_risk = ((cheat_entry - cheat_sl) / cheat_entry) * 100.0
-                            if 0.5 <= compressed_risk <= CONFIG_NON750["lp_risk_cap"]:
-                                entry_triggered = True
-                                c_entry = cheat_entry
-                                c_sl = cheat_sl
-                                c_setup = "LAUNCHPAD CHEAT"
-                                break
+                            if vdu_ok and cheat_ok and prox_ok and above_10ema:
+                                cheat_e = round(prev_h + 0.05, 2)
+                                cheat_s = round(prev_l * 0.995, 2)
+                                comp_risk = ((cheat_e - cheat_s) / cheat_e) * 100.0
+                                if (h >= cheat_e) and (0.5 <= comp_risk <= 4.5):
+                                    entry_triggered = True
+                                    c_entry = cheat_e
+                                    c_sl = cheat_s
+                                    c_setup = "CHEAT BREAKOUT"
+                                    break
 
                 if entry_triggered:
                     deliv_surge = dv / dv_avg if dv_avg > 0 else 1.0
                     rs_ratio = (perf_60s[i] / n_perf) if n_perf > 0 else (1.0 + abs(perf_60s[i]))
                     conv_score = round(deliv_surge * max(0.1, rs_ratio), 3)
 
-                    risk_mult_tag = "2.0x" if conv_score >= 3.20 else ("1.5x" if conv_score >= 2.60 else "1.0x")
+                    r_dist = c_entry - c_sl
+                    risk_pct = (r_dist / c_entry) * 100.0
 
-                    if c_setup == "LAUNCHPAD CHEAT" and conv_score < 2.30:
-                        pass
-                    else:
-                        in_trade = True
-                        entry_p = c_entry
-                        calc_sl = c_sl
-                        active_stop = c_sl
-                        entry_d = t
-                        entry_idx = i
-                        trade_setup = c_setup
-                        conv_score_val = conv_score
-                        conv_mult_str = risk_mult_tag
-                        hit_milestone = False
-                        harvested_pct = 0.0
-
-                        if i == len(df) - 1:
-                            ext_pct = round(((c - c_entry) / c_entry) * 100.0, 2)
-                            risk_pct = round(((c_entry - c_sl) / c_entry) * 100.0, 2)
-                            t1_harvest_p = round(c_entry * (1.0 + min(1.5 * risk_pct, 6.0) / 100.0), 2)
-                            action_tag = "BUY STOP-LIMIT" if ext_pct <= 1.5 else "LIMIT RETEST"
-
-                            fresh_triggers.append({
-                                "symbol": sym,
-                                "type": c_setup,
-                                "entry_trigger": f"₹{c_entry:.2f}",
-                                "close": f"₹{c:.2f}",
-                                "extended_%": f"{ext_pct:+.1f}%",
-                                "cheat_stop_loss": f"₹{c_sl:.2f}",
-                                "risk_%": f"{risk_pct:.2f}%",
-                                "t1_harvest_target": f"₹{t1_harvest_p:.2f} (+1.5R)",
-                                "conviction_score": conv_score,
-                                "conv_multiplier": risk_mult_tag,
-                                "turnover": f"₹{to_50d[i]:.1f} Cr",
-                                "action": action_tag
-                            })
-
-            # ==================================================================
-            # 3. STATE-TRACKED PERSISTENT COILING WATCHLIST PIPELINE
-            # Scans historical coiling bases and validates against 4 Disqualification Gates
-            # ==================================================================
-            if not in_trade and len(df) >= 30:
-                last_idx = len(df) - 1
-                curr_c = closes[last_idx]
-                curr_ema50 = ema50s[last_idx]
-
-                for base_end_offset in range(0, 16):
-                    b_idx = last_idx - base_end_offset
-                    if b_idx < CONFIG_NON750["lp_base_len_max"]:
-                        continue
-
-                    for b_len in range(CONFIG_NON750["lp_base_len_min"], CONFIG_NON750["lp_base_len_max"] + 1):
-                        base_highs = highs[b_idx - b_len : b_idx]
-                        base_lows = lows[b_idx - b_len : b_idx]
-                        ceil = base_highs.max()
-                        floor = base_lows.min()
-                        spread = ((ceil - floor) / floor) * 100.0 if floor > 0 else 99.0
-
-                        if not (CONFIG_NON750["lp_base_min"] <= spread <= CONFIG_NON750["lp_base_max"]):
-                            continue
-
-                        base_vols = volumes[b_idx - b_len : b_idx]
-                        vdu_val = pd.Series(base_vols).rolling(5, min_periods=1).mean().min()
-                        v_ref = vol_avgs[b_idx]
-                        if v_ref <= 0 or (vdu_val / v_ref > CONFIG_NON750["lp_vdu_ratio"]):
-                            continue
-
-                        coiling_duration = (last_idx - (b_idx - b_len))
-
-                        # Gate 1: Floor Breakdown
-                        if curr_c < (floor * 0.99):
-                            continue
-
-                        # Gate 2: Max Staleness (> 25 sessions)
-                        if coiling_duration > CONFIG_NON750["coiling_max_staleness_days"]:
-                            continue
-
-                        # Gate 3: Heavy Distribution Contamination (> 2 days)
-                        dist_days = 0
-                        for k in range(len(closes[b_idx : last_idx + 1])):
-                            k_idx = b_idx + k
-                            if (closes[k_idx] < closes[k_idx - 1]) and (volumes[k_idx] >= 1.35 * vol_avgs[k_idx]) and (range_closes[k_idx] <= 0.35):
-                                dist_days += 1
-                        if dist_days > CONFIG_NON750["coiling_max_dist_days"]:
-                            continue
-
-                        # Gate 4: Daily Close < Daily 50 EMA
-                        if curr_c < curr_ema50:
-                            continue
-
-                        dist_to_ceiling = round(((ceil - curr_c) / curr_c) * 100.0, 2)
-                        
-                        recent_h = highs[max(0, last_idx - 3) : last_idx + 1]
-                        recent_l = lows[max(0, last_idx - 3) : last_idx + 1]
-                        cheat_entry_lvl = round(recent_h.min() + 0.05, 2)
-                        cheat_sl_lvl = round(recent_l.min() * 0.995, 2)
-                        cheat_risk = round(((cheat_entry_lvl - cheat_sl_lvl) / cheat_entry_lvl) * 100.0, 2)
-
-                        deliv_surge = deliv_vols[last_idx] / deliv_avgs[last_idx] if deliv_avgs[last_idx] > 0 else 1.0
-                        rs_ratio = (perf_60s[last_idx] / n_perf) if n_perf > 0 else 1.0
-                        conv_score = round(deliv_surge * max(0.1, rs_ratio), 2)
-
-                        active_coiling_watchlist.append({
-                            "symbol": sym,
-                            "setup_class": "LAUNCHPAD ACTIVE COIL",
-                            "close": f"₹{curr_c:.2f}",
-                            "pivot_ceiling": f"₹{ceil:.2f}",
-                            "base_floor": f"₹{floor:.2f}",
-                            "cheat_entry_level": f"₹{cheat_entry_lvl:.2f}",
-                            "cheat_stop_loss": f"₹{cheat_sl_lvl:.2f}",
-                            "compressed_risk_%": f"{cheat_risk:.2f}%",
-                            "dist_to_ceiling_%": f"{dist_to_ceiling:+.2f}%",
-                            "base_spread_%": f"{spread:.2f}%",
-                            "coiling_duration_days": int(coiling_duration),
-                            "conviction_score": conv_score,
-                            "turnover": f"₹{to_50d[last_idx]:.1f} Cr",
-                            "status": "MONITORING_FOR_LIVE_SCANNER"
-                        })
-                        break
-                    if len(active_coiling_watchlist) > 0 and active_coiling_watchlist[-1]["symbol"] == sym:
-                        break
+                    in_trade = True
+                    entry_p = c_entry
+                    calc_sl = c_sl
+                    active_stop = c_sl
+                    trade_setup = c_setup
+                    hit_milestone = False
+                    entry_d = t
+                    t1_pct = min(1.5 * risk_pct, 6.0)
+                    t1_target_p = round(entry_p * (1.0 + t1_pct / 100.0), 2)
+                    conv_tag = "2.0x" if conv_score >= 3.20 else ("1.5x" if conv_score >= 2.60 else "1.0x")
         except Exception:
             continue
 
-    fresh_triggers.sort(key=lambda x: x["conviction_score"], reverse=True)
-    active_coiling_watchlist.sort(key=lambda x: float(x["dist_to_ceiling_%"].replace("%", "").replace("+", "")))
-    active_trailing_positions.sort(key=lambda x: x["pnl_%"], reverse=True)
+    if not trades:
+        print("⚠ No trades generated.")
+        return
 
-    payload = {
-        "Scan_Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "scan_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "Universe": "NON-NIFTY 750",
-        "Strategy_Framework": "Combination 7 (Strategy 1 + Strategy 2 Cheat + Strategy 3 Sizing + Exit 3)",
-        "Fresh_Triggers": fresh_triggers,
-        "Active_Coiling_Watchlist": active_coiling_watchlist,
-        "Watchlist": active_coiling_watchlist,
-        "Active_Positions": active_trailing_positions,
-        "active_trailing_positions": active_trailing_positions
-    }
+    df_t = pd.DataFrame(trades)
+    wins = df_t[df_t["gain_pct"] > 0]
+    losses = df_t[df_t["gain_pct"] <= 0]
+    win_rate = (len(wins) / len(df_t)) * 100.0
+    tot_r = df_t["r_mult"].sum()
+    exp_r = tot_r / len(df_t)
 
-    with open(RESULTS_OUT, "w", encoding="utf-8") as fp:
-        json.dump(payload, fp, indent=2)
+    gross_win = wins["gain_pct"].sum()
+    gross_loss = abs(losses["gain_pct"].sum())
+    profit_factor = round(gross_win / gross_loss, 2) if gross_loss > 0 else 99.0
 
-    print(f"✅ Generated {RESULTS_OUT}: {len(fresh_triggers)} Fresh Triggers, {len(active_coiling_watchlist)} Active Coiling Candidates, {len(active_trailing_positions)} Active Positions.")
+    print("\n" + "=" * 85)
+    print("📈 SWING ULTRA NON-750 (COMBINATION 7) AUDIT REPORT")
+    print("=" * 85)
+    print(f"Total Trades:           {len(df_t):,}")
+    print(f"Win Rate:               {win_rate:.1f}%")
+    print(f"Profit Factor:          {profit_factor}")
+    print(f"Average Win:            +{wins['gain_pct'].mean():.2f}%")
+    print(f"Average Loss:           {losses['gain_pct'].mean():.2f}%")
+    print(f"Net Expectancy (%):     +{df_t['gain_pct'].mean():.2f}%")
+    print(f"Total R-Multiple:       +{tot_r:,.1f} R")
+    print(f"Expectancy (R/Trade):   +{exp_r:.2f} R")
+    print(f"Average Hold:           {df_t['hold_days'].mean():.1f} days")
+    print("-" * 85)
+    print(f"• Shakeouts Absorbed (Runners Retained): {shakeouts_absorbed}")
+    print(f"• Severe Gaps Cut (Tail Loss Prevented): {severe_gaps_cut}")
+    print("=" * 85)
+
+    with open(RESULTS_FILE, "w", encoding="utf-8") as fp:
+        json.dump({
+            "universe": "NON_NIFTY_750",
+            "total_trades": len(df_t),
+            "win_rate": round(win_rate, 2),
+            "profit_factor": profit_factor,
+            "total_r": round(tot_r, 2),
+            "exp_r": round(exp_r, 2),
+            "shakeouts_absorbed": shakeouts_absorbed,
+            "severe_gaps_cut": severe_gaps_cut,
+            "recent_trades": trades[-50:]
+        }, fp, indent=2)
+    print(f"💾 Results saved to '{RESULTS_FILE}'.")
 
 
 if __name__ == "__main__":
