@@ -25,13 +25,388 @@ jobs:
         run: pip install pandas numpy
 
       - name: Execute Gap-Up Empirical Derivation
-        run: python gap_up_empirical_audit.py
+        run: |
+          python - << 'EOF'
+          import os
+          import glob
+          import json
+          import numpy as np
+          import pandas as pd
+          from datetime import datetime
+
+          DATA_DIR = "data"
+          RESULTS_FILE = "gap_up_empirical_audit_results.json"
+
+          def clean_and_prepare(raw_data):
+              if not raw_data or not isinstance(raw_data, list):
+                  return []
+              date_map = {}
+              for r in raw_data:
+                  if not isinstance(r, dict):
+                      continue
+                  raw_t = str(r.get("time", "")).strip()
+                  if not raw_t:
+                      continue
+                  d_str = raw_t[:10]
+                  try:
+                      c = float(r.get("close", 0) or 0)
+                      if c <= 0:
+                          continue
+                      entry = {
+                          "time": d_str,
+                          "open": float(r.get("open", c) or c),
+                          "high": float(r.get("high", c) or c),
+                          "low": float(r.get("low", c) or c),
+                          "close": c,
+                          "delivery_vol": float(r.get("delivery_vol", 0) or 0),
+                          "volume": float(r.get("volume", 0) or 0),
+                          "deliv_pct": float(r.get("deliv_pct", 0) or 0),
+                      }
+                      if d_str not in date_map or entry["volume"] > date_map[d_str]["volume"]:
+                          date_map[d_str] = entry
+                  except Exception:
+                      continue
+
+              clean = [date_map[k] for k in sorted(date_map.keys())]
+
+              known_multipliers = [2.0, 5.0, 10.0, 1.5, 2.5, 3.0, 4.0]
+              for i in range(len(clean) - 1, 0, -1):
+                  prev_c = clean[i - 1]["close"]
+                  curr_o = clean[i]["open"]
+                  if prev_c > 0 and curr_o > 0:
+                      ratio = prev_c / curr_o
+                      adj_factor = None
+                      if ratio >= 1.35:
+                          for k in known_multipliers:
+                              if abs(ratio - k) / k < 0.15:
+                                  adj_factor = k
+                                  break
+                          if not adj_factor and 1.70 <= ratio <= 2.30:
+                              adj_factor = 2.0
+                          elif not adj_factor and 4.30 <= ratio <= 5.50:
+                              adj_factor = 5.0
+                          elif not adj_factor and 8.50 <= ratio <= 11.50:
+                              adj_factor = 10.0
+                      if adj_factor:
+                          for j in range(0, i):
+                              clean[j]["open"] = round(clean[j]["open"] / adj_factor, 2)
+                              clean[j]["high"] = round(clean[j]["high"] / adj_factor, 2)
+                              clean[j]["low"] = round(clean[j]["low"] / adj_factor, 2)
+                              clean[j]["close"] = round(clean[j]["close"] / adj_factor, 2)
+                              clean[j]["delivery_vol"] = clean[j]["delivery_vol"] * adj_factor
+                              clean[j]["volume"] = clean[j]["volume"] * adj_factor
+
+              running_vol = 50000.0
+              for i in range(len(clean)):
+                  v = clean[i]["volume"]
+                  dv = clean[i]["delivery_vol"]
+                  pct = clean[i]["deliv_pct"]
+                  if v > 0:
+                      running_vol = 0.9 * running_vol + 0.1 * v
+                  else:
+                      clean[i]["volume"] = running_vol
+                      v = running_vol
+                  if dv <= 0:
+                      clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
+                      clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
+                  elif dv > v:
+                      clean[i]["delivery_vol"] = v
+                      clean[i]["deliv_pct"] = 100.0
+
+              return clean
+
+          def load_nifty_benchmark():
+              for f in ["nifty.json", "nifty50.json", "NIFTY.json", "NIFTY50.json"]:
+                  p = os.path.join(DATA_DIR, f)
+                  if os.path.exists(p):
+                      try:
+                          with open(p, "r", encoding="utf-8") as fp:
+                              raw = json.load(fp)
+                          clean = clean_and_prepare(raw)
+                          if len(clean) > 50:
+                              df = pd.DataFrame(clean)
+                              df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+                              return {str(r["time"])[:10]: float(r["perf_60d"]) for _, r in df.iterrows()}
+                      except Exception:
+                          continue
+              return {}
+
+          def load_nifty750_symbols():
+              p = os.path.join(DATA_DIR, "nifty750.json")
+              if os.path.exists(p):
+                  try:
+                      with open(p, "r", encoding="utf-8") as fp:
+                          data = json.load(fp)
+                      if isinstance(data, list):
+                          return {str(x).strip().upper() for x in data}
+                      if isinstance(data, dict):
+                          return {str(x).strip().upper() for x in data.keys()}
+                  except Exception:
+                      pass
+              return set()
+
+          print("=" * 85)
+          print("🔬 EMPIRICAL GAP-UP & STOP-LOSS AUDIT ACROSS COMPLETE DATABASE")
+          print("=" * 85)
+
+          n750_set = load_nifty750_symbols()
+          nifty_perf_map = load_nifty_benchmark()
+          nifty_dates = sorted(nifty_perf_map.keys())
+
+          json_files = glob.glob(os.path.join(DATA_DIR, "*.json"))
+          excluded = {
+              "nifty750.json", "nifty50.json", "nifty.json", "NIFTY.json", "NIFTY50.json",
+              "fundamentals.json", "backtest_results.json", "swing_ultra750_results.json",
+              "swing_ultraN750_results.json", "live_intraday_breakouts.json",
+              "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json",
+              "gap_down_audit_results.json", "gap_down_audit_full_results.json",
+              RESULTS_FILE
+          }
+
+          target_files = [p for p in sorted(json_files) if os.path.basename(p) not in excluded]
+          print(f"📊 Scanning {len(target_files)} symbols for all breakout trades...")
+
+          records = []
+
+          for path in target_files:
+              sym = os.path.splitext(os.path.basename(path))[0].upper()
+              try:
+                  with open(path, "r", encoding="utf-8") as fp:
+                      raw = json.load(fp)
+                  clean = clean_and_prepare(raw)
+                  if len(clean) < 60:
+                      continue
+
+                  df = pd.DataFrame(clean)
+                  df["gross_vol_sma20"] = df["volume"].rolling(20, min_periods=1).mean()
+                  df["deliv_sma20"] = df["delivery_vol"].rolling(20, min_periods=1).mean()
+                  df["turnover_cr"] = (df["close"] * df["volume"]) / 1e7
+                  df["turnover_50d"] = df["turnover_cr"].rolling(50, min_periods=10).mean().fillna(0)
+                  df["deliv_pct_50d"] = df["deliv_pct"].rolling(50, min_periods=10).mean().fillna(35.0)
+                  df["ema_10"] = df["close"].ewm(span=10, adjust=False).mean()
+                  df["ema_20"] = df["close"].ewm(span=20, adjust=False).mean()
+                  df["ema_50"] = df["close"].ewm(span=50, adjust=False).mean()
+                  df["sma_200"] = df["close"].rolling(200, min_periods=50).mean()
+                  df["perf_60d"] = df["close"].pct_change(60).fillna(0)
+
+                  prev_c = df["close"].shift(1)
+                  tr = pd.concat([df["high"] - df["low"], (df["high"] - prev_c).abs(), (df["low"] - prev_c).abs()], axis=1).max(axis=1)
+                  df["atr_14"] = tr.rolling(14, min_periods=1).mean()
+
+                  highs = df["high"].values
+                  lows = df["low"].values
+                  opens = df["open"].values
+                  closes = df["close"].values
+                  volumes = df["volume"].values
+                  vol_avgs = df["gross_vol_sma20"].values
+                  deliv_vols = df["delivery_vol"].values
+                  deliv_avgs = df["deliv_sma20"].values
+                  deliv_pcts = df["deliv_pct"].values
+                  deliv_pct_avgs = df["deliv_pct_50d"].values
+                  to_50d = df["turnover_50d"].values
+                  ema10s = df["ema_10"].values
+                  ema20s = df["ema_20"].values
+                  sma200s = df["sma_200"].values
+                  perf_60s = df["perf_60d"].values
+                  atr14s = df["atr_14"].values
+                  times = df["time"].values
+
+                  is_n750 = sym in n750_set
+                  min_turnover = 10.0 if is_n750 else 5.0
+                  base_spread_min = 6.0 if is_n750 else 8.0
+                  base_spread_max = 12.0 if is_n750 else 18.0
+                  vdu_thresh = 0.45 if is_n750 else 0.42
+                  prox_max = 0.028 if is_n750 else 0.030
+
+                  for i in range(40, len(df)):
+                      t = str(times[i])[:10]
+                      if to_50d[i] < min_turnover:
+                          continue
+
+                      sma200 = sma200s[i]
+                      if pd.isna(sma200) or closes[i] < sma200:
+                          continue
+
+                      n_perf = nifty_perf_map.get(t)
+                      if n_perf is None:
+                          p_dates = [d for d in nifty_dates if d <= t]
+                          n_perf = nifty_perf_map[p_dates[-1]] if p_dates else 0.001
+                      if perf_60s[i] <= n_perf:
+                          continue
+
+                      shelf_found = False
+                      cheat_entry = 0.0
+                      cheat_sl = 0.0
+                      cheat_h = 0.0
+                      cheat_l = 0.0
+
+                      for s_len in range(10, 19):
+                          s_h = highs[max(0, i - s_len) : i].max()
+                          s_l = lows[max(0, i - s_len) : i].min()
+                          spread = ((s_h - s_l) / s_l) * 100.0 if s_l > 0 else 99.0
+                          if s_l > 0 and (base_spread_min <= spread <= base_spread_max):
+                              base_vols = volumes[max(0, i - 15) : i]
+                              lowest_5d = pd.Series(base_vols).rolling(5, min_periods=1).mean().min() if len(base_vols) > 0 else vol_avgs[i]
+                              vdu_ok = (lowest_5d / vol_avgs[i] <= vdu_thresh) if vol_avgs[i] > 0 else False
+
+                              prev_h = highs[i - 1]
+                              prev_l = lows[i - 1]
+                              prev_atr = atr14s[i - 1]
+                              cheat_ok = (prev_atr > 0) and ((prev_h - prev_l) / prev_atr <= 0.65)
+                              prox = (s_h - closes[i - 1]) / s_h if s_h > 0 else 1.0
+                              prox_ok = 0.010 <= prox <= prox_max
+                              above_10ema = closes[i - 1] >= ema10s[i - 1]
+
+                              if vdu_ok and cheat_ok and prox_ok and above_10ema:
+                                  cheat_e = round(prev_h + 0.05, 2)
+                                  cheat_s = round(prev_l * 0.995, 2)
+                                  comp_risk = ((cheat_e - cheat_s) / cheat_e) * 100.0
+                                  if 0.5 <= comp_risk <= 4.5:
+                                      shelf_found = True
+                                      cheat_entry = cheat_e
+                                      cheat_sl = cheat_s
+                                      cheat_h = prev_h
+                                      cheat_l = prev_l
+                                      break
+
+                      if not shelf_found:
+                          continue
+
+                      if highs[i] < cheat_entry:
+                          continue
+
+                      day_open = opens[i]
+                      day_high = highs[i]
+                      day_low = lows[i]
+                      day_close = closes[i]
+
+                      gap_pct = round(((day_open - cheat_entry) / cheat_entry) * 100.0, 2)
+                      day1_fade = bool(day_close < day_open)
+                      day1_gain_from_open = round(((day_close - day_open) / day_open) * 100.0, 2)
+                      day1_max_run_from_open = round(((day_high - day_open) / day_open) * 100.0, 2)
+                      day1_drop_from_open = round(((day_low - day_open) / day_open) * 100.0, 2)
+
+                      violated_cheat_low = bool(day_low <= cheat_sl)
+                      pivot_retest_sl = round(cheat_h * 0.995, 2)
+                      violated_pivot_retest = bool(day_low <= pivot_retest_sl)
+                      open_drop_pct = round(((day_open - day_low) / day_open) * 100.0, 2)
+
+                      actual_entry = day_open if gap_pct > 0 else cheat_entry
+                      risk_dist_base = actual_entry - cheat_sl
+                      risk_pct_base = (risk_dist_base / actual_entry) * 100.0
+                      t1_target = round(actual_entry * (1.0 + min(1.5 * risk_pct_base, 6.0) / 100.0), 2)
+
+                      hit_t1 = False
+                      active_sl = cheat_sl
+                      trade_pnl = 0.0
+
+                      for k in range(i, min(len(df), i + 45)):
+                          k_h = highs[k]
+                          k_l = lows[k]
+                          k_c = closes[k]
+                          k_ema20 = ema20s[k]
+
+                          if not hit_t1:
+                              if k_l <= active_sl:
+                                  trade_pnl = ((active_sl - actual_entry) / actual_entry) * 100.0
+                                  break
+                              if k_h >= t1_target:
+                                  hit_t1 = True
+                                  active_sl = max(active_sl, round(actual_entry * 1.005, 2))
+                          else:
+                              active_sl = max(active_sl, k_ema20)
+                              if k_c < k_ema20:
+                                  t1_gain = ((t1_target - actual_entry) / actual_entry) * 100.0
+                                  run_gain = ((k_c - actual_entry) / actual_entry) * 100.0
+                                  trade_pnl = (0.20 * t1_gain) + (0.80 * run_gain)
+                                  break
+
+                      records.append({
+                          "symbol": sym,
+                          "date": t,
+                          "universe": "NIFTY_750" if is_n750 else "NON_N750",
+                          "gap_pct": gap_pct,
+                          "day1_fade": day1_fade,
+                          "day1_gain_from_open": day1_gain_from_open,
+                          "day1_max_run_from_open": day1_max_run_from_open,
+                          "day1_drop_from_open": day1_drop_from_open,
+                          "violated_cheat_low": violated_cheat_low,
+                          "violated_pivot_retest": violated_pivot_retest,
+                          "open_drop_pct": open_drop_pct,
+                          "hit_t1": hit_t1,
+                          "trade_pnl": round(trade_pnl, 2),
+                          "is_winner": bool(trade_pnl > 0),
+                          "r_mult": round(trade_pnl / risk_pct_base, 2) if risk_pct_base > 0 else 0.0
+                      })
+              except Exception:
+                  continue
+
+          if not records:
+              print("No breakout trades found in data/.")
+              exit(0)
+
+          df_r = pd.DataFrame(records)
+          print(f"\nTotal Breakout Trades Analyzed: {len(df_r):,}")
+
+          def summarize_tier(sub, label):
+              n = len(sub)
+              if n == 0:
+                  return {"tier": label, "count": 0}
+              fades = sub[sub["day1_fade"] == True]
+              winners = sub[sub["is_winner"] == True]
+              retest_violated = sub[sub["violated_pivot_retest"] == True]
+              cheat_l_violated = sub[sub["violated_cheat_low"] == True]
+
+              return {
+                  "tier": label,
+                  "count": n,
+                  "pct_of_total": round(n / len(df_r) * 100.0, 1),
+                  "day1_fade_pct": round(len(fades) / n * 100.0, 1),
+                  "win_rate": round(len(winners) / n * 100.0, 1),
+                  "avg_pnl": round(sub["trade_pnl"].mean(), 2),
+                  "avg_r": round(sub["r_mult"].mean(), 2),
+                  "retest_violated_pct": round(len(retest_violated) / n * 100.0, 1),
+                  "cheat_l_violated_pct": round(len(cheat_l_violated) / n * 100.0, 1),
+                  "avg_day1_run": round(sub["day1_max_run_from_open"].mean(), 2),
+              }
+
+          flat = df_r[df_r["gap_pct"] <= 0.0]
+          micro = df_r[(df_r["gap_pct"] > 0.0) & (df_r["gap_pct"] <= 1.0)]
+          shallow = df_r[(df_r["gap_pct"] > 1.0) & (df_r["gap_pct"] <= 2.0)]
+          moderate = df_r[(df_r["gap_pct"] > 2.0) & (df_r["gap_pct"] <= 3.5)]
+          severe = df_r[df_r["gap_pct"] > 3.5]
+
+          results = [
+              summarize_tier(flat, "Normal Open (<= 0.0% - Crossed Intraday)"),
+              summarize_tier(micro, "Micro Gap (0.0% to 1.0%)"),
+              summarize_tier(shallow, "Shallow Gap (1.0% to 2.0%)"),
+              summarize_tier(moderate, "Moderate Gap (2.0% to 3.5%)"),
+              summarize_tier(severe, "Severe Gap (> 3.5%)")
+          ]
+
+          print("\n" + "=" * 90)
+          print(f"{'Gap Tier':<40} | {'Count':<8} | {'Fade%':<7} | {'WinRate':<8} | {'Avg R':<7} | {'Retest Breached%':<17}")
+          print("-" * 90)
+          for r in results:
+              if r["count"] > 0:
+                  print(f"{r['tier']:<40} | {r['count']:<8} | {r['day1_fade_pct']:<6}% | {r['win_rate']:<7}% | {r['avg_r']:<7} | {r['retest_violated_pct']:<15}%")
+          print("=" * 90)
+
+          with open(RESULTS_FILE, "w", encoding="utf-8") as fp:
+              json.dump({
+                  "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                  "total_trades": len(df_r),
+                  "summary_table": results,
+                  "raw_records": records[:200]
+              }, fp, indent=2)
+          print(f"Detailed derivation results saved to '{RESULTS_FILE}'.")
+          EOF
 
       - name: Commit & Push Audit Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add gap_up_empirical_audit_results.json gap_up_empirical_audit.py
+          git add gap_up_empirical_audit_results.json
           if ! git diff --quiet || ! git diff --staged --quiet; then
             git commit -m "Complete Gap-Up Empirical Audit Results [skip ci]"
             git pull --rebase --autostash origin main
