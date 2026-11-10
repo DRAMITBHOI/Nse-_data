@@ -1,23 +1,23 @@
 {
-  "Last_Updated": "2026-11-09 23:18:23 IST",
-  "Total_Sessions_Audited": 13,
-  "Latest_Session_Date": "2026-11-09",
+  "Last_Updated": "2026-11-10 13:51:59 IST",
+  "Total_Sessions_Audited": 14,
+  "Latest_Session_Date": "2026-11-10",
   "Latest_Ground_Truth": [
-    "BANKBEES",
+    "SMLMAH",
     "PVTBANIETF",
-    "SMLMAH"
+    "BANKBEES"
   ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
       "TP (Caught)": 2,
       "FN (Missed)": 1,
-      "FP (Fakeouts)": 6,
-      "TN (Quiet)": 1,
+      "FP (Fakeouts)": 4,
+      "TN (Quiet)": 3,
       "TPR (Sensitivity)": "66.7%",
       "FNR (Miss Rate)": "33.3%",
-      "FPR (Fallout)": "85.7%",
-      "TNR (Specificity)": "14.3%"
+      "FPR (Fallout)": "57.1%",
+      "TNR (Specificity)": "42.9%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
@@ -33,20 +33,20 @@
   ],
   "Cumulative_Metrics": {
     "Scanner_V1": {
-      "Total_TP": 3,
-      "Total_FN": 18,
-      "Total_FP": 23,
-      "Total_TN": 104,
-      "Cumulative_TPR": "14.3%",
-      "Cumulative_FNR": "85.7%",
-      "Cumulative_FPR": "18.1%",
-      "Cumulative_TNR": "81.9%"
+      "Total_TP": 5,
+      "Total_FN": 19,
+      "Total_FP": 27,
+      "Total_TN": 107,
+      "Cumulative_TPR": "20.8%",
+      "Cumulative_FNR": "79.2%",
+      "Cumulative_FPR": "20.1%",
+      "Cumulative_TNR": "79.9%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 21,
+      "Total_FN": 24,
       "Total_FP": 0,
-      "Total_TN": 127,
+      "Total_TN": 134,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -399,6 +399,35 @@
         "fnr": 33.3,
         "fpr": 85.7,
         "tnr": 14.3
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-10",
+      "ground_truth_count": 3,
+      "ground_truth_symbols": [
+        "SMLMAH",
+        "PVTBANIETF",
+        "BANKBEES"
+      ],
+      "v1": {
+        "tp": 2,
+        "fn": 1,
+        "fp": 4,
+        "tn": 3,
+        "tpr": 66.7,
+        "fnr": 33.3,
+        "fpr": 57.1,
+        "tnr": 42.9
       },
       "v2": {
         "tp": 0,
