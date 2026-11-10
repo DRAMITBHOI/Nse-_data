@@ -7,6 +7,7 @@ from datetime import datetime
 
 DATA_DIR = "data"
 RESULTS_FILE = "swing_ultraN750_results.json"
+ACTIVE_WATCHLIST_FILE = os.path.join(DATA_DIR, "active_watchlist.json")
 
 
 def clean_and_prepare(raw_data):
@@ -120,9 +121,29 @@ def load_nifty750_symbols():
     return set()
 
 
+def merge_active_watchlist(new_items, current_universe):
+    """Merges new pre-breakout candidates into active_watchlist.json while preserving other universe items."""
+    existing = {}
+    if os.path.exists(ACTIVE_WATCHLIST_FILE):
+        try:
+            with open(ACTIVE_WATCHLIST_FILE, "r", encoding="utf-8") as fp:
+                existing = json.load(fp)
+        except Exception:
+            existing = {}
+
+    cleaned = {k: v for k, v in existing.items() if v.get("universe") != current_universe}
+    for item in new_items:
+        sym = item["symbol"]
+        cleaned[sym] = item
+
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(ACTIVE_WATCHLIST_FILE, "w", encoding="utf-8") as fp:
+        json.dump(cleaned, fp, indent=2)
+
+
 def run_swing_ultraN750():
     print("=" * 85)
-    print("🚀 SWING ULTRA NON-750 (COMBINATION 7 - GAP-DOWN & GAP-UP INTEGRATED)")
+    print("🚀 SWING ULTRA NON-750 (COMBINATION 7 - GAP RULES & WATCHLIST GENERATOR)")
     print("   Universe: High-Growth Micro & Small Caps Outside Nifty 750 (Turnover >= ₹5 Cr/d)")
     print("=" * 85)
 
@@ -137,7 +158,7 @@ def run_swing_ultraN750():
         "swing_ultraN750_results.json", "live_intraday_breakouts.json",
         "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json",
         "gap_down_audit_results.json", "gap_down_audit_full_results.json",
-        "gap_up_empirical_audit_results.json"
+        "gap_up_empirical_audit_results.json", "active_watchlist.json"
     }
 
     target_files = [p for p in sorted(json_files) if os.path.basename(p) not in excluded]
@@ -147,6 +168,7 @@ def run_swing_ultraN750():
     print(f"📊 Processing {len(target_files)} Non-Nifty 750 stocks...")
 
     trades = []
+    active_prebreakouts = []
     shakeouts_absorbed = 0
     severe_gaps_cut = 0
     normal_entries = 0
@@ -230,9 +252,7 @@ def run_swing_ultraN750():
                     exit_p = c
                     exit_reason = ""
 
-                    # ==============================================================
-                    # BIFURCATED GAP-DOWN PROTOCOL (9:15 AM vs 9:30 AM LEEWAY)
-                    # ==============================================================
+                    # BIFURCATED GAP-DOWN PROTOCOL
                     if o < active_stop:
                         gap_depth_pct = ((active_stop - o) / active_stop) * 100.0
                         is_severe = (gap_depth_pct > 2.0) or (o < ema50)
@@ -243,7 +263,6 @@ def run_swing_ultraN750():
                             exit_reason = "Gap-Down Severe / 50 EMA Breakdown (9:15 AM)"
                             severe_gaps_cut += 1
                         else:
-                            # Shallow gap (<= 2.0%) holding >= 50 EMA
                             if c >= active_stop:
                                 shakeouts_absorbed += 1
                             else:
@@ -251,14 +270,12 @@ def run_swing_ultraN750():
                                 exit_p = round(o * 0.988, 2)
                                 exit_reason = "Gap-Down Leeway Failed (9:30 AM)"
 
-                    # Standard Intraday SL (if not exited on gap)
                     if not exit_triggered:
                         if not hit_milestone and l <= active_stop:
                             exit_triggered = True
                             exit_p = active_stop
                             exit_reason = "Hard SL Hit"
                         else:
-                            # Partial Profit Milestone Check
                             if not hit_milestone and h >= t1_target_p:
                                 hit_milestone = True
                                 active_stop = max(active_stop, round(entry_p * 1.005, 2))
@@ -299,7 +316,7 @@ def run_swing_ultraN750():
                     continue
 
                 # -------------------------------------------------------------
-                # ENTRY SCANNERS (Turnover >= 5 Cr for Non-Nifty 750)
+                # ENTRY SCANNERS
                 # -------------------------------------------------------------
                 if to_50d[i] < 5.0:
                     continue
@@ -320,7 +337,7 @@ def run_swing_ultraN750():
                 c_sl = 0.0
                 c_setup = ""
 
-                # Engine 1: V-Reversal Setup (Broader bounds for Small/Micro caps)
+                # Engine 1: V-Reversal Setup
                 recent_20_h = highs[max(0, i - 20) : i].max()
                 if recent_20_h > 0:
                     drop_depth = ((recent_20_h - l) / recent_20_h) * 100.0
@@ -340,7 +357,7 @@ def run_swing_ultraN750():
                                 c_sl = v_sl
                                 c_setup = "V-REVERSAL"
 
-                # Engine 2: Launchpad Cheat Entry (Integrated Gap-Up Matrix, Max Spread 18%)
+                # Engine 2: Launchpad Cheat Entry
                 if not entry_triggered:
                     for s_len in range(10, 19):
                         s_h = highs[max(0, i - s_len) : i].max()
@@ -363,24 +380,16 @@ def run_swing_ultraN750():
                                 cheat_e = round(prev_h + 0.05, 2)
                                 cheat_s = round(prev_l * 0.995, 2)
 
-                                # -------------------------------------------------------------
-                                # EMPIRICAL GAP-UP ACTION PLAN EVALUATION
-                                # -------------------------------------------------------------
+                                # GAP-UP EVALUATION
                                 gap_pct = ((o - cheat_e) / cheat_e) * 100.0 if cheat_e > 0 else 0.0
-
-                                # Tier 3: Extended Gap (> +2.0%) -> Disqualified (60% Day-1 Fade Trap)
                                 if gap_pct > 2.0:
                                     extended_gaps_skipped += 1
                                     continue
-
-                                # Tier 2: Modest Gap (0.0% < Gap <= +2.0%)
                                 elif gap_pct > 0.0:
                                     if h <= o:
                                         continue
                                     effective_entry = o
                                     modest_gaps_entered += 1
-
-                                # Tier 1: Normal Open (Open <= Pivot) -> Standard Intraday Cross
                                 else:
                                     if h < cheat_e:
                                         continue
@@ -413,6 +422,108 @@ def run_swing_ultraN750():
                     t1_pct = min(1.5 * risk_pct, 6.0)
                     t1_target_p = round(entry_p * (1.0 + t1_pct / 100.0), 2)
                     conv_tag = "2.0x" if conv_score >= 3.20 else ("1.5x" if conv_score >= 2.60 else "1.0x")
+
+            # =================================================================
+            # PRE-BREAKOUT WATCHLIST SCANNER (EVALUATING LATEST COMPLETED BAR)
+            # =================================================================
+            last_idx = len(df) - 1
+            if last_idx >= 40 and not in_trade:
+                last_c = closes[last_idx]
+                last_h = highs[last_idx]
+                last_l = lows[last_idx]
+                last_v_avg = vol_avgs[last_idx]
+                last_to = to_50d[last_idx]
+                last_sma200 = sma200s[last_idx]
+                last_perf = perf_60s[last_idx]
+                last_atr = atr14s[last_idx]
+                last_t = str(times[last_idx])[:10]
+
+                n_perf_latest = nifty_perf_map.get(last_t)
+                if n_perf_latest is None:
+                    p_dates = [d for d in nifty_dates if d <= last_t]
+                    n_perf_latest = nifty_perf_map[p_dates[-1]] if p_dates else 0.001
+
+                stage2_ok = bool(last_c >= last_sma200) if pd.notnull(last_sma200) else False
+                rs_ok = bool(last_perf > n_perf_latest)
+                turnover_ok = bool(last_to >= 5.0)
+
+                if stage2_ok and rs_ok and turnover_ok:
+                    pb_found = False
+                    pb_record = None
+
+                    # Check Launchpad Cheat Setup on latest candle
+                    for s_len in range(10, 19):
+                        s_h = highs[max(0, last_idx - s_len + 1) : last_idx + 1].max()
+                        s_l = lows[max(0, last_idx - s_len + 1) : last_idx + 1].min()
+                        spread = ((s_h - s_l) / s_l) * 100.0 if s_l > 0 else 99.0
+                        if s_l > 0 and (8.0 <= spread <= 18.0):
+                            base_vols = volumes[max(0, last_idx - 14) : last_idx + 1]
+                            lowest_5d = pd.Series(base_vols).rolling(5, min_periods=1).mean().min() if len(base_vols) > 0 else last_v_avg
+                            vdu_ratio = round(lowest_5d / last_v_avg, 3) if last_v_avg > 0 else 1.0
+                            vdu_ok = (vdu_ratio <= 0.42)
+
+                            cheat_ok = (last_atr > 0) and ((last_h - last_l) / last_atr <= 0.65)
+                            prox = (s_h - last_c) / s_h if s_h > 0 else 1.0
+                            prox_ok = 0.005 <= prox <= 0.030
+                            above_10ema = last_c >= ema10s[last_idx]
+
+                            if vdu_ok and cheat_ok and prox_ok and above_10ema:
+                                pivot_p = round(last_h + 0.05, 2)
+                                sl_p = round(last_l * 0.995, 2)
+                                r_pct = round(((pivot_p - sl_p) / pivot_p) * 100.0, 2)
+                                if 0.5 <= r_pct <= 4.5:
+                                    pb_record = {
+                                        "symbol": sym,
+                                        "universe": "NON-N750",
+                                        "setup": "LAUNCHPAD CHEAT",
+                                        "pivot_ceiling": pivot_p,
+                                        "stop_loss": sl_p,
+                                        "max_allowed_open": round(pivot_p * 1.02, 2),
+                                        "shelf_high": round(s_h, 2),
+                                        "shelf_spread_%": round(spread, 2),
+                                        "last_close": round(last_c, 2),
+                                        "last_atr": round(last_atr, 2),
+                                        "risk_%": r_pct,
+                                        "vdu_ratio": vdu_ratio,
+                                        "qualify_date": last_t,
+                                        "added_date": datetime.now().strftime("%Y-%m-%d")
+                                    }
+                                    pb_found = True
+                                    break
+
+                    # Check V-Reversal Setup on latest candle if Cheat not found
+                    if not pb_found:
+                        recent_20_h = highs[max(0, last_idx - 20) : last_idx + 1].max()
+                        if recent_20_h > 0:
+                            drop_depth = ((recent_20_h - last_l) / recent_20_h) * 100.0
+                            if 16.0 <= drop_depth <= 28.0:
+                                prior_3d_h = highs[max(0, last_idx - 2) : last_idx + 1].max()
+                                prior_3d_l = lows[max(0, last_idx - 2) : last_idx + 1].min()
+                                v_sl = round(prior_3d_l * 0.995, 2)
+                                v_piv = round(prior_3d_h + 0.05, 2)
+                                v_risk = round(((v_piv - v_sl) / v_piv) * 100.0, 2)
+                                if 0.5 <= v_risk <= 5.0 and last_c >= ema10s[last_idx]:
+                                    pb_record = {
+                                        "symbol": sym,
+                                        "universe": "NON-N750",
+                                        "setup": "V-REVERSAL",
+                                        "pivot_ceiling": v_piv,
+                                        "stop_loss": v_sl,
+                                        "max_allowed_open": round(v_piv * 1.02, 2),
+                                        "shelf_high": round(recent_20_h, 2),
+                                        "shelf_spread_%": round(drop_depth, 2),
+                                        "last_close": round(last_c, 2),
+                                        "last_atr": round(last_atr, 2),
+                                        "risk_%": v_risk,
+                                        "vdu_ratio": 1.0,
+                                        "qualify_date": last_t,
+                                        "added_date": datetime.now().strftime("%Y-%m-%d")
+                                    }
+                                    pb_found = True
+
+                    if pb_found and pb_record:
+                        active_prebreakouts.append(pb_record)
+
         except Exception:
             continue
 
@@ -450,6 +561,8 @@ def run_swing_ultraN750():
     print(f"• Normal Intraday Entries:               {normal_entries}")
     print(f"• Modest Gap-Up Entries (<= 2.0%):       {modest_gaps_entered}")
     print(f"• Extended Gap-Ups Skipped (> 2.0%):     {extended_gaps_skipped} (Fade Traps Avoided)")
+    print("-" * 85)
+    print(f"🎯 Active Pre-Breakout Setups Qualified: {len(active_prebreakouts)}")
     print("=" * 85)
 
     with open(RESULTS_FILE, "w", encoding="utf-8") as fp:
@@ -465,9 +578,13 @@ def run_swing_ultraN750():
             "normal_entries": normal_entries,
             "modest_gaps_entered": modest_gaps_entered,
             "extended_gaps_skipped": extended_gaps_skipped,
+            "Watchlist": active_prebreakouts,
             "recent_trades": trades[-50:]
         }, fp, indent=2)
-    print(f"💾 Results saved to '{RESULTS_FILE}'.")
+    print(f"💾 Results & Watchlist saved to '{RESULTS_FILE}'.")
+
+    merge_active_watchlist(active_prebreakouts, "NON-N750")
+    print(f"📋 Consolidated Active Watchlist updated in '{ACTIVE_WATCHLIST_FILE}'.")
 
 
 if __name__ == "__main__":
