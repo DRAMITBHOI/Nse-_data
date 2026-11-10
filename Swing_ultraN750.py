@@ -373,7 +373,7 @@ def run_swing_ultraN750():
                             prev_atr = atr14s[i - 1]
                             cheat_ok = (prev_atr > 0) and ((prev_h - prev_l) / prev_atr <= 0.65)
                             prox = (s_h - closes[i - 1]) / s_h if s_h > 0 else 1.0
-                            prox_ok = 0.010 <= prox <= 0.030
+                            prox_ok = 0.005 <= prox <= 0.030
                             above_10ema = closes[i - 1] >= ema10s[i - 1]
 
                             if vdu_ok and cheat_ok and prox_ok and above_10ema:
