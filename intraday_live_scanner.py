@@ -8,6 +8,7 @@ import urllib.request
 import urllib.parse
 import pandas as pd
 import requests
+import numpy as np
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -15,8 +16,8 @@ os.makedirs(DATA_DIR, exist_ok=True)
 LIVE_BREAKOUTS_FILE = os.path.join(DATA_DIR, "live_intraday_breakouts.json")
 MY_TRADES_FILE = os.path.join(DATA_DIR, "my_trades.json")
 NIFTY750_FILE = os.path.join(DATA_DIR, "nifty750.json")
+ACTIVE_WATCHLIST_FILE = os.path.join(DATA_DIR, "active_watchlist.json")
 
-# Secure Token Retrieval: Env Secrets first -> local_secrets.json fallback
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 
@@ -26,14 +27,13 @@ if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         try:
             with open(secrets_path, "r", encoding="utf-8") as f:
                 cfg = json.load(f)
-                TELEGRAM_BOT_TOKEN = cfg.get("8659551805:AAGc436Ii25qrFvcrxh2Iu4kDbVRxKu344k", TELEGRAM_BOT_TOKEN)
-                TELEGRAM_CHAT_ID = cfg.get("7860290981", TELEGRAM_CHAT_ID)
+                TELEGRAM_BOT_TOKEN = cfg.get("TELEGRAM_BOT_TOKEN", cfg.get("8659551805:AAGc436Ii25qrFvcrxh2Iu4kDbVRxKu344k", TELEGRAM_BOT_TOKEN))
+                TELEGRAM_CHAT_ID = cfg.get("TELEGRAM_CHAT_ID", cfg.get("7860290981", TELEGRAM_CHAT_ID))
         except Exception:
             pass
 
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 EXCLUDED_SYMBOLS = {"LIQUIDCASE", "LIQGRWBEES", "LIQUIDBEES", "GOLDBEES", "NIFTYBEES", "BANKBEES", "SILVERBEES"}
-WATCHLIST_MAX_AGE_DAYS = 5
 
 
 def get_ist_now():
@@ -59,7 +59,7 @@ def get_market_session_elapsed():
     market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
     market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
     if now < market_open:
-        return 1
+        return 0
     elif now > market_close:
         return 375
     else:
@@ -97,7 +97,7 @@ class LivePriceClient:
                 p_m = re.search(r'data-last-price="([\d\.]+)"', html)
                 if p_m:
                     ltp = float(p_m.group(1))
-                    d_high, d_low = ltp, ltp
+                    d_high, d_low, d_open = ltp, ltp, ltp
                     rng_m = re.search(r'Day range.*?₹([\d\.,]+)\s*-\s*₹([\d\.,]+)', html, re.DOTALL)
                     if rng_m:
                         d_low = float(rng_m.group(1).replace(",", ""))
@@ -115,7 +115,13 @@ class LivePriceClient:
                             d_vol = float(v_str)
 
                     if ltp > 0:
-                        return {"ltp": ltp, "day_high": max(d_high, ltp), "day_low": min(d_low, ltp), "day_vol": d_vol}
+                        return {
+                            "ltp": ltp,
+                            "day_open": d_open,
+                            "day_high": max(d_high, ltp),
+                            "day_low": min(d_low, ltp),
+                            "day_vol": d_vol
+                        }
         except Exception:
             pass
 
@@ -127,11 +133,18 @@ class LivePriceClient:
                 data = r.json()
                 meta = data.get("chart", {}).get("result", [{}])[0].get("meta", {})
                 ltp = float(meta.get("regularMarketPrice", 0) or 0)
+                d_open = float(meta.get("regularMarketDayOpen", ltp) or ltp)
                 d_high = float(meta.get("regularMarketDayHigh", ltp) or ltp)
                 d_low = float(meta.get("regularMarketDayLow", ltp) or ltp)
                 d_vol = float(meta.get("regularMarketVolume", 0) or 0)
                 if ltp > 0:
-                    return {"ltp": ltp, "day_high": max(d_high, ltp), "day_low": min(d_low, ltp), "day_vol": d_vol}
+                    return {
+                        "ltp": ltp,
+                        "day_open": d_open,
+                        "day_high": max(d_high, ltp),
+                        "day_low": min(d_low, ltp),
+                        "day_vol": d_vol
+                    }
         except Exception:
             pass
         return None
@@ -142,13 +155,16 @@ def clean_and_prepare(raw_data):
         return []
     date_map = {}
     for r in raw_data:
-        if not isinstance(r, dict): continue
+        if not isinstance(r, dict):
+            continue
         raw_t = str(r.get("time", "")).strip()
-        if not raw_t: continue
+        if not raw_t:
+            continue
         d_str = raw_t[:10]
         try:
             c = float(r.get("close", 0) or 0)
-            if c <= 0: continue
+            if c <= 0:
+                continue
             entry = {
                 "time": d_str,
                 "open": float(r.get("open", c) or c),
@@ -165,27 +181,17 @@ def clean_and_prepare(raw_data):
             continue
 
     clean = [date_map[k] for k in sorted(date_map.keys())]
-    running_vol = 50000.0
-    for i in range(len(clean)):
-        v = clean[i]["volume"]
-        dv = clean[i]["delivery_vol"]
-        pct = clean[i]["deliv_pct"]
-        if v > 0:
-            running_vol = 0.9 * running_vol + 0.1 * v
-        else:
-            clean[i]["volume"] = running_vol
-            v = running_vol
-        if dv <= 0:
-            clean[i]["delivery_vol"] = v * (pct / 100.0 if pct > 0 else 0.50)
-            clean[i]["deliv_pct"] = pct if pct > 0 else 50.0
-        elif dv > v:
-            clean[i]["delivery_vol"] = v
-            clean[i]["deliv_pct"] = 100.0
     return clean
 
 
-def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins: int):
-    """Monitors open positions in data/my_trades.json against the 5 Exit 2.2 rules."""
+def monitor_combination7_active_positions(live_client: LivePriceClient, elapsed_mins: int):
+    """
+    Monitors open positions in data/my_trades.json according to Combination 7 rules:
+    - Phase 1 (Pre-+1.5R): Stop = Initial Hard SL (Cheat Low / V-Reversal Low - 0.5%)
+    - Milestone (+1.5R): Book 20% partial profit, move Stop to Entry + 0.5%
+    - Phase 2 (Post-+1.5R): 80% runner trails Daily 20 EMA
+    - Integrated Bifurcated Gap-Down Protocol (9:15 AM severe cut vs 9:30 AM leeway)
+    """
     if not os.path.exists(MY_TRADES_FILE):
         return
     try:
@@ -197,7 +203,6 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
     if not isinstance(trades, list) or not trades:
         return
 
-    expected_fraction = get_u_curve_expected_volume_fraction(elapsed_mins)
     updated_trades = []
 
     for t in trades:
@@ -207,16 +212,19 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
 
         sym = str(t.get("symbol", "")).upper().strip()
         entry_price = float(t.get("entry_price", 0.0))
-        catastrophe_sl = float(t.get("hard_sl", entry_price * 0.92))
+        initial_sl = float(t.get("hard_sl", t.get("stop_loss", entry_price * 0.955)))
+        hit_milestone = bool(t.get("hit_milestone", False))
+        active_stop = float(t.get("active_stop", initial_sl))
         peak_gain_pct = float(t.get("peak_gain_%", 0.0))
-        peak_close = float(t.get("peak_close", entry_price))
-        vdu_under_count = int(t.get("vdu_under_count", 0))
 
+        # Milestone: +1.5R calculation
+        risk_pct = ((entry_price - initial_sl) / entry_price) * 100.0 if entry_price > initial_sl else 3.5
+        t1_target_pct = min(1.5 * risk_pct, 6.0)
+        t1_target_price = round(entry_price * (1.0 + t1_target_pct / 100.0), 2)
+
+        # Indicator extraction from daily history
         ema20 = entry_price * 0.95
-        sma20_vol = 50000.0
-        atr_14 = entry_price * 0.02
-        dist_count_12d = 0
-
+        ema50 = entry_price * 0.90
         sym_json = os.path.join(DATA_DIR, f"{sym}.json")
         if os.path.exists(sym_json):
             try:
@@ -226,21 +234,8 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
                 if len(clean) >= 20:
                     df_hist = pd.DataFrame(clean)
                     ema20 = float(df_hist["close"].ewm(span=20, adjust=False).mean().iloc[-1])
-                    vols = df_hist["volume"].iloc[-20:].tolist()
-                    sma20_vol = float(sum(vols) / len(vols)) if vols else 50000.0
-                    prev_c = df_hist["close"].shift(1)
-                    tr = pd.concat([df_hist["high"] - df_hist["low"], (df_hist["high"] - prev_c).abs(), (df_hist["low"] - prev_c).abs()], axis=1).max(axis=1)
-                    atr_14 = float(tr.rolling(14, min_periods=1).mean().iloc[-1])
-                    dv_sma = df_hist["delivery_vol"].rolling(20, min_periods=1).mean().iloc[-1]
-                    dp_avg = df_hist["deliv_pct"].rolling(50, min_periods=5).mean().iloc[-1]
-                    c_rng = df_hist["high"] - df_hist["low"]
-                    rc = np.where(c_rng > 0, (df_hist["close"] - df_hist["low"]) / c_rng, 0.5)
-                    is_dist = (
-                        (df_hist["close"] < df_hist["close"].shift(1)) &
-                        ((df_hist["delivery_vol"] >= 1.35 * dv_sma) | (df_hist["deliv_pct"] >= 1.15 * dp_avg)) &
-                        (rc <= 0.45)
-                    ).astype(int)
-                    dist_count_12d = int(is_dist.rolling(12, min_periods=1).sum().iloc[-1])
+                    if len(clean) >= 50:
+                        ema50 = float(df_hist["close"].ewm(span=50, adjust=False).mean().iloc[-1])
             except Exception:
                 pass
 
@@ -252,75 +247,76 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
             continue
 
         ltp = quote["ltp"]
+        day_open = quote.get("day_open", ltp)
         day_high = quote["day_high"]
-        day_low = quote["day_low"]
-        day_vol = quote["day_vol"]
 
         curr_gain_pct = ((ltp - entry_price) / entry_price) * 100.0 if entry_price > 0 else 0.0
         peak_gain_pct = max(peak_gain_pct, curr_gain_pct)
-        peak_close = max(peak_close, ltp)
 
-        vol_pace = (day_vol / expected_fraction) / max(1.0, sma20_vol)
-        bar_range = day_high - day_low
-        range_closeness = (ltp - day_low) / bar_range if bar_range > 0 else 0.50
+        # Milestone Check (+1.5R)
+        if not hit_milestone and (day_high >= t1_target_price or ltp >= t1_target_price):
+            hit_milestone = True
+            active_stop = max(active_stop, round(entry_price * 1.005, 2))
+            t["hit_milestone"] = True
+            t["active_stop"] = active_stop
+            if not t.get("t1_alert_sent", False):
+                t1_msg = (
+                    f"🎯 <b>COMBINATION 7: BOOK 20% PROFIT (+1.5R HIT)</b>\n"
+                    f"• <b>Symbol</b>: <code>#{sym}</code>\n"
+                    f"• <b>Target Price</b>: ₹{t1_target_price:,.2f} (+{t1_target_pct:.2f}%)\n"
+                    f"• <b>Live NSE LTP</b>: ₹{ltp:,.2f} (<b>{curr_gain_pct:+.2f}%</b>)\n"
+                    f"• <b>Action</b>: Harvest 20% partial profit. Trail 80% runner on 20 EMA.\n"
+                    f"• <b>Ratcheted Stop</b>: ₹{active_stop:,.2f} (Entry + 0.5% Guaranteed Safe)"
+                )
+                send_telegram_alert(t1_msg)
+                t["t1_alert_sent"] = True
 
+        if hit_milestone:
+            active_stop = max(active_stop, ema20)
+
+        # ======================================================================
+        # BIFURCATED GAP-DOWN DEFENSE & INTRADAY STOP CHECKS
+        # ======================================================================
         exit_triggered = False
         exit_rule = ""
 
-        # 1. Catastrophe Stop
-        if ltp < catastrophe_sl:
-            exit_triggered = True
-            exit_rule = f"1. Catastrophe SL Breach (LTP ₹{ltp:,.2f} < Hard SL ₹{catastrophe_sl:,.2f})"
+        # Check Overnight Gap-Down if checked in first 20 minutes
+        if elapsed_mins <= 20 and day_open < active_stop:
+            gap_depth_pct = ((active_stop - day_open) / active_stop) * 100.0
+            is_severe = (gap_depth_pct > 2.0) or (day_open < ema50)
 
-        # 2. Climactic Churn Harvest
-        elif peak_gain_pct >= 20.0 and vol_pace >= 2.0 and range_closeness <= 0.35:
-            exit_triggered = True
-            exit_rule = f"2. Climactic Churn Harvest (Peak +{peak_gain_pct:.1f}%, Vol Pace {vol_pace:.1f}x)"
-
-        # 3. Distribution Cluster Breakdown
-        elif dist_count_12d >= 3 and ltp < ema20:
-            exit_triggered = True
-            exit_rule = f"3. Distribution Cluster Breakdown ({dist_count_12d} Dist Days & LTP < 20 EMA ₹{ema20:,.2f})"
-
-        # 4. Mega-Runner 15% Cushion Lock
-        elif peak_gain_pct >= 50.0:
-            cushion_stop = max(ema20, peak_close * 0.85)
-            if ltp < cushion_stop:
+            if is_severe:
                 exit_triggered = True
-                exit_rule = f"4. Mega-Runner 15% Cushion Lock (LTP ₹{ltp:,.2f} < Cushion ₹{cushion_stop:,.2f})"
-
-        # 5. 20 EMA Breakdown Engine
-        elif ltp < ema20:
-            if vol_pace >= 1.25:
-                exit_triggered = True
-                exit_rule = f"5A. Heavy Volume 20 EMA Breach (LTP ₹{ltp:,.2f} < ₹{ema20:,.2f} | Pace {vol_pace:.1f}x)"
+                exit_rule = f"Gap-Down Severe Breach (>2% or <50 EMA) @ ₹{day_open:,.2f}"
             else:
-                vdu_under_count += 1
-                atr_floor = ema20 - (1.5 * atr_14)
-                pct_floor = ema20 * 0.95
-                dynamic_leeway = min(pct_floor, atr_floor)
-                guaranteed_be = entry_price * 1.015
-                active_vdu_stop = max(guaranteed_be, dynamic_leeway)
+                # Shallow gap holding 50 EMA: 15-minute leeway
+                if elapsed_mins >= 15:
+                    if ltp < active_stop:
+                        exit_triggered = True
+                        exit_rule = f"Gap-Down 15-Min Leeway Reclaim Failed @ ₹{ltp:,.2f}"
+                else:
+                    t["status_note"] = "Under 15-min gap-down observation (holding above 50 EMA)"
 
-                if ltp < active_vdu_stop:
-                    exit_triggered = True
-                    exit_rule = f"5B. Dynamic VDU Floor Breach (LTP ₹{ltp:,.2f} < Floor ₹{active_vdu_stop:,.2f})"
-                elif vdu_under_count > 5:
-                    exit_triggered = True
-                    exit_rule = "5B. 5-Session VDU Reclaim Failure"
-        else:
-            vdu_under_count = 0
+        # Normal Stop Loss Check (if not exited on gap)
+        if not exit_triggered:
+            if not hit_milestone and ltp <= active_stop:
+                exit_triggered = True
+                exit_rule = f"Hard Stop Breached (LTP ₹{ltp:,.2f} <= ₹{active_stop:,.2f})"
+            elif hit_milestone and ltp < ema20:
+                # For runner, check 20 EMA close / breakdown
+                exit_triggered = True
+                exit_rule = f"Runner 20 EMA Breakdown (LTP ₹{ltp:,.2f} < 20 EMA ₹{ema20:,.2f})"
 
         if exit_triggered and not t.get("exit_alert_sent", False):
             pnl_pct = round(curr_gain_pct, 2)
             exit_msg = (
-                f"🚨 <b>EXIT 2.2 TRIGGER: CLOSE POSITION</b>\n"
+                f"🚨 <b>COMBINATION 7 EXIT TRIGGER: SQUARE OFF</b>\n"
                 f"• <b>Symbol</b>: <code>#{sym}</code>\n"
                 f"• <b>Reason</b>: <b>{exit_rule}</b>\n"
                 f"• <b>Live NSE LTP</b>: ₹{ltp:,.2f} (<b>{pnl_pct:+.2f}%</b>)\n"
                 f"• <b>Entry Price</b>: ₹{entry_price:,.2f}\n"
+                f"• <b>Active Stop</b>: ₹{active_stop:,.2f}\n"
                 f"• <b>20 EMA Floor</b>: ₹{ema20:,.2f}\n"
-                f"• <b>Hard SL</b>: ₹{catastrophe_sl:,.2f}\n"
                 f"• <b>Peak Unrealized</b>: +{peak_gain_pct:.2f}%\n"
                 f"━━━━━━━━━━━━━━━━━━━━\n"
                 f"🛑 <i>Action: Execute square-off order immediately.</i>"
@@ -329,10 +325,10 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
             t["exit_alert_sent"] = True
             t["exit_price"] = ltp
             t["exit_reason"] = exit_rule
+            t["status"] = "CLOSED"
 
         t["peak_gain_%"] = round(peak_gain_pct, 2)
-        t["peak_close"] = round(peak_close, 2)
-        t["vdu_under_count"] = vdu_under_count
+        t["active_stop"] = round(active_stop, 2)
         updated_trades.append(t)
 
     try:
@@ -342,89 +338,44 @@ def monitor_exit2_2_active_positions(live_client: LivePriceClient, elapsed_mins:
         pass
 
 
-def load_nifty750_symbols():
-    if os.path.exists(NIFTY750_FILE):
-        try:
-            with open(NIFTY750_FILE, "r", encoding="utf-8") as fp:
-                data = json.load(fp)
-            if isinstance(data, list):
-                return {str(x).strip().upper() for x in data}
-            if isinstance(data, dict):
-                return {str(x).strip().upper() for x in data.keys()}
-        except Exception:
-            pass
-    return set()
-
-
-def load_comprehensive_targets(n750_set):
+def load_active_prebreakout_targets():
     """
-    Loads candidates strictly generated by Swing Ultra 750 & Swing Ultra Non-750.
-    Retains candidates up to 5 days, pruning setups whose structural floor is broken.
+    Loads candidates directly from active_watchlist.json (and fallback to swing_ultra results).
+    Persists candidates indefinitely unless structural floor is violated.
     """
     targets = {}
-    today_dt = get_ist_now().date()
-    sources = [
-        (os.path.join(DATA_DIR, "swing_ultra750_results.json"), "NIFTY 750"),
-        (os.path.join(DATA_DIR, "swing_ultraN750_results.json"), "NON-N750")
-    ]
 
-    for fpath, default_univ in sources:
-        if not os.path.exists(fpath):
-            continue
+    # Primary: active_watchlist.json
+    if os.path.exists(ACTIVE_WATCHLIST_FILE):
         try:
-            with open(fpath, "r", encoding="utf-8") as fp:
-                d = json.load(fp)
-            items = list(d.get("Watchlist", [])) + list(d.get("Fresh_Triggers", []))
-            for item in items:
-                sym = str(item.get("symbol", "")).strip().upper()
-                if not sym or sym.endswith("BEES") or sym in EXCLUDED_SYMBOLS:
-                    continue
-                p_str = str(item.get("pivot_ceiling") or item.get("pivot_target") or item.get("pivot") or "0").replace("₹", "").replace(",", "").strip()
-                pivot = float(p_str)
-                if pivot <= 0: continue
-                sl_str = str(item.get("stop_loss", pivot * 0.92)).replace("₹", "").replace(",", "").strip()
-                stop_loss = float(sl_str)
-                spread_pct = float(str(item.get("spread_%", "6.0")).replace("%", "") or 6.0)
-                setup = item.get("setup_class") or item.get("type") or "LAUNCHPAD COIL"
-                univ = "NIFTY 750" if (n750_set and sym in n750_set) else default_univ
-
-                targets[sym] = {
-                    "symbol": sym,
-                    "universe": univ,
-                    "setup": setup,
-                    "pivot_ceiling": pivot,
-                    "stop_loss": stop_loss,
-                    "shelf_spread_%": spread_pct,
-                    "added_date": str(today_dt)
-                }
-        except Exception:
-            pass
-
-    # Carry forward historical watchlists up to 5 sessions
-    if os.path.exists(LIVE_BREAKOUTS_FILE):
-        try:
-            with open(LIVE_BREAKOUTS_FILE, "r", encoding="utf-8") as f:
-                prev = json.load(f)
-            historical_watchlist = prev.get("Active_MultiDay_Watchlist", {})
-            for sym, item in historical_watchlist.items():
-                if sym in targets or sym in EXCLUDED_SYMBOLS:
-                    continue
-                try:
-                    entry_dt = datetime.datetime.strptime(item.get("added_date", str(today_dt)), "%Y-%m-%d").date()
-                    age_days = (today_dt - entry_dt).days
-                except Exception:
-                    age_days = 99
-
-                # Check if still within 5 session window
-                if age_days <= WATCHLIST_MAX_AGE_DAYS:
-                    pivot = float(item.get("pivot_ceiling", 0))
-                    sl = float(item.get("stop_loss", pivot * 0.92))
-                    if pivot > 0:
+            with open(ACTIVE_WATCHLIST_FILE, "r", encoding="utf-8") as fp:
+                data = json.load(fp)
+            if isinstance(data, dict):
+                for sym, item in data.items():
+                    targets[sym.upper()] = item
+            elif isinstance(data, list):
+                for item in data:
+                    sym = str(item.get("symbol", "")).upper().strip()
+                    if sym:
                         targets[sym] = item
         except Exception:
             pass
 
-    return targets
+    # Secondary: fallback to swing_ultra750_results.json and swing_ultraN750_results.json
+    for fpath in ["swing_ultra750_results.json", "swing_ultraN750_results.json"]:
+        full_p = os.path.join(DATA_DIR, fpath)
+        if os.path.exists(full_p):
+            try:
+                with open(full_p, "r", encoding="utf-8") as fp:
+                    d = json.load(fp)
+                for item in d.get("Watchlist", []):
+                    sym = str(item.get("symbol", "")).upper().strip()
+                    if sym and sym not in targets:
+                        targets[sym] = item
+            except Exception:
+                pass
+
+    return {k: v for k, v in targets.items() if k not in EXCLUDED_SYMBOLS}
 
 
 def run_live_intraday_scan():
@@ -433,10 +384,19 @@ def run_live_intraday_scan():
     now_str = now_dt.strftime("%Y-%m-%d %I:%M:%S %p IST")
     elapsed_mins = get_market_session_elapsed()
 
-    n750_set = load_nifty750_symbols()
-    targets = load_comprehensive_targets(n750_set)
+    live_client = LivePriceClient()
 
-    # State variables
+    # Step 1: Monitor Active Positions for Combination 7 SL / Milestone / 20 EMA Runner Exits
+    monitor_combination7_active_positions(live_client, elapsed_mins)
+
+    # Step 2: Load Active Pre-Breakout Targets
+    targets = load_active_prebreakout_targets()
+    if not targets:
+        print("❌ No active pre-breakout candidates found in watchlist.")
+        return
+
+    expected_fraction = get_u_curve_expected_volume_fraction(elapsed_mins)
+
     alert1_sent = set()
     alert2_sent = set()
     benchmark_highs = {}
@@ -456,32 +416,22 @@ def run_live_intraday_scan():
         except Exception:
             pass
 
-    live_client = LivePriceClient()
-
-    # Step 1: Monitor Active Trades for Exit 2.2
-    monitor_exit2_2_active_positions(live_client, elapsed_mins)
-
-    if not targets:
-        print("❌ No institutional candidates currently eligible for scanning.")
-        return
-
-    expected_fraction = get_u_curve_expected_volume_fraction(elapsed_mins)
-
     radar_candidates = []
     coiling_list = []
-    multi_day_watchlist = {}
+    persisted_watchlist = {}
 
     for sym, meta in targets.items():
-        pivot = float(meta["pivot_ceiling"])
-        stop_loss = float(meta["stop_loss"])
-        universe = meta["universe"]
-        setup = meta["setup"]
-        shelf_spread = float(meta.get("shelf_spread_%", 6.0))
+        pivot = float(meta.get("pivot_ceiling", 0.0))
+        stop_loss = float(meta.get("stop_loss", pivot * 0.955))
+        universe = meta.get("universe", "NIFTY 750")
+        setup = meta.get("setup", "LAUNCHPAD CHEAT")
+        max_allowed_open = float(meta.get("max_allowed_open", round(pivot * 1.02, 2)))
 
         quote = live_client.fetch_live_quote(sym)
         time.sleep(0.04)
 
         ltp = None
+        day_open = None
         day_high = None
         day_low = None
         day_vol = 0.0
@@ -489,6 +439,7 @@ def run_live_intraday_scan():
 
         if quote:
             ltp = quote["ltp"]
+            day_open = quote.get("day_open", ltp)
             day_high = quote["day_high"]
             day_low = quote["day_low"]
             day_vol = quote["day_vol"]
@@ -506,6 +457,7 @@ def run_live_intraday_scan():
                     if ltp is None or ltp <= 0:
                         last_c = float(clean[-1].get("close", pivot))
                         ltp = last_c
+                        day_open = float(clean[-1].get("open", last_c))
                         day_high = float(clean[-1].get("high", last_c))
                         day_low = float(clean[-1].get("low", last_c))
             except Exception:
@@ -513,42 +465,62 @@ def run_live_intraday_scan():
 
         if ltp is None or ltp <= 0:
             ltp = pivot
+            day_open = pivot
             day_high = pivot
             day_low = pivot
 
         day_high = max(day_high or ltp, ltp)
         day_low = min(day_low or ltp, ltp)
+        day_open = day_open or ltp
 
-        # PRUNE INVALIDATED SETUPS: If price breaks below base stop floor, purge it from multi-day tracking
+        # PERSISTENCE & PRUNING: Only prune if structural base stop floor is breached
         if ltp < stop_loss:
             continue
 
-        multi_day_watchlist[sym] = meta
+        persisted_watchlist[sym] = meta
 
         sma20_vol = max(1.0, sma20_vol)
         proj_vol = day_vol / expected_fraction
         vol_pace = round(proj_vol / sma20_vol, 2) if sma20_vol > 0 else 1.0
 
         clearance_pct = round(((ltp - pivot) / pivot) * 100.0, 2)
-        risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 8.0
+        risk_pct = round(((pivot - stop_loss) / pivot) * 100.0, 2) if pivot > stop_loss else 3.5
 
-        # Universe Aligned Volume Hurdle
-        is_v_reversal = "V-REVERSAL" in setup
-        if is_v_reversal:
-            pace_threshold = 1.30 if universe == "NIFTY 750" else 1.20
-        else:
-            if elapsed_mins <= 60:
-                pace_threshold = 1.05 if universe == "NIFTY 750" else 0.80
-            else:
-                pace_threshold = 1.20 if universe == "NIFTY 750" else 0.85
-                if shelf_spread > 7.0:
-                    pace_threshold += 0.20
-
+        # Volume Pace Threshold
+        pace_threshold = 1.20 if universe == "NIFTY 750" else 0.90
         is_vol_confirmed = bool(vol_pace >= pace_threshold)
-        cleared_pivot = bool(clearance_pct >= 0.15)
+
+        # ======================================================================
+        # EMPIRICAL GAP-UP & BREAKOUT ACTION PLAN
+        # ======================================================================
+        opening_gap_pct = round(((day_open - pivot) / pivot) * 100.0, 2) if pivot > 0 else 0.0
+
+        is_breakout_valid = False
+        disqualification_reason = ""
+
+        # Tier 3: Severe Extension (> +2.0% Gap-Up) -> AVOID / DISQUALIFIED
+        if day_open > max_allowed_open or opening_gap_pct > 2.0:
+            disqualification_reason = f"Extended Gap-Up (+{opening_gap_pct:.1f}% > +2.0% Cap - 60% Fade Risk)"
+            is_breakout_valid = False
+
+        # Tier 2: Modest Gap (0.0% < Gap <= +2.0%) -> 9:20 AM Confirmation
+        elif opening_gap_pct > 0.0:
+            if elapsed_mins < 5:
+                disqualification_reason = f"Modest Gap (+{opening_gap_pct:.1f}%): Awaiting 9:20 AM Opening Range High"
+                is_breakout_valid = False
+            else:
+                # Requires LTP pushing above the opening range
+                if ltp > day_open and ltp >= pivot and is_vol_confirmed:
+                    is_breakout_valid = True
+
+        # Tier 1: Normal Open (Open <= Pivot) -> Standard Pivot Clearance
+        else:
+            if ltp >= pivot and is_vol_confirmed:
+                is_breakout_valid = True
+
         wick_touched = bool(day_high >= pivot)
 
-        if wick_touched or cleared_pivot:
+        if wick_touched or is_breakout_valid:
             if sym not in benchmark_highs:
                 benchmark_highs[sym] = round(day_high, 2)
             else:
@@ -560,18 +532,19 @@ def run_live_intraday_scan():
             "setup": setup,
             "pivot_ceiling": round(pivot, 2),
             "ltp": round(ltp, 2),
+            "day_open": round(day_open, 2),
             "day_high": round(day_high, 2),
             "day_low": round(day_low, 2),
             "stop_loss": round(stop_loss, 2),
             "risk_%": risk_pct,
+            "opening_gap_%": opening_gap_pct,
             "clearance_%": clearance_pct,
-            "proj_vol_pace": vol_pace
+            "proj_vol_pace": vol_pace,
+            "disqualification_reason": disqualification_reason
         }
 
-        # ----------------------------------------------------------------------
-        # ALERT 1: ZERO-DELAY SINGLE-TICK CEILING CLEARANCE
-        # ----------------------------------------------------------------------
-        if cleared_pivot and is_vol_confirmed:
+        # ALERT 1: CONFIRMED BREAKOUT TRIGGER
+        if is_breakout_valid:
             record["action"] = "CONFIRMED BREAKOUT"
             radar_candidates.append(record)
             master_confirmed_breakouts[sym] = record
@@ -579,25 +552,25 @@ def run_live_intraday_scan():
             if sym not in alert1_sent:
                 ref_h = benchmark_highs.get(sym, day_high)
                 msg1 = (
-                    f"👀 <b>RADAR: INSTITUTIONAL BREAKOUT CONFIRMED</b>\n"
+                    f"👀 <b>RADAR: COMBINATION 7 BREAKOUT TRIGGERED</b>\n"
                     f"• <b>Symbol</b>: <code>#{sym}</code> ({universe} | {setup})\n"
                     f"• <b>Pivot Ceiling</b>: ₹{pivot:,.2f}\n"
                     f"• <b>Live NSE LTP</b>: ₹{ltp:,.2f} (<b>{clearance_pct:+.2f}%</b>)\n"
-                    f"• <b>Session Day High</b>: ₹{day_high:,.2f}\n"
+                    f"• <b>Day Open</b>: ₹{day_open:,.2f} (Gap: {opening_gap_pct:+.2f}%)\n"
                     f"• <b>Volume Pace</b>: <b>{vol_pace}x SMA20</b>\n"
                     f"• <b>Stop Loss</b>: ₹{stop_loss:,.2f} (Risk: {risk_pct}%)\n"
-                    f"📌 <i>Alert 1 dispatched on tick 1. Tracking for continuation above ₹{ref_h:,.2f}.</i>"
+                    f"• <b>T1 (+1.5R) Target</b>: ₹{round(ltp * (1.0 + min(1.5*risk_pct, 6.0)/100.0), 2):,.2f}\n"
+                    f"━━━━━━━━━━━━━━━━━━━━\n"
+                    f"📌 <i>Alert 1 dispatched. Tracking for continuation above ₹{ref_h:,.2f}.</i>"
                 )
                 send_telegram_alert(msg1)
                 alert1_sent.add(sym)
                 time.sleep(1)
 
-        # ----------------------------------------------------------------------
-        # ALERT 2: AUTONOMOUS DAY-HIGH BREAK
-        # ----------------------------------------------------------------------
+        # ALERT 2: DAY-HIGH EXPANSION
         if sym not in alert2_sent and sym in benchmark_highs:
             prior_ref_high = float(benchmark_highs[sym])
-            if ltp >= (prior_ref_high * 1.0015) and ltp > pivot and is_vol_confirmed:
+            if ltp >= (prior_ref_high * 1.0015) and ltp > pivot and is_vol_confirmed and not disqualification_reason:
                 record["action"] = "CONFIRMED BREAKOUT"
                 master_confirmed_breakouts[sym] = record
 
@@ -616,17 +589,19 @@ def run_live_intraday_scan():
                 benchmark_highs[sym] = round(day_high, 2)
                 time.sleep(1)
 
-        # Watchlist Coiling & Rejection State
-        if not cleared_pivot:
-            record["action"] = "WICK REJECTED" if wick_touched else "COILING"
+        if not is_breakout_valid:
+            if disqualification_reason:
+                record["action"] = "DISQUALIFIED / EXTENDED"
+            elif wick_touched:
+                record["action"] = "WICK REJECTED"
+            else:
+                record["action"] = "COILING"
             coiling_list.append(record)
 
     coiling_list.sort(key=lambda x: x["clearance_%"], reverse=True)
     final_confirmed = list(master_confirmed_breakouts.values())
 
-    # --------------------------------------------------------------------------
-    # 03:15 PM EOD CLOSING SUMMARY (CNC DELIVERY EXECUTION)
-    # --------------------------------------------------------------------------
+    # 03:15 PM EOD SUMMARY
     if elapsed_mins >= 360 and not eod_summary_sent:
         summary_msg = (
             f"🎯 <b>CONFIRMED CLOSING BREAKOUTS (3:15 PM EXECUTION)</b>\n"
@@ -643,12 +618,6 @@ def run_live_intraday_scan():
         else:
             summary_msg += "<i>No candidates held above pivot with verified volume today.</i>\n"
 
-        wicked = [c for c in coiling_list if c["action"] == "WICK REJECTED"][:5]
-        if wicked:
-            summary_msg += "\n<b>⚠️ Upper Wick Rejections (Avoid):</b>\n"
-            for w in wicked:
-                summary_msg += f"🔴 {w['symbol']}: High ₹{w['day_high']:,.2f} ➔ LTP ₹{w['ltp']:,.2f} ({w['clearance_%']:+.2f}%)\n"
-
         send_telegram_alert(summary_msg)
         eod_summary_sent = True
 
@@ -662,14 +631,18 @@ def run_live_intraday_scan():
         "Benchmark_Highs": benchmark_highs,
         "Master_Confirmed_Breakouts": master_confirmed_breakouts,
         "Breakouts_All_Day": final_confirmed,
-        "Active_MultiDay_Watchlist": multi_day_watchlist,
+        "Active_MultiDay_Watchlist": persisted_watchlist,
         "Coiling": coiling_list[:50]
     }
 
     with open(LIVE_BREAKOUTS_FILE, "w", encoding="utf-8") as f:
         json.dump(output_payload, f, indent=2)
 
-    print(f"✅ V1 Scan Complete: {len(final_confirmed)} Master Confirmed, {len(coiling_list)} Coils.")
+    # Save persisted active watchlist back
+    with open(ACTIVE_WATCHLIST_FILE, "w", encoding="utf-8") as f:
+        json.dump(persisted_watchlist, f, indent=2)
+
+    print(f"✅ Combination 7 Live Scan Complete: {len(final_confirmed)} Confirmed, {len(coiling_list)} Coils/Observed.")
 
 
 if __name__ == "__main__":
