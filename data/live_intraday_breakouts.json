@@ -1,28 +1,28 @@
 {
   "Date": "2026-11-10",
-  "Scan_Timestamp": "2026-11-10 01:59:10 PM IST",
-  "Elapsed_Minutes": 284,
+  "Scan_Timestamp": "2026-11-10 02:02:20 PM IST",
+  "Elapsed_Minutes": 287,
   "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "SMLMAH",
-    "FCL",
-    "KPL",
-    "DELTACORP",
-    "DCBBANK",
-    "MUFIN",
+    "BIRLACABLE",
     "GPPL",
     "WELENT",
-    "KDDL",
-    "BIRLACABLE",
-    "STYLEBAAZA",
     "ORIENTELEC",
-    "RACLGEAR",
-    "VINCOFE",
-    "TFCILTD",
+    "FOSECOIND",
     "UFLEX",
-    "PVTBANIETF",
+    "RACLGEAR",
     "PARAGMILK",
-    "FOSECOIND"
+    "PVTBANIETF",
+    "TFCILTD",
+    "STYLEBAAZA",
+    "DELTACORP",
+    "KPL",
+    "DCBBANK",
+    "SMLMAH",
+    "VINCOFE",
+    "FCL",
+    "MUFIN",
+    "KDDL"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -79,7 +79,7 @@
       "stop_loss": 154.27,
       "risk_%": 8.0,
       "clearance_%": 1.72,
-      "proj_vol_pace": 1.7,
+      "proj_vol_pace": 1.68,
       "action": "CONFIRMED BREAKOUT"
     },
     "DCBBANK": {
@@ -121,7 +121,7 @@
       "stop_loss": 26.77,
       "risk_%": 7.5,
       "clearance_%": 3.39,
-      "proj_vol_pace": 1.5,
+      "proj_vol_pace": 1.49,
       "action": "CONFIRMED BREAKOUT"
     },
     "SMLMAH": {
@@ -149,7 +149,7 @@
       "stop_loss": 71.93,
       "risk_%": 8.0,
       "clearance_%": 3.76,
-      "proj_vol_pace": 2.52,
+      "proj_vol_pace": 2.5,
       "action": "CONFIRMED BREAKOUT"
     },
     "UFLEX": {
@@ -163,7 +163,7 @@
       "stop_loss": 547.22,
       "risk_%": 8.0,
       "clearance_%": 1.97,
-      "proj_vol_pace": 2.21,
+      "proj_vol_pace": 2.19,
       "action": "CONFIRMED BREAKOUT"
     },
     "KPL": {
@@ -177,7 +177,7 @@
       "stop_loss": 3480.36,
       "risk_%": 8.0,
       "clearance_%": 1.94,
-      "proj_vol_pace": 3.23,
+      "proj_vol_pace": 3.2,
       "action": "CONFIRMED BREAKOUT"
     },
     "STYLEBAAZA": {
@@ -191,7 +191,7 @@
       "stop_loss": 351.44,
       "risk_%": 8.0,
       "clearance_%": 9.4,
-      "proj_vol_pace": 3.83,
+      "proj_vol_pace": 3.8,
       "action": "CONFIRMED BREAKOUT"
     },
     "RACLGEAR": {
@@ -233,7 +233,7 @@
       "stop_loss": 298.5,
       "risk_%": 10.09,
       "clearance_%": 3.95,
-      "proj_vol_pace": 1.39,
+      "proj_vol_pace": 1.38,
       "action": "CONFIRMED BREAKOUT"
     },
     "MUFIN": {
@@ -261,7 +261,7 @@
       "stop_loss": 3611.0,
       "risk_%": 8.0,
       "clearance_%": 6.94,
-      "proj_vol_pace": 1.64,
+      "proj_vol_pace": 1.63,
       "action": "CONFIRMED BREAKOUT"
     },
     "PARAGMILK": {
@@ -347,7 +347,7 @@
       "stop_loss": 154.27,
       "risk_%": 8.0,
       "clearance_%": 1.72,
-      "proj_vol_pace": 1.7,
+      "proj_vol_pace": 1.68,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -389,7 +389,7 @@
       "stop_loss": 26.77,
       "risk_%": 7.5,
       "clearance_%": 3.39,
-      "proj_vol_pace": 1.5,
+      "proj_vol_pace": 1.49,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -417,7 +417,7 @@
       "stop_loss": 71.93,
       "risk_%": 8.0,
       "clearance_%": 3.76,
-      "proj_vol_pace": 2.52,
+      "proj_vol_pace": 2.5,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -431,7 +431,7 @@
       "stop_loss": 547.22,
       "risk_%": 8.0,
       "clearance_%": 1.97,
-      "proj_vol_pace": 2.21,
+      "proj_vol_pace": 2.19,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -445,7 +445,7 @@
       "stop_loss": 3480.36,
       "risk_%": 8.0,
       "clearance_%": 1.94,
-      "proj_vol_pace": 3.23,
+      "proj_vol_pace": 3.2,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -459,7 +459,7 @@
       "stop_loss": 351.44,
       "risk_%": 8.0,
       "clearance_%": 9.4,
-      "proj_vol_pace": 3.83,
+      "proj_vol_pace": 3.8,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -501,7 +501,7 @@
       "stop_loss": 298.5,
       "risk_%": 10.09,
       "clearance_%": 3.95,
-      "proj_vol_pace": 1.39,
+      "proj_vol_pace": 1.38,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -529,7 +529,7 @@
       "stop_loss": 3611.0,
       "risk_%": 8.0,
       "clearance_%": 6.94,
-      "proj_vol_pace": 1.64,
+      "proj_vol_pace": 1.63,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -873,7 +873,7 @@
       "stop_loss": 888.63,
       "risk_%": 8.0,
       "clearance_%": 0.01,
-      "proj_vol_pace": 1.19,
+      "proj_vol_pace": 1.18,
       "action": "WICK REJECTED"
     },
     {
@@ -887,7 +887,7 @@
       "stop_loss": 323.52,
       "risk_%": 8.0,
       "clearance_%": -0.37,
-      "proj_vol_pace": 0.68,
+      "proj_vol_pace": 0.67,
       "action": "WICK REJECTED"
     },
     {
@@ -915,7 +915,7 @@
       "stop_loss": 390.95,
       "risk_%": 8.0,
       "clearance_%": -1.84,
-      "proj_vol_pace": 0.79,
+      "proj_vol_pace": 0.78,
       "action": "WICK REJECTED"
     },
     {
@@ -929,7 +929,7 @@
       "stop_loss": 1559.86,
       "risk_%": 8.0,
       "clearance_%": -2.37,
-      "proj_vol_pace": 1.25,
+      "proj_vol_pace": 1.24,
       "action": "WICK REJECTED"
     },
     {
@@ -943,7 +943,7 @@
       "stop_loss": 70.23,
       "risk_%": 8.0,
       "clearance_%": -2.61,
-      "proj_vol_pace": 1.44,
+      "proj_vol_pace": 1.43,
       "action": "WICK REJECTED"
     },
     {
@@ -985,7 +985,7 @@
       "stop_loss": 368.0,
       "risk_%": 8.0,
       "clearance_%": -3.06,
-      "proj_vol_pace": 0.77,
+      "proj_vol_pace": 0.76,
       "action": "COILING"
     },
     {
@@ -999,7 +999,7 @@
       "stop_loss": 1019.36,
       "risk_%": 8.0,
       "clearance_%": -4.9,
-      "proj_vol_pace": 0.64,
+      "proj_vol_pace": 0.63,
       "action": "COILING"
     },
     {
@@ -1013,7 +1013,7 @@
       "stop_loss": 1711.2,
       "risk_%": 8.0,
       "clearance_%": -5.15,
-      "proj_vol_pace": 1.1,
+      "proj_vol_pace": 1.09,
       "action": "COILING"
     }
   ]
