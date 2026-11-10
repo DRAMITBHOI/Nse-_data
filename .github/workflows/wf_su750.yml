@@ -3,12 +3,17 @@ name: Run Daily Swing Ultra 750
 on:
   workflow_dispatch:
 
+concurrency:
+  group: scanner-su-750
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Repository with LFS
@@ -29,21 +34,28 @@ jobs:
 
       - name: Execute Daily Swing Ultra 750 Scanner
         run: |
-          python Swing_ultra750.py
+          # Handles case sensitivity on Linux runner
+          if [ -f "swing_ultra750.py" ]; then
+            python swing_ultra750.py
+          elif [ -f "Swing_ultra750.py" ]; then
+            python Swing_ultra750.py
+          else
+            echo "Error: swing_ultra750.py script not found!"
+            exit 1
+          fi
 
       - name: Commit & Push Scanner Output
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Stage all updated results, logs, and data files
-          git add -A
+          # Stage both root and data/ results plus consolidated active_watchlist.json
+          git add swing_ultra750_results.json || true
+          git add data/swing_ultra750_results.json || true
+          git add data/active_watchlist.json || true
           
-          # Check if there are changes to commit
           if ! git diff --quiet || ! git diff --staged --quiet; then
-            git commit -m "Auto-update Swing Ultra 750 Daily Scanner [skip ci]"
-            
-            # Rebase cleanly against any remote edits before pushing
+            git commit -m "Auto-update Swing Ultra 750 & Active Watchlist [skip ci]"
             git pull --rebase --autostash origin main
             git push origin main
           else
