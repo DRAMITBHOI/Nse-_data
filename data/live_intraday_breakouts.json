@@ -1,28 +1,28 @@
 {
   "Date": "2026-11-10",
-  "Scan_Timestamp": "2026-11-10 01:53:10 PM IST",
-  "Elapsed_Minutes": 278,
+  "Scan_Timestamp": "2026-11-10 01:56:12 PM IST",
+  "Elapsed_Minutes": 281,
   "EOD_Summary_Sent": false,
   "Alert1_Sent": [
-    "KPL",
-    "DELTACORP",
-    "VINCOFE",
-    "DCBBANK",
-    "PVTBANIETF",
-    "ORIENTELEC",
-    "RACLGEAR",
-    "BIRLACABLE",
-    "TFCILTD",
-    "MUFIN",
-    "SMLMAH",
-    "WELENT",
-    "GPPL",
-    "STYLEBAAZA",
-    "UFLEX",
-    "PARAGMILK",
-    "FCL",
     "FOSECOIND",
-    "KDDL"
+    "VINCOFE",
+    "GPPL",
+    "UFLEX",
+    "KPL",
+    "PARAGMILK",
+    "DELTACORP",
+    "PVTBANIETF",
+    "SMLMAH",
+    "BIRLACABLE",
+    "ORIENTELEC",
+    "STYLEBAAZA",
+    "FCL",
+    "KDDL",
+    "DCBBANK",
+    "TFCILTD",
+    "WELENT",
+    "MUFIN",
+    "RACLGEAR"
   ],
   "Alert2_Sent": [],
   "Benchmark_Highs": {
@@ -79,7 +79,7 @@
       "stop_loss": 154.27,
       "risk_%": 8.0,
       "clearance_%": 1.72,
-      "proj_vol_pace": 1.72,
+      "proj_vol_pace": 1.71,
       "action": "CONFIRMED BREAKOUT"
     },
     "DCBBANK": {
@@ -121,7 +121,7 @@
       "stop_loss": 26.77,
       "risk_%": 7.5,
       "clearance_%": 3.39,
-      "proj_vol_pace": 1.53,
+      "proj_vol_pace": 1.52,
       "action": "CONFIRMED BREAKOUT"
     },
     "SMLMAH": {
@@ -149,7 +149,7 @@
       "stop_loss": 71.93,
       "risk_%": 8.0,
       "clearance_%": 3.76,
-      "proj_vol_pace": 2.56,
+      "proj_vol_pace": 2.54,
       "action": "CONFIRMED BREAKOUT"
     },
     "UFLEX": {
@@ -163,7 +163,7 @@
       "stop_loss": 547.22,
       "risk_%": 8.0,
       "clearance_%": 1.97,
-      "proj_vol_pace": 2.24,
+      "proj_vol_pace": 2.22,
       "action": "CONFIRMED BREAKOUT"
     },
     "KPL": {
@@ -177,7 +177,7 @@
       "stop_loss": 3480.36,
       "risk_%": 8.0,
       "clearance_%": 1.94,
-      "proj_vol_pace": 3.28,
+      "proj_vol_pace": 3.26,
       "action": "CONFIRMED BREAKOUT"
     },
     "STYLEBAAZA": {
@@ -191,7 +191,7 @@
       "stop_loss": 351.44,
       "risk_%": 8.0,
       "clearance_%": 9.4,
-      "proj_vol_pace": 3.89,
+      "proj_vol_pace": 3.86,
       "action": "CONFIRMED BREAKOUT"
     },
     "RACLGEAR": {
@@ -233,7 +233,7 @@
       "stop_loss": 298.5,
       "risk_%": 10.09,
       "clearance_%": 3.95,
-      "proj_vol_pace": 1.42,
+      "proj_vol_pace": 1.4,
       "action": "CONFIRMED BREAKOUT"
     },
     "MUFIN": {
@@ -261,7 +261,7 @@
       "stop_loss": 3611.0,
       "risk_%": 8.0,
       "clearance_%": 6.94,
-      "proj_vol_pace": 1.67,
+      "proj_vol_pace": 1.65,
       "action": "CONFIRMED BREAKOUT"
     },
     "PARAGMILK": {
@@ -347,7 +347,7 @@
       "stop_loss": 154.27,
       "risk_%": 8.0,
       "clearance_%": 1.72,
-      "proj_vol_pace": 1.72,
+      "proj_vol_pace": 1.71,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -389,7 +389,7 @@
       "stop_loss": 26.77,
       "risk_%": 7.5,
       "clearance_%": 3.39,
-      "proj_vol_pace": 1.53,
+      "proj_vol_pace": 1.52,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -417,7 +417,7 @@
       "stop_loss": 71.93,
       "risk_%": 8.0,
       "clearance_%": 3.76,
-      "proj_vol_pace": 2.56,
+      "proj_vol_pace": 2.54,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -431,7 +431,7 @@
       "stop_loss": 547.22,
       "risk_%": 8.0,
       "clearance_%": 1.97,
-      "proj_vol_pace": 2.24,
+      "proj_vol_pace": 2.22,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -445,7 +445,7 @@
       "stop_loss": 3480.36,
       "risk_%": 8.0,
       "clearance_%": 1.94,
-      "proj_vol_pace": 3.28,
+      "proj_vol_pace": 3.26,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -459,7 +459,7 @@
       "stop_loss": 351.44,
       "risk_%": 8.0,
       "clearance_%": 9.4,
-      "proj_vol_pace": 3.89,
+      "proj_vol_pace": 3.86,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -501,7 +501,7 @@
       "stop_loss": 298.5,
       "risk_%": 10.09,
       "clearance_%": 3.95,
-      "proj_vol_pace": 1.42,
+      "proj_vol_pace": 1.4,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -529,7 +529,7 @@
       "stop_loss": 3611.0,
       "risk_%": 8.0,
       "clearance_%": 6.94,
-      "proj_vol_pace": 1.67,
+      "proj_vol_pace": 1.65,
       "action": "CONFIRMED BREAKOUT"
     },
     {
@@ -873,7 +873,7 @@
       "stop_loss": 888.63,
       "risk_%": 8.0,
       "clearance_%": 0.01,
-      "proj_vol_pace": 1.21,
+      "proj_vol_pace": 1.2,
       "action": "WICK REJECTED"
     },
     {
@@ -887,7 +887,7 @@
       "stop_loss": 323.52,
       "risk_%": 8.0,
       "clearance_%": -0.37,
-      "proj_vol_pace": 0.69,
+      "proj_vol_pace": 0.68,
       "action": "WICK REJECTED"
     },
     {
@@ -901,7 +901,7 @@
       "stop_loss": 147.14,
       "risk_%": 8.0,
       "clearance_%": -1.83,
-      "proj_vol_pace": 0.39,
+      "proj_vol_pace": 0.38,
       "action": "COILING"
     },
     {
@@ -929,7 +929,7 @@
       "stop_loss": 1559.86,
       "risk_%": 8.0,
       "clearance_%": -2.37,
-      "proj_vol_pace": 1.27,
+      "proj_vol_pace": 1.26,
       "action": "WICK REJECTED"
     },
     {
@@ -943,7 +943,7 @@
       "stop_loss": 70.23,
       "risk_%": 8.0,
       "clearance_%": -2.61,
-      "proj_vol_pace": 1.47,
+      "proj_vol_pace": 1.46,
       "action": "WICK REJECTED"
     },
     {
@@ -957,7 +957,7 @@
       "stop_loss": 9.32,
       "risk_%": 8.0,
       "clearance_%": -2.67,
-      "proj_vol_pace": 0.91,
+      "proj_vol_pace": 0.9,
       "action": "WICK REJECTED"
     },
     {
@@ -971,7 +971,7 @@
       "stop_loss": 73.78,
       "risk_%": 8.0,
       "clearance_%": -2.97,
-      "proj_vol_pace": 0.94,
+      "proj_vol_pace": 0.93,
       "action": "WICK REJECTED"
     },
     {
@@ -985,7 +985,7 @@
       "stop_loss": 368.0,
       "risk_%": 8.0,
       "clearance_%": -3.06,
-      "proj_vol_pace": 0.78,
+      "proj_vol_pace": 0.77,
       "action": "COILING"
     },
     {
@@ -999,7 +999,7 @@
       "stop_loss": 1019.36,
       "risk_%": 8.0,
       "clearance_%": -4.9,
-      "proj_vol_pace": 0.65,
+      "proj_vol_pace": 0.64,
       "action": "COILING"
     },
     {
@@ -1013,7 +1013,7 @@
       "stop_loss": 1711.2,
       "risk_%": 8.0,
       "clearance_%": -5.15,
-      "proj_vol_pace": 1.12,
+      "proj_vol_pace": 1.11,
       "action": "COILING"
     }
   ]
