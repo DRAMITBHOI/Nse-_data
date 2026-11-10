@@ -122,7 +122,7 @@ def load_nifty750_symbols():
 
 def run_swing_ultra750():
     print("=" * 85)
-    print("🚀 SWING ULTRA 750 (COMBINATION 7 - INTEGRATED GAP-DOWN PROTOCOL)")
+    print("🚀 SWING ULTRA 750 (COMBINATION 7 - GAP-DOWN & GAP-UP INTEGRATED)")
     print("   Universe: Nifty 750 Core (Turnover >= ₹10 Cr/d)")
     print("=" * 85)
 
@@ -136,11 +136,11 @@ def run_swing_ultra750():
         "fundamentals.json", "backtest_results.json", "swing_ultra750_results.json",
         "swing_ultraN750_results.json", "live_intraday_breakouts.json",
         "live_intraday_breakouts_v2.json", "accuracy_audit_log.json", "my_trades.json",
-        "gap_down_audit_results.json", "gap_down_audit_full_results.json"
+        "gap_down_audit_results.json", "gap_down_audit_full_results.json",
+        "gap_up_empirical_audit_results.json"
     }
 
     target_files = [p for p in sorted(json_files) if os.path.basename(p) not in excluded]
-    # Filter strictly for Nifty 750 symbols
     if n750_set:
         target_files = [p for p in target_files if os.path.splitext(os.path.basename(p))[0].upper() in n750_set]
 
@@ -149,6 +149,9 @@ def run_swing_ultra750():
     trades = []
     shakeouts_absorbed = 0
     severe_gaps_cut = 0
+    normal_entries = 0
+    modest_gaps_entered = 0
+    extended_gaps_skipped = 0
 
     for path in target_files:
         sym = os.path.splitext(os.path.basename(path))[0].upper()
@@ -242,12 +245,10 @@ def run_swing_ultra750():
                         else:
                             # Shallow gap (<= 2.0%) holding >= 50 EMA
                             if c >= active_stop:
-                                # Reclaimed by close: SHAKEOUT ABSORBED. Position survives!
                                 shakeouts_absorbed += 1
                             else:
-                                # Failed to reclaim by 9:30 AM: Exit executed
                                 exit_triggered = True
-                                exit_p = round(o * 0.988, 2)  # modeled with 9:30 AM failure slippage
+                                exit_p = round(o * 0.988, 2)
                                 exit_reason = "Gap-Down Leeway Failed (9:30 AM)"
 
                     # Standard Intraday SL (if not exited on gap)
@@ -270,7 +271,6 @@ def run_swing_ultra750():
                                     exit_reason = "Daily Close < 20 EMA"
 
                     if exit_triggered:
-                        # Blended PnL (20% @ +1.5R, 80% @ Runner Exit)
                         if hit_milestone:
                             t1_gain = ((t1_target_p - entry_p) / entry_p) * 100.0
                             runner_gain = ((exit_p - entry_p) / entry_p) * 100.0
@@ -340,7 +340,7 @@ def run_swing_ultra750():
                                 c_sl = v_sl
                                 c_setup = "V-REVERSAL"
 
-                # Engine 2: Launchpad Cheat Entry
+                # Engine 2: Launchpad Cheat Entry (Integrated Gap-Up Matrix)
                 if not entry_triggered:
                     for s_len in range(10, 19):
                         s_h = highs[max(0, i - s_len) : i].max()
@@ -361,11 +361,38 @@ def run_swing_ultra750():
 
                             if vdu_ok and cheat_ok and prox_ok and above_10ema:
                                 cheat_e = round(prev_h + 0.05, 2)
+                                # Stop Loss: Empirically anchored to Base Structural Floor (Cheat Low - 0.5%)
                                 cheat_s = round(prev_l * 0.995, 2)
-                                comp_risk = ((cheat_e - cheat_s) / cheat_e) * 100.0
-                                if (h >= cheat_e) and (0.5 <= comp_risk <= 4.5):
+
+                                # -------------------------------------------------------------
+                                # EMPIRICAL GAP-UP ACTION PLAN EVALUATION
+                                # -------------------------------------------------------------
+                                gap_pct = ((o - cheat_e) / cheat_e) * 100.0 if cheat_e > 0 else 0.0
+
+                                # Tier 3: Extended Gap (> +2.0%) -> Disqualified (60% Day-1 Fade Trap)
+                                if gap_pct > 2.0:
+                                    extended_gaps_skipped += 1
+                                    continue
+
+                                # Tier 2: Modest Gap (0.0% < Gap <= +2.0%)
+                                elif gap_pct > 0.0:
+                                    # Requires intraday continuation above open (9:20 AM ORH proxy)
+                                    if h <= o:
+                                        continue
+                                    effective_entry = o
+                                    modest_gaps_entered += 1
+
+                                # Tier 1: Normal Open (Open <= Pivot) -> Standard Intraday Cross
+                                else:
+                                    if h < cheat_e:
+                                        continue
+                                    effective_entry = cheat_e
+                                    normal_entries += 1
+
+                                comp_risk = ((effective_entry - cheat_s) / effective_entry) * 100.0
+                                if 0.5 <= comp_risk <= 4.5:
                                     entry_triggered = True
-                                    c_entry = cheat_e
+                                    c_entry = effective_entry
                                     c_sl = cheat_s
                                     c_setup = "CHEAT BREAKOUT"
                                     break
@@ -422,8 +449,12 @@ def run_swing_ultra750():
     print(f"Expectancy (R/Trade):   +{exp_r:.2f} R")
     print(f"Average Hold:           {df_t['hold_days'].mean():.1f} days")
     print("-" * 85)
+    print("🛡 GAP RISK MANAGEMENT STATS:")
     print(f"• Shakeouts Absorbed (Runners Retained): {shakeouts_absorbed}")
     print(f"• Severe Gaps Cut (Tail Loss Prevented): {severe_gaps_cut}")
+    print(f"• Normal Intraday Entries:               {normal_entries}")
+    print(f"• Modest Gap-Up Entries (<= 2.0%):       {modest_gaps_entered}")
+    print(f"• Extended Gap-Ups Skipped (> 2.0%):     {extended_gaps_skipped} (Fade Traps Avoided)")
     print("=" * 85)
 
     with open(RESULTS_FILE, "w", encoding="utf-8") as fp:
@@ -436,6 +467,9 @@ def run_swing_ultra750():
             "exp_r": round(exp_r, 2),
             "shakeouts_absorbed": shakeouts_absorbed,
             "severe_gaps_cut": severe_gaps_cut,
+            "normal_entries": normal_entries,
+            "modest_gaps_entered": modest_gaps_entered,
+            "extended_gaps_skipped": extended_gaps_skipped,
             "recent_trades": trades[-50:]
         }, fp, indent=2)
     print(f"💾 Results saved to '{RESULTS_FILE}'.")
