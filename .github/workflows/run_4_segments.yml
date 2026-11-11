@@ -1,0 +1,42 @@
+name: Quick 4-Segment Backtest
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: quick-4-segments
+  cancel-in-progress: true
+
+jobs:
+  run-summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy requests
+
+      - name: Run 4-Segment Backtest Engine
+        run: |
+          # Handles case sensitivity on Linux
+          if [ -f "backtest_4_segments.py" ]; then
+            python backtest_4_segments.py
+          elif [ -f "Backtest_4_segments.py" ]; then
+            python Backtest_4_segments.py
+          else
+            echo "Error: backtest_4_segments.py not found in root!"
+            exit 1
+          fi
