@@ -1,23 +1,23 @@
 {
-  "Last_Updated": "2026-11-10 20:47:47 IST",
-  "Total_Sessions_Audited": 14,
-  "Latest_Session_Date": "2026-11-10",
+  "Last_Updated": "2026-11-11 13:42:12 IST",
+  "Total_Sessions_Audited": 15,
+  "Latest_Session_Date": "2026-11-11",
   "Latest_Ground_Truth": [
-    "PVTBANIETF",
     "BANKBEES",
+    "PVTBANIETF",
     "SMLMAH"
   ],
   "Latest_Day_Matrix": [
     {
       "Engine": "Scanner V1 (Live Alerts)",
-      "TP (Caught)": 2,
-      "FN (Missed)": 1,
-      "FP (Fakeouts)": 4,
-      "TN (Quiet)": 3,
-      "TPR (Sensitivity)": "66.7%",
-      "FNR (Miss Rate)": "33.3%",
-      "FPR (Fallout)": "57.1%",
-      "TNR (Specificity)": "42.9%"
+      "TP (Caught)": 0,
+      "FN (Missed)": 3,
+      "FP (Fakeouts)": 0,
+      "TN (Quiet)": 7,
+      "TPR (Sensitivity)": "0.0%",
+      "FNR (Miss Rate)": "100.0%",
+      "FPR (Fallout)": "0.0%",
+      "TNR (Specificity)": "100.0%"
     },
     {
       "Engine": "Scanner V2 (Optimized Silent)",
@@ -34,19 +34,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 5,
-      "Total_FN": 19,
+      "Total_FN": 22,
       "Total_FP": 27,
-      "Total_TN": 107,
-      "Cumulative_TPR": "20.8%",
-      "Cumulative_FNR": "79.2%",
-      "Cumulative_FPR": "20.1%",
-      "Cumulative_TNR": "79.9%"
+      "Total_TN": 114,
+      "Cumulative_TPR": "18.5%",
+      "Cumulative_FNR": "81.5%",
+      "Cumulative_FPR": "19.1%",
+      "Cumulative_TNR": "80.9%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 24,
+      "Total_FN": 27,
       "Total_FP": 0,
-      "Total_TN": 134,
+      "Total_TN": 141,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -428,6 +428,35 @@
         "fnr": 33.3,
         "fpr": 57.1,
         "tnr": 42.9
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-11",
+      "ground_truth_count": 3,
+      "ground_truth_symbols": [
+        "BANKBEES",
+        "PVTBANIETF",
+        "SMLMAH"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
       },
       "v2": {
         "tp": 0,
