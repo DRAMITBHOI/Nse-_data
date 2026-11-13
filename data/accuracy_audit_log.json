@@ -1,10 +1,10 @@
 {
-  "Last_Updated": "2026-11-12 21:07:12 IST",
-  "Total_Sessions_Audited": 16,
-  "Latest_Session_Date": "2026-11-12",
+  "Last_Updated": "2026-11-13 13:39:44 IST",
+  "Total_Sessions_Audited": 17,
+  "Latest_Session_Date": "2026-11-13",
   "Latest_Ground_Truth": [
-    "SMLMAH",
     "BANKBEES",
+    "SMLMAH",
     "PVTBANIETF"
   ],
   "Latest_Day_Matrix": [
@@ -34,19 +34,19 @@
   "Cumulative_Metrics": {
     "Scanner_V1": {
       "Total_TP": 5,
-      "Total_FN": 25,
+      "Total_FN": 28,
       "Total_FP": 27,
-      "Total_TN": 121,
-      "Cumulative_TPR": "16.7%",
-      "Cumulative_FNR": "83.3%",
-      "Cumulative_FPR": "18.2%",
-      "Cumulative_TNR": "81.8%"
+      "Total_TN": 128,
+      "Cumulative_TPR": "15.2%",
+      "Cumulative_FNR": "84.8%",
+      "Cumulative_FPR": "17.4%",
+      "Cumulative_TNR": "82.6%"
     },
     "Scanner_V2": {
       "Total_TP": 0,
-      "Total_FN": 30,
+      "Total_FN": 33,
       "Total_FP": 0,
-      "Total_TN": 148,
+      "Total_TN": 155,
       "Cumulative_TPR": "0.0%",
       "Cumulative_FNR": "100.0%",
       "Cumulative_FPR": "0.0%",
@@ -475,6 +475,35 @@
       "ground_truth_symbols": [
         "SMLMAH",
         "BANKBEES",
+        "PVTBANIETF"
+      ],
+      "v1": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      },
+      "v2": {
+        "tp": 0,
+        "fn": 3,
+        "fp": 0,
+        "tn": 7,
+        "tpr": 0.0,
+        "fnr": 100.0,
+        "fpr": 0.0,
+        "tnr": 100.0
+      }
+    },
+    {
+      "date": "2026-11-13",
+      "ground_truth_count": 3,
+      "ground_truth_symbols": [
+        "BANKBEES",
+        "SMLMAH",
         "PVTBANIETF"
       ],
       "v1": {
