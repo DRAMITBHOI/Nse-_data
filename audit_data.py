@@ -19,19 +19,19 @@ EXCLUDED_FILES = {
 }
 
 def audit_repository():
-    # 1. Check Nifty 750 mapping
     n750_syms = set()
     if os.path.exists(NIFTY750_FILE):
         with open(NIFTY750_FILE, "r", encoding="utf-8") as f:
             d = json.load(f)
-            n750_syms = {str(x).strip().upper() for x in (d.keys() if isinstance(d, dict) else d)}
-    print(f"📋 Nifty 750 symbols loaded: {len(n750_syms)}")
+            items = d.keys() if isinstance(d, dict) else d
+            n750_syms = {str(x).strip().upper() for x in items}
+    print(f"Nifty 750 symbols loaded: {len(n750_syms)}")
 
     json_files = [
         f for f in glob.glob(os.path.join(DATA_DIR, "*.json"))
         if os.path.basename(f) not in EXCLUDED_FILES
     ]
-    print(f"📁 Total symbol JSON files found: {len(json_files)}\n")
+    print(f"Total symbol JSON files found: {len(json_files)}\n")
 
     records = []
     anomalies = []
@@ -48,7 +48,8 @@ def audit_repository():
             df = pd.DataFrame(raw)
             required_cols = {"time", "open", "high", "low", "close", "volume"}
             if not required_cols.issubset(df.columns):
-                anomalies.append((sym, f"Missing columns: {required_cols - set(df.columns)}"))
+                missing = required_cols - set(df.columns)
+                anomalies.append((sym, f"Missing columns: {missing}"))
                 continue
 
             df["date"] = df["time"].astype(str).str[:10]
@@ -59,24 +60,21 @@ def audit_repository():
                 else:
                     df[col] = 0.0
 
-            # Authenticity & Sanity Checks
             n_rows = len(df)
             min_date = df["date"].min()
             max_date = df["date"].max()
-            
-            # Check OHLC logical consistency (High >= max(Open, Close) and Low <= min(Open, Close))
-            ohlc_valid_pct = (
+
+            ohlc_ok = (
                 (df["high"] >= df[["open", "close"]].max(axis=1) - 0.05) &
                 (df["low"] <= df[["open", "close"]].min(axis=1) + 0.05) &
                 (df["close"] > 0)
-            ).mean() * 100
+            )
+            ohlc_valid_pct = ohlc_ok.mean() * 100
 
-            # Check Delivery Data Authenticity (real NSE delivery varies daily, not constant 0 or 50%)
             nonzero_deliv_pct = (df["delivery_vol"] > 0).mean() * 100
-            unique_deliv_ratios = (df["delivery_vol"] / df["volume"].replace(0, np.nan)).dropna().round(4).nunique()
+            ratios = (df["delivery_vol"] / df["volume"].replace(0, np.nan)).dropna()
+            unique_deliv_ratios = ratios.round(4).nunique()
             deliv_exceeds_vol = (df["delivery_vol"] > df["volume"] * 1.001).sum()
-
-            # Check if prices look synthetic (e.g., exact constant returns or zero variance)
             ret_std = df["close"].pct_change().dropna().std()
 
             records.append({
@@ -97,4 +95,26 @@ def audit_repository():
     audit_df = pd.DataFrame(records)
     audit_df.to_csv(os.path.join(DATA_DIR, "repo_data_audit.csv"), index=False)
 
-    min_d = sorted(audit_df["min_date"].dropna())[len(audit_df) // 2] if len(
+    min_list = sorted(audit_df["min_date"].dropna().tolist())
+    max_list = sorted(audit_df["max_date"].dropna().tolist())
+    mid = len(audit_df) // 2
+    min_d = min_list[mid] if min_list else "N/A"
+    max_d = max_list[mid] if max_list else "N/A"
+
+    print("=== REPOSITORY AUTHENTICITY & COVERAGE SUMMARY ===")
+    print(f"Valid parsed symbols:          {len(audit_df)}")
+    print(f"Nifty 750 matched in data/:    {audit_df['is_n750'].sum()} / {len(n750_syms)}")
+    print(f"Median trading days / symbol:  {audit_df['rows'].median():.0f}")
+    print(f"Date span (median min -> max): {min_d} -> {max_d}")
+    print(f"Symbols with >= 1000 rows:     {(audit_df['rows'] >= 1000).sum()}")
+    print(f"Avg OHLC logical validity:     {audit_df['ohlc_valid_%'].mean():.2f}%")
+    print(f"Avg true delivery coverage:    {audit_df['has_deliv_%'].mean():.2f}%")
+    print(f"Suspect flat/synthetic files:  {(audit_df['unique_deliv_ratios'] < 10).sum()}")
+    print(f"Corrupt/Empty files skipped:   {len(anomalies)}")
+
+    if anomalies[:10]:
+        print("\nSample anomalies:", anomalies[:10])
+    print("\nSaved full per-symbol report to data/repo_data_audit.csv")
+
+if __name__ == "__main__":
+    audit_repository()
