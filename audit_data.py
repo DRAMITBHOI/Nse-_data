@@ -97,20 +97,4 @@ def audit_repository():
     audit_df = pd.DataFrame(records)
     audit_df.to_csv(os.path.join(DATA_DIR, "repo_data_audit.csv"), index=False)
 
-    print("=== REPOSITORY AUTHENTICITY & COVERAGE SUMMARY ===")
-    print(f"Valid parsed symbols:          {len(audit_df)}")
-    print(f"Nifty 750 matched in data/:    {audit_df['is_n750'].sum()} / {len(n750_syms)}")
-    print(f"Median trading days / symbol:  {audit_df['rows'].median():.0f}")
-    print(f"Date span (median min -> max): {audit_df['min_date'].median()} -> {audit_df['max_date'].median()}")
-    print(f"Symbols with >= 1000 rows:     {(audit_df['rows'] >= 1000).sum()}")
-    print(f"Avg OHLC logical validity:     {audit_df['ohlc_valid_%'].mean():.2f}%")
-    print(f"Avg true delivery coverage:    {audit_df['has_deliv_%'].mean():.2f}%")
-    print(f"Suspect flat/synthetic files:  {(audit_df['unique_deliv_ratios'] < 10).sum()} (fewer than 10 unique deliv ratios)")
-    print(f"Corrupt/Empty files skipped:   {len(anomalies)}")
-    
-    if anomalies[:10]:
-        print("\nSample anomalies:", anomalies[:10])
-    print("\nSaved full per-symbol report to data/repo_data_audit.csv")
-
-if __name__ == "__main__":
-    audit_repository()
+    min_d = sorted(audit_df["min_date"].dropna())[len(audit_df) // 2] if len(
