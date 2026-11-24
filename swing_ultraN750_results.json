@@ -1,9 +1,9 @@
 {
   "universe": "NON_NIFTY_750",
-  "total_trades": 1695,
-  "win_rate": 31.98,
+  "total_trades": 1696,
+  "win_rate": 31.96,
   "profit_factor": 1.52,
-  "total_r": 505.82,
+  "total_r": 504.82,
   "exp_r": 0.3,
   "shakeouts_absorbed": 188,
   "severe_gaps_cut": 125,
@@ -21,10 +21,10 @@
       "shelf_high": 351.0,
       "shelf_spread_%": 10.03,
       "last_close": 343.57,
-      "last_atr": 20.27,
+      "last_atr": 16.76,
       "risk_%": 3.29,
-      "vdu_ratio": 0.286,
-      "qualify_date": "2026-11-23",
+      "vdu_ratio": 0.374,
+      "qualify_date": "2026-11-24",
       "added_date": "2026-11-24"
     },
     {
@@ -37,28 +37,14 @@
       "shelf_high": 336.05,
       "shelf_spread_%": 15.44,
       "last_close": 330.2,
-      "last_atr": 19.45,
+      "last_atr": 19.11,
       "risk_%": 3.76,
-      "vdu_ratio": 0.262,
-      "qualify_date": "2026-11-23",
+      "vdu_ratio": 0.283,
+      "qualify_date": "2026-11-24",
       "added_date": "2026-11-24"
     }
   ],
   "recent_trades": [
-    {
-      "symbol": "VINDHYATEL",
-      "entry_date": "2024-01-16",
-      "exit_date": "2024-01-17",
-      "setup": "CHEAT BREAKOUT",
-      "conviction": "2.0x",
-      "entry_price": 2400.05,
-      "exit_price": 2348.65,
-      "gain_pct": -2.14,
-      "r_mult": -1.0,
-      "exit_reason": "Hard SL Hit",
-      "hold_days": 1,
-      "hit_milestone": false
-    },
     {
       "symbol": "VIPIND",
       "entry_date": "2021-10-04",
@@ -268,6 +254,20 @@
       "exit_reason": "Daily Close < 20 EMA",
       "hold_days": 19,
       "hit_milestone": true
+    },
+    {
+      "symbol": "VRLLOG",
+      "entry_date": "2026-11-23",
+      "exit_date": "2026-11-24",
+      "setup": "CHEAT BREAKOUT",
+      "conviction": "2.0x",
+      "entry_price": 345.0,
+      "exit_price": 334.92,
+      "gain_pct": -2.92,
+      "r_mult": -1.0,
+      "exit_reason": "Hard SL Hit",
+      "hold_days": 1,
+      "hit_milestone": false
     },
     {
       "symbol": "VSSL",
