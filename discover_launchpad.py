@@ -12,7 +12,7 @@ H25, H60 = 25, 60
 EXCLUDED = {"nifty750.json", "nifty50.json", "nifty.json",
             "fundamentals.json", "accuracy_audit_log.json"}
 BAD_TOKENS = ("report", "results", "scanner", "watchlist", "leaderboard",
-              "sweep", "audit", "backtest", "champion", "history", "nifty")
+              "sweep", "audit", "backtest", "champion", "history", "nifty", "nsei")
 
 
 def is_non_stock_file(name):
@@ -107,7 +107,6 @@ def clean_stock(raw, sym, exclusions, duplicates, splits, audit):
         exclusions.append((sym, "insufficient_rows_<260", len(rows)))
         return None
 
-    # Corporate-action heuristic; inspect audit output manually.
     multipliers = [2., 3., 4., 5., 10.]
     for i in range(len(rows)-1, 0, -1):
         prev_c, curr_o = rows[i-1]["close"], rows[i]["open"]
@@ -186,19 +185,38 @@ def add_indicators(df):
 
 
 def load_nifty():
-    for fname in sorted(os.listdir(DATA_DIR)):
-        if fname.lower() in {"nifty.json", "nifty50.json"}:
-            p = os.path.join(DATA_DIR, fname)
+    candidates = [
+        f for f in sorted(os.listdir(DATA_DIR))
+        if f.lower().endswith(".json")
+        and f.lower() != "nifty750.json"
+        and ("nifty" in f.lower() or "nsei" in f.lower())
+    ]
+    # Prefer exact nifty.json / nifty50.json first if present
+    candidates.sort(key=lambda x: (0 if x.lower() in {"nifty.json", "nifty50.json", "nifty_50.json", "nifty 50.json"} else 1, x.lower()))
+
+    for fname in candidates:
+        p = os.path.join(DATA_DIR, fname)
+        try:
             with open(p, encoding="utf-8") as f:
                 raw = json.load(f)
             if isinstance(raw, dict):
-                raw = raw.get("data") or raw.get("candles") or []
+                for key in ("data", "candles", "records", "history", "ohlc"):
+                    if isinstance(raw.get(key), list):
+                        raw = raw[key]
+                        break
+            if not isinstance(raw, list):
+                continue
             dm = {}
             for r in raw:
-                if isinstance(r, dict) and r.get("time"):
-                    c = number(r.get("close"))
-                    if np.isfinite(c) and c > 0:
-                        dm[str(r["time"])[:10]] = c
+                if isinstance(r, dict):
+                    t_val = r.get("time") or r.get("date") or r.get("timestamp")
+                    c_val = number(r.get("close") if "close" in r else r.get("Close"))
+                    if t_val and np.isfinite(c_val) and c_val > 0:
+                        dm[str(t_val)[:10]] = c_val
+                elif isinstance(r, (list, tuple)) and len(r) >= 5:
+                    c_val = number(r[4])
+                    if r[0] and np.isfinite(c_val) and c_val > 0:
+                        dm[str(r[0])[:10]] = c_val
             if len(dm) >= 200:
                 s = pd.Series(dm).sort_index()
                 perf = s.pct_change(60)
@@ -206,7 +224,12 @@ def load_nifty():
                 valid = perf.notna() & sma.notna()
                 print(f"Loaded Nifty benchmark from {fname}: {len(dm)} days ({s.index.min()} -> {s.index.max()}).")
                 return perf[valid].to_dict(), (s[valid] >= sma[valid]).astype(int).to_dict()
-    raise RuntimeError("Nifty benchmark requires >=200 valid daily observations.")
+        except Exception:
+            continue
+
+    raise RuntimeError(
+        f"Nifty benchmark requires >=200 valid daily observations. Candidate files checked in {DATA_DIR}/: {candidates}"
+    )
 
 
 def benchmark_on_date(date, perf, regime, dates):
@@ -299,7 +322,6 @@ def run_discovery():
     stocks={}
     turnover,breadth_all,breadth_n750=[],[],[]
 
-    # Pass 1: clean and calculate indicators.
     for path in files:
         sym=os.path.splitext(os.path.basename(path))[0].upper()
         try:
@@ -352,7 +374,6 @@ def run_discovery():
         h252,absorb=[arr[x] for x in ("high_252","daily_absorption")]
         dobv,dobvmax,obvcov=[arr[x] for x in ("deliv_obv","dobv_20max","obv_cov_21d")]
 
-        # 252-bar warm-up; reserve next-day entry plus 25 forward sessions.
         for i in range(252,len(df)-26):
             d=date[i]
             if d<START_DATE: continue
@@ -375,7 +396,6 @@ def run_discovery():
             surge=dv[i]/ds[i]; vsurge=vol[i]/vs[i]
             rs=p60[i]-nr; normrs=rs/(atr14[i]/cl[i])
             c1=surge*max(.1,p60[i]/nr) if nr>0 else np.nan
-            # Preserve the historical baseline fallback when Nifty 60d return <= 0.
             orig_score=surge*max(.1,p60[i]/nr if nr>0 else 1.0+abs(p60[i]))
             c2=surge*max(.1,1+rs); c2u=surge*(1+rs)
             vdu3=np.min(vol[i-3:i])/vs[i]; vdu5=np.min(vol[i-5:i])/vs[i]
@@ -383,7 +403,6 @@ def run_discovery():
             dist52=cl[i]/h252[i] if np.isfinite(h252[i]) and h252[i]>0 else np.nan
             event=f"{sym}_{d}"
 
-            # Faithful baseline shelf selection: first width-qualified 10-18 day shelf.
             original=None; maxwidth=.08 if curr750 else .13
             for n in range(10,19):
                 sh,sl=np.max(hi[i-n:i]),np.min(lo[i-n:i])
@@ -430,7 +449,6 @@ def run_discovery():
                 baseabs=np.nanmean(aw) if acov>=MIN_DELIV_COVERAGE else np.nan
                 c3=surge*np.sqrt(min(skew,5))*max(.1,1+normrs/10) if np.isfinite(skew) else np.nan
 
-                # B/C entries: exact fill on signal day i; exit evaluation begins i+1.
                 cheat=int((hi[i-1]-lo[i-1] <= .75*atr14[i]) and
                           (hi[i-1]>=sl+.65*(pivot-sl)) and (hi[i-1]<pivot))
                 b=("NO_CHEAT",0.,np.nan,0.,0.,"NO_CHEAT",np.nan)
@@ -478,7 +496,6 @@ def run_discovery():
         summary("Original baseline IS",base[base.is_oos==0],"outcome_25d","realized_r","mfe_r")
         summary("Original baseline OOS",base[base.is_oos==1],"outcome_25d","realized_r","mfe_r")
 
-    # Univariate bands: derive on IS only, validate on OOS. No fallback "optimal" band.
     features=["base_len","spread_pct","spread_atr","atr_contraction","vdu_3d_ratio","vdu_5d_ratio",
         "deliv_skew","base_absorption","prior_30d_pct","dist_52w_high","norm_rs",
         "conv_c1_original","conv_c2_floored","conv_c2_unfloored","conv_c3_orthogonal",
@@ -540,7 +557,6 @@ def run_discovery():
             except Exception as e:
                 print(f"{f}: band error: {e}")
 
-    # Shelf duration distribution: rows are correlated variants, not independent trades.
     res["duration_bucket"]=pd.cut(res.base_len,[6,9,13,18,25],
         labels=["7-9d","10-13d","14-18d","19-25d"])
     print("\n=== DURATION BUCKETS (SHELF VARIANTS; NOT INDEPENDENT EVENTS) ===")
