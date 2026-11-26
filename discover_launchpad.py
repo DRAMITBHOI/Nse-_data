@@ -191,7 +191,6 @@ def load_nifty():
         and f.lower() != "nifty750.json"
         and ("nifty" in f.lower() or "nsei" in f.lower())
     ]
-    # Prefer exact nifty.json / nifty50.json first if present
     candidates.sort(key=lambda x: (0 if x.lower() in {"nifty.json", "nifty50.json", "nifty_50.json", "nifty 50.json"} else 1, x.lower()))
 
     for fname in candidates:
@@ -483,9 +482,10 @@ def run_discovery():
 
     res=pd.DataFrame(events); base=pd.DataFrame(baseline)
     if res.empty: raise RuntimeError("No discovery events found; inspect inputs and filters.")
-    res.to_csv(os.path.join(DATA_DIR,"launchpad_discovery_corrected.csv"),index=False)
+    res.to_csv(os.path.join(DATA_DIR,"launchpad_discovery_corrected.csv.gz"),index=False,compression="gzip")
+    res[res.is_shortest_shelf==1].to_csv(os.path.join(DATA_DIR,"launchpad_shortest_shelf.csv"),index=False)
     base.to_csv(os.path.join(DATA_DIR,"launchpad_original_baseline_corrected.csv"),index=False)
-    print(f"Saved {len(res)} shelf rows / {res.event_id.nunique()} unique breakouts.")
+    print(f"Saved {len(res)} shelf rows / {res.event_id.nunique()} unique breakouts (compressed .csv.gz + shortest_shelf.csv).")
     print(f"Saved {len(base)} original-baseline events.")
     exp=res[res.is_shortest_shelf==1].copy()
     summary("A1 shortest shelf ALL",exp,"outcome_a_25d","realized_r_a","mfe_r_a")
