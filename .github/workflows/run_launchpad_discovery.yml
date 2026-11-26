@@ -27,6 +27,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/launchpad_discovery_corrected.csv data/launchpad_original_baseline_corrected.csv data/audit_exclusions.csv data/audit_corporate_actions.csv data/audit_duplicate_dates.csv
+          git add data/launchpad_discovery_corrected.csv.gz data/launchpad_shortest_shelf.csv data/launchpad_original_baseline_corrected.csv data/audit_exclusions.csv data/audit_corporate_actions.csv data/audit_duplicate_dates.csv
           git commit -m "Add Launchpad discovery and audit datasets" || exit 0
           git push
