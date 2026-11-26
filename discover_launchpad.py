@@ -1,4 +1,3 @@
-
 import os, glob, json
 from datetime import datetime
 import numpy as np
@@ -187,21 +186,26 @@ def add_indicators(df):
 
 
 def load_nifty():
-    for name in ("nifty.json","nifty50.json"):
-        p=os.path.join(DATA_DIR,name)
-        if not os.path.exists(p): continue
-        with open(p,encoding="utf-8") as f: raw=json.load(f)
-        dm={}
-        for r in raw:
-            if isinstance(r,dict) and r.get("time"):
-                c=number(r.get("close"))
-                if np.isfinite(c) and c>0: dm[str(r["time"])[:10]]=c
-        if len(dm)>=200:
-            s=pd.Series(dm).sort_index()
-            perf=s.pct_change(60)
-            sma=s.rolling(50,min_periods=50).mean()
-            valid=perf.notna() & sma.notna()
-            return perf[valid].to_dict(),(s[valid]>=sma[valid]).astype(int).to_dict()
+    for fname in sorted(os.listdir(DATA_DIR)):
+        if fname.lower() in {"nifty.json", "nifty50.json"}:
+            p = os.path.join(DATA_DIR, fname)
+            with open(p, encoding="utf-8") as f:
+                raw = json.load(f)
+            if isinstance(raw, dict):
+                raw = raw.get("data") or raw.get("candles") or []
+            dm = {}
+            for r in raw:
+                if isinstance(r, dict) and r.get("time"):
+                    c = number(r.get("close"))
+                    if np.isfinite(c) and c > 0:
+                        dm[str(r["time"])[:10]] = c
+            if len(dm) >= 200:
+                s = pd.Series(dm).sort_index()
+                perf = s.pct_change(60)
+                sma = s.rolling(50, min_periods=50).mean()
+                valid = perf.notna() & sma.notna()
+                print(f"Loaded Nifty benchmark from {fname}: {len(dm)} days ({s.index.min()} -> {s.index.max()}).")
+                return perf[valid].to_dict(), (s[valid] >= sma[valid]).astype(int).to_dict()
     raise RuntimeError("Nifty benchmark requires >=200 valid daily observations.")
 
 
